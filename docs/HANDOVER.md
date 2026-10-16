@@ -306,7 +306,19 @@ Answer: barely. Cautious players do a bit better, but guarding isn't used much m
 
 ### Found
 
-1. **Rations created from nothing.** When a caught thief can't pay, the thief pays only what they have (down to 0), but the guard still receives the full `guard_reward`. Same when someone is robbed and caught the same night. 19 cases in 3 games. Present in every balance result so far, so guarding is slightly flattered. Needs a rule decision, then rerun the tables.
+1. **Rations created from nothing (fixed on branch `fix/ledger-conservation`).** A caught thief who couldn't pay was capped at what they held, but the guard was still credited the full `guard_reward`; same when someone was robbed and caught the same night. Under v2 it created food in 261 of 300 games (about 4.7 rations a game). Fix: every ration move is one transfer of what the payer actually has (`move()` in `play_night`), caught thieves settle first, thefts take from a snapshot after that, and only scavenging creates food. `check_invariants.py` now enforces conservation (it failed on the old engine, passes now). All results in `sim/results/` were regenerated. What changed under v2 (300 games):
+
+   | Measure | Before fix | After fix |
+   | --- | --- | --- |
+   | Alive at the end | 10.9 | 10.6 |
+   | Lone always-stealer, wins vs fair | 1.04× | **1.20×** |
+   | Lone always-guard | 0.10× | 0.05× |
+   | Lone turtle | 0.33× | 0.27× |
+   | Opportunist personality | 1.34× | 1.22× |
+   | Shark personality | 1.43× | 1.44× |
+   | Learning players: sharks' win share (7% of office) | 20% | 20% |
+
+   The v2 claim "no all-in strategy beats mixing it up" no longer holds: stealing every night now wins 1.2× a fair share. With 1-ration steals (`v2+steal_1`) it drops to 0.1×.
 2. **Double bounty.** Two investigators watching the same thief both get paid (seed 30, night 4).
 3. **Leader after night 5** takes a seat 77% of the time but wins only 21% (random 7%), because secret goals carry points. Use this as the gate for random events: an event that pushes it up is rejected.
 4. **Public guess vs truth.** From #news alone, the guess of someone's rations is exact only 15–34% of nights; off by 3+ on 12–21%.
