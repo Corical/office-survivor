@@ -1,0 +1,442 @@
+<title>Survivors Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-width engineering sheet. Verdict, legend, three diagrams, then reference tables. */
+:root {
+  --bg: #f1f2ec; --panel: #ffffff; --panel2: #e7e9e0;
+  --ink: #1c2019; --ink2: #575d52; --line: #c4c8ba;
+  --accent: #4b5a1c;
+  --built: #2d7a37; --planned: #575d52; --prop: #a8620a; --open: #8b9086;
+  --a-scav: #3a8a35; --a-steal: #c0392b; --a-guard: #2a66a8; --a-inv: #b88000; --a-gift: #7646b0;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131611; --panel: #1b1f18; --panel2: #23281f;
+  --ink: #e5e8de; --ink2: #a2a899; --line: #3b4136;
+  --accent: #bccb7c;
+  --built: #6cc070; --planned: #a2a899; --prop: #e3a347; --open: #7d8378;
+  --a-scav: #6cc067; --a-steal: #ef6b5d; --a-guard: #6aa5e8; --a-inv: #e3b33f; --a-gift: #b08ae6;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #131611; --panel: #1b1f18; --panel2: #23281f;
+  --ink: #e5e8de; --ink2: #a2a899; --line: #3b4136;
+  --accent: #bccb7c;
+  --built: #6cc070; --planned: #a2a899; --prop: #e3a347; --open: #7d8378;
+  --a-scav: #6cc067; --a-steal: #ef6b5d; --a-guard: #6aa5e8; --a-inv: #e3b33f; --a-gift: #b08ae6;
+  color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+main { max-width: none; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; display: grid; gap: 40px; }
+h1, h2 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 4vw, 46px); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 22px; font-weight: 600; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.verdict { font-size: 18px; margin: 10px 0 0; }
+section { display: grid; gap: 14px; min-width: 0; }
+section > p { margin: 0; color: var(--ink2); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 13px; color: var(--ink2); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 26px; height: 16px; border-radius: 3px; background: var(--panel); display: inline-block; }
+.sw.built { border: 2px solid var(--built); }
+.sw.planned { border: 1.5px solid var(--planned); }
+.sw.prop { border: 2px dashed var(--prop); }
+.sw.open { border: 2px dotted var(--open); }
+.sw.ext { border: 1.5px dashed var(--line); background: var(--panel2); }
+.sw.hinge { border: 3px solid var(--built); }
+figure { margin: 0; display: grid; gap: 10px; min-width: 0; }
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.scroll svg { display: block; width: 100%; height: auto; min-width: 980px; }
+figcaption { font-size: 14px; color: var(--ink2); }
+
+/* SVG parts (page CSS, so they follow the theme) */
+.b { fill: var(--panel); stroke: var(--planned); stroke-width: 1.2; }
+.b.built { stroke: var(--built); stroke-width: 2; }
+.b.hinge { stroke: var(--built); stroke-width: 3.2; }
+.b.prop { stroke: var(--prop); stroke-width: 2; stroke-dasharray: 7 4; }
+.b.open { stroke: var(--open); stroke-width: 2; stroke-dasharray: 2 4; }
+.b.ext { fill: var(--panel2); stroke: var(--line); stroke-dasharray: 5 4; }
+.ctr { fill: none; stroke: var(--line); stroke-width: 1.4; }
+.ctr.fill { fill: var(--bg); }
+.t { fill: var(--ink); font: 600 13px var(--f-body); }
+.tm { fill: var(--ink); font: 500 13px var(--f-mono); }
+.s { fill: var(--ink2); font: 400 11.5px var(--f-body); }
+.lbl { fill: var(--ink2); font: 500 11px var(--f-mono); }
+.cap { fill: var(--accent); font: 500 12px var(--f-mono); letter-spacing: 0.06em; }
+.ar { stroke: var(--ink2); stroke-width: 1.4; fill: none; }
+.ar.dash { stroke-dasharray: 6 4; }
+.ah { fill: var(--ink2); }
+.st-scav { fill: var(--a-scav); } .st-steal { fill: var(--a-steal); } .st-guard { fill: var(--a-guard); }
+.st-inv { fill: var(--a-inv); } .st-gift { fill: var(--a-gift); } .st-none { fill: var(--line); }
+.flag { fill: var(--prop); font: 500 11px var(--f-mono); }
+
+/* Tables */
+.tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+th { font-family: var(--f-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink2); background: var(--panel2); }
+td.prose { white-space: normal; min-width: 320px; }
+tr:last-child td { border-bottom: none; }
+code, .mono { font-family: var(--f-mono); font-size: 13px; }
+.pill { display: inline-block; font-family: var(--f-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 99px; border: 1.5px solid; }
+.pill.built { color: var(--built); border-color: var(--built); }
+.pill.planned { color: var(--planned); border-color: var(--planned); }
+.pill.prop { color: var(--prop); border-color: var(--prop); border-style: dashed; }
+.pill.open { color: var(--open); border-color: var(--open); border-style: dotted; }
+pre { margin: 0; font-family: var(--f-mono); font-size: 13px; line-height: 1.6; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; }
+.two > * { min-width: 0; }
+@media (max-width: 480px) { .two { grid-template-columns: 1fr; } }
+</style>
+
+<main>
+<header>
+  <div class="eyebrow">Survivors · office survival game · target architecture</div>
+  <h1>Survivors architecture</h1>
+  <p class="verdict">Nothing of the bot is built yet. The design: one Discord bot on your Pi, one game engine that the bot and the simulator both use, and one log file that records everything and can replay the season.</p>
+</header>
+
+<section>
+  <div class="legend" aria-label="Legend">
+    <span><i class="sw built"></i>Exists today</span>
+    <span><i class="sw hinge"></i>Exists, and everything depends on it</span>
+    <span><i class="sw planned"></i>Planned in the handover, not built</span>
+    <span><i class="sw prop"></i>My addition to the plan</span>
+    <span><i class="sw open"></i>Not decided yet</span>
+    <span><i class="sw ext"></i>Outside the project (Discord, your other bot)</span>
+  </div>
+</section>
+
+<section>
+  <h2>Where everything runs</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1400 800" role="img" aria-label="Players use Discord. Discord talks to one bot service on the Raspberry Pi, which holds the engine, scheduler, logger and storage. The season log is copied to the laptop after the reveal for the replay and recap animation.">
+      <defs>
+        <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <!-- Players -->
+      <rect class="b ext" x="20" y="260" width="180" height="110" rx="6"/>
+      <text class="t" x="32" y="286">Players</text>
+      <text class="s" x="32" y="306">about 15 colleagues</text>
+      <text class="s" x="32" y="324">Discord on phone or PC</text>
+      <text class="s" x="32" y="342">each under a secret alias</text>
+
+      <!-- Discord -->
+      <rect class="ctr fill" x="300" y="40" width="300" height="560" rx="10"/>
+      <text class="cap" x="320" y="66">DISCORD · CLOUD</text>
+      <rect class="b ext" x="320" y="86" width="260" height="56" rx="5"/>
+      <text class="t" x="332" y="110">Slash commands</text><text class="s" x="332" y="128">replies only you can see</text>
+      <rect class="b ext" x="320" y="158" width="260" height="56" rx="5"/>
+      <text class="tm" x="332" y="182">#news</text><text class="s" x="332" y="200">one bot post a day, 07:30</text>
+      <rect class="b ext" x="320" y="230" width="260" height="56" rx="5"/>
+      <text class="tm" x="332" y="254">#radio</text><text class="s" x="332" y="272">anonymous posts, by alias</text>
+      <rect class="b ext" x="320" y="302" width="260" height="56" rx="5"/>
+      <text class="t" x="332" y="326">Private DMs</text><text class="s" x="332" y="344">your alias, investigation results</text>
+      <rect class="b ext" x="320" y="374" width="260" height="56" rx="5"/>
+      <text class="tm" x="332" y="398">#town-square</text><text class="s" x="332" y="416">normal chat; the bot ignores it</text>
+      <text class="s" x="320" y="470">The bot only reads slash commands.</text>
+      <text class="s" x="320" y="488">It never reads chat, or private</text>
+      <text class="s" x="320" y="506">messages between players.</text>
+
+
+      <!-- Pi -->
+      <rect class="ctr fill" x="660" y="40" width="720" height="560" rx="10"/>
+      <text class="cap" x="680" y="66">RASPBERRY PI · ALWAYS ON, AT HOME</text>
+      <rect class="b ext" x="680" y="80" width="330" height="40" rx="5"/>
+      <text class="s" x="692" y="105">Your existing bot: own service and token, untouched</text>
+      <text class="s" x="1030" y="105">The Pi connects out to Discord; no ports open at home.</text>
+
+      <rect class="ctr" x="680" y="136" width="680" height="444" rx="8"/>
+      <text class="cap" x="700" y="162">SURVIVORS-BOT.SERVICE · SYSTEMD · OWN DISCORD APP AND TOKEN</text>
+
+      <rect class="b" x="700" y="184" width="190" height="56" rx="5"/>
+      <text class="t" x="712" y="208">Discord adapter</text><text class="s" x="712" y="226">discord.py, slash commands</text>
+      <rect class="b" x="920" y="184" width="200" height="56" rx="5"/>
+      <text class="t" x="932" y="208">Command handlers</text><text class="s" x="932" y="226">/join … /quit, alias lookup</text>
+      <rect class="b" x="1150" y="184" width="190" height="56" rx="5"/>
+      <text class="t" x="1162" y="208">Scheduler</text><text class="s" x="1162" y="226">weekdays, Africa/Johannesburg</text>
+
+      <rect class="b built" x="700" y="284" width="190" height="64" rx="5"/>
+      <text class="tm" x="712" y="308">game.json</text><text class="s" x="712" y="326">every rule number</text><text class="s" x="712" y="342">same file the simulator reads</text>
+      <rect class="b hinge" x="920" y="284" width="420" height="64" rx="5"/>
+      <text class="t" x="934" y="308">Game engine (shared)</text>
+      <text class="s" x="934" y="326">resolves one night in a fixed order, with seeded random rolls</text>
+      <text class="s" x="934" y="342">exists today inside the simulator; to be pulled out into its own module</text>
+
+      <rect class="b" x="700" y="392" width="640" height="52" rx="5"/>
+      <text class="t" x="712" y="414">Event logger</text>
+      <text class="s" x="712" y="432">numbers and timestamps every event, then appends it. Nothing is ever edited or deleted.</text>
+
+      <rect class="b" x="700" y="488" width="150" height="64" rx="5"/>
+      <text class="t" x="712" y="512">Alias vault</text><text class="s" x="712" y="530">alias ↔ Discord id</text><text class="s" x="712" y="546">kept out of the log</text>
+      <rect class="b" x="870" y="488" width="170" height="64" rx="5"/>
+      <text class="tm" x="882" y="512">season.jsonl</text><text class="s" x="882" y="530">the record of truth</text><text class="s" x="882" y="546">format already defined</text>
+      <rect class="b" x="1060" y="488" width="130" height="64" rx="5"/>
+      <text class="t" x="1072" y="512">Nightly check</text><text class="s" x="1072" y="530">replay.py --check</text><text class="s" x="1072" y="546">rebuilds every ration</text>
+      <rect class="b" x="1210" y="488" width="130" height="64" rx="5"/>
+      <text class="tm" x="1222" y="512">game.db</text><text class="s" x="1222" y="530">SQLite</text><text class="s" x="1222" y="546">current state</text>
+
+      <line class="ar" x1="890" y1="212" x2="918" y2="212" marker-end="url(#ar1)"/>
+      <line class="ar" x1="1020" y1="240" x2="1020" y2="282" marker-end="url(#ar1)"/>
+      <text class="lbl" x="1028" y="266">legal?</text>
+      <line class="ar" x1="1245" y1="240" x2="1245" y2="282" marker-end="url(#ar1)"/>
+      <text class="lbl" x="1253" y="258">lock 23:59</text>
+      <text class="lbl" x="1253" y="274">run 07:30</text>
+      <line class="ar" x1="890" y1="316" x2="918" y2="316" marker-end="url(#ar1)"/>
+      <path class="ar" d="M940,284 V262 H795 V242" marker-end="url(#ar1)"/>
+      <text class="lbl" x="868" y="257" text-anchor="middle">posts news, DMs</text>
+      <line class="ar" x1="1130" y1="348" x2="1130" y2="390" marker-end="url(#ar1)"/>
+      <text class="lbl" x="1138" y="374">every event</text>
+      <line class="ar" x1="955" y1="444" x2="955" y2="486" marker-end="url(#ar1)"/>
+      <text class="lbl" x="963" y="470">append</text>
+      <line class="ar" x1="1275" y1="444" x2="1275" y2="486" marker-end="url(#ar1)"/>
+      <text class="lbl" x="1283" y="470">update</text>
+      <line class="ar" x1="1040" y1="520" x2="1058" y2="520" marker-end="url(#ar1)"/>
+
+
+      <!-- Laptop -->
+      <rect class="ctr fill" x="20" y="640" width="1360" height="140" rx="10"/>
+      <text class="cap" x="40" y="666">YOUR LAPTOP OR CLAUDE WORKSPACE · DEVELOPMENT, AND AFTER THE SEASON</text>
+      <rect class="b built" x="40" y="688" width="230" height="64" rx="5"/>
+      <text class="t" x="52" y="712">Simulator</text><text class="s" x="52" y="730">balance tests, smart players</text>
+      <rect class="b" x="290" y="688" width="230" height="64" rx="5"/>
+      <text class="t" x="302" y="712">Same game engine</text><text class="s" x="302" y="730">imported, never copied</text>
+      <rect class="b built" x="540" y="688" width="230" height="64" rx="5"/>
+      <text class="tm" x="552" y="712">replay.py</text><text class="s" x="552" y="730">rebuilds and tells any game</text>
+      <rect class="b" x="790" y="688" width="230" height="64" rx="5"/>
+      <text class="t" x="802" y="712">Recap animation</text><text class="s" x="802" y="730">built from replay --frames</text>
+      <rect class="b built" x="1040" y="688" width="320" height="64" rx="5"/>
+      <text class="t" x="1052" y="712">Explainer video kit</text><text class="s" x="1052" y="730">build.py writes specs; Craft apps draw them</text>
+      <line class="ar" x1="270" y1="720" x2="288" y2="720" marker-end="url(#ar1)"/>
+      <line class="ar" x1="770" y1="720" x2="788" y2="720" marker-end="url(#ar1)"/>
+
+      <!-- Cross-container arrows, drawn last so no box covers them -->
+      <line class="ar" x1="200" y1="300" x2="298" y2="300" marker-end="url(#ar1)"/>
+      <text class="lbl" x="250" y="292" text-anchor="middle">commands</text>
+      <line class="ar" x1="300" y1="336" x2="202" y2="336" marker-end="url(#ar1)"/>
+      <text class="lbl" x="250" y="354" text-anchor="middle">news, DMs</text>
+      <line class="ar" x1="602" y1="212" x2="698" y2="212" marker-start="url(#ar1)" marker-end="url(#ar1)"/>
+      <text class="lbl" x="631" y="204" text-anchor="middle">gateway</text>
+      <path class="ar dash" d="M955,552 V620 H655 V686" marker-end="url(#ar1)"/>
+      <text class="lbl" x="805" y="614" text-anchor="middle">copied off the Pi after the reveal</text>
+    </svg>
+    </div>
+    <figcaption>Players only ever touch Discord. One bot service on the Pi does everything else. The engine (thick border) is the one piece that exists today: it's inside the simulator and has to be pulled out so the bot and the simulator run the same rules. The season log stays on the Pi until the reveal, then gets copied off for the replay and the recap animation.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>One game day</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1400 270" role="img" aria-label="During the day players pick and change one secret move. At 23:59 moves lock and no-shows scavenge. At 07:30 the engine resolves the night in nine steps and posts #news.">
+      <defs>
+        <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <text class="cap" x="20" y="40">DURING THE DAY</text>
+      <text class="cap" x="480" y="40">23:59</text>
+      <text class="cap" x="620" y="40">07:30 · RESOLVED IN THIS ORDER</text>
+
+      <rect class="b" x="20" y="60" width="440" height="40" rx="5"/><text class="s" x="34" y="85">Pick one secret move: /scavenge /steal /guard /investigate /gift</text>
+      <rect class="b" x="20" y="110" width="440" height="40" rx="5"/><text class="s" x="34" y="135">Change your mind as often as you like; the last one counts</text>
+      <rect class="b" x="20" y="160" width="440" height="40" rx="5"/><text class="s" x="34" y="185">Post one anonymous message with /radio</text>
+      <rect class="b" x="20" y="210" width="440" height="40" rx="5"/><text class="s" x="34" y="235">/status shows your own rations, only to you</text>
+
+      <rect class="b" x="480" y="60" width="120" height="190" rx="5"/>
+      <text class="t" x="492" y="86">Lock</text>
+      <text class="s" x="492" y="108">moves frozen</text>
+      <text class="s" x="492" y="134">no move?</text>
+      <text class="s" x="492" y="150">you scavenge</text>
+      <text class="s" x="492" y="176">the night's</text>
+      <text class="s" x="492" y="192">random seed</text>
+      <text class="s" x="492" y="208">is saved</text>
+
+      <line class="ar" x1="460" y1="155" x2="478" y2="155" marker-end="url(#ar2)"/>
+      <line class="ar" x1="600" y1="155" x2="618" y2="155" marker-end="url(#ar2)"/>
+
+      <!-- row 1 -->
+      <rect class="b" x="620" y="60" width="140" height="64" rx="5"/><rect class="st-guard" x="620" y="60" width="6" height="64"/>
+      <text class="t" x="636" y="86">1 · Guards go up</text><text class="s" x="636" y="106">2 nights each, max 3</text>
+      <rect class="b" x="772" y="60" width="140" height="64" rx="5"/><rect class="st-guard" x="772" y="60" width="6" height="64"/>
+      <text class="t" x="788" y="86">2 · Guard catches</text><text class="s" x="788" y="106">thief named, pays 2</text>
+      <rect class="b" x="924" y="60" width="140" height="64" rx="5"/><rect class="st-steal" x="924" y="60" width="6" height="64"/>
+      <text class="t" x="940" y="86">3 · Other steals</text><text class="s" x="940" y="106">take 2, shared out</text>
+      <rect class="b" x="1076" y="60" width="140" height="64" rx="5"/><rect class="st-scav" x="1076" y="60" width="6" height="64"/>
+      <text class="t" x="1092" y="86">4 · Scavenge</text><text class="s" x="1092" y="106">find 0–2</text>
+      <rect class="b" x="1228" y="60" width="140" height="64" rx="5"/><rect class="st-gift" x="1228" y="60" width="6" height="64"/>
+      <text class="t" x="1244" y="86">5 · Gifts</text><text class="s" x="1244" y="106">giver to receiver</text>
+      <line class="ar" x1="760" y1="92" x2="771" y2="92" marker-end="url(#ar2)"/>
+      <line class="ar" x1="912" y1="92" x2="923" y2="92" marker-end="url(#ar2)"/>
+      <line class="ar" x1="1064" y1="92" x2="1075" y2="92" marker-end="url(#ar2)"/>
+      <line class="ar" x1="1216" y1="92" x2="1227" y2="92" marker-end="url(#ar2)"/>
+      <path class="ar" d="M1298,124 V142 H690 V158" marker-end="url(#ar2)"/>
+
+      <!-- row 2 -->
+      <rect class="b open" x="620" y="160" width="140" height="64" rx="5"/><rect class="st-inv" x="620" y="160" width="6" height="64"/>
+      <text class="t" x="636" y="186">6 · Investigations</text><text class="s" x="636" y="206">DM, expose, bounty 1</text>
+      <rect class="b" x="772" y="160" width="140" height="64" rx="5"/><rect class="st-none" x="772" y="160" width="6" height="64"/>
+      <text class="t" x="788" y="186">7 · Everyone eats</text><text class="s" x="788" y="206">1 each, not bandits</text>
+      <rect class="b" x="924" y="160" width="140" height="64" rx="5"/><rect class="st-none" x="924" y="160" width="6" height="64"/>
+      <text class="t" x="940" y="186">8 · Bandit check</text><text class="s" x="940" y="206">0 → bandit, 3 → back</text>
+      <rect class="b" x="1076" y="160" width="140" height="64" rx="5"/><rect class="st-none" x="1076" y="160" width="6" height="64"/>
+      <text class="t" x="1092" y="186">9 · #news posts</text><text class="s" x="1092" y="206">then the log check</text>
+      <line class="ar" x1="760" y1="192" x2="771" y2="192" marker-end="url(#ar2)"/>
+      <line class="ar" x1="912" y1="192" x2="923" y2="192" marker-end="url(#ar2)"/>
+      <line class="ar" x1="1064" y1="192" x2="1075" y2="192" marker-end="url(#ar2)"/>
+      <text class="flag" x="620" y="246">Not decided: the rules doc puts step 6 after eating; the simulator runs it before.</text>
+    </svg>
+    </div>
+    <figcaption>This is the order the simulator runs today. The coloured stripes are the action colours from the video style guide. Weekdays only, 10 rounds, Africa/Johannesburg time. The dotted border marks the one step whose position is still undecided.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>How everything gets logged</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1400 320" role="img" aria-label="Five kinds of events go through one logger into one append-only season log. Current state, the nightly check, the recap and retention all come from that log. The alias vault is deliberately not connected.">
+      <defs>
+        <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <text class="cap" x="20" y="20">WHAT GETS LOGGED</text>
+      <rect class="b" x="20" y="30" width="260" height="44" rx="5"/><text class="s" x="34" y="57">Commands and changes of mind</text>
+      <rect class="b" x="20" y="84" width="260" height="44" rx="5"/><text class="s" x="34" y="111">Random rolls, seeded</text>
+      <rect class="b" x="20" y="138" width="260" height="44" rx="5"/><text class="s" x="34" y="165">Night results and every ration change</text>
+      <rect class="b" x="20" y="192" width="260" height="44" rx="5"/><text class="s" x="34" y="219">Every post and DM the bot sends</text>
+      <rect class="b" x="20" y="246" width="260" height="44" rx="5"/><text class="s" x="34" y="273">Game Master actions</text>
+      <line class="ar" x1="280" y1="52" x2="338" y2="160" marker-end="url(#ar3)"/>
+      <line class="ar" x1="280" y1="106" x2="338" y2="172" marker-end="url(#ar3)"/>
+      <line class="ar" x1="280" y1="160" x2="338" y2="185" marker-end="url(#ar3)"/>
+      <line class="ar" x1="280" y1="214" x2="338" y2="198" marker-end="url(#ar3)"/>
+      <line class="ar" x1="280" y1="268" x2="338" y2="210" marker-end="url(#ar3)"/>
+
+      <rect class="b" x="340" y="135" width="180" height="100" rx="5"/>
+      <text class="t" x="354" y="162">Event logger</text>
+      <text class="s" x="354" y="184">one line per event</text>
+      <text class="s" x="354" y="202">numbered with no gaps</text>
+      <text class="s" x="354" y="220">SAST timestamp</text>
+      <line class="ar" x1="520" y1="185" x2="578" y2="185" marker-end="url(#ar3)"/>
+      <text class="lbl" x="549" y="177" text-anchor="middle">append</text>
+
+      <rect class="b" x="580" y="135" width="200" height="100" rx="5" style="stroke-width:2.4"/>
+      <text class="tm" x="594" y="162">season.jsonl</text>
+      <text class="s" x="594" y="184">never edited</text>
+      <text class="s" x="594" y="202">a fix is a new event</text>
+      <text class="s" x="594" y="220">locked until the reveal</text>
+
+      <line class="ar" x1="780" y1="175" x2="858" y2="46" marker-end="url(#ar3)"/>
+      <line class="ar" x1="780" y1="182" x2="858" y2="122" marker-end="url(#ar3)"/>
+      <line class="ar" x1="780" y1="190" x2="858" y2="198" marker-end="url(#ar3)"/>
+      <line class="ar" x1="780" y1="198" x2="858" y2="274" marker-end="url(#ar3)"/>
+      <text class="lbl" x="806" y="104" text-anchor="middle">rebuild</text>
+
+      <rect class="b prop" x="860" y="20" width="310" height="52" rx="5"/>
+      <text class="t" x="874" y="42">game.db: current state</text><text class="s" x="874" y="60">rebuildable from the log if it ever breaks</text>
+      <rect class="b" x="860" y="96" width="310" height="52" rx="5"/>
+      <text class="t" x="874" y="118">Nightly replay --check</text><text class="s" x="874" y="136">fails if anything wasn't logged</text>
+      <rect class="b" x="860" y="172" width="310" height="52" rx="5"/>
+      <text class="t" x="874" y="194">After the reveal: the recap</text><text class="s" x="874" y="212">replay → frames → animation</text>
+      <rect class="b" x="860" y="248" width="310" height="52" rx="5"/>
+      <text class="t" x="874" y="270">Kept and deleted</text><text class="s" x="874" y="288">moves kept; radio text deleted after the recap</text>
+
+      <rect class="b" x="1210" y="110" width="170" height="120" rx="5"/>
+      <text class="t" x="1224" y="136">Alias vault</text>
+      <text class="s" x="1224" y="158">alias ↔ Discord id</text>
+      <text class="s" x="1224" y="180">written once at /join</text>
+      <text class="s" x="1224" y="198">never in the log</text>
+      <text class="s" x="1224" y="216">no arrow, on purpose</text>
+    </svg>
+    </div>
+    <figcaption>One logger writes everything into one file, and everything else is read from that file. The format already exists (<code>sim/LOG_FORMAT.md</code>), and the simulator writes it today, so the replay and recap tools can be built and tested on fake games before a real season starts. The alias vault is kept apart so the log stays anonymous.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What each part does</h2>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Part</th><th>Runs on</th><th>Job</th><th>Reads</th><th>Writes</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Discord server channels</td><td>Discord</td><td class="prose">Where people play: #town-square, #news and #radio (bot posts only), slash commands, DMs.</td><td>–</td><td>–</td><td><span class="pill planned">not set up</span></td></tr>
+      <tr><td><span class="mono">survivors-bot.service</span></td><td>Pi, systemd</td><td class="prose">Keeps the bot running and restarts it after a crash or reboot. Separate from your existing bot, so one can't take the other down.</td><td>–</td><td>–</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td>Discord adapter</td><td>Pi</td><td class="prose">Talks to Discord: receives slash commands, posts #news and #radio, sends DMs. All replies are ephemeral (only the sender sees them).</td><td>Discord</td><td>Discord</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td>Command handlers</td><td>Pi</td><td class="prose">/join, /status, /scavenge, /steal, /guard, /investigate, /gift, /radio, /quit. Autocomplete on aliases. Checks each move is allowed before accepting it.</td><td>game.db, engine</td><td>log</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td>Scheduler</td><td>Pi</td><td class="prose">Locks moves at 23:59 and runs the night at 07:30, weekdays, Africa/Johannesburg time.</td><td>clock</td><td>log</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td>Game engine</td><td>Pi and laptop</td><td class="prose">Resolves one night in the fixed order above. Pure rules: no Discord, no files, no clock inside.</td><td>game.json, the night's moves</td><td>events</td><td><span class="pill built">exists in the simulator</span></td></tr>
+      <tr><td><span class="mono">game.json</span></td><td>Pi and laptop</td><td class="prose">Every rule number. The bot, the simulator and the video build all read the same file.</td><td>–</td><td>–</td><td><span class="pill built">exists</span></td></tr>
+      <tr><td>Event logger</td><td>Pi</td><td class="prose">Numbers and timestamps every event, then appends it to the season log.</td><td>–</td><td>season.jsonl, game.db</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td><span class="mono">season.jsonl</span></td><td>Pi disk</td><td class="prose">The record of truth for the whole season. Locked until the reveal.</td><td>–</td><td>–</td><td><span class="pill built">format exists</span></td></tr>
+      <tr><td><span class="mono">game.db</span> (SQLite)</td><td>Pi</td><td class="prose">Current state for fast answers: who's playing, today's moves, guards used, rations.</td><td>log</td><td>–</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td>Alias vault</td><td>Pi</td><td class="prose">Which alias belongs to which Discord account. Separate table, no Game Master command reads it during the season.</td><td>–</td><td>–</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td>Nightly check</td><td>Pi, after #news</td><td class="prose">Runs <span class="mono">replay.py --check</span> on the real log. A failure means something wasn't logged.</td><td>season.jsonl</td><td>–</td><td><span class="pill built">tool exists</span></td></tr>
+      <tr><td>Game Master commands</td><td>Pi</td><td class="prose">Admin only: pause a round, fix a mistake, read the radio log. No command shows anyone's rations mid-game. Every use is logged.</td><td>game.db</td><td>log</td><td><span class="pill planned">planned</span></td></tr>
+      <tr><td>Random events</td><td>Pi</td><td class="prose">Only if adopted: one seeded roll a day at a random time, private events sent by DM. Not simulated yet.</td><td>game.json</td><td>log</td><td><span class="pill open">idea, untested</span></td></tr>
+      <tr><td>Simulator</td><td>Laptop</td><td class="prose">Balance tests, all-in strategies, learning and Jev players. Writes the same log as the bot.</td><td>game.json</td><td>results/, logs</td><td><span class="pill built">exists</span></td></tr>
+      <tr><td>Replay and recap</td><td>Laptop</td><td class="prose"><span class="mono">replay.py</span> rebuilds any game and writes per-night frames; the recap animation is built from those frames.</td><td>season.jsonl</td><td>frames.json, video</td><td><span class="pill built">replay exists</span> <span class="pill planned">recap planned</span></td></tr>
+      <tr><td>Explainer video kit</td><td>Laptop, Craft apps</td><td class="prose">Turns game.json and the script into scene specs, captions and a to-do list. 0 of 58 items made.</td><td>game.json, source/</td><td>build/, output/</td><td><span class="pill built">specs exist</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Splitting the code so the bot and simulator can't drift</h2>
+  <p>The handover strongly recommends moving the night-resolution code out of the simulator into a shared module. The five connection points below (I've called them ports) are my addition. They're how one engine can run in both places: the engine only uses these five, and the bot and the simulator each plug in their own version.</p>
+  <div class="two">
+    <div class="tw">
+    <table>
+      <thead><tr><th>Port <span class="pill prop">my addition</span></th><th>What it hides</th><th>Bot plugs in</th><th>Simulator plugs in</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Messenger</td><td>how messages reach players</td><td>Discord</td><td>printed to screen</td></tr>
+        <tr><td class="mono">Clock</td><td>what time and which night it is</td><td>real clock, SAST, weekdays</td><td>a night counter</td></tr>
+        <tr><td class="mono">Random</td><td>every dice roll</td><td>seeded per round, each roll logged</td><td>seeded per game</td></tr>
+        <tr><td class="mono">EventLog</td><td>where events go</td><td>season.jsonl on disk</td><td>memory, or <span class="mono">--log</span> file</td></tr>
+        <tr><td class="mono">Store</td><td>current game state</td><td>SQLite game.db</td><td>memory</td></tr>
+      </tbody>
+    </table>
+    </div>
+<pre>survivors/
+  game.json            every rule number
+  engine/              shared: no Discord, no files
+    rules.py           loads game.json
+    night.py           the 9-step resolve
+    ports.py           Messenger, Clock, Random, EventLog, Store
+  bot/                 runs on the Pi
+    main.py            starts the service
+    commands.py        slash commands
+    scheduler.py       23:59 lock, 07:30 run
+    discord_messenger.py
+    sqlite_store.py
+    jsonl_log.py
+  sim/                 imports engine/ instead of its own copy
+  video/               unchanged</pre>
+  </div>
+  <p>Proposed layout. Today the night code is inside <span class="mono">sim/survivors_sim.py</span> (<span class="mono">Game.play_night</span>, about 280 lines).</p>
+</section>
+
+<section>
+  <h2>Not designed or not decided yet</h2>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Item</th><th>Why it matters</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>Alias vault on your own Pi</td><td class="prose">Anyone with admin access to the Pi can read any SQLite file. Unless the vault is encrypted with a key kept off the Pi, "even the Game Master can't see it" is a promise, not a lock.</td><td><span class="pill open">not designed</span></td></tr>
+      <tr><td>Backups of the season log</td><td class="prose">One SD card holds the whole season and the replay. If it dies, the recap goes with it.</td><td><span class="pill open">not designed</span></td></tr>
+      <tr><td>Pi is off at 07:30</td><td class="prose">Power cut or reboot at resolve time: the night must run once on restart, never twice.</td><td><span class="pill open">not designed</span></td></tr>
+      <tr><td>Public holidays</td><td class="prose">"Weekdays only" doesn't say whether a South African public holiday is a round.</td><td><span class="pill open">not decided</span></td></tr>
+      <tr><td>Investigations before or after eating</td><td class="prose">The rules doc and the simulator disagree (step 6 above).</td><td><span class="pill open">not decided</span></td></tr>
+      <tr><td>Bounty on caught or empty steals</td><td class="prose">The simulator charges the bounty even when the thief was caught by a guard or found nothing.</td><td><span class="pill open">not decided</span></td></tr>
+      <tr><td>Guarding while already protected</td><td class="prose">The simulator treats it as a wasted night. The bot could refuse it with a message instead.</td><td><span class="pill open">not decided</span></td></tr>
+      <tr><td>Gift size</td><td class="prose">The bot lets players choose an amount; no maximum set.</td><td><span class="pill open">not decided</span></td></tr>
+      <tr><td>Head count</td><td class="prose">Seats are a third of the players. 15 is assumed everywhere, including "five seats" in the video.</td><td><span class="pill open">waiting on sign-ups</span></td></tr>
+      <tr><td>Discord application</td><td class="prose">New app, bot token, permissions, the three channels.</td><td><span class="pill open">not started</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+</main>
