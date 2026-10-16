@@ -19,6 +19,20 @@ import survivors_sim as S  # noqa: E402
 CONFIGS = ["baseline", "v1_original", "v1_original+gift_bonus+missed_half",
            "guard_unlimited+steal_1", "r1_first_pick", "catch_3+guard_cooldown_1"]
 
+# Food may only enter or leave the game through these. Every other ration movement is a transfer between
+# players and must net to exactly zero each night: nobody can be paid what somebody else didn't give.
+CREATE = {"scavenge", "guard_income", "gift_bonus"}
+DESTROY = {"eat", "fine"}
+
+
+def check_conservation(name, seed, events):
+    by_night = {}
+    for e in events:
+        if e["type"] == "ration" and e["reason"] not in CREATE | DESTROY:
+            by_night[e["night"]] = by_night.get(e["night"], 0) + e["delta"]
+    for night, net in by_night.items():
+        assert net == 0, (name, seed, f"night {night}: transfers between players net to {net:+d}, food created or lost")
+
 for name in CONFIGS:
     rules = replace(S.Rules(), **S.variant(name))
     for seed in range(300):
@@ -29,6 +43,8 @@ for name in CONFIGS:
                 assert p.rations >= 0, (name, seed, p.name, "negative rations")
                 assert p.bandit or p.rations > 0, (name, seed, p.name, "survivor at 0 rations")
         res = g.finish()
+        if g.logging:
+            check_conservation(name, seed, g.events)
         assert len(res["extracted"]) <= res["seats"], (name, seed, "too many seats")
         assert all(not p.bandit for p in res["extracted"]), (name, seed, "bandit extracted")
         left = [p for p in g.players if not p.bandit and p not in res["extracted"]]

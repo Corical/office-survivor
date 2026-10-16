@@ -21,7 +21,7 @@ Everything that happens in a game is logged, so the whole game can be checked, r
 | `action` | Each night, one per player (final choice) | `player`, `action`, `target`, `amount`, `auto` (missed deadline), `as_bandit`, `rations_before`, `decided_by` (simulator brain), `decision` (Jev's pick and probability) | private |
 | `guard_up` | A new guard is set | `player`, `until_night`, `guards_used` | private |
 | `guard_wasted` | Guarding while already protected | `player`, `protected_until` | private |
-| `steal` | Each theft attempt | `thief`, `target`, `outcome` (`success`, `empty` or `caught`), `amount`, `split_with` | victim sees the amount only; caught thieves are public |
+| `steal` | Each theft attempt | `thief`, `target`, `outcome` (`success`, `empty` or `caught`), `amount`, `split_with`, `paid` (caught only: what the thief actually handed over) | victim sees the amount only; caught thieves are public |
 | `scavenge` | Each scavenge | `player`, `found`, `auto` | private |
 | `gift` | Each gift | `giver`, `receiver`, `amount` | giver and receiver |
 | `investigate` | Each investigation | `investigator`, `target`, `saw_action`, `saw_target` | private |
@@ -36,7 +36,9 @@ Everything that happens in a game is logged, so the whole game can be checked, r
 | `result` | After the last night, one per player | `player`, `rations`, `survived`, `extracted`, `objective`, `objective_done`, `score`, `stole`, `steals_ok`, `steals_caught`, `times_robbed`, `gave_away` | public at the reveal |
 | `game_end` | The very end | `winners`, `winner_tiebreak` | public |
 
-Ration `reason` values: `robbed`, `stole`, `caught_penalty`, `guard_reward`, `scavenge`, `guard_income`, `gift_out`, `gift_in`, `bounty_paid`, `bounty_received`, `eat`. Random events will add `event`.
+Ration `reason` values: `robbed`, `stole`, `caught_penalty`, `guard_reward`, `fine`, `scavenge`, `guard_income`, `gift_out`, `gift_in`, `gift_bonus`, `bounty_paid`, `bounty_received`, `eat`. Random events will add `event`.
+
+**The books must balance.** Food is only created by `scavenge`, `guard_income` and `gift_bonus`, and only destroyed by `eat` and `fine`. Every other reason is one side of a transfer between two players, so within a night those deltas must add up to exactly zero. A transfer moves only what the payer actually has, and the receiver gets exactly that. `check_invariants.py` enforces this on every logged game.
 
 ## Extra events only the bot writes
 

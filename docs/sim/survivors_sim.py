@@ -562,7 +562,6 @@ class Game:
                        decided_by=(self.brain.name if pid in self.smart_ids else "rules"),
                        decision=last.get(pid), why=self.why.get(pid, {}).get("reasons"),
                        odds=self.why.get(pid, {}).get("odds"), visibility="private")
-        loss_items, gain_items = defaultdict(list), defaultdict(list)
         for p in self.players:
             p.actions[acts[p.pid][0]] += 1
             p.robbed_last = False
@@ -587,34 +586,59 @@ class Game:
             if a[0] == "steal" and a[1] is not None:
                 steals[a[1]].append(pid)
 
-        gains = defaultdict(int)
-        losses = defaultdict(int)
+        # Every change to rations goes through these: food moves between players only as a transfer of what the
+        # payer actually has, and only scavenging creates it. Nothing is booked on one side alone.
+        bal = dict(start)
+
+        def move(src, dst, amount, out_reason, in_reason):
+            """Move up to `amount` from src to dst; both sides get exactly what moved. Returns what moved."""
+            moved = min(amount, bal[src])
+            if moved:
+                bal[src] -= moved
+                bal[dst] += moved
+                self.ledger(self.P(src), -moved, out_reason, bal[src], detail=self.P(dst).name,
+                            **({"requested": amount} if moved < amount else {}))
+                self.ledger(self.P(dst), moved, in_reason, bal[dst], detail=self.P(src).name)
+            return moved
+
         robbed_by = defaultdict(list)       # victim -> thieves who got something
+        # 1. Thieves who walked into a guard pay first, from what they actually hold. The guard receives what was
+        #    paid, up to guard_reward; anything above that is a fine and leaves the game.
         for tgt, thieves in steals.items():
-            t = self.P(tgt)
-            if tgt in guards:
-                for th in thieves:
-                    tp = self.P(th)
-                    losses[th] += r.caught_penalty
-                    gains[tgt] += r.guard_reward
-                    loss_items[th].append(("caught_penalty", r.caught_penalty, t.name))
-                    gain_items[tgt].append(("guard_reward", r.guard_reward, tp.name))
-                    self.L("steal", thief=tp.name, target=t.name, outcome="caught", amount=0, visibility="public")
-                    tp.steals_caught += 1
-                    tp.caution *= 0.5
-                    self.public_delta[th] -= r.caught_penalty
-                    self.public_susp[th] += 2
-                    self.known_guard[tgt] = self.night
-                    ev["caught"] += 1
-                    fine = (f"{tp.name} pays {t.name} {r.caught_penalty}." if r.guard_reward
-                            else f"{tp.name} is fined {r.caught_penalty}.")
-                    news.append(f"CAUGHT: {t.name} was guarding and caught {tp.name} red-handed. {fine}")
-                    tp.notes.append(f"Night {self.night}: you tried to rob {t.name}, who was guarding. You paid {r.caught_penalty}.")
-                    t.notes.append(f"Night {self.night}: your guard caught {tp.name}; they paid you {r.guard_reward}.")
-                    truth.append(f"{tp.name} tried to rob {t.name} (guarded)")
+            if tgt not in guards:
                 continue
+            t = self.P(tgt)
+            for th in thieves:
+                tp = self.P(th)
+                can_pay = min(r.caught_penalty, bal[th])                 # what the thief actually hands over
+                to_guard = move(th, tgt, min(can_pay, r.guard_reward), "caught_penalty", "guard_reward")
+                fined = can_pay - to_guard                                # the rest leaves the game
+                if fined:
+                    bal[th] -= fined
+                    self.ledger(tp, -fined, "fine", bal[th], detail=t.name)
+                paid = to_guard + fined
+                self.L("steal", thief=tp.name, target=t.name, outcome="caught", amount=0, paid=paid,
+                       visibility="public")
+                tp.steals_caught += 1
+                tp.caution *= 0.5
+                self.public_delta[th] -= paid
+                self.public_susp[th] += 2
+                self.known_guard[tgt] = self.night
+                ev["caught"] += 1
+                fine = (f"{tp.name} pays {t.name} {to_guard}." if r.guard_reward else f"{tp.name} is fined {paid}.")
+                news.append(f"CAUGHT: {t.name} was guarding and caught {tp.name} red-handed. {fine}")
+                tp.notes.append(f"Night {self.night}: you tried to rob {t.name}, who was guarding. You paid {paid}.")
+                t.notes.append(f"Night {self.night}: your guard caught {tp.name}; they paid you {to_guard}.")
+                truth.append(f"{tp.name} tried to rob {t.name} (guarded)")
+        # 2. Other thefts take from what each victim holds after step 1, fixed before any theft lands, so the
+        #    order between thieves can't matter and tonight's loot can't be stolen again tonight.
+        can_lose = dict(bal)
+        for tgt, thieves in steals.items():
+            if tgt in guards:
+                continue
+            t = self.P(tgt)
             wants = [(th, r.bandit_steal_amount if self.P(th).bandit else r.steal_amount) for th in thieves]
-            available = start[tgt]
+            available = can_lose[tgt]
             total_want = sum(w for _, w in wants)
             take = min(available, total_want)
             # split as evenly as possible, random order for remainders
@@ -630,14 +654,11 @@ class Game:
                         progressed = True
                 if not progressed:
                     break
-            losses[tgt] += take
-            if take > 0:
-                loss_items[tgt].append(("robbed", take, ", ".join(self.P(th).name for th, g in shares.items() if g)))
             for th, got in shares.items():
-                gains[th] += got
                 tp = self.P(th)
                 if got > 0:
-                    gain_items[th].append(("stole", got, t.name))
+                    moved = move(tgt, th, got, "robbed", "stole")
+                    assert moved == got, ("theft larger than the victim's start-of-step rations", t.name, got, moved)
                 self.L("steal", thief=tp.name, target=t.name, outcome="success" if got else "empty", amount=got,
                        split_with=len(thieves) - 1, visibility="victim_sees_amount_only")
                 if got > 0:
@@ -662,37 +683,29 @@ class Game:
                 ev["empty_steal"] += 1
                 news.append(f"Someone broke into {t.name}'s place and found nothing.")
 
+        # 3. Scavenging (and guard income, where a rule set has it) is the only thing that creates food.
         for pid, a in acts.items():
             p = self.P(pid)
             if a[0] == "scavenge" and not p.bandit:
                 if a[3] and r.missed_scavenge_max >= 0:
-                    gains[pid] += rng.randint(0, r.missed_scavenge_max)
+                    found = rng.randint(0, r.missed_scavenge_max)
                 else:
-                    gains[pid] += rng.randint(r.scavenge_min, r.scavenge_max)
-                found = gains[pid] - sum(x[1] for x in gain_items[pid])
-                gain_items[pid].append(("scavenge", found, "auto" if a[3] else ""))
+                    found = rng.randint(r.scavenge_min, r.scavenge_max)
+                bal[pid] += found
                 self.L("scavenge", player=p.name, found=found, auto=bool(a[3]), visibility="private")
+                if found:
+                    self.ledger(p, found, "scavenge", bal[pid], detail="auto" if a[3] else "")
                 if self.brain:
-                    p.notes.append(f"Night {self.night}: you scavenged and found {gains[pid]}.")
+                    p.notes.append(f"Night {self.night}: you scavenged and found {found}.")
             elif a[0] == "guard" and not p.bandit and r.guard_income_max > 0:
                 extra = rng.randint(0, r.guard_income_max)
-                gains[pid] += extra
-                gain_items[pid].append(("guard_income", extra, ""))
+                bal[pid] += extra
+                if extra:
+                    self.ledger(p, extra, "guard_income", bal[pid], detail="")
 
         for p in self.players:
-            p.rations = max(0, start[p.pid] - losses[p.pid]) + gains[p.pid]
-            if self.logging:                       # same result, written out item by item
-                bal = start[p.pid]
-                for reason, amt, detail in loss_items[p.pid]:
-                    d = min(amt, bal)
-                    bal -= d
-                    extra = {"requested": amt} if d < amt else {}
-                    self.ledger(p, -d, reason, bal, detail=detail, **extra)
-                for reason, amt, detail in gain_items[p.pid]:
-                    if amt:
-                        bal += amt
-                        self.ledger(p, amt, reason, bal, detail=detail)
-                assert bal == p.rations, (p.name, bal, p.rations)
+            p.rations = bal[p.pid]
+            assert p.rations >= 0, (p.name, p.rations)
 
         # gifts (after steals, so a gift can't be stolen the same night)
         for pid, a in acts.items():
@@ -703,11 +716,14 @@ class Game:
             if amt <= 0:
                 continue
             giver.rations -= amt
-            recv.rations += amt + r.gift_bonus
+            recv.rations += amt
             giver.gifted_out += amt
             self.L("gift", giver=giver.name, receiver=recv.name, amount=amt, visibility="giver_and_receiver")
             self.ledger(giver, -amt, "gift_out", giver.rations, detail=recv.name)
-            self.ledger(recv, amt + r.gift_bonus, "gift_in", recv.rations, detail=giver.name)
+            self.ledger(recv, amt, "gift_in", recv.rations, detail=giver.name)
+            if r.gift_bonus:                       # a rule-set bonus is new food, booked as such
+                recv.rations += r.gift_bonus
+                self.ledger(recv, r.gift_bonus, "gift_bonus", recv.rations, detail=giver.name)
             ev["gift"] += 1
             recv.notes.append(f"Night {self.night}: {giver.name} secretly gave you {amt}.")
             giver.notes.append(f"Night {self.night}: you gave {recv.name} {amt}.")
