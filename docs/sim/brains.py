@@ -33,6 +33,19 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 KINDS = ("scavenge", "steal", "guard", "investigate", "gift")
+SECRETS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".secrets", "typesafe.env")
+
+
+def key_from_secrets_file(path=SECRETS_FILE):
+    """TYPESAFE_API_KEY from the project's git-ignored .secrets/typesafe.env, or None. Lines starting with # are comments."""
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith("TYPESAFE_API_KEY="):
+                return line.split("=", 1)[1].strip().strip('"').strip("'") or None
+    return None
 JEV_PRICE_PER_M_INPUT = 0.042   # USD per million input tokens, from TypeSafe's launch post; check current pricing
 
 
@@ -88,7 +101,7 @@ class JevBrain:
                  max_calls=3000, sample=True, workers=16, timeout=20.0):
         self.arch = arch_table
         self.model = model
-        self.api_key = api_key or os.environ.get("TYPESAFE_API_KEY")
+        self.api_key = api_key or os.environ.get("TYPESAFE_API_KEY") or key_from_secrets_file()
         self.base = (base or os.environ.get("TYPESAFE_API_BASE") or "https://api.typesafe.ai").rstrip("/")
         self.mock = mock
         self.max_calls = max_calls
@@ -102,7 +115,8 @@ class JevBrain:
         self.last = {}
         self._lock = threading.Lock()
         if not mock and not self.api_key:
-            raise SystemExit("Jev brain needs TYPESAFE_API_KEY in the environment (or use --jev-mock to test offline).")
+            raise SystemExit("Jev brain needs a key: paste it into .secrets/typesafe.env at the project root "
+                             "(or set TYPESAFE_API_KEY), or use --jev-mock to test offline.")
 
     # ---- transport
     def _post(self, payload):
@@ -159,8 +173,9 @@ class JevBrain:
                                  "this person most plausibly make tonight, given their personality, secret goal, "
                                  "rations and everything they know? Play to win, the way a real colleague would."),
                 "criteria": {o["key"]: o["desc"] for o in options}}},
-            "metadata": {"prior": prior},
         }
+        if self.mock:
+            payload["metadata"] = {"prior": prior}   # only the offline mock reads this; the real API doesn't document it
         t0 = time.time()
         resp = self._post(payload)
         ans = resp["answers"]["move"]

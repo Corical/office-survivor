@@ -242,6 +242,8 @@ class Game:
         self.public_delta = defaultdict(int)  # what the public can infer about rations
         self.public_susp = defaultdict(float)
         self.known_guard = {}              # pid -> last night they publicly caught someone
+        self.why = {}                      # pid -> reasons and odds behind tonight's rules-brain move (for the log)
+        self._why, self._odds = [], None
         mix = mix or OFFICE_MIX
         archs = self.rng.choices(list(mix), weights=list(mix.values()), k=rules.players)
         for i, arch in enumerate(force or []):
@@ -373,56 +375,93 @@ class Game:
         return "\n".join(lines)
 
     def choose(self, p):
+        """The rules brain's move, plus why: the reasons and odds are kept for the replay log (no extra dice rolls)."""
+        self._why, self._odds = [], None
+        act = self._choose(p)
+        self.why[p.pid] = {"reasons": self._why, "odds": self._odds}
+        return act
+
+    def _choose(self, p):
         a = ARCH[p.arch]
+        why = self._why
         final = self.night == self.r.rounds
         if not p.bandit and self.rng.random() < a["miss"] * self.r.miss_scale:
             p.missed += 1
+            why.append(f"missed the deadline (a {p.arch} misses {a['miss'] * self.r.miss_scale:.0%} of nights), "
+                       "so the bot scavenged for them")
             return ("scavenge", None, 0, True)
 
         if p.bandit:
             kind = "steal" if self.rng.random() < 0.85 else "investigate"
+            self._odds = {"steal": 0.85, "investigate": 0.15}
+            why.append("a bandit can only steal (85%) or investigate (15%)")
         elif a.get("pure"):
             kind = a["pure"]
+            why.append(f"test player: {a['desc']}")
             if kind == "turtle":
                 kind = "guard" if self.can_guard(p) else "scavenge"
             elif kind == "guard" and not self.can_guard(p) and p.guard_until < self.night:
                 kind = "scavenge"           # out of guards: forced to do something else
+                why.append("out of guards, so scavenged")
             if kind == "gift" and p.rations < 2:
                 kind = "scavenge"
+                why.append("too little food to give, so scavenged")
         else:
             w = dict(zip(KINDS, a["w"]))
+            why.append(f"{p.arch}: {a['desc']}")
             w["steal"] *= p.caution
+            if p.caution < 1:
+                why.append(f"has been caught before, so stealing odds are cut to {p.caution:.0%} of normal")
             if p.robbed_last:
                 w["guard"] += 0.5
+                why.append("robbed last night, so more likely to guard")
                 if p.arch == "detective":
                     w["investigate"] += 0.3
+                    why.append("detective who was robbed: wants to find out who")
             revenge = [t for t in p.knows_robbed_by if not self.P(t).bandit]
             if revenge and p.arch != "saint":
                 w["steal"] += 0.4
+                why.append("knows who robbed them (" + ", ".join(self.P(t).name for t in revenge) + "): wants revenge")
             if p.rations <= 2:
                 w["steal"] += 0.25 * (p.arch != "saint")
                 w["gift"] = 0
                 w["guard"] *= 0.5
+                why.append(f"only {p.rations} rations left: desperate, no gifts"
+                           + (", more stealing" if p.arch != "saint" else ""))
             if p.rations >= 8:
                 w["guard"] += 0.15
+                why.append(f"{p.rations} rations: protecting the stash")
             if final:
                 w["steal"] += 0.6 * a["final"]
                 w["guard"] += 0.3
                 w["investigate"] = 0          # info is worthless on the last night
+                why.append("last night: grab or protect a seat, information is worthless now")
             if p.objective == "steal3_clean" and p.steals_ok < 3 and p.steals_caught == 0:
                 w["steal"] += 0.2
+                why.append(f"secret goal (steal 3 times clean, {p.steals_ok} so far) nudges toward stealing")
             if p.objective == "give" and p.gifted_out < self.r.give_goal:
                 w["gift"] += 0.25
+                why.append(f"secret goal (give away {self.r.give_goal}, {p.gifted_out} so far) nudges toward gifting")
             if p.objective == "grudge":
                 if self.r.grudge_goal == "deny" and self.night >= self.r.rounds - 2:
                     w["steal"] += 0.3
+                    why.append("secret goal (stop " + self.P(p.obj_target).name + " extracting) nudges toward stealing")
                 elif self.r.grudge_goal == "rob" and p.grudge_hits < self.r.grudge_robs:
                     w["steal"] += 0.2
+                    why.append("secret goal (rob " + self.P(p.obj_target).name + ") nudges toward stealing")
             if p.rations <= 1:
                 w["gift"] = 0
             if not self.can_guard(p):
+                if p.guard_until >= self.night:
+                    why.append(f"already protected until night {p.guard_until}, so no new guard")
+                elif self.r.guard_limit and p.guards_used >= self.r.guard_limit:
+                    why.append(f"used all {self.r.guard_limit} guards")
                 w["guard"] = 0               # protected already, out of guards, or cooling down
+            total = sum(v for v in w.values() if v > 0)
+            self._odds = {k: round(v / total, 3) for k, v in w.items() if v > 0} if total else {}
             kind = self.weighted(w)
+            if self._odds.get(kind):
+                why.append(f"rolled {kind} (a {self._odds[kind]:.0%} chance)")
 
         if kind == "steal":
             return ("steal", self.pick_steal_target(p), 0, False)
@@ -431,36 +470,55 @@ class Game:
         if kind == "gift":
             tgt = self.pick_gift_target(p)
             if tgt is None:
+                why.append("nobody to give to, so scavenged")
                 return ("scavenge", None, 0, False)
             amt = 2 if p.rations >= 7 else 1
             return ("gift", tgt, amt, False)
         return (kind, None, 0, False)
 
     def pick_steal_target(self, p):
-        best, best_s = None, -1e9
+        best, best_s, best_info = None, -1e9, None
         for q in self.players:
             if q.pid == p.pid:
                 continue
             s = self.perceived(p, q)
+            guess = s
+            flags = []
             if q.pid in p.knows_robbed_by:
                 s += 3
+                flags.append("revenge: they robbed you")
             if p.objective in ("beat", "grudge") and q.pid == p.obj_target:
                 s += 2
+                flags.append("your secret-goal target")
             if q.pid in self.known_guard and self.night - self.known_guard[q.pid] <= 2:
                 s -= 4
             if q.bandit:
                 s -= 3
+            if p.suspicion[q.pid] > 0:
+                flags.append("you suspect them")
             s += p.suspicion[q.pid] * 0.5      # punish people you suspect
             if p.arch == "chaos":
                 s = self.rng.random()
             if s > best_s:
-                best, best_s = q.pid, s
+                best, best_s, best_info = q.pid, s, (guess, flags)
+        if best is not None:
+            if p.arch == "chaos":
+                self._why.append(f"picked {self.P(best).name} at random (chaos)")
+            else:
+                guess, flags = best_info
+                self._why.append(f"picked {self.P(best).name}: looked like they had about {max(0, round(guess))} rations"
+                                 + ("; " + "; ".join(flags) if flags else ""))
         return best
 
     def pick_investigate_target(self, p):
         cands = [q for q in self.players if q.pid != p.pid]
         susp = [(p.suspicion[q.pid] + self.public_susp[q.pid] + self.rng.random(), q.pid) for q in cands]
-        return max(susp)[1]
+        top = max(susp)
+        q = self.P(top[1])
+        known = p.suspicion[q.pid] + self.public_susp[q.pid]
+        self._why.append(f"watched {q.name}: " + ("top suspect (named in #news or #radio, or seen stealing)"
+                                                  if known > 0 else "a hunch, nobody stood out"))
+        return top[1]
 
     def pick_gift_target(self, p):
         cands = [q for q in self.players if q.pid != p.pid]
@@ -468,12 +526,16 @@ class Game:
             return None
         # give to whoever looks worst off; bandits close to rejoining are attractive too
         scored = [(self.perceived(p, q) - (2 if q.robbed_last else 0), q.pid) for q in cands]
-        return min(scored)[1]
+        low = min(scored)
+        q = self.P(low[1])
+        self._why.append(f"gave to {q.name}: looked worst off" + (" (robbed last night)" if q.robbed_last else ""))
+        return low[1]
 
     # ---------------- one night ----------------
     def play_night(self):
         self.night += 1
         r, rng = self.r, self.rng
+        self.why = {}
         if not self.brain:
             acts = {p.pid: self.choose(p) for p in self.players}
         else:
@@ -487,6 +549,7 @@ class Game:
                 else:
                     waiting.append(p)
             if waiting:
+                self._why = []               # brains reuse the target pickers; keep their notes off other players
                 acts.update(self.brain.decide_many(self, waiting))
             acts = dict(sorted(acts.items()))
         start_bandit = {p.pid: p.bandit for p in self.players}
@@ -497,7 +560,8 @@ class Game:
                 self.L("action", player=p.name, action=a[0], target=self.P(a[1]).name if a[1] is not None else None,
                        amount=a[2] or None, auto=bool(a[3]), as_bandit=p.bandit, rations_before=p.rations,
                        decided_by=(self.brain.name if pid in self.smart_ids else "rules"),
-                       decision=last.get(pid), visibility="private")
+                       decision=last.get(pid), why=self.why.get(pid, {}).get("reasons"),
+                       odds=self.why.get(pid, {}).get("odds"), visibility="private")
         loss_items, gain_items = defaultdict(list), defaultdict(list)
         for p in self.players:
             p.actions[acts[p.pid][0]] += 1

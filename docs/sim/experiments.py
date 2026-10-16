@@ -142,11 +142,28 @@ def fmt_pct(x):
     return f"{x:.0%}"
 
 
+def lower_priority():
+    """Run below normal priority so the machine stays usable; worker processes inherit it."""
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+        k32 = ctypes.windll.kernel32
+        k32.GetCurrentProcess.restype = wintypes.HANDLE
+        k32.SetPriorityClass.argtypes = (wintypes.HANDLE, wintypes.DWORD)
+        BELOW_NORMAL_PRIORITY_CLASS = 0x00004000
+        if not k32.SetPriorityClass(k32.GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS):
+            print("(could not lower priority; running at normal priority)")
+    else:
+        os.nice(10)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", type=int, default=300)
-    ap.add_argument("--procs", type=int, default=os.cpu_count() or 1)
+    ap.add_argument("--procs", type=int, default=max(1, (os.cpu_count() or 2) // 2),
+                    help="worker processes (default: half the logical processors, so the machine stays usable)")
     a = ap.parse_args()
+    lower_priority()
     jobs = [(ph, name, over, a.runs) for ph, _, items in PHASES for name, over in items]
     with Pool(a.procs) as pool:
         rows = pool.map(run_one, jobs)
