@@ -1,0 +1,197 @@
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+SURVIVORS - simulated game (seed 11, 15 players, 10 nights)
+
+Cast:
+  CleverCrow opportunist  secret goal: get robbed at least 1x and still extract
+  ColdCoffee paranoid     secret goal: steal at least 3 times without ever being caught
+  FoggyGlasses casual       secret goal: successfully rob ColdCoffee at least 1x
+  HollowTin opportunist  secret goal: give away 3 rations over the game
+  IronSpatula casual       secret goal: steal at least 3 times without ever being caught
+  LazyRiver opportunist  secret goal: steal at least 3 times without ever being caught
+  LooseCannon detective    secret goal: give away 3 rations over the game
+  LuckyLantern farmer       secret goal: give away 3 rations over the game
+  MuddyPaws saint        secret goal: finish with more rations than LuckyLantern
+  PaperTiger saint        secret goal: finish with more rations than HollowTin
+  QuietBadger opportunist  secret goal: give away 3 rations over the game
+  RustyKettle casual       secret goal: steal at least 3 times without ever being caught
+  SneakyPenguin opportunist  secret goal: successfully rob ColdCoffee at least 1x
+  SoggyBiscuit shark        secret goal: finish with more rations than LuckyLantern
+  VelvetMole opportunist  secret goal: successfully rob SneakyPenguin at least 1x
+
+=== NIGHT 1 - #news, 07:30 ===
+  - Someone hit SneakyPenguin overnight. SneakyPenguin is down 2.
+  - Someone hit IronSpatula overnight. IronSpatula is down 2.
+  - Someone hit HollowTin overnight. HollowTin is down 2.
+  - Someone hit LuckyLantern overnight. LuckyLantern is down 2.
+  [behind the scenes]
+    LooseCannon robbed SneakyPenguin for 2
+    CleverCrow robbed IronSpatula for 2
+    RustyKettle robbed HollowTin for 2
+    HollowTin robbed LuckyLantern for 2
+    PaperTiger gave LazyRiver 2
+    MuddyPaws gave LuckyLantern 2
+    IronSpatula missed the deadline (auto-scavenge)
+    rations: RustyKettle 8, LooseCannon 8, LazyRiver 8, CleverCrow 8, VelvetMole 7, LuckyLantern 7, SoggyBiscuit 6, QuietBadger 6, IronSpatula 6, HollowTin 6, FoggyGlasses 6, ColdCoffee 6, SneakyPenguin 5, PaperTiger 4, MuddyPaws 4
+
+=== NIGHT 2 - #news, 07:30 ===
+  - Someone hit LazyRiver overnight. LazyRiver is down 2.
+  [behind the scenes]
+    RustyKettle robbed LazyRiver for 2
+    QuietBadger missed the deadline (auto-scavenge)
+    LazyRiver missed the deadline (auto-scavenge)
+    SneakyPenguin missed the deadline (auto-scavenge)
+    VelvetMole missed the deadline (auto-scavenge)
+    HollowTin missed the deadline (auto-scavenge)
+    IronSpatula missed the deadline (auto-scavenge)
+    rations: RustyKettle 9, CleverCrow 9, SoggyBiscuit 7, LooseCannon 7, VelvetMole 6, LuckyLantern 6, LazyRiver 6, IronSpatula 6, HollowTin 6, FoggyGlasses 6, ColdCoffee 6, QuietBadger 5, PaperTiger 5, SneakyPenguin 4, MuddyPaws 3
+
+=== NIGHT 3 - #news, 07:30 ===
+  - Someone hit QuietBadger overnight. QuietBadger is down 2.
+  - Someone hit FoggyGlasses overnight. FoggyGlasses is down 2.
+  [behind the scenes]
+    VelvetMole robbed QuietBadger for 2
+    SoggyBiscuit robbed FoggyGlasses for 2
+    RustyKettle missed the deadline (auto-scavenge)
+    rations: SoggyBiscuit 8, RustyKettle 8, CleverCrow 8, VelvetMole 7, PaperTiger 6, LooseCannon 6, IronSpatula 6, HollowTin 6, SneakyPenguin 5, LuckyLantern 5, LazyRiver 5, ColdCoffee 5, FoggyGlasses 4, QuietBadger 3, MuddyPaws 2
+
+=== NIGHT 4 - #news, 07:30 ===
+  - CAUGHT: ColdCoffee was guarding and caught SneakyPenguin red-handed. SneakyPenguin pays ColdCoffee 2.
+  - Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 2.
+  - Someone hit MuddyPaws overnight. MuddyPaws is down 2.
+  - EXPOSED: an investigator saw CleverCrow rob SoggyBiscuit. CleverCrow pays them 1.
+  [behind the scenes]
+    SneakyPenguin tried to rob ColdCoffee (guarded)
+    CleverCrow robbed SoggyBiscuit for 2
+    SoggyBiscuit robbed MuddyPaws for 2
+    QuietBadger gave FoggyGlasses 1
+    HollowTin gave QuietBadger 1
+    IronSpatula missed the deadline (auto-scavenge)
+    rations: RustyKettle 9, VelvetMole 8, ColdCoffee 8, CleverCrow 8, SoggyBiscuit 7, LooseCannon 7, IronSpatula 7, FoggyGlasses 6, PaperTiger 5, LazyRiver 5, LuckyLantern 4, HollowTin 4, SneakyPenguin 2, QuietBadger 2, MuddyPaws 1
+
+=== NIGHT 5 - #news, 07:30 ===
+  - Someone hit HollowTin overnight. HollowTin is down 2.
+  - CAUGHT: RustyKettle was guarding and caught LazyRiver red-handed. LazyRiver pays RustyKettle 2.
+  - CAUGHT: RustyKettle was guarding and caught VelvetMole red-handed. VelvetMole pays RustyKettle 2.
+  - 2 people hit PaperTiger overnight. PaperTiger is down 4.
+  [behind the scenes]
+    QuietBadger robbed HollowTin for 2
+    LazyRiver tried to rob RustyKettle (guarded)
+    VelvetMole tried to rob RustyKettle (guarded)
+    CleverCrow robbed PaperTiger for 2
+    SoggyBiscuit robbed PaperTiger for 2
+    SneakyPenguin missed the deadline (auto-scavenge)
+    IronSpatula missed the deadline (auto-scavenge)
+    rations: RustyKettle 12, CleverCrow 9, SoggyBiscuit 8, ColdCoffee 7, LooseCannon 6, IronSpatula 6, VelvetMole 5, LuckyLantern 5, FoggyGlasses 5, SneakyPenguin 3, QuietBadger 3, PaperTiger 2, LazyRiver 2, HollowTin 2, MuddyPaws 1
+
+=== NIGHT 6 - #news, 07:30 ===
+  - Someone hit LooseCannon overnight. LooseCannon is down 2.
+  [behind the scenes]
+    CleverCrow robbed LooseCannon for 2
+    RustyKettle missed the deadline (auto-scavenge)
+    FoggyGlasses missed the deadline (auto-scavenge)
+    rations: RustyKettle 12, CleverCrow 10, SoggyBiscuit 7, IronSpatula 7, FoggyGlasses 6, ColdCoffee 6, LooseCannon 5, VelvetMole 4, LuckyLantern 4, SneakyPenguin 3, QuietBadger 2, LazyRiver 2, PaperTiger 1, MuddyPaws 1, HollowTin 1
+
+=== NIGHT 7 - #news, 07:30 ===
+  - 2 people hit ColdCoffee overnight. ColdCoffee is down 4.
+  - Someone hit QuietBadger overnight. QuietBadger is down 2.
+  - CAUGHT: IronSpatula was guarding and caught VelvetMole red-handed. VelvetMole pays IronSpatula 2.
+  - Someone hit LuckyLantern overnight. LuckyLantern is down 2.
+  - HollowTin ran out of food. HollowTin is back... as a bandit.
+  - MuddyPaws ran out of food. MuddyPaws is back... as a bandit.
+  [behind the scenes]
+    QuietBadger robbed ColdCoffee for 2
+    RustyKettle robbed ColdCoffee for 2
+    LooseCannon robbed QuietBadger for 2
+    VelvetMole tried to rob IronSpatula (guarded)
+    SoggyBiscuit robbed LuckyLantern for 2
+    rations: RustyKettle 13, CleverCrow 11, SoggyBiscuit 8, IronSpatula 8, LooseCannon 6, FoggyGlasses 5, SneakyPenguin 3, LuckyLantern 3, PaperTiger 2, VelvetMole 1, QuietBadger 1, LazyRiver 1, ColdCoffee 1, MuddyPaws 0(B), HollowTin 0(B)
+
+=== NIGHT 8 - #news, 07:30 ===
+  - Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 2.
+  - Someone hit LooseCannon overnight. LooseCannon is down 2.
+  - CAUGHT: CleverCrow was guarding and caught HollowTin red-handed. HollowTin pays CleverCrow 2.
+  - Someone hit RustyKettle overnight. RustyKettle is down 1.
+  - EXPOSED: an investigator saw VelvetMole rob LooseCannon. VelvetMole pays them 1.
+  - ColdCoffee ran out of food. ColdCoffee is back... as a bandit.
+  [behind the scenes]
+    SneakyPenguin robbed SoggyBiscuit for 2
+    VelvetMole robbed LooseCannon for 2
+    HollowTin tried to rob CleverCrow (guarded)
+    MuddyPaws robbed RustyKettle for 1
+    LazyRiver missed the deadline (auto-scavenge)
+    RustyKettle missed the deadline (auto-scavenge)
+    FoggyGlasses missed the deadline (auto-scavenge)
+    rations: RustyKettle 13, CleverCrow 12, IronSpatula 9, SoggyBiscuit 6, SneakyPenguin 4, LooseCannon 4, FoggyGlasses 4, LuckyLantern 2, LazyRiver 2, VelvetMole 1, QuietBadger 1, PaperTiger 1, MuddyPaws 1(B), HollowTin 0(B), ColdCoffee 0(B)
+
+=== NIGHT 9 - #news, 07:30 ===
+  - 2 people hit RustyKettle overnight. RustyKettle is down 4.
+  - 2 people hit FoggyGlasses overnight. FoggyGlasses is down 2.
+  - Someone hit LuckyLantern overnight. LuckyLantern is down 2.
+  - Someone hit LazyRiver overnight. LazyRiver is down 1.
+  - LuckyLantern ran out of food. LuckyLantern is back... as a bandit.
+  [behind the scenes]
+    VelvetMole robbed RustyKettle for 2
+    CleverCrow robbed RustyKettle for 2
+    MuddyPaws robbed FoggyGlasses for 1
+    HollowTin robbed FoggyGlasses for 1
+    SoggyBiscuit robbed LuckyLantern for 2
+    ColdCoffee robbed LazyRiver for 1
+    IronSpatula missed the deadline (auto-scavenge)
+    rations: CleverCrow 13, IronSpatula 10, RustyKettle 9, SoggyBiscuit 7, SneakyPenguin 3, LooseCannon 3, VelvetMole 2, MuddyPaws 2(B), QuietBadger 1, PaperTiger 1, LazyRiver 1, HollowTin 1(B), FoggyGlasses 1, ColdCoffee 1(B), LuckyLantern 0(B)
+
+=== NIGHT 10 - #news, 07:30 ===
+  - 2 people hit FoggyGlasses overnight. FoggyGlasses is down 1.
+  - Someone hit QuietBadger overnight. QuietBadger is down 1.
+  - 2 people hit VelvetMole overnight. VelvetMole is down 2.
+  - CAUGHT: SneakyPenguin was guarding and caught VelvetMole red-handed. VelvetMole pays SneakyPenguin 2.
+  - CAUGHT: SneakyPenguin was guarding and caught HollowTin red-handed. HollowTin pays SneakyPenguin 2.
+  - 2 people hit LazyRiver overnight. LazyRiver is down 1.
+  - CAUGHT: LooseCannon was guarding and caught SoggyBiscuit red-handed. SoggyBiscuit pays LooseCannon 2.
+  - Someone hit PaperTiger overnight. PaperTiger is down 1.
+  - Someone hit IronSpatula overnight. IronSpatula is down 1.
+  - Someone hit CleverCrow overnight. CleverCrow is down 1.
+  - QuietBadger ran out of food. QuietBadger is back... as a bandit.
+  - LazyRiver ran out of food. LazyRiver is back... as a bandit.
+  - VelvetMole ran out of food. VelvetMole is back... as a bandit.
+  - PaperTiger ran out of food. PaperTiger is back... as a bandit.
+  - FoggyGlasses ran out of food. FoggyGlasses is back... as a bandit.
+  - Bandit MuddyPaws has scraped together enough to rejoin the survivors.
+  [behind the scenes]
+    CleverCrow robbed FoggyGlasses for 1
+    QuietBadger robbed FoggyGlasses for 0
+    LazyRiver robbed QuietBadger for 1
+    LuckyLantern robbed VelvetMole for 1
+    LooseCannon robbed VelvetMole for 1
+    VelvetMole tried to rob SneakyPenguin (guarded)
+    HollowTin tried to rob SneakyPenguin (guarded)
+    FoggyGlasses robbed LazyRiver for 1
+    RustyKettle robbed LazyRiver for 0
+    SoggyBiscuit tried to rob LooseCannon (guarded)
+    IronSpatula robbed PaperTiger for 1
+    MuddyPaws robbed IronSpatula for 1
+    ColdCoffee robbed CleverCrow for 1
+    rations: CleverCrow 12, IronSpatula 9, RustyKettle 8, SneakyPenguin 6, LooseCannon 5, SoggyBiscuit 4, MuddyPaws 3, ColdCoffee 2(B), LuckyLantern 1(B), VelvetMole 0(B), QuietBadger 0(B), PaperTiger 0(B), LazyRiver 0(B), HollowTin 0(B), FoggyGlasses 0(B)
+
+=== EXTRACTION ===
+  5 seats. On the chopper: CleverCrow (12), IronSpatula (9), RustyKettle (8), SneakyPenguin (6), LooseCannon (5)
+
+=== THE REVEAL ===
+  5 pts  CleverCrow opportunist  extracted  rations 12  stole 11 (6 ok / 0 caught), robbed 1x, goal DONE: get robbed at least 1x and still extract
+  5 pts  RustyKettle casual       extracted  rations 8   stole 6 (3 ok / 0 caught), robbed 2x, goal DONE: steal at least 3 times without ever being caught
+  3 pts  LooseCannon detective    extracted  rations 5   stole 5 (3 ok / 0 caught), robbed 2x, goal failed: give away 3 rations over the game
+  3 pts  SneakyPenguin opportunist  extracted  rations 6   stole 2 (1 ok / 1 caught), robbed 1x, goal failed: successfully rob ColdCoffee at least 1x
+  3 pts  SoggyBiscuit shark        survived   rations 4   stole 10 (5 ok / 1 caught), robbed 2x, goal DONE: finish with more rations than LuckyLantern
+  3 pts  IronSpatula casual       extracted  rations 9   stole 1 (1 ok / 0 caught), robbed 2x, goal failed: steal at least 3 times without ever being caught
+  3 pts  MuddyPaws saint        survived   rations 3   stole 3 (3 ok / 0 caught), robbed 1x, goal DONE: finish with more rations than LuckyLantern
+  0 pts  QuietBadger opportunist  bandit     rations 0   stole 4 (2 ok / 0 caught), robbed 3x, goal failed: give away 3 rations over the game
+  0 pts  LazyRiver opportunist  bandit     rations 0   stole 1 (1 ok / 1 caught), robbed 3x, goal failed: steal at least 3 times without ever being caught
+  0 pts  VelvetMole opportunist  bandit     rations 0   stole 6 (3 ok / 3 caught), robbed 1x, goal failed: successfully rob SneakyPenguin at least 1x
+  0 pts  HollowTin opportunist  bandit     rations 0   stole 3 (2 ok / 2 caught), robbed 2x, goal failed: give away 3 rations over the game
+  0 pts  PaperTiger saint        bandit     rations 0   stole 0 (0 ok / 0 caught), robbed 2x, goal failed: finish with more rations than HollowTin
+  0 pts  LuckyLantern farmer       bandit     rations 1   stole 1 (1 ok / 0 caught), robbed 3x, goal failed: give away 3 rations over the game
+  0 pts  FoggyGlasses casual       bandit     rations 0   stole 1 (1 ok / 0 caught), robbed 3x, goal failed: successfully rob ColdCoffee at least 1x
+  0 pts  ColdCoffee paranoid     bandit     rations 2   stole 2 (2 ok / 0 caught), robbed 1x, goal failed: steal at least 3 times without ever being caught
+
+  Winner(s): CleverCrow
+
+Replay log written to sim/results/sample_game_v2_log.jsonl

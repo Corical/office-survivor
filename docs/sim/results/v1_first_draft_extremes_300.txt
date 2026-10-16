@@ -1,0 +1,43 @@
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+EXTREMES - 300 games per scenario, 15 players
+Rules changed from default: {'start_rations': 5, 'caught_penalty': 1, 'guard_reward': 0, 'guard_nights': 1, 'guard_limit': 0, 'investigate_bounty': 0, 'winner_tiebreak': 'none', 'tiebreak': 'coin', 'give_goal': 5, 'grudge_goal': 'deny', 'grudge_robs': 2, 'robbed_goal': 2, 'bandit_steal_amount': 2}
+
+1) THE WHOLE OFFICE GOES ULTRA (all players play the same way)
+                        Survivors  Ever bandit    1st death   Robs/night   Catch rate Quiet nights  Seat cutoff  Empty seats
+normal office                7.15         11.2         3.30         2.57         0.13         0.31         2.05         0.34
+always_guard                  0.0         15.0          5.0          0.0         0.00          9.0          0.0          5.0
+turtle                        0.0         15.0          5.0          0.0         0.00          9.0          0.0          5.0
+always_steal                 0.37         15.0         2.45         5.14         0.00         0.05         0.79         4.63
+always_scavenge              14.5         0.91         9.11         0.11         0.00         8.44         6.13          0.0
+always_gift                  1.54         15.0         3.10         1.92         0.00         2.10         2.28         3.46
+always_investigate            0.0         15.0          5.0          0.0         0.00          9.0          0.0          5.0
+
+2) ONE PLAYER GOES ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      31%                         1.75                    2.57
+always_guard               5.9%     0.88      37%      60%       100%     1.79        1.54        2.31
+turtle                     5.9%     0.88      37%      60%       100%     1.79        1.54        2.31
+always_steal              12.8%     1.92      54%      60%        43%     2.46        1.59        3.03
+always_scavenge            7.8%     1.17      42%      60%        56%     2.06        1.80        2.48
+always_gift                2.8%     0.42      15%      22%       100%     1.04        1.78        2.54
+always_investigate         3.6%     0.54      15%      19%       100%     1.09        1.73        2.54
+
+3) 3 PLAYERS GO ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      31%                         1.75                    2.57
+always_guard               8.6%     1.29      33%      40%       100%     1.59        1.23        1.94
+turtle                     8.6%     1.29      33%      40%       100%     1.59        1.23        1.94
+always_steal               9.6%     1.45      33%      35%        70%     1.75        1.31        3.71
+always_scavenge            7.0%     1.05      39%      67%        49%     2.05        1.87        2.26
+always_gift                3.3%     0.49      14%      21%       100%     1.16        1.82        2.61
+always_investigate         3.2%     0.49      14%      15%       100%     1.08        1.74        2.57
+
+4) 5 PLAYERS GO ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      31%                         1.75                    2.57
+always_guard               8.9%     1.34      25%      25%       100%     1.24        0.92        1.59
+turtle                     8.9%     1.34      25%      25%       100%     1.24        0.92        1.59
+always_steal               7.5%     1.13      19%      19%        88%     1.30        1.16        4.09
+always_scavenge            7.2%     1.08      39%      78%        36%     2.11        1.93        2.02
+always_gift                3.2%     0.48      15%      20%       100%     1.19        1.93        2.57
+always_investigate         3.0%     0.45      11%      13%       100%     0.96        1.69        2.51

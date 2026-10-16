@@ -1,0 +1,1949 @@
+{
+  "players": [
+    {
+      "id": 0,
+      "name": "QuietBadger",
+      "personality": "opportunist",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 1,
+      "name": "LazyRiver",
+      "personality": "opportunist",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 2,
+      "name": "LooseCannon",
+      "personality": "detective",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 3,
+      "name": "SneakyPenguin",
+      "personality": "opportunist",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 4,
+      "name": "CleverCrow",
+      "personality": "opportunist",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 5,
+      "name": "VelvetMole",
+      "personality": "opportunist",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 6,
+      "name": "RustyKettle",
+      "personality": "casual",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 7,
+      "name": "HollowTin",
+      "personality": "opportunist",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 8,
+      "name": "SoggyBiscuit",
+      "personality": "shark",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 9,
+      "name": "PaperTiger",
+      "personality": "saint",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 10,
+      "name": "IronSpatula",
+      "personality": "casual",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 11,
+      "name": "LuckyLantern",
+      "personality": "farmer",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 12,
+      "name": "FoggyGlasses",
+      "personality": "casual",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 13,
+      "name": "MuddyPaws",
+      "personality": "saint",
+      "start_rations": 7,
+      "smart": false
+    },
+    {
+      "id": 14,
+      "name": "ColdCoffee",
+      "personality": "paranoid",
+      "start_rations": 7,
+      "smart": false
+    }
+  ],
+  "frames": [
+    {
+      "night": 1,
+      "players": {
+        "QuietBadger": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "SneakyPenguin",
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "IronSpatula",
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "HollowTin",
+          "auto": false
+        },
+        "HollowTin": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LuckyLantern",
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 6,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "gift",
+          "target": "LazyRiver",
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LuckyLantern": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "gift",
+          "target": "LuckyLantern",
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "SoggyBiscuit set a guard (protected until night 2, guard #1)",
+        "LooseCannon stole 2 from SneakyPenguin",
+        "CleverCrow stole 2 from IronSpatula",
+        "RustyKettle stole 2 from HollowTin",
+        "HollowTin stole 2 from LuckyLantern",
+        "QuietBadger scavenged and found 0",
+        "LazyRiver scavenged and found 0",
+        "SneakyPenguin scavenged and found 1",
+        "VelvetMole scavenged and found 1",
+        "IronSpatula scavenged and found 2 (missed the deadline)",
+        "LuckyLantern scavenged and found 1",
+        "FoggyGlasses scavenged and found 0",
+        "ColdCoffee scavenged and found 0",
+        "PaperTiger secretly gave LazyRiver 2",
+        "MuddyPaws secretly gave LuckyLantern 2"
+      ],
+      "news": [
+        "Someone hit SneakyPenguin overnight. SneakyPenguin is down 2.",
+        "Someone hit IronSpatula overnight. IronSpatula is down 2.",
+        "Someone hit HollowTin overnight. HollowTin is down 2.",
+        "Someone hit LuckyLantern overnight. LuckyLantern is down 2."
+      ]
+    },
+    {
+      "night": 2,
+      "players": {
+        "QuietBadger": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LazyRiver": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LooseCannon": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "CleverCrow": {
+          "rations": 9,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "RustyKettle": {
+          "rations": 9,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LazyRiver",
+          "auto": false
+        },
+        "HollowTin": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "SoggyBiscuit": {
+          "rations": 7,
+          "bandit": false,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LuckyLantern": {
+          "rations": 6,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "LuckyLantern set a guard (protected until night 3, guard #1)",
+        "RustyKettle stole 2 from LazyRiver",
+        "QuietBadger scavenged and found 0 (missed the deadline)",
+        "LazyRiver scavenged and found 1 (missed the deadline)",
+        "LooseCannon scavenged and found 0",
+        "SneakyPenguin scavenged and found 0 (missed the deadline)",
+        "CleverCrow scavenged and found 2",
+        "VelvetMole scavenged and found 0 (missed the deadline)",
+        "HollowTin scavenged and found 1 (missed the deadline)",
+        "SoggyBiscuit scavenged and found 2",
+        "PaperTiger scavenged and found 2",
+        "IronSpatula scavenged and found 1 (missed the deadline)",
+        "FoggyGlasses scavenged and found 1",
+        "MuddyPaws scavenged and found 0",
+        "ColdCoffee scavenged and found 1"
+      ],
+      "news": [
+        "Someone hit LazyRiver overnight. LazyRiver is down 2."
+      ]
+    },
+    {
+      "night": 3,
+      "players": {
+        "QuietBadger": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 5,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 6,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "QuietBadger",
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "HollowTin": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "FoggyGlasses",
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LuckyLantern": {
+          "rations": 5,
+          "bandit": false,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "investigate",
+          "target": "LazyRiver",
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 5,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "LazyRiver set a guard (protected until night 4, guard #1)",
+        "LooseCannon set a guard (protected until night 4, guard #1)",
+        "ColdCoffee set a guard (protected until night 4, guard #1)",
+        "VelvetMole stole 2 from QuietBadger",
+        "SoggyBiscuit stole 2 from FoggyGlasses",
+        "QuietBadger scavenged and found 1",
+        "SneakyPenguin scavenged and found 2",
+        "CleverCrow scavenged and found 0",
+        "RustyKettle scavenged and found 0 (missed the deadline)",
+        "HollowTin scavenged and found 1",
+        "PaperTiger scavenged and found 2",
+        "IronSpatula scavenged and found 1",
+        "LuckyLantern scavenged and found 0",
+        "FoggyGlasses scavenged and found 1",
+        "MuddyPaws watched LazyRiver (guard)"
+      ],
+      "news": [
+        "Someone hit QuietBadger overnight. QuietBadger is down 2.",
+        "Someone hit FoggyGlasses overnight. FoggyGlasses is down 2."
+      ]
+    },
+    {
+      "night": 4,
+      "players": {
+        "QuietBadger": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "gift",
+          "target": "FoggyGlasses",
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 5,
+          "bandit": false,
+          "protected": true,
+          "action": "investigate",
+          "target": "CleverCrow",
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 7,
+          "bandit": false,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "ColdCoffee",
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "SoggyBiscuit",
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 9,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "HollowTin": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "gift",
+          "target": "QuietBadger",
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "MuddyPaws",
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LuckyLantern": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 8,
+          "bandit": false,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "SneakyPenguin tried to rob ColdCoffee but walked into a guard",
+        "CleverCrow stole 2 from SoggyBiscuit",
+        "SoggyBiscuit stole 2 from MuddyPaws",
+        "LooseCannon scavenged and found 2",
+        "VelvetMole scavenged and found 2",
+        "RustyKettle scavenged and found 2",
+        "PaperTiger scavenged and found 0",
+        "IronSpatula scavenged and found 2 (missed the deadline)",
+        "LuckyLantern scavenged and found 0",
+        "FoggyGlasses scavenged and found 2",
+        "MuddyPaws scavenged and found 2",
+        "ColdCoffee scavenged and found 2",
+        "QuietBadger secretly gave FoggyGlasses 1",
+        "HollowTin secretly gave QuietBadger 1",
+        "LazyRiver watched CleverCrow (steal SoggyBiscuit)",
+        "LazyRiver exposed CleverCrow for robbing SoggyBiscuit; paid 1"
+      ],
+      "news": [
+        "CAUGHT: ColdCoffee was guarding and caught SneakyPenguin red-handed. SneakyPenguin pays ColdCoffee 2.",
+        "Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 2.",
+        "Someone hit MuddyPaws overnight. MuddyPaws is down 2.",
+        "EXPOSED: an investigator saw CleverCrow rob SoggyBiscuit. CleverCrow pays them 1."
+      ]
+    },
+    {
+      "night": 5,
+      "players": {
+        "QuietBadger": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "HollowTin",
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "RustyKettle",
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "CleverCrow": {
+          "rations": 9,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "PaperTiger",
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "RustyKettle",
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 12,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "HollowTin": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "PaperTiger",
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LuckyLantern": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 7,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "RustyKettle set a guard (protected until night 6, guard #1)",
+        "ColdCoffee set a guard (protected until night 6, guard #2)",
+        "QuietBadger stole 2 from HollowTin",
+        "LazyRiver tried to rob RustyKettle but walked into a guard",
+        "VelvetMole tried to rob RustyKettle but walked into a guard",
+        "CleverCrow stole 2 from PaperTiger",
+        "SoggyBiscuit stole 2 from PaperTiger",
+        "LooseCannon scavenged and found 0",
+        "SneakyPenguin scavenged and found 2 (missed the deadline)",
+        "HollowTin scavenged and found 1",
+        "PaperTiger scavenged and found 2",
+        "IronSpatula scavenged and found 0 (missed the deadline)",
+        "LuckyLantern scavenged and found 2",
+        "FoggyGlasses scavenged and found 0",
+        "MuddyPaws scavenged and found 1"
+      ],
+      "news": [
+        "Someone hit HollowTin overnight. HollowTin is down 2.",
+        "CAUGHT: RustyKettle was guarding and caught LazyRiver red-handed. LazyRiver pays RustyKettle 2.",
+        "CAUGHT: RustyKettle was guarding and caught VelvetMole red-handed. VelvetMole pays RustyKettle 2.",
+        "2 people hit PaperTiger overnight. PaperTiger is down 4."
+      ]
+    },
+    {
+      "night": 6,
+      "players": {
+        "QuietBadger": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 10,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LooseCannon",
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "investigate",
+          "target": "SneakyPenguin",
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 12,
+          "bandit": false,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "HollowTin": {
+          "rations": 1,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LuckyLantern": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "MuddyPaws": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 6,
+          "bandit": false,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "HollowTin set a guard (protected until night 7, guard #1)",
+        "CleverCrow stole 2 from LooseCannon",
+        "QuietBadger scavenged and found 0",
+        "LazyRiver scavenged and found 1",
+        "LooseCannon scavenged and found 2",
+        "SneakyPenguin scavenged and found 1",
+        "RustyKettle scavenged and found 1 (missed the deadline)",
+        "SoggyBiscuit scavenged and found 0",
+        "PaperTiger scavenged and found 0",
+        "IronSpatula scavenged and found 2",
+        "LuckyLantern scavenged and found 0",
+        "FoggyGlasses scavenged and found 2 (missed the deadline)",
+        "MuddyPaws scavenged and found 1",
+        "ColdCoffee scavenged and found 0",
+        "VelvetMole watched SneakyPenguin (scavenge)"
+      ],
+      "news": [
+        "Someone hit LooseCannon overnight. LooseCannon is down 2."
+      ]
+    },
+    {
+      "night": 7,
+      "players": {
+        "QuietBadger": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "ColdCoffee",
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "investigate",
+          "target": "CleverCrow",
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "QuietBadger",
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 11,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "IronSpatula",
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 13,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "ColdCoffee",
+          "auto": false
+        },
+        "HollowTin": {
+          "rations": 0,
+          "bandit": true,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LuckyLantern",
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 8,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "LuckyLantern": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 5,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "IronSpatula set a guard (protected until night 8, guard #1)",
+        "QuietBadger stole 2 from ColdCoffee",
+        "RustyKettle stole 2 from ColdCoffee",
+        "LooseCannon stole 2 from QuietBadger",
+        "VelvetMole tried to rob IronSpatula but walked into a guard",
+        "SoggyBiscuit stole 2 from LuckyLantern",
+        "SneakyPenguin scavenged and found 1",
+        "CleverCrow scavenged and found 2",
+        "HollowTin scavenged and found 0",
+        "PaperTiger scavenged and found 2",
+        "LuckyLantern scavenged and found 2",
+        "FoggyGlasses scavenged and found 0",
+        "MuddyPaws scavenged and found 0",
+        "ColdCoffee scavenged and found 0",
+        "LazyRiver watched CleverCrow (scavenge)",
+        "HollowTin ran out of food and became a bandit",
+        "MuddyPaws ran out of food and became a bandit"
+      ],
+      "news": [
+        "2 people hit ColdCoffee overnight. ColdCoffee is down 4.",
+        "Someone hit QuietBadger overnight. QuietBadger is down 2.",
+        "CAUGHT: IronSpatula was guarding and caught VelvetMole red-handed. VelvetMole pays IronSpatula 2.",
+        "Someone hit LuckyLantern overnight. LuckyLantern is down 2.",
+        "HollowTin ran out of food. HollowTin is back... as a bandit.",
+        "MuddyPaws ran out of food. MuddyPaws is back... as a bandit."
+      ]
+    },
+    {
+      "night": 8,
+      "players": {
+        "QuietBadger": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LooseCannon": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "investigate",
+          "target": "VelvetMole",
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "SoggyBiscuit",
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 12,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LooseCannon",
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 13,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "HollowTin": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "CleverCrow",
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 6,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 9,
+          "bandit": false,
+          "protected": true,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LuckyLantern": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "MuddyPaws": {
+          "rations": 1,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "RustyKettle",
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 0,
+          "bandit": true,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "CleverCrow set a guard (protected until night 9, guard #1)",
+        "ColdCoffee set a guard (protected until night 9, guard #3)",
+        "SneakyPenguin stole 2 from SoggyBiscuit",
+        "VelvetMole stole 2 from LooseCannon",
+        "HollowTin tried to rob CleverCrow but walked into a guard",
+        "MuddyPaws stole 1 from RustyKettle",
+        "QuietBadger scavenged and found 1",
+        "LazyRiver scavenged and found 2 (missed the deadline)",
+        "RustyKettle scavenged and found 2 (missed the deadline)",
+        "SoggyBiscuit scavenged and found 1",
+        "PaperTiger scavenged and found 0",
+        "IronSpatula scavenged and found 2",
+        "LuckyLantern scavenged and found 0",
+        "FoggyGlasses scavenged and found 0 (missed the deadline)",
+        "LooseCannon watched VelvetMole (steal LooseCannon)",
+        "LooseCannon exposed VelvetMole for robbing LooseCannon; paid 1",
+        "ColdCoffee ran out of food and became a bandit"
+      ],
+      "news": [
+        "Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 2.",
+        "Someone hit LooseCannon overnight. LooseCannon is down 2.",
+        "CAUGHT: CleverCrow was guarding and caught HollowTin red-handed. HollowTin pays CleverCrow 2.",
+        "Someone hit RustyKettle overnight. RustyKettle is down 1.",
+        "EXPOSED: an investigator saw VelvetMole rob LooseCannon. VelvetMole pays them 1.",
+        "ColdCoffee ran out of food. ColdCoffee is back... as a bandit."
+      ]
+    },
+    {
+      "night": 9,
+      "players": {
+        "QuietBadger": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 3,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 13,
+          "bandit": false,
+          "protected": true,
+          "action": "steal",
+          "target": "RustyKettle",
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 2,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "RustyKettle",
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 9,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "HollowTin": {
+          "rations": 1,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "FoggyGlasses",
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 7,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LuckyLantern",
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 10,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": true
+        },
+        "LuckyLantern": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 1,
+          "bandit": false,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 2,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "FoggyGlasses",
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 1,
+          "bandit": true,
+          "protected": true,
+          "action": "steal",
+          "target": "LazyRiver",
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "LooseCannon set a guard (protected until night 10, guard #2)",
+        "VelvetMole stole 2 from RustyKettle",
+        "CleverCrow stole 2 from RustyKettle",
+        "MuddyPaws stole 1 from FoggyGlasses",
+        "HollowTin stole 1 from FoggyGlasses",
+        "SoggyBiscuit stole 2 from LuckyLantern",
+        "ColdCoffee stole 1 from LazyRiver",
+        "QuietBadger scavenged and found 1",
+        "LazyRiver scavenged and found 1",
+        "SneakyPenguin scavenged and found 0",
+        "RustyKettle scavenged and found 1",
+        "PaperTiger scavenged and found 1",
+        "IronSpatula scavenged and found 2 (missed the deadline)",
+        "LuckyLantern scavenged and found 1",
+        "FoggyGlasses scavenged and found 0",
+        "LuckyLantern ran out of food and became a bandit"
+      ],
+      "news": [
+        "2 people hit RustyKettle overnight. RustyKettle is down 4.",
+        "2 people hit FoggyGlasses overnight. FoggyGlasses is down 2.",
+        "Someone hit LuckyLantern overnight. LuckyLantern is down 2.",
+        "Someone hit LazyRiver overnight. LazyRiver is down 1.",
+        "LuckyLantern ran out of food. LuckyLantern is back... as a bandit."
+      ]
+    },
+    {
+      "night": 10,
+      "players": {
+        "QuietBadger": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "FoggyGlasses",
+          "auto": false
+        },
+        "LazyRiver": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "QuietBadger",
+          "auto": false
+        },
+        "LooseCannon": {
+          "rations": 5,
+          "bandit": false,
+          "protected": true,
+          "action": "steal",
+          "target": "VelvetMole",
+          "auto": false
+        },
+        "SneakyPenguin": {
+          "rations": 6,
+          "bandit": false,
+          "protected": true,
+          "action": "guard",
+          "target": null,
+          "auto": false
+        },
+        "CleverCrow": {
+          "rations": 12,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "FoggyGlasses",
+          "auto": false
+        },
+        "VelvetMole": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "SneakyPenguin",
+          "auto": false
+        },
+        "RustyKettle": {
+          "rations": 8,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LazyRiver",
+          "auto": false
+        },
+        "HollowTin": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "SneakyPenguin",
+          "auto": false
+        },
+        "SoggyBiscuit": {
+          "rations": 4,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "LooseCannon",
+          "auto": false
+        },
+        "PaperTiger": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "scavenge",
+          "target": null,
+          "auto": false
+        },
+        "IronSpatula": {
+          "rations": 9,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "PaperTiger",
+          "auto": false
+        },
+        "LuckyLantern": {
+          "rations": 1,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "VelvetMole",
+          "auto": false
+        },
+        "FoggyGlasses": {
+          "rations": 0,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "LazyRiver",
+          "auto": false
+        },
+        "MuddyPaws": {
+          "rations": 3,
+          "bandit": false,
+          "protected": false,
+          "action": "steal",
+          "target": "IronSpatula",
+          "auto": false
+        },
+        "ColdCoffee": {
+          "rations": 2,
+          "bandit": true,
+          "protected": false,
+          "action": "steal",
+          "target": "CleverCrow",
+          "auto": false
+        }
+      },
+      "what_happened": [
+        "SneakyPenguin set a guard (protected until night 11, guard #1)",
+        "CleverCrow stole 1 from FoggyGlasses",
+        "QuietBadger broke into FoggyGlasses's place and found nothing",
+        "LazyRiver stole 1 from QuietBadger",
+        "LuckyLantern stole 1 from VelvetMole",
+        "LooseCannon stole 1 from VelvetMole",
+        "VelvetMole tried to rob SneakyPenguin but walked into a guard",
+        "HollowTin tried to rob SneakyPenguin but walked into a guard",
+        "FoggyGlasses stole 1 from LazyRiver",
+        "RustyKettle broke into LazyRiver's place and found nothing",
+        "SoggyBiscuit tried to rob LooseCannon but walked into a guard",
+        "IronSpatula stole 1 from PaperTiger",
+        "MuddyPaws stole 1 from IronSpatula",
+        "ColdCoffee stole 1 from CleverCrow",
+        "PaperTiger scavenged and found 1",
+        "QuietBadger ran out of food and became a bandit",
+        "LazyRiver ran out of food and became a bandit",
+        "VelvetMole ran out of food and became a bandit",
+        "PaperTiger ran out of food and became a bandit",
+        "FoggyGlasses ran out of food and became a bandit",
+        "MuddyPaws rejoined the survivors with 3"
+      ],
+      "news": [
+        "2 people hit FoggyGlasses overnight. FoggyGlasses is down 1.",
+        "Someone hit QuietBadger overnight. QuietBadger is down 1.",
+        "2 people hit VelvetMole overnight. VelvetMole is down 2.",
+        "CAUGHT: SneakyPenguin was guarding and caught VelvetMole red-handed. VelvetMole pays SneakyPenguin 2.",
+        "CAUGHT: SneakyPenguin was guarding and caught HollowTin red-handed. HollowTin pays SneakyPenguin 2.",
+        "2 people hit LazyRiver overnight. LazyRiver is down 1.",
+        "CAUGHT: LooseCannon was guarding and caught SoggyBiscuit red-handed. SoggyBiscuit pays LooseCannon 2.",
+        "Someone hit PaperTiger overnight. PaperTiger is down 1.",
+        "Someone hit IronSpatula overnight. IronSpatula is down 1.",
+        "Someone hit CleverCrow overnight. CleverCrow is down 1.",
+        "QuietBadger ran out of food. QuietBadger is back... as a bandit.",
+        "LazyRiver ran out of food. LazyRiver is back... as a bandit.",
+        "VelvetMole ran out of food. VelvetMole is back... as a bandit.",
+        "PaperTiger ran out of food. PaperTiger is back... as a bandit.",
+        "FoggyGlasses ran out of food. FoggyGlasses is back... as a bandit.",
+        "Bandit MuddyPaws has scraped together enough to rejoin the survivors."
+      ]
+    }
+  ],
+  "ending": [
+    {
+      "seq": 634,
+      "night": 10,
+      "type": "extraction",
+      "seats": 5,
+      "extracted": [
+        "CleverCrow",
+        "IronSpatula",
+        "RustyKettle",
+        "SneakyPenguin",
+        "LooseCannon"
+      ],
+      "ranking": [
+        {
+          "player": "CleverCrow",
+          "rations": 12,
+          "gave_away": 0
+        },
+        {
+          "player": "IronSpatula",
+          "rations": 9,
+          "gave_away": 0
+        },
+        {
+          "player": "RustyKettle",
+          "rations": 8,
+          "gave_away": 0
+        },
+        {
+          "player": "SneakyPenguin",
+          "rations": 6,
+          "gave_away": 0
+        },
+        {
+          "player": "LooseCannon",
+          "rations": 5,
+          "gave_away": 0
+        },
+        {
+          "player": "SoggyBiscuit",
+          "rations": 4,
+          "gave_away": 0
+        },
+        {
+          "player": "MuddyPaws",
+          "rations": 3,
+          "gave_away": 2
+        }
+      ],
+      "tiebreak": "kindness",
+      "decided_by_coin_flip": false,
+      "visibility": "public"
+    },
+    {
+      "seq": 650,
+      "night": 10,
+      "type": "game_end",
+      "winners": [
+        "CleverCrow"
+      ],
+      "winner_tiebreak": "kindness",
+      "visibility": "public"
+    }
+  ],
+  "results": [
+    {
+      "seq": 635,
+      "night": 10,
+      "type": "result",
+      "player": "QuietBadger",
+      "rations": 0,
+      "survived": false,
+      "extracted": false,
+      "objective": "give away 3 rations over the game",
+      "objective_done": false,
+      "score": 0,
+      "stole": 4,
+      "steals_ok": 2,
+      "steals_caught": 0,
+      "times_robbed": 3,
+      "gave_away": 1,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 636,
+      "night": 10,
+      "type": "result",
+      "player": "LazyRiver",
+      "rations": 0,
+      "survived": false,
+      "extracted": false,
+      "objective": "steal at least 3 times without ever being caught",
+      "objective_done": false,
+      "score": 0,
+      "stole": 1,
+      "steals_ok": 1,
+      "steals_caught": 1,
+      "times_robbed": 3,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 637,
+      "night": 10,
+      "type": "result",
+      "player": "LooseCannon",
+      "rations": 5,
+      "survived": true,
+      "extracted": true,
+      "objective": "give away 3 rations over the game",
+      "objective_done": false,
+      "score": 3,
+      "stole": 5,
+      "steals_ok": 3,
+      "steals_caught": 0,
+      "times_robbed": 2,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 638,
+      "night": 10,
+      "type": "result",
+      "player": "SneakyPenguin",
+      "rations": 6,
+      "survived": true,
+      "extracted": true,
+      "objective": "successfully rob ColdCoffee at least 1x",
+      "objective_done": false,
+      "score": 3,
+      "stole": 2,
+      "steals_ok": 1,
+      "steals_caught": 1,
+      "times_robbed": 1,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 639,
+      "night": 10,
+      "type": "result",
+      "player": "CleverCrow",
+      "rations": 12,
+      "survived": true,
+      "extracted": true,
+      "objective": "get robbed at least 1x and still extract",
+      "objective_done": true,
+      "score": 5,
+      "stole": 11,
+      "steals_ok": 6,
+      "steals_caught": 0,
+      "times_robbed": 1,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 640,
+      "night": 10,
+      "type": "result",
+      "player": "VelvetMole",
+      "rations": 0,
+      "survived": false,
+      "extracted": false,
+      "objective": "successfully rob SneakyPenguin at least 1x",
+      "objective_done": false,
+      "score": 0,
+      "stole": 6,
+      "steals_ok": 3,
+      "steals_caught": 3,
+      "times_robbed": 1,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 641,
+      "night": 10,
+      "type": "result",
+      "player": "RustyKettle",
+      "rations": 8,
+      "survived": true,
+      "extracted": true,
+      "objective": "steal at least 3 times without ever being caught",
+      "objective_done": true,
+      "score": 5,
+      "stole": 6,
+      "steals_ok": 3,
+      "steals_caught": 0,
+      "times_robbed": 2,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 642,
+      "night": 10,
+      "type": "result",
+      "player": "HollowTin",
+      "rations": 0,
+      "survived": false,
+      "extracted": false,
+      "objective": "give away 3 rations over the game",
+      "objective_done": false,
+      "score": 0,
+      "stole": 3,
+      "steals_ok": 2,
+      "steals_caught": 2,
+      "times_robbed": 2,
+      "gave_away": 1,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 643,
+      "night": 10,
+      "type": "result",
+      "player": "SoggyBiscuit",
+      "rations": 4,
+      "survived": true,
+      "extracted": false,
+      "objective": "finish with more rations than LuckyLantern",
+      "objective_done": true,
+      "score": 3,
+      "stole": 10,
+      "steals_ok": 5,
+      "steals_caught": 1,
+      "times_robbed": 2,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 644,
+      "night": 10,
+      "type": "result",
+      "player": "PaperTiger",
+      "rations": 0,
+      "survived": false,
+      "extracted": false,
+      "objective": "finish with more rations than HollowTin",
+      "objective_done": false,
+      "score": 0,
+      "stole": 0,
+      "steals_ok": 0,
+      "steals_caught": 0,
+      "times_robbed": 2,
+      "gave_away": 2,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 645,
+      "night": 10,
+      "type": "result",
+      "player": "IronSpatula",
+      "rations": 9,
+      "survived": true,
+      "extracted": true,
+      "objective": "steal at least 3 times without ever being caught",
+      "objective_done": false,
+      "score": 3,
+      "stole": 1,
+      "steals_ok": 1,
+      "steals_caught": 0,
+      "times_robbed": 2,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 646,
+      "night": 10,
+      "type": "result",
+      "player": "LuckyLantern",
+      "rations": 1,
+      "survived": false,
+      "extracted": false,
+      "objective": "give away 3 rations over the game",
+      "objective_done": false,
+      "score": 0,
+      "stole": 1,
+      "steals_ok": 1,
+      "steals_caught": 0,
+      "times_robbed": 3,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 647,
+      "night": 10,
+      "type": "result",
+      "player": "FoggyGlasses",
+      "rations": 0,
+      "survived": false,
+      "extracted": false,
+      "objective": "successfully rob ColdCoffee at least 1x",
+      "objective_done": false,
+      "score": 0,
+      "stole": 1,
+      "steals_ok": 1,
+      "steals_caught": 0,
+      "times_robbed": 3,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 648,
+      "night": 10,
+      "type": "result",
+      "player": "MuddyPaws",
+      "rations": 3,
+      "survived": true,
+      "extracted": false,
+      "objective": "finish with more rations than LuckyLantern",
+      "objective_done": true,
+      "score": 3,
+      "stole": 3,
+      "steals_ok": 3,
+      "steals_caught": 0,
+      "times_robbed": 1,
+      "gave_away": 2,
+      "visibility": "public_at_reveal"
+    },
+    {
+      "seq": 649,
+      "night": 10,
+      "type": "result",
+      "player": "ColdCoffee",
+      "rations": 2,
+      "survived": false,
+      "extracted": false,
+      "objective": "steal at least 3 times without ever being caught",
+      "objective_done": false,
+      "score": 0,
+      "stole": 2,
+      "steals_ok": 2,
+      "steals_caught": 0,
+      "times_robbed": 1,
+      "gave_away": 0,
+      "visibility": "public_at_reveal"
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+Log: 650 events, 15 players, 10 nights, seed 11
+Replay check: every ration, bandit and result rebuilds exactly from the log.
+
+=== Night 1 ===
+  SoggyBiscuit set a guard (protected until night 2, guard #1)
+  LooseCannon stole 2 from SneakyPenguin
+  CleverCrow stole 2 from IronSpatula
+  RustyKettle stole 2 from HollowTin
+  HollowTin stole 2 from LuckyLantern
+  QuietBadger scavenged and found 0
+  LazyRiver scavenged and found 0
+  SneakyPenguin scavenged and found 1
+  VelvetMole scavenged and found 1
+  IronSpatula scavenged and found 2 (missed the deadline)
+  LuckyLantern scavenged and found 1
+  FoggyGlasses scavenged and found 0
+  ColdCoffee scavenged and found 0
+  PaperTiger secretly gave LazyRiver 2
+  MuddyPaws secretly gave LuckyLantern 2
+  rations: LazyRiver 8, LooseCannon 8, CleverCrow 8, RustyKettle 8, VelvetMole 7, LuckyLantern 7, QuietBadger 6, HollowTin 6, SoggyBiscuit 6, IronSpatula 6, FoggyGlasses 6, ColdCoffee 6, SneakyPenguin 5, PaperTiger 4, MuddyPaws 4
+
+=== Night 2 ===
+  LuckyLantern set a guard (protected until night 3, guard #1)
+  RustyKettle stole 2 from LazyRiver
+  QuietBadger scavenged and found 0 (missed the deadline)
+  LazyRiver scavenged and found 1 (missed the deadline)
+  LooseCannon scavenged and found 0
+  SneakyPenguin scavenged and found 0 (missed the deadline)
+  CleverCrow scavenged and found 2
+  VelvetMole scavenged and found 0 (missed the deadline)
+  HollowTin scavenged and found 1 (missed the deadline)
+  SoggyBiscuit scavenged and found 2
+  PaperTiger scavenged and found 2
+  IronSpatula scavenged and found 1 (missed the deadline)
+  FoggyGlasses scavenged and found 1
+  MuddyPaws scavenged and found 0
+  ColdCoffee scavenged and found 1
+  rations: CleverCrow 9, RustyKettle 9, LooseCannon 7, SoggyBiscuit 7, LazyRiver 6, VelvetMole 6, HollowTin 6, IronSpatula 6, LuckyLantern 6, FoggyGlasses 6, ColdCoffee 6, QuietBadger 5, PaperTiger 5, SneakyPenguin 4, MuddyPaws 3
+
+=== Night 3 ===
+  LazyRiver set a guard (protected until night 4, guard #1)
+  LooseCannon set a guard (protected until night 4, guard #1)
+  ColdCoffee set a guard (protected until night 4, guard #1)
+  VelvetMole stole 2 from QuietBadger
+  SoggyBiscuit stole 2 from FoggyGlasses
+  QuietBadger scavenged and found 1
+  SneakyPenguin scavenged and found 2
+  CleverCrow scavenged and found 0
+  RustyKettle scavenged and found 0 (missed the deadline)
+  HollowTin scavenged and found 1
+  PaperTiger scavenged and found 2
+  IronSpatula scavenged and found 1
+  LuckyLantern scavenged and found 0
+  FoggyGlasses scavenged and found 1
+  MuddyPaws watched LazyRiver (guard)
+  rations: CleverCrow 8, RustyKettle 8, SoggyBiscuit 8, VelvetMole 7, LooseCannon 6, HollowTin 6, PaperTiger 6, IronSpatula 6, LazyRiver 5, SneakyPenguin 5, LuckyLantern 5, ColdCoffee 5, FoggyGlasses 4, QuietBadger 3, MuddyPaws 2
+
+=== Night 4 ===
+  SneakyPenguin tried to rob ColdCoffee but walked into a guard
+  CleverCrow stole 2 from SoggyBiscuit
+  SoggyBiscuit stole 2 from MuddyPaws
+  LooseCannon scavenged and found 2
+  VelvetMole scavenged and found 2
+  RustyKettle scavenged and found 2
+  PaperTiger scavenged and found 0
+  IronSpatula scavenged and found 2 (missed the deadline)
+  LuckyLantern scavenged and found 0
+  FoggyGlasses scavenged and found 2
+  MuddyPaws scavenged and found 2
+  ColdCoffee scavenged and found 2
+  QuietBadger secretly gave FoggyGlasses 1
+  HollowTin secretly gave QuietBadger 1
+  LazyRiver watched CleverCrow (steal SoggyBiscuit)
+  LazyRiver exposed CleverCrow for robbing SoggyBiscuit; paid 1
+  rations: RustyKettle 9, CleverCrow 8, VelvetMole 8, ColdCoffee 8, LooseCannon 7, SoggyBiscuit 7, IronSpatula 7, FoggyGlasses 6, LazyRiver 5, PaperTiger 5, HollowTin 4, LuckyLantern 4, QuietBadger 2, SneakyPenguin 2, MuddyPaws 1
+
+=== Night 5 ===
+  RustyKettle set a guard (protected until night 6, guard #1)
+  ColdCoffee set a guard (protected until night 6, guard #2)
+  QuietBadger stole 2 from HollowTin
+  LazyRiver tried to rob RustyKettle but walked into a guard
+  VelvetMole tried to rob RustyKettle but walked into a guard
+  CleverCrow stole 2 from PaperTiger
+  SoggyBiscuit stole 2 from PaperTiger
+  LooseCannon scavenged and found 0
+  SneakyPenguin scavenged and found 2 (missed the deadline)
+  HollowTin scavenged and found 1
+  PaperTiger scavenged and found 2
+  IronSpatula scavenged and found 0 (missed the deadline)
+  LuckyLantern scavenged and found 2
+  FoggyGlasses scavenged and found 0
+  MuddyPaws scavenged and found 1
+  rations: RustyKettle 12, CleverCrow 9, SoggyBiscuit 8, ColdCoffee 7, LooseCannon 6, IronSpatula 6, VelvetMole 5, LuckyLantern 5, FoggyGlasses 5, QuietBadger 3, SneakyPenguin 3, LazyRiver 2, HollowTin 2, PaperTiger 2, MuddyPaws 1
+
+=== Night 6 ===
+  HollowTin set a guard (protected until night 7, guard #1)
+  CleverCrow stole 2 from LooseCannon
+  QuietBadger scavenged and found 0
+  LazyRiver scavenged and found 1
+  LooseCannon scavenged and found 2
+  SneakyPenguin scavenged and found 1
+  RustyKettle scavenged and found 1 (missed the deadline)
+  SoggyBiscuit scavenged and found 0
+  PaperTiger scavenged and found 0
+  IronSpatula scavenged and found 2
+  LuckyLantern scavenged and found 0
+  FoggyGlasses scavenged and found 2 (missed the deadline)
+  MuddyPaws scavenged and found 1
+  ColdCoffee scavenged and found 0
+  VelvetMole watched SneakyPenguin (scavenge)
+  rations: RustyKettle 12, CleverCrow 10, SoggyBiscuit 7, IronSpatula 7, FoggyGlasses 6, ColdCoffee 6, LooseCannon 5, VelvetMole 4, LuckyLantern 4, SneakyPenguin 3, QuietBadger 2, LazyRiver 2, HollowTin 1, PaperTiger 1, MuddyPaws 1
+
+=== Night 7 ===
+  IronSpatula set a guard (protected until night 8, guard #1)
+  QuietBadger stole 2 from ColdCoffee
+  RustyKettle stole 2 from ColdCoffee
+  LooseCannon stole 2 from QuietBadger
+  VelvetMole tried to rob IronSpatula but walked into a guard
+  SoggyBiscuit stole 2 from LuckyLantern
+  SneakyPenguin scavenged and found 1
+  CleverCrow scavenged and found 2
+  HollowTin scavenged and found 0
+  PaperTiger scavenged and found 2
+  LuckyLantern scavenged and found 2
+  FoggyGlasses scavenged and found 0
+  MuddyPaws scavenged and found 0
+  ColdCoffee scavenged and found 0
+  LazyRiver watched CleverCrow (scavenge)
+  HollowTin ran out of food and became a bandit
+  MuddyPaws ran out of food and became a bandit
+  rations: RustyKettle 13, CleverCrow 11, SoggyBiscuit 8, IronSpatula 8, LooseCannon 6, FoggyGlasses 5, SneakyPenguin 3, LuckyLantern 3, PaperTiger 2, QuietBadger 1, LazyRiver 1, VelvetMole 1, ColdCoffee 1, HollowTin 0 (B), MuddyPaws 0 (B)
+
+=== Night 8 ===
+  CleverCrow set a guard (protected until night 9, guard #1)
+  ColdCoffee set a guard (protected until night 9, guard #3)
+  SneakyPenguin stole 2 from SoggyBiscuit
+  VelvetMole stole 2 from LooseCannon
+  HollowTin tried to rob CleverCrow but walked into a guard
+  MuddyPaws stole 1 from RustyKettle
+  QuietBadger scavenged and found 1
+  LazyRiver scavenged and found 2 (missed the deadline)
+  RustyKettle scavenged and found 2 (missed the deadline)
+  SoggyBiscuit scavenged and found 1
+  PaperTiger scavenged and found 0
+  IronSpatula scavenged and found 2
+  LuckyLantern scavenged and found 0
+  FoggyGlasses scavenged and found 0 (missed the deadline)
+  LooseCannon watched VelvetMole (steal LooseCannon)
+  LooseCannon exposed VelvetMole for robbing LooseCannon; paid 1
+  ColdCoffee ran out of food and became a bandit
+  rations: RustyKettle 13, CleverCrow 12, IronSpatula 9, SoggyBiscuit 6, LooseCannon 4, SneakyPenguin 4, FoggyGlasses 4, LazyRiver 2, LuckyLantern 2, QuietBadger 1, VelvetMole 1, PaperTiger 1, MuddyPaws 1 (B), HollowTin 0 (B), ColdCoffee 0 (B)
+
+=== Night 9 ===
+  LooseCannon set a guard (protected until night 10, guard #2)
+  VelvetMole stole 2 from RustyKettle
+  CleverCrow stole 2 from RustyKettle
+  MuddyPaws stole 1 from FoggyGlasses
+  HollowTin stole 1 from FoggyGlasses
+  SoggyBiscuit stole 2 from LuckyLantern
+  ColdCoffee stole 1 from LazyRiver
+  QuietBadger scavenged and found 1
+  LazyRiver scavenged and found 1
+  SneakyPenguin scavenged and found 0
+  RustyKettle scavenged and found 1
+  PaperTiger scavenged and found 1
+  IronSpatula scavenged and found 2 (missed the deadline)
+  LuckyLantern scavenged and found 1
+  FoggyGlasses scavenged and found 0
+  LuckyLantern ran out of food and became a bandit
+  rations: CleverCrow 13, IronSpatula 10, RustyKettle 9, SoggyBiscuit 7, LooseCannon 3, SneakyPenguin 3, VelvetMole 2, MuddyPaws 2 (B), QuietBadger 1, LazyRiver 1, HollowTin 1 (B), PaperTiger 1, FoggyGlasses 1, ColdCoffee 1 (B), LuckyLantern 0 (B)
+
+=== Night 10 ===
+  SneakyPenguin set a guard (protected until night 11, guard #1)
+  CleverCrow stole 1 from FoggyGlasses
+  QuietBadger broke into FoggyGlasses's place and found nothing
+  LazyRiver stole 1 from QuietBadger
+  LuckyLantern stole 1 from VelvetMole
+  LooseCannon stole 1 from VelvetMole
+  VelvetMole tried to rob SneakyPenguin but walked into a guard
+  HollowTin tried to rob SneakyPenguin but walked into a guard
+  FoggyGlasses stole 1 from LazyRiver
+  RustyKettle broke into LazyRiver's place and found nothing
+  SoggyBiscuit tried to rob LooseCannon but walked into a guard
+  IronSpatula stole 1 from PaperTiger
+  MuddyPaws stole 1 from IronSpatula
+  ColdCoffee stole 1 from CleverCrow
+  PaperTiger scavenged and found 1
+  QuietBadger ran out of food and became a bandit
+  LazyRiver ran out of food and became a bandit
+  VelvetMole ran out of food and became a bandit
+  PaperTiger ran out of food and became a bandit
+  FoggyGlasses ran out of food and became a bandit
+  MuddyPaws rejoined the survivors with 3
+  rations: CleverCrow 12, IronSpatula 9, RustyKettle 8, SneakyPenguin 6, LooseCannon 5, SoggyBiscuit 4, MuddyPaws 3, ColdCoffee 2 (B), LuckyLantern 1 (B), QuietBadger 0 (B), LazyRiver 0 (B), VelvetMole 0 (B), HollowTin 0 (B), PaperTiger 0 (B), FoggyGlasses 0 (B)
+
+Helicopter (5 seats): CleverCrow, IronSpatula, RustyKettle, SneakyPenguin, LooseCannon
+Winner: CleverCrow

@@ -1,0 +1,769 @@
+{
+  "total_duration_s": 154.5,
+  "game_facts": {
+    "players": 15,
+    "rounds": 10,
+    "start_rations": 7,
+    "eat": 1,
+    "scavenge_min": 0,
+    "scavenge_max": 2,
+    "steal_amount": 2,
+    "caught_penalty": 2,
+    "guard_reward": 2,
+    "guard_nights": 2,
+    "guard_limit": 3,
+    "investigate_bounty": 1,
+    "bandit_steal_amount": 1,
+    "bandit_rejoin": 3,
+    "seat_ratio": 0.3333333333,
+    "pts_extract": 3,
+    "pts_objective": 2,
+    "pts_survive": 1,
+    "tiebreak": "kindness",
+    "winner_tiebreak": "kindness",
+    "give_goal": 3,
+    "grudge_goal": "rob",
+    "grudge_robs": 1,
+    "robbed_goal": 1,
+    "deadline": "midnight",
+    "news_time": "07:30",
+    "news_time_spoken": "half past seven",
+    "join_command": "/join",
+    "minutes_per_day": 2,
+    "launch_date": "[LAUNCH DATE]",
+    "example_names": [
+      "RustyKettle",
+      "QuietBadger",
+      "SoggyBiscuit",
+      "LuckyLantern"
+    ],
+    "aliases": "Everyone plays under a secret alias assigned by the bot at /join; all game output uses aliases.",
+    "seats": 5,
+    "game_span": "two weeks",
+    "scavenge_spoken": "nothing, one or two rations",
+    "guard_span": "tonight and tomorrow night",
+    "join_spoken": "slash join",
+    "name1": "RustyKettle",
+    "name2": "QuietBadger",
+    "name3": "SoggyBiscuit",
+    "name4": "LuckyLantern",
+    "game_version": "v2 (16 Oct 2026)"
+  },
+  "style": {
+    "_about": "Look and sound for every stage. Changing anything here marks all assets and scenes for redo.",
+    "canvas": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "safe_margin_px": 96
+    },
+    "palette": {
+      "night_bg": "#14213D",
+      "night_mid": "#1F3B6E",
+      "day_bg": "#F4F1E8",
+      "text_light": "#F4F1E8",
+      "text_dark": "#14213D",
+      "ration_tin": "#D4A72C",
+      "ration_tin_label": "#8C2F1B",
+      "shadow": "#0B1222",
+      "avatar_skin_tones": [
+        "#F2C9A0",
+        "#D9A273",
+        "#A9714B",
+        "#6E4A2F"
+      ],
+      "avatar_shirts": [
+        "#2EC4B6",
+        "#FF9F1C",
+        "#E5E5E5",
+        "#5C6B73"
+      ]
+    },
+    "actions": {
+      "scavenge": {
+        "icon": "shovel",
+        "colour": "#3BA55C"
+      },
+      "steal": {
+        "icon": "grabbing hand",
+        "colour": "#E5484D"
+      },
+      "guard": {
+        "icon": "shield",
+        "colour": "#3E7BFA"
+      },
+      "investigate": {
+        "icon": "magnifying glass",
+        "colour": "#F5A524"
+      },
+      "gift": {
+        "icon": "gift box",
+        "colour": "#9B5DE5"
+      }
+    },
+    "fonts": {
+      "headline": "Fredoka Bold, or the nearest bold rounded sans available",
+      "body": "Inter SemiBold, or the nearest clean sans available",
+      "ui_mockups": "Inter or the system sans, so screens look like a real chat app"
+    },
+    "text_rules": {
+      "on_screen_max_words": 8,
+      "headline_min_px": 72,
+      "on_screen_text_position": "upper third, centred, inside the safe margin",
+      "captions": "bottom centre, 44 px, light text on a 70% black rounded box, max 2 lines of 42 characters"
+    },
+    "motion_rules": [
+      "Ease in-out on everything; pops and stamps take 0.25-0.35 s.",
+      "Hold every on-screen text line for at least 2 seconds.",
+      "No strobing: any flicker stays below 3 flashes per second.",
+      "Each scene starts when its voiceover paragraph starts.",
+      "Action icons always appear in their action colour, inside a circular badge."
+    ],
+    "art_direction": "Flat, friendly cartoon. Simple round avatars with dot eyes only. Night scenes are dark navy, not scary.",
+    "brand_rules": [
+      "Chat screens look like a modern chat app (dark sidebar, channel list, messages) but never use the Discord logo, wordmark or mascot.",
+      "The narration may say 'Discord'; the visuals stay generic.",
+      "Only the example names from game.json appear on screen."
+    ],
+    "audio": {
+      "voice": "Calm and slightly dramatic, like a late-night radio host. 48 kHz mono WAV, one file per scene.",
+      "music": "Low, tense, royalty-free background beat, about 15-20 dB under the voice. Cuts out at the drumroll in scene 13, back for scene 14.",
+      "final_loudness": "about -16 LUFS integrated, peaks below -1 dBTP"
+    },
+    "export": {
+      "scene_clips": "1920x1080, 30 fps, no audio, exactly the scene's duration_s",
+      "final": "H.264 MP4, 1920x1080, 30 fps, high quality (CRF about 18); AAC 48 kHz 192 kbps stereo; captions burned in"
+    }
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "number": 1,
+      "title": "Hook",
+      "start_s": 0.0,
+      "duration_s": 10,
+      "timing_source": "draft",
+      "narration": "For the next two weeks, the office becomes a survival game. Food is scarce, everyone is hungry, and anyone could turn on you.",
+      "word_count": 23,
+      "on_screen_text": "SURVIVORS",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "Office floor plan fades in at night (office_floorplan_night)."
+        },
+        {
+          "at_s": 1.5,
+          "do": "Two or three desk lamps flicker gently (under 3 flashes per second)."
+        },
+        {
+          "at_s": 3.0,
+          "do": "Desks morph into tents one cluster at a time (tent, top_down)."
+        },
+        {
+          "at_s": 7.0,
+          "do": "title_logo slams in centre with a small dust puff; hold to the end."
+        }
+      ],
+      "assets": [
+        "office_floorplan_night",
+        "tent",
+        "title_logo"
+      ],
+      "sfx": [
+        "night ambience",
+        "lamp buzz",
+        "whoosh per morph",
+        "title slam"
+      ],
+      "transition_in": "cut",
+      "voiceover_file": "output/03_audio/vo/scene_01.wav",
+      "output": "output/04_scenes/scene_01.mp4",
+      "vo_hash": "2669db18d098",
+      "hash": "61b8900b94a0"
+    },
+    {
+      "id": "scene_02",
+      "number": 2,
+      "title": "The goal",
+      "start_s": 10.0,
+      "duration_s": 10,
+      "timing_source": "draft",
+      "narration": "The game runs for ten workdays. Your goal: stay alive, and on the last night, grab one of five seats on the rescue helicopter.",
+      "word_count": 24,
+      "on_screen_text": "10 nights · 5 seats",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "calendar_strip slides in from the left."
+        },
+        {
+          "at_s": 1.0,
+          "do": "Tiles tick off one by one, evenly, until all 10 are ticked by 6.0 s."
+        },
+        {
+          "at_s": 6.0,
+          "do": "Camera pans right to the helicopter with 5 empty seats, rotor idling."
+        },
+        {
+          "at_s": 8.0,
+          "do": "On-screen text appears."
+        }
+      ],
+      "assets": [
+        "calendar_strip",
+        "helicopter"
+      ],
+      "sfx": [
+        "soft tick per tile",
+        "helicopter idle"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_02.wav",
+      "output": "output/04_scenes/scene_02.mp4",
+      "vo_hash": "cbc7cae959c8",
+      "hash": "ed4bef30d416"
+    },
+    {
+      "id": "scene_03",
+      "number": 3,
+      "title": "Food",
+      "start_s": 20.0,
+      "duration_s": 9,
+      "timing_source": "draft",
+      "narration": "Everyone starts with seven rations. Every night, you eat one. Run out, and you become a bandit. More on that later.",
+      "word_count": 21,
+      "on_screen_text": "Start with 7 · eat 1 a night",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "One avatar (standing) with 7 ration_tin in a row beside them."
+        },
+        {
+          "at_s": 1.5,
+          "do": "moon_sun cycles above; each night 1 tin pops away, speeding up, until none are left at 7.0 s."
+        },
+        {
+          "at_s": 7.2,
+          "do": "bandit_mask drops onto the avatar's face with a thunk; hold."
+        }
+      ],
+      "assets": [
+        "avatar",
+        "ration_tin",
+        "moon_sun",
+        "bandit_mask"
+      ],
+      "sfx": [
+        "tin clink per pop",
+        "mask thunk"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_03.wav",
+      "output": "output/04_scenes/scene_03.mp4",
+      "vo_hash": "151871650389",
+      "hash": "b7549513d85d"
+    },
+    {
+      "id": "scene_04",
+      "number": 4,
+      "title": "Your daily move",
+      "start_s": 29.0,
+      "duration_s": 9,
+      "timing_source": "draft",
+      "narration": "Each day, you pick one secret move in Discord before midnight. Nobody else can see what you chose. You have five options.",
+      "word_count": 22,
+      "on_screen_text": "1 secret move a day, before midnight",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "ui_phone_chat slides up from the bottom."
+        },
+        {
+          "at_s": 1.5,
+          "do": "Thumb taps the message box; '/steal' types in."
+        },
+        {
+          "at_s": 4.0,
+          "do": "Phone shrinks to the left; the five action_icons fan out in an arc with their labels."
+        },
+        {
+          "at_s": 6.5,
+          "do": "On-screen text appears."
+        }
+      ],
+      "assets": [
+        "ui_phone_chat",
+        "action_icons"
+      ],
+      "sfx": [
+        "phone slide",
+        "tap",
+        "keyboard clicks",
+        "fan whoosh"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_04.wav",
+      "output": "output/04_scenes/scene_04.mp4",
+      "vo_hash": "3cb66f55e0a5",
+      "hash": "5ed39fa45d80"
+    },
+    {
+      "id": "scene_05",
+      "number": 5,
+      "title": "Scavenge",
+      "start_s": 38.0,
+      "duration_s": 8,
+      "timing_source": "draft",
+      "narration": "Scavenge. Go looking for food and find nothing, one or two rations. If you forget to play, you scavenge automatically.",
+      "word_count": 20,
+      "on_screen_text": "SCAVENGE: find 0–2",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "icon_scavenge badge pins to the top-left corner and stays for the scene."
+        },
+        {
+          "at_s": 0.5,
+          "do": "Avatar (digging pose) rummages in the bin."
+        },
+        {
+          "at_s": 2.5,
+          "do": "slot_counter spins and lands on each value from 0 to 2 in turn, a tin popping out for each."
+        },
+        {
+          "at_s": 6.0,
+          "do": "Small clock icon with 'missed it? auto-scavenge'."
+        }
+      ],
+      "assets": [
+        "action_icons",
+        "avatar",
+        "bin",
+        "slot_counter",
+        "ration_tin"
+      ],
+      "sfx": [
+        "rummaging",
+        "slot spin",
+        "tin clink"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_05.wav",
+      "output": "output/04_scenes/scene_05.mp4",
+      "vo_hash": "8dae578a9fe8",
+      "hash": "a8a3600b7d84"
+    },
+    {
+      "id": "scene_06",
+      "number": 6,
+      "title": "Steal",
+      "start_s": 46.0,
+      "duration_s": 8,
+      "timing_source": "draft",
+      "narration": "Steal. Pick someone and take two of their rations. They'll know they were robbed. They won't know it was you.",
+      "word_count": 20,
+      "on_screen_text": "STEAL: take 2, stay hidden",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "icon_steal badge pins top-left. Avatar sleeping beside 4 tins."
+        },
+        {
+          "at_s": 1.0,
+          "do": "thief_shadow tiptoes in from the right."
+        },
+        {
+          "at_s": 3.0,
+          "do": "Thief lifts 2 tins and slips away."
+        },
+        {
+          "at_s": 5.0,
+          "do": "Avatar wakes (startled pose) with question_mark bouncing above."
+        }
+      ],
+      "assets": [
+        "action_icons",
+        "avatar",
+        "thief_shadow",
+        "ration_tin",
+        "question_mark"
+      ],
+      "sfx": [
+        "tiptoe",
+        "tin clink",
+        "startled 'huh'"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_06.wav",
+      "output": "output/04_scenes/scene_06.mp4",
+      "vo_hash": "cb80d7a50fba",
+      "hash": "f44079be985e"
+    },
+    {
+      "id": "scene_07",
+      "number": 7,
+      "title": "Guard",
+      "start_s": 54.0,
+      "duration_s": 13,
+      "timing_source": "draft",
+      "narration": "Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you two rations. You only get three guards, so choose your moment.",
+      "word_count": 33,
+      "on_screen_text": "GUARD: 2 nights · thief pays you 2 · 3 per game",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "icon_guard badge pins top-left. Avatar with shield_glow over them."
+        },
+        {
+          "at_s": 1.0,
+          "do": "2 nights pass above (moon, sun, moon) to show the shield lasting."
+        },
+        {
+          "at_s": 4.0,
+          "do": "thief_shadow sneaks in and bounces off the shield."
+        },
+        {
+          "at_s": 5.5,
+          "do": "spotlight snaps on the thief; small banner 'CAUGHT'."
+        },
+        {
+          "at_s": 7.0,
+          "do": "Thief hands 2 tins to the guard."
+        },
+        {
+          "at_s": 9.5,
+          "do": "shield_counter appears: 3 shields, one greys out."
+        }
+      ],
+      "assets": [
+        "action_icons",
+        "avatar",
+        "shield_glow",
+        "moon_sun",
+        "thief_shadow",
+        "spotlight",
+        "ration_tin",
+        "shield_counter"
+      ],
+      "sfx": [
+        "shield hum",
+        "bonk",
+        "spotlight clunk",
+        "tin clinks"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_07.wav",
+      "output": "output/04_scenes/scene_07.mp4",
+      "vo_hash": "de3f752ea271",
+      "hash": "ea4bef917fa5"
+    },
+    {
+      "id": "scene_08",
+      "number": 8,
+      "title": "Investigate",
+      "start_s": 67.0,
+      "duration_s": 10,
+      "timing_source": "draft",
+      "narration": "Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration.",
+      "word_count": 24,
+      "on_screen_text": "INVESTIGATE: catch a thief, get 1",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "icon_investigate badge pins top-left. Row of tents (front_with_window), night."
+        },
+        {
+          "at_s": 1.0,
+          "do": "magnifying_glass_large sweeps across the tents and stops at one window."
+        },
+        {
+          "at_s": 3.5,
+          "do": "Through the lens: thief_shadow taking a tin."
+        },
+        {
+          "at_s": 6.0,
+          "do": "stamp_exposed slams over the window."
+        },
+        {
+          "at_s": 7.5,
+          "do": "1 tin flies from the thief to the investigator avatar."
+        }
+      ],
+      "assets": [
+        "action_icons",
+        "tent",
+        "magnifying_glass_large",
+        "thief_shadow",
+        "stamp_exposed",
+        "ration_tin",
+        "avatar"
+      ],
+      "sfx": [
+        "sweep whoosh",
+        "stamp slam",
+        "tin clink"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_08.wav",
+      "output": "output/04_scenes/scene_08.mp4",
+      "vo_hash": "1777a574d99a",
+      "hash": "1a5d57deb5c7"
+    },
+    {
+      "id": "scene_09",
+      "number": 9,
+      "title": "Gift",
+      "start_s": 77.0,
+      "duration_s": 7,
+      "timing_source": "draft",
+      "narration": "Gift. Give some of your food to someone else. Only the two of you will know.",
+      "word_count": 16,
+      "on_screen_text": "GIFT: your secret",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "icon_gift badge pins top-left. Two avatars side by side, soft purple glow."
+        },
+        {
+          "at_s": 1.0,
+          "do": "One avatar passes a tin to the other."
+        },
+        {
+          "at_s": 3.5,
+          "do": "Both do the finger-to-lips pose."
+        }
+      ],
+      "assets": [
+        "action_icons",
+        "avatar",
+        "ration_tin"
+      ],
+      "sfx": [
+        "soft chime",
+        "shh"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_09.wav",
+      "output": "output/04_scenes/scene_09.mp4",
+      "vo_hash": "bbeb119cee9f",
+      "hash": "a7ed82a33819"
+    },
+    {
+      "id": "scene_10",
+      "number": 10,
+      "title": "The morning news",
+      "start_s": 84.0,
+      "duration_s": 14,
+      "timing_source": "draft",
+      "narration": "Every morning at half past seven, the news drops in Discord: who got robbed, who got caught, and who ran out of food. You'll always know what happened. You'll rarely know who did it.",
+      "word_count": 34,
+      "on_screen_text": "07:30 · #news",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "ui_news_post slides in; header '07:30 MORNING NEWS'."
+        },
+        {
+          "at_s": 2.0,
+          "do": "Line 1 appears (robbery)."
+        },
+        {
+          "at_s": 5.0,
+          "do": "Line 2 appears (caught thief)."
+        },
+        {
+          "at_s": 8.0,
+          "do": "Line 3 appears (ran out of food)."
+        },
+        {
+          "at_s": 10.5,
+          "do": "A big '?' fades in over the screen on 'You'll rarely know who did it'."
+        }
+      ],
+      "assets": [
+        "ui_news_post"
+      ],
+      "sfx": [
+        "notification ping per line"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_10.wav",
+      "output": "output/04_scenes/scene_10.mp4",
+      "vo_hash": "0ac05185b616",
+      "hash": "977265b52f1d"
+    },
+    {
+      "id": "scene_11",
+      "number": 11,
+      "title": "Bandits",
+      "start_s": 98.0,
+      "duration_s": 9,
+      "timing_source": "draft",
+      "narration": "Run out of food and you're a bandit. Bandits can only steal, but get back to three rations and you rejoin the survivors.",
+      "word_count": 23,
+      "on_screen_text": "BANDIT: steal only · back at 3",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "Avatar wearing bandit_mask sneaks between tents."
+        },
+        {
+          "at_s": 1.5,
+          "do": "Steals 1 tin at a time; a counter above them climbs from 0 to 3."
+        },
+        {
+          "at_s": 6.5,
+          "do": "bandit_mask flies off; the avatar's colours brighten back to normal."
+        }
+      ],
+      "assets": [
+        "avatar",
+        "bandit_mask",
+        "tent",
+        "ration_tin"
+      ],
+      "sfx": [
+        "sneaky footsteps",
+        "clink per steal",
+        "mask whoosh"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_11.wav",
+      "output": "output/04_scenes/scene_11.mp4",
+      "vo_hash": "e3e0df547873",
+      "hash": "ba4d27f2fd56"
+    },
+    {
+      "id": "scene_12",
+      "number": 12,
+      "title": "Secret goal and radio",
+      "start_s": 107.0,
+      "duration_s": 12,
+      "timing_source": "draft",
+      "narration": "You'll also get a secret goal that only you know about. And once a day you can post an anonymous message on the radio channel. Tips, accusations, lies. Your call.",
+      "word_count": 30,
+      "on_screen_text": "Secret goal · 1 anonymous radio message a day",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "secret_envelope drops in and wobbles; wax seal glints. Never open it."
+        },
+        {
+          "at_s": 5.0,
+          "do": "Cut to ui_radio_channel with radio_icon; three anonymous messages pop in at 5.5, 7.0 and 8.5 s."
+        },
+        {
+          "at_s": 10.0,
+          "do": "On-screen text appears."
+        }
+      ],
+      "assets": [
+        "secret_envelope",
+        "ui_radio_channel",
+        "radio_icon"
+      ],
+      "sfx": [
+        "envelope drop",
+        "radio static",
+        "ping per message"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_12.wav",
+      "output": "output/04_scenes/scene_12.mp4",
+      "vo_hash": "62da2eec3183",
+      "hash": "0331fa98feae"
+    },
+    {
+      "id": "scene_13",
+      "number": 13,
+      "title": "Extraction and the reveal",
+      "start_s": 119.0,
+      "duration_s": 18,
+      "timing_source": "draft",
+      "narration": "On the last night, the helicopter lands. The five survivors with the most food get a seat. A seat and your secret goal both earn points, and the most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
+      "word_count": 45,
+      "on_screen_text": "Seat = 3 pts · secret goal = 2 pts",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "Night sky; helicopter descends, rotor spinning, dust blowing."
+        },
+        {
+          "at_s": 2.0,
+          "do": "5 avatars (mixed colours) climb aboard one by one; seats light up."
+        },
+        {
+          "at_s": 7.5,
+          "do": "scoreboard flips in."
+        },
+        {
+          "at_s": 11.5,
+          "do": "MUSIC CUT. Drumroll."
+        },
+        {
+          "at_s": 12.0,
+          "do": "curtain pulls open on news_clipping_wall with 'THE REVEAL' in the headline font."
+        }
+      ],
+      "assets": [
+        "helicopter",
+        "avatar",
+        "scoreboard",
+        "curtain",
+        "news_clipping_wall"
+      ],
+      "sfx": [
+        "helicopter landing",
+        "seat dings",
+        "drumroll",
+        "curtain swish"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_13.wav",
+      "output": "output/04_scenes/scene_13.mp4",
+      "vo_hash": "7d2d7c1c2d98",
+      "hash": "4d894d74fc90"
+    },
+    {
+      "id": "scene_14",
+      "number": 14,
+      "title": "How to join",
+      "start_s": 137.0,
+      "duration_s": 17.5,
+      "timing_source": "draft",
+      "narration": "It takes two minutes a day, it's completely optional, and nothing in the game touches real work or real money. Type slash join in Discord and you'll get a secret alias, so nobody knows who's who. And remember: trust no one.",
+      "word_count": 41,
+      "on_screen_text": "/join · secret alias · trust no one",
+      "beats": [
+        {
+          "at_s": 0.0,
+          "do": "ui_join: '/join' typed, the bot's private reply reveals the alias 'RustyKettle'."
+        },
+        {
+          "at_s": 6.7,
+          "do": "Background: tents morph back into desks; lights come up to day_bg."
+        },
+        {
+          "at_s": 12.1,
+          "do": "End card: title_logo (small) + 'trust no one'. Hold to the end."
+        }
+      ],
+      "assets": [
+        "ui_join",
+        "office_floorplan_night",
+        "tent",
+        "title_logo"
+      ],
+      "sfx": [
+        "typing",
+        "reply ping",
+        "final sting"
+      ],
+      "transition_in": "0.3 s crossfade",
+      "voiceover_file": "output/03_audio/vo/scene_14.wav",
+      "output": "output/04_scenes/scene_14.mp4",
+      "vo_hash": "a14e8fe5180f",
+      "hash": "bb31b3034af5"
+    }
+  ]
+}

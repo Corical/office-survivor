@@ -1,0 +1,86 @@
+{
+  "_about": "Look and sound for every stage. Changing anything here marks all assets and scenes for redo.",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "safe_margin_px": 96
+  },
+  "palette": {
+    "night_bg": "#14213D",
+    "night_mid": "#1F3B6E",
+    "day_bg": "#F4F1E8",
+    "text_light": "#F4F1E8",
+    "text_dark": "#14213D",
+    "ration_tin": "#D4A72C",
+    "ration_tin_label": "#8C2F1B",
+    "shadow": "#0B1222",
+    "avatar_skin_tones": [
+      "#F2C9A0",
+      "#D9A273",
+      "#A9714B",
+      "#6E4A2F"
+    ],
+    "avatar_shirts": [
+      "#2EC4B6",
+      "#FF9F1C",
+      "#E5E5E5",
+      "#5C6B73"
+    ]
+  },
+  "actions": {
+    "scavenge": {
+      "icon": "shovel",
+      "colour": "#3BA55C"
+    },
+    "steal": {
+      "icon": "grabbing hand",
+      "colour": "#E5484D"
+    },
+    "guard": {
+      "icon": "shield",
+      "colour": "#3E7BFA"
+    },
+    "investigate": {
+      "icon": "magnifying glass",
+      "colour": "#F5A524"
+    },
+    "gift": {
+      "icon": "gift box",
+      "colour": "#9B5DE5"
+    }
+  },
+  "fonts": {
+    "headline": "Fredoka Bold, or the nearest bold rounded sans available",
+    "body": "Inter SemiBold, or the nearest clean sans available",
+    "ui_mockups": "Inter or the system sans, so screens look like a real chat app"
+  },
+  "text_rules": {
+    "on_screen_max_words": 8,
+    "headline_min_px": 72,
+    "on_screen_text_position": "upper third, centred, inside the safe margin",
+    "captions": "bottom centre, 44 px, light text on a 70% black rounded box, max 2 lines of 42 characters"
+  },
+  "motion_rules": [
+    "Ease in-out on everything; pops and stamps take 0.25-0.35 s.",
+    "Hold every on-screen text line for at least 2 seconds.",
+    "No strobing: any flicker stays below 3 flashes per second.",
+    "Each scene starts when its voiceover paragraph starts.",
+    "Action icons always appear in their action colour, inside a circular badge."
+  ],
+  "art_direction": "Flat, friendly cartoon. Simple round avatars with dot eyes only. Night scenes are dark navy, not scary.",
+  "brand_rules": [
+    "Chat screens look like a modern chat app (dark sidebar, channel list, messages) but never use the Discord logo, wordmark or mascot.",
+    "The narration may say 'Discord'; the visuals stay generic.",
+    "Only the example names from game.json appear on screen."
+  ],
+  "audio": {
+    "voice": "Calm and slightly dramatic, like a late-night radio host. 48 kHz mono WAV, one file per scene.",
+    "music": "Low, tense, royalty-free background beat, about 15-20 dB under the voice. Cuts out at the drumroll in scene 13, back for scene 14.",
+    "final_loudness": "about -16 LUFS integrated, peaks below -1 dBTP"
+  },
+  "export": {
+    "scene_clips": "1920x1080, 30 fps, no audio, exactly the scene's duration_s",
+    "final": "H.264 MP4, 1920x1080, 30 fps, high quality (CRF about 18); AAC 48 kHz 192 kbps stereo; captions burned in"
+  }
+}

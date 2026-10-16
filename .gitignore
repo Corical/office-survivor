@@ -1,0 +1,10 @@
+# Secrets: API keys live here and must never be committed
+.secrets/
+*.env
+
+# Stale copy of docs/ from the first session's handover
+survivors_kit.zip
+
+# Python
+__pycache__/
+*.pyc

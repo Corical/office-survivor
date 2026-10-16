@@ -1,0 +1,43 @@
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+EXTREMES - 300 games per scenario, 15 players
+Rules changed from default: none
+
+1) THE WHOLE OFFICE GOES ULTRA (all players play the same way)
+                        Survivors  Ever bandit    1st death   Robs/night   Catch rate Quiet nights  Seat cutoff  Empty seats
+normal office                10.9         5.34         4.57         1.96         0.24         0.36         4.72          0.0
+always_guard                 3.52         12.7          7.0         1.06         0.00          6.0         1.29         1.93
+turtle                       14.0         1.08         9.27         0.12         0.00         8.34         5.05          0.0
+always_steal                 0.45         14.7         4.20         5.54         0.00         0.01         0.57         4.55
+always_scavenge              14.9         0.07         10.9         0.00         0.00         9.89         8.25          0.0
+always_gift                  2.57         14.9         3.64         1.85         0.00         2.64         1.87         2.49
+always_investigate            0.0         15.0          7.0          0.0         0.00         6.27          0.0          5.0
+
+2) ONE PLAYER GOES ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      33%                         2.07                    1.96
+always_guard               0.7%     0.10      11%      53%        54%     0.96        2.12        1.83
+turtle                     2.2%     0.33      36%      84%        18%     1.89        2.12        1.84
+always_steal               6.9%     1.04      41%      63%        42%     2.18        1.99        2.34
+always_scavenge            2.0%     0.30      41%      89%        12%     2.16        2.11        1.88
+always_gift                5.3%     0.80       6%      31%       100%     1.20        2.14        1.97
+always_investigate         0.0%     0.00       1%      39%        94%     0.61        2.10        1.97
+
+3) 3 PLAYERS GO ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      33%                         2.07                    1.96
+always_guard               0.9%     0.14      13%      58%        51%     1.08        2.20        1.60
+turtle                     3.2%     0.48      38%      88%        15%     1.96        2.08        1.52
+always_steal               5.1%     0.76      41%      60%        46%     2.26        1.87        2.99
+always_scavenge            3.7%     0.56      41%      91%        11%     2.12        2.13        1.77
+always_gift                2.7%     0.41       4%      26%       100%     1.16        2.34        2.08
+always_investigate         0.0%     0.00       5%      28%        96%     0.66        2.24        1.95
+
+4) 5 PLAYERS GO ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      33%                         2.07                    1.96
+always_guard               0.9%     0.13      17%      56%        53%     1.17        2.28        1.45
+turtle                     5.0%     0.75      40%      87%        15%     2.03        2.01        1.35
+always_steal               4.6%     0.70      35%      53%        53%     1.98        1.74        3.47
+always_scavenge            4.4%     0.66      40%      93%         8%     2.12        2.12        1.58
+always_gift                2.9%     0.44       5%      27%       100%     1.16        2.53        2.12
+always_investigate         0.1%     0.02       7%      20%        97%     0.68        2.38        1.94

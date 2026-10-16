@@ -1,0 +1,148 @@
+# Guard bonus test (16 Oct 2026): does a 50% chance of +1 food while guarding bring guarding back?
+# Commands:
+#   python3 sim/survivors_sim.py batch --runs 300 --brain adaptive --set guard_income_max=0
+#   python3 sim/survivors_sim.py batch --runs 300 --brain adaptive --set guard_income_max=1
+#   python3 sim/survivors_sim.py extremes --runs 300 --set guard_income_max=1
+
+=== Learning players, no guard bonus
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+Brain: adaptive for all players
+SURVIVORS - 300 simulated games, 15 players, 10 nights
+Rules changed from default: none
+
+Metric                                                mean     p10     p90
+Survivors at the end                                  12.4    10.0    14.0
+Bandits at the end                                    2.63    1.00    5.00
+Players who were ever a bandit                        3.42    1.00    6.00
+Bandit comebacks                                      0.92    0.00    2.00
+Died without ever being robbed                        0.62    0.00    2.00
+First death on night                                  5.49    3.00    9.00
+Steal attempts per game                               22.3    9.00    37.0
+Share of steals caught by a guard                     0.14    0.02    0.25
+Steals that found nothing                             0.14    0.00    1.00
+Robberies per night                                   1.66    0.70    2.50
+Quiet nights (no robbery/catch/death)                 0.92    0.00    3.00
+Richest player's rations                              10.8    8.00    13.0
+Median survivor rations                               4.87    3.50    6.50
+Rations needed for the last seat                      5.91    4.00    8.00
+Last seat decided by coin flip                        0.30    0.00    1.00
+Empty seats on the chopper                             0.0    0.00    0.00
+Deaths on the final night                             0.68    0.00    2.00
+Share of seats won by heavy thieves (3+ steals)       0.27    0.00    0.60
+Joint winners per game                                1.08    1.00    1.00
+
+Personality    share  avg pts  extract  win share  
+shark             7%     2.79      56%        20%
+opportunist      16%     2.56      49%        26%
+casual           25%     1.90      34%        17%
+farmer           19%     1.81      30%        11%
+paranoid         11%     1.72      30%         7%
+detective         7%     1.57      23%         6%
+chaos             7%     1.42      21%         8%
+saint             8%     1.34      16%         5%
+
+Secret objective                                   completed
+finish with more rations than @player                    46%
+get robbed at least 1x and still extract                 24%
+steal at least 3 times without ever being caught         10%
+give away 3 rations over the game                         3%
+successfully rob @player at least 1x                     23%
+
+Flags:
+  - 'shark' players win 20% of games while being 7% of the office. Dominant strategy?
+  - Objective 'steal at least 3 times without ever being caught' is nearly impossible (10%).
+  - Objective 'give away 3 rations over the game' is nearly impossible (3%).
+
+=== Learning players, guard bonus (guard_income_max=1)
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+Brain: adaptive for all players
+SURVIVORS - 300 simulated games, 15 players, 10 nights
+Rules changed from default: {'guard_income_max': 1}
+
+Metric                                                mean     p10     p90
+Survivors at the end                                  12.7    10.0    15.0
+Bandits at the end                                    2.33    0.00    5.00
+Players who were ever a bandit                         3.0    1.00    5.00
+Bandit comebacks                                      0.79    0.00    2.00
+Died without ever being robbed                        0.53    0.00    2.00
+First death on night                                  5.89    3.00    9.00
+Steal attempts per game                               21.9    9.00    35.0
+Share of steals caught by a guard                     0.15    0.00    0.29
+Steals that found nothing                             0.13    0.00    1.00
+Robberies per night                                   1.63    0.70    2.60
+Quiet nights (no robbery/catch/death)                 0.97    0.00    3.00
+Richest player's rations                              11.3    9.00    14.0
+Median survivor rations                               5.09    3.50    6.50
+Rations needed for the last seat                      6.20    5.00    8.00
+Last seat decided by coin flip                        0.29    0.00    1.00
+Empty seats on the chopper                             0.0    0.00    0.00
+Deaths on the final night                             0.60    0.00    2.00
+Share of seats won by heavy thieves (3+ steals)       0.25    0.00    0.42
+Joint winners per game                                1.07    1.00    1.00
+
+Personality    share  avg pts  extract  win share  
+shark             7%     2.68      50%        18%
+opportunist      16%     2.42      45%        24%
+paranoid         11%     2.10      41%        13%
+farmer           19%     1.86      31%        12%
+casual           25%     1.84      33%        16%
+chaos             7%     1.48      22%         7%
+detective         7%     1.47      20%         4%
+saint             8%     1.39      16%         5%
+
+Secret objective                                   completed
+finish with more rations than @player                    46%
+get robbed at least 1x and still extract                 24%
+steal at least 3 times without ever being caught          7%
+give away 3 rations over the game                         4%
+successfully rob @player at least 1x                     21%
+
+Flags:
+  - 'shark' players win 18% of games while being 7% of the office. Dominant strategy?
+  - Objective 'steal at least 3 times without ever being caught' is nearly impossible (7%).
+  - Objective 'give away 3 rations over the game' is nearly impossible (4%).
+
+=== Normal players, guard bonus: all-in strategies
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+EXTREMES - 300 games per scenario, 15 players
+Rules changed from default: {'guard_income_max': 1}
+
+1) THE WHOLE OFFICE GOES ULTRA (all players play the same way)
+                        Survivors  Ever bandit    1st death   Robs/night   Catch rate Quiet nights  Seat cutoff  Empty seats
+normal office                11.7         4.61         4.79         1.92         0.24         0.42         5.46          0.0
+always_guard                 14.1         0.93         9.66         0.08         0.00         8.73         5.02          0.0
+turtle                       14.7         0.32         10.4         0.03         0.00         9.45         6.61          0.0
+always_steal                 0.45         14.7         4.20         5.54         0.00         0.01         0.57         4.55
+always_scavenge              14.9         0.07         10.9         0.00         0.00         9.89         8.25          0.0
+always_gift                  2.57         14.9         3.64         1.85         0.00         2.64         1.87         2.49
+always_investigate            0.0         15.0          7.0          0.0         0.00         6.27          0.0          5.0
+
+2) ONE PLAYER GOES ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      33%                         2.16                    1.92
+always_guard               0.3%     0.05      23%      85%        18%     1.60        2.15        1.79
+turtle                     1.7%     0.25      44%      91%        10%     2.27        2.14        1.76
+always_steal               8.7%     1.30      42%      69%        36%     2.38        2.06        2.34
+always_scavenge            1.3%     0.20      33%      93%        10%     1.98        2.14        1.82
+always_gift                1.0%     0.15       1%      28%       100%     1.08        2.21        1.96
+always_investigate         0.2%     0.03       1%      40%        94%     0.74        2.17        1.93
+
+3) 3 PLAYERS GO ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      33%                         2.16                    1.92
+always_guard               2.1%     0.32      30%      87%        15%     1.78        2.16        1.48
+turtle                     4.0%     0.59      42%      93%         8%     2.12        2.08        1.47
+always_steal               5.7%     0.86      39%      61%        44%     2.20        1.92        2.97
+always_scavenge            2.4%     0.36      35%      91%        11%     1.94        2.18        1.67
+always_gift                1.7%     0.25       2%      26%       100%     1.11        2.43        2.05
+always_investigate         0.1%     0.02       2%      29%        95%     0.62        2.31        1.92
+
+4) 5 PLAYERS GO ULTRA in a normal office (fair win share per player = 6.7%)
+                      Win share  vs fair  Extract  Survive  Ever died  Avg pts  Others pts  Robs/night
+(normal player)            6.7%     1.00      33%                         2.16                    1.92
+always_guard               3.4%     0.52      33%      89%        12%     1.87        2.15        1.29
+turtle                     5.5%     0.83      45%      95%         5%     2.21        1.98        1.27
+always_steal               4.1%     0.61      31%      52%        55%     1.87        1.88        3.38
+always_scavenge            2.9%     0.43      35%      93%         9%     1.96        2.23        1.56
+always_gift                1.1%     0.17       2%      26%       100%     1.04        2.65        2.05
+always_investigate         0.1%     0.01       5%      22%        97%     0.61        2.44        1.85

@@ -1,0 +1,432 @@
+{
+  "style": {
+    "_about": "Look and sound for every stage. Changing anything here marks all assets and scenes for redo.",
+    "canvas": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "safe_margin_px": 96
+    },
+    "palette": {
+      "night_bg": "#14213D",
+      "night_mid": "#1F3B6E",
+      "day_bg": "#F4F1E8",
+      "text_light": "#F4F1E8",
+      "text_dark": "#14213D",
+      "ration_tin": "#D4A72C",
+      "ration_tin_label": "#8C2F1B",
+      "shadow": "#0B1222",
+      "avatar_skin_tones": [
+        "#F2C9A0",
+        "#D9A273",
+        "#A9714B",
+        "#6E4A2F"
+      ],
+      "avatar_shirts": [
+        "#2EC4B6",
+        "#FF9F1C",
+        "#E5E5E5",
+        "#5C6B73"
+      ]
+    },
+    "actions": {
+      "scavenge": {
+        "icon": "shovel",
+        "colour": "#3BA55C"
+      },
+      "steal": {
+        "icon": "grabbing hand",
+        "colour": "#E5484D"
+      },
+      "guard": {
+        "icon": "shield",
+        "colour": "#3E7BFA"
+      },
+      "investigate": {
+        "icon": "magnifying glass",
+        "colour": "#F5A524"
+      },
+      "gift": {
+        "icon": "gift box",
+        "colour": "#9B5DE5"
+      }
+    },
+    "fonts": {
+      "headline": "Fredoka Bold, or the nearest bold rounded sans available",
+      "body": "Inter SemiBold, or the nearest clean sans available",
+      "ui_mockups": "Inter or the system sans, so screens look like a real chat app"
+    },
+    "text_rules": {
+      "on_screen_max_words": 8,
+      "headline_min_px": 72,
+      "on_screen_text_position": "upper third, centred, inside the safe margin",
+      "captions": "bottom centre, 44 px, light text on a 70% black rounded box, max 2 lines of 42 characters"
+    },
+    "motion_rules": [
+      "Ease in-out on everything; pops and stamps take 0.25-0.35 s.",
+      "Hold every on-screen text line for at least 2 seconds.",
+      "No strobing: any flicker stays below 3 flashes per second.",
+      "Each scene starts when its voiceover paragraph starts.",
+      "Action icons always appear in their action colour, inside a circular badge."
+    ],
+    "art_direction": "Flat, friendly cartoon. Simple round avatars with dot eyes only. Night scenes are dark navy, not scary.",
+    "brand_rules": [
+      "Chat screens look like a modern chat app (dark sidebar, channel list, messages) but never use the Discord logo, wordmark or mascot.",
+      "The narration may say 'Discord'; the visuals stay generic.",
+      "Only the example names from game.json appear on screen."
+    ],
+    "audio": {
+      "voice": "Calm and slightly dramatic, like a late-night radio host. 48 kHz mono WAV, one file per scene.",
+      "music": "Low, tense, royalty-free background beat, about 15-20 dB under the voice. Cuts out at the drumroll in scene 13, back for scene 14.",
+      "final_loudness": "about -16 LUFS integrated, peaks below -1 dBTP"
+    },
+    "export": {
+      "scene_clips": "1920x1080, 30 fps, no audio, exactly the scene's duration_s",
+      "final": "H.264 MP4, 1920x1080, 30 fps, high quality (CRF about 18); AAC 48 kHz 192 kbps stereo; captions burned in"
+    }
+  },
+  "assets": [
+    {
+      "id": "avatar",
+      "tool": "VectorCraft",
+      "type": "character",
+      "description": "Simple round player avatar: head, body, arms, legs. Dot eyes, no other facial detail, so nobody looks like a real colleague. Must read clearly at 200 px tall.",
+      "variants": [
+        "4 colour combos from style.palette (skin tone x shirt) for crowds",
+        "poses: standing, sleeping (lying down, zzz), digging, sneaking, startled, climbing, finger-to-lips, holding a tin"
+      ],
+      "separate_layers": [
+        "head",
+        "body",
+        "left_arm",
+        "right_arm",
+        "legs",
+        "held_item"
+      ],
+      "size": "vector, as needed",
+      "output": "output/01_assets/avatar.svg (+ .png at 2x)",
+      "hash": "65693e2aca42"
+    },
+    {
+      "id": "bandit_mask",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Classic bandit eye-mask that fits the avatar's head, as its own file so it can drop on and fly off.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/bandit_mask.svg (+ .png at 2x)",
+      "hash": "df3f07b344fe"
+    },
+    {
+      "id": "thief_shadow",
+      "tool": "VectorCraft",
+      "type": "character",
+      "description": "Dark silhouette of the avatar (palette.shadow) in a sneaking pose.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/thief_shadow.svg (+ .png at 2x)",
+      "hash": "d7b9470278c4"
+    },
+    {
+      "id": "ration_tin",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Single food tin: gold body (palette.ration_tin), red label band (palette.ration_tin_label). Must read at 48 px.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/ration_tin.svg (+ .png at 2x)",
+      "hash": "608449c48422"
+    },
+    {
+      "id": "action_icons",
+      "tool": "VectorCraft",
+      "type": "icon set",
+      "description": "Five matching icons in circular badges, each in its action colour from style.actions: shovel (scavenge), grabbing hand (steal), shield (guard), magnifying glass (investigate), gift box (gift). Same line weight and corner radius across all five.",
+      "variants": [
+        "icon_scavenge",
+        "icon_steal",
+        "icon_guard",
+        "icon_investigate",
+        "icon_gift"
+      ],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/action_icons.svg (+ .png at 2x)",
+      "hash": "5f43397d10e5"
+    },
+    {
+      "id": "title_logo",
+      "tool": "VectorCraft",
+      "type": "logo",
+      "description": "Original wordmark 'SURVIVORS' in the headline font, slightly weathered stencil feel, light on navy. Plus a small version for the end card.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/title_logo.svg (+ .png at 2x)",
+      "hash": "e9dce7b5bbd2"
+    },
+    {
+      "id": "office_floorplan_night",
+      "tool": "VectorCraft",
+      "type": "background",
+      "description": "Top-down office floor plan at night: about 15 desks in clusters, a few desk lamps that can switch on and off, navy palette.",
+      "variants": [],
+      "separate_layers": [
+        "floor",
+        "each desk",
+        "each lamp glow"
+      ],
+      "size": "1920x1080",
+      "output": "output/01_assets/office_floorplan_night.svg (+ .png at 2x)",
+      "hash": "d720424ca28d"
+    },
+    {
+      "id": "tent",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Small camping tent, top-down at the same angle as the desks so a desk can morph into it, plus a front view with a window.",
+      "variants": [
+        "top_down",
+        "front_with_window"
+      ],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/tent.svg (+ .png at 2x)",
+      "hash": "8d2214ea8513"
+    },
+    {
+      "id": "calendar_strip",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Row of 10 weekday tiles (Mon-Fri) that can be ticked off one by one.",
+      "variants": [],
+      "separate_layers": [
+        "each tile",
+        "tick mark"
+      ],
+      "size": "vector, as needed",
+      "output": "output/01_assets/calendar_strip.svg (+ .png at 2x)",
+      "hash": "4d1976461549"
+    },
+    {
+      "id": "helicopter",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Friendly rescue helicopter, side view, open door showing 5 seats. Rotor as its own layer so it can spin.",
+      "variants": [],
+      "separate_layers": [
+        "body",
+        "rotor",
+        "door",
+        "each seat"
+      ],
+      "size": "vector, as needed",
+      "output": "output/01_assets/helicopter.svg (+ .png at 2x)",
+      "hash": "d9547f5c4c17"
+    },
+    {
+      "id": "bin",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Dented outdoor rubbish bin for the avatar to dig through.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/bin.svg (+ .png at 2x)",
+      "hash": "3ba215322e51"
+    },
+    {
+      "id": "slot_counter",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Small slot-machine reel showing the digits 0 to 2 (can also be built from text in EffectCraft).",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/slot_counter.svg (+ .png at 2x)",
+      "hash": "6f2a5939b247"
+    },
+    {
+      "id": "moon_sun",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Moon and sun icons for showing nights passing.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/moon_sun.svg (+ .png at 2x)",
+      "hash": "bec9ffb1ae4c"
+    },
+    {
+      "id": "shield_glow",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Translucent dome in the guard colour that sits over an avatar.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/shield_glow.svg (+ .png at 2x)",
+      "hash": "9f1092c89b1a"
+    },
+    {
+      "id": "spotlight",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Cone of light from above for the caught thief.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/spotlight.svg (+ .png at 2x)",
+      "hash": "5d5656909829"
+    },
+    {
+      "id": "shield_counter",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "3 small shield icons in a row; each can be greyed out when used.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/shield_counter.svg (+ .png at 2x)",
+      "hash": "a72b7ae4d599"
+    },
+    {
+      "id": "magnifying_glass_large",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Large magnifying glass that sweeps across the scene; the lens area is transparent.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/magnifying_glass_large.svg (+ .png at 2x)",
+      "hash": "9feae8a8e217"
+    },
+    {
+      "id": "stamp_exposed",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Big rubber stamp 'EXPOSED' in the steal colour, slightly rotated, grungy edges.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/stamp_exposed.svg (+ .png at 2x)",
+      "hash": "25f6df224026"
+    },
+    {
+      "id": "question_mark",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Bouncy question mark above a head.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/question_mark.svg (+ .png at 2x)",
+      "hash": "b4d3846d33d1"
+    },
+    {
+      "id": "secret_envelope",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Sealed envelope with a wax seal and the words 'SECRET GOAL'. Never show goal text.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/secret_envelope.svg (+ .png at 2x)",
+      "hash": "f655a183ca72"
+    },
+    {
+      "id": "radio_icon",
+      "tool": "VectorCraft",
+      "type": "icon",
+      "description": "Walkie-talkie icon for the radio channel.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/radio_icon.svg (+ .png at 2x)",
+      "hash": "6f614ad222c5"
+    },
+    {
+      "id": "scoreboard",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Scoreboard panel with two rows: 'Seat +3' and 'Secret goal +2'.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/scoreboard.svg (+ .png at 2x)",
+      "hash": "61341d3ee97c"
+    },
+    {
+      "id": "curtain",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Red stage curtain in two halves that pulls open to reveal 'THE REVEAL'.",
+      "variants": [],
+      "separate_layers": [
+        "left",
+        "right"
+      ],
+      "size": "vector, as needed",
+      "output": "output/01_assets/curtain.svg (+ .png at 2x)",
+      "hash": "920bbd77d653"
+    },
+    {
+      "id": "news_clipping_wall",
+      "tool": "VectorCraft",
+      "type": "background",
+      "description": "Wall of pinned paper clippings and red string behind the curtain. Clippings only use the example names (RustyKettle, QuietBadger, SoggyBiscuit, LuckyLantern).",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed",
+      "output": "output/01_assets/news_clipping_wall.svg (+ .png at 2x)",
+      "hash": "070811b774c9"
+    },
+    {
+      "id": "ui_phone_chat",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "Phone frame showing a generic dark chat app on a 'survivors' server: channel list (#town-square, #news, #radio), and a message box with '/steal' being typed and a small command-suggestion popup. No Discord logo or branding.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "phone screen inside a 1920x1080 frame",
+      "output": "output/02_ui/ui_phone_chat.svg (+ .png at 2x)",
+      "hash": "2b4e6af80241"
+    },
+    {
+      "id": "ui_news_post",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "The #news channel in the same generic chat app. 'Survivors Bot' posts '07:30 MORNING NEWS' with three lines, each its own layer: 'Someone hit RustyKettle overnight. Down 2.' / 'CAUGHT: QuietBadger caught SoggyBiscuit red-handed. SoggyBiscuit pays QuietBadger 2.' / 'LuckyLantern ran out of food.'",
+      "variants": [],
+      "separate_layers": [],
+      "size": "1920x1080",
+      "output": "output/02_ui/ui_news_post.svg (+ .png at 2x)",
+      "hash": "d72bb1b5b017"
+    },
+    {
+      "id": "ui_radio_channel",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "The #radio channel with three messages from 'Anonymous', each its own layer: 'SoggyBiscuit was out late last night...' / 'Don't trust the quiet ones.' / 'RustyKettle is lying about their rations.'",
+      "variants": [],
+      "separate_layers": [],
+      "size": "1920x1080",
+      "output": "output/02_ui/ui_radio_channel.svg (+ .png at 2x)",
+      "hash": "07f2fc7fb952"
+    },
+    {
+      "id": "ui_join",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "Message box with '/join' typed, then the bot replies privately: 'You're in. Your secret alias is RustyKettle. Tell no one. Day 1 starts [LAUNCH DATE] at 07:30.'",
+      "variants": [],
+      "separate_layers": [],
+      "size": "1920x1080",
+      "output": "output/02_ui/ui_join.svg (+ .png at 2x)",
+      "hash": "76f73ce36a86"
+    }
+  ]
+}

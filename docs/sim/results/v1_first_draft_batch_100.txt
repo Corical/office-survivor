@@ -1,0 +1,48 @@
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+SURVIVORS - 100 simulated games, 15 players, 10 nights
+Rules changed from default: {'start_rations': 5, 'caught_penalty': 1, 'guard_reward': 0, 'guard_nights': 1, 'guard_limit': 0, 'investigate_bounty': 0, 'winner_tiebreak': 'none', 'tiebreak': 'coin', 'give_goal': 5, 'grudge_goal': 'deny', 'grudge_robs': 2, 'robbed_goal': 2, 'bandit_steal_amount': 2}
+
+Metric                                                mean     p10     p90
+Survivors at the end                                  7.28    4.00    11.0
+Bandits at the end                                    7.72    4.00    11.0
+Players who were ever a bandit                        11.1    8.00    14.0
+Bandit comebacks                                      5.53    3.00    8.00
+Died without ever being robbed                        0.98    0.00    2.00
+First death on night                                  3.42    2.00    5.00
+Steal attempts per game                               42.5    30.9    54.2
+Share of steals caught by a guard                     0.13    0.04    0.23
+Steals that found nothing                             0.67    0.00    2.00
+Robberies per night                                   2.55    1.90    3.20
+Quiet nights (no robbery/catch/death)                 0.31    0.00    1.00
+Richest player's rations                              4.63    3.00    7.00
+Median survivor rations                               2.49    1.50    3.00
+Rations needed for the last seat                      2.04    1.00    3.00
+Last seat decided by coin flip                        0.43    0.00    1.00
+Empty seats on the chopper                            0.29    0.00    1.00
+Deaths on the final night                             2.24    0.00    4.00
+Share of seats won by heavy thieves (3+ steals)       0.52    0.20    0.80
+Joint winners per game                                2.67    1.00    4.00
+
+Personality    share  avg pts  extract  win share  
+shark             7%     2.20      44%        10%
+opportunist      15%     2.02      35%        17%
+casual           25%     1.88      35%        24%
+farmer           20%     1.76      30%        20%
+paranoid         10%     1.68      31%        10%
+chaos             7%     1.56      23%         6%
+saint             8%     1.54      22%         6%
+detective         7%     1.52      23%         7%
+
+Secret objective                                   completed
+finish with more rations than @player                    44%
+get robbed at least 2x and still extract                 15%
+steal at least 3 times without ever being caught         38%
+give away 5 rations over the game                         0%
+make sure @player doesn't extract                        69%
+
+Flags:
+  - The chopper often leaves with empty seats: too many bandits at the end.
+  - The last seat is a coin flip in 43% of games. Rations are too bunched.
+  - 7.7 of 15 end as bandits. The economy is too harsh.
+  - 52% of seats go to heavy thieves. Crime pays too well.
+  - Objective 'give away 5 rations over the game' is nearly impossible (0%).

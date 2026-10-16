@@ -1,0 +1,291 @@
+{
+  "_about": "Everything that must be drawn. VectorCraft assets export to output/01_assets/<id>.svg (+ .png at 2x); FigCraft screens to output/02_ui/<id>.svg (+ .png). Text fields may use {key} for a number from game.json, {key:word} for it spelled out, {key:Word} capitalised, {key:rations} for 'two rations' / 'one ration'. Derived keys: seats, game_span, scavenge_spoken, guard_span, join_spoken, name1..name4. Run build.py to see every available key.",
+  "assets": [
+    {
+      "id": "avatar",
+      "tool": "VectorCraft",
+      "type": "character",
+      "description": "Simple round player avatar: head, body, arms, legs. Dot eyes, no other facial detail, so nobody looks like a real colleague. Must read clearly at 200 px tall.",
+      "variants": [
+        "4 colour combos from style.palette (skin tone x shirt) for crowds",
+        "poses: standing, sleeping (lying down, zzz), digging, sneaking, startled, climbing, finger-to-lips, holding a tin"
+      ],
+      "separate_layers": [
+        "head",
+        "body",
+        "left_arm",
+        "right_arm",
+        "legs",
+        "held_item"
+      ],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "bandit_mask",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Classic bandit eye-mask that fits the avatar's head, as its own file so it can drop on and fly off.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "thief_shadow",
+      "tool": "VectorCraft",
+      "type": "character",
+      "description": "Dark silhouette of the avatar (palette.shadow) in a sneaking pose.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "ration_tin",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Single food tin: gold body (palette.ration_tin), red label band (palette.ration_tin_label). Must read at 48 px.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "action_icons",
+      "tool": "VectorCraft",
+      "type": "icon set",
+      "description": "Five matching icons in circular badges, each in its action colour from style.actions: shovel (scavenge), grabbing hand (steal), shield (guard), magnifying glass (investigate), gift box (gift). Same line weight and corner radius across all five.",
+      "variants": [
+        "icon_scavenge",
+        "icon_steal",
+        "icon_guard",
+        "icon_investigate",
+        "icon_gift"
+      ],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "title_logo",
+      "tool": "VectorCraft",
+      "type": "logo",
+      "description": "Original wordmark 'SURVIVORS' in the headline font, slightly weathered stencil feel, light on navy. Plus a small version for the end card.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "office_floorplan_night",
+      "tool": "VectorCraft",
+      "type": "background",
+      "description": "Top-down office floor plan at night: about {players} desks in clusters, a few desk lamps that can switch on and off, navy palette.",
+      "variants": [],
+      "separate_layers": [
+        "floor",
+        "each desk",
+        "each lamp glow"
+      ],
+      "size": "1920x1080"
+    },
+    {
+      "id": "tent",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Small camping tent, top-down at the same angle as the desks so a desk can morph into it, plus a front view with a window.",
+      "variants": [
+        "top_down",
+        "front_with_window"
+      ],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "calendar_strip",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Row of {rounds} weekday tiles (Mon-Fri) that can be ticked off one by one.",
+      "variants": [],
+      "separate_layers": [
+        "each tile",
+        "tick mark"
+      ],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "helicopter",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Friendly rescue helicopter, side view, open door showing {seats} seats. Rotor as its own layer so it can spin.",
+      "variants": [],
+      "separate_layers": [
+        "body",
+        "rotor",
+        "door",
+        "each seat"
+      ],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "bin",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Dented outdoor rubbish bin for the avatar to dig through.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "slot_counter",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Small slot-machine reel showing the digits {scavenge_min} to {scavenge_max} (can also be built from text in EffectCraft).",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "moon_sun",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Moon and sun icons for showing nights passing.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "shield_glow",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Translucent dome in the guard colour that sits over an avatar.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "spotlight",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Cone of light from above for the caught thief.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "shield_counter",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "{guard_limit} small shield icons in a row; each can be greyed out when used.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "magnifying_glass_large",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Large magnifying glass that sweeps across the scene; the lens area is transparent.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "stamp_exposed",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Big rubber stamp 'EXPOSED' in the steal colour, slightly rotated, grungy edges.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "question_mark",
+      "tool": "VectorCraft",
+      "type": "effect",
+      "description": "Bouncy question mark above a head.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "secret_envelope",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Sealed envelope with a wax seal and the words 'SECRET GOAL'. Never show goal text.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "radio_icon",
+      "tool": "VectorCraft",
+      "type": "icon",
+      "description": "Walkie-talkie icon for the radio channel.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "scoreboard",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Scoreboard panel with two rows: 'Seat +{pts_extract}' and 'Secret goal +{pts_objective}'.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "curtain",
+      "tool": "VectorCraft",
+      "type": "prop",
+      "description": "Red stage curtain in two halves that pulls open to reveal 'THE REVEAL'.",
+      "variants": [],
+      "separate_layers": [
+        "left",
+        "right"
+      ],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "news_clipping_wall",
+      "tool": "VectorCraft",
+      "type": "background",
+      "description": "Wall of pinned paper clippings and red string behind the curtain. Clippings only use the example names ({name1}, {name2}, {name3}, {name4}).",
+      "variants": [],
+      "separate_layers": [],
+      "size": "vector, as needed"
+    },
+    {
+      "id": "ui_phone_chat",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "Phone frame showing a generic dark chat app on a 'survivors' server: channel list (#town-square, #news, #radio), and a message box with '/steal' being typed and a small command-suggestion popup. No Discord logo or branding.",
+      "variants": [],
+      "separate_layers": [],
+      "size": "phone screen inside a 1920x1080 frame"
+    },
+    {
+      "id": "ui_news_post",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "The #news channel in the same generic chat app. 'Survivors Bot' posts '{news_time} MORNING NEWS' with three lines, each its own layer: 'Someone hit {name1} overnight. Down {steal_amount}.' / 'CAUGHT: {name2} caught {name3} red-handed. {name3} pays {name2} {caught_penalty}.' / '{name4} ran out of food.'",
+      "variants": [],
+      "separate_layers": [],
+      "size": "1920x1080"
+    },
+    {
+      "id": "ui_radio_channel",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "The #radio channel with three messages from 'Anonymous', each its own layer: '{name3} was out late last night...' / 'Don't trust the quiet ones.' / '{name1} is lying about their rations.'",
+      "variants": [],
+      "separate_layers": [],
+      "size": "1920x1080"
+    },
+    {
+      "id": "ui_join",
+      "tool": "FigCraft",
+      "type": "ui",
+      "description": "Message box with '{join_command}' typed, then the bot replies privately: 'You're in. Your secret alias is {name1}. Tell no one. Day 1 starts {launch_date} at {news_time}.'",
+      "variants": [],
+      "separate_layers": [],
+      "size": "1920x1080"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "model": "jev-latest",
+  "state": "Survivors is a 10-night office survival game with 15 colleagues. Everyone eats 1 ration a night; at 0 you become a bandit who can only steal or investigate and rejoins at 3 rations. After the last night the 5 survivors with the most rations take a helicopter seat (3 pts); completing your secret goal is worth 2 pts; most points wins. Ties go to whoever gave away the most.\nYou are GrumpyGecko. Personality: busy, often misses the deadline, mostly scavenges. Secret goal: give away 3 rations over the game.\nIt is night 4 of 10. You have 7 rations.\nYour stealing so far: none.\nPublic #news and #radio (last few nights): Night 1: Someone hit SneakyPenguin overnight. SneakyPenguin is down 2. | Night 1: Someone hit PaperTiger overnight. PaperTiger is down 2. | Night 1: Someone hit HollowTin overnight. HollowTin is down 2. | Night 2: 2 people hit FoggyGlasses overnight. FoggyGlasses is down 4. | Night 2: CAUGHT: GrumpyGecko was guarding and caught BurntToast red-handed. BurntToast pays GrumpyGecko 2. | Night 2: EXPOSED: an investigator saw BurntToast rob GrumpyGecko. BurntToast pays them 1. | Night 3: Someone hit VelvetMole overnight. VelvetMole is down 2. | Night 3: \"Just saying: LooseCannon has been very quiet. Too quiet.\"\nWhat only you know: Night 1: you scavenged and found 1. | Night 2: your guard caught BurntToast; they paid you 2. | Night 3: you scavenged and found 0.",
+  "questions": {
+    "move": {
+      "type": "choice",
+      "instructions": "You are deciding for the player described in the state. Which single move would this person most plausibly make tonight, given their personality, secret goal, rations and everything they know? Play to win, the way a real colleague would.",
+      "criteria": {
+        "scavenge": "Scavenge: find 0 to 2 rations at random. Safe, but you can be robbed.",
+        "guard": "Guard: protected for 2 night(s); any thief who tries is named in #news and pays you 2. You find no food tonight. Guards left: 2.",
+        "steal:NightOwl": "Steal from NightOwl (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:IronSpatula": "Steal from IronSpatula (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:MissingSock": "Steal from MissingSock (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:HollowTin": "Steal from HollowTin (robbed 1x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:LooseCannon": "Steal from LooseCannon (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:RustyKettle": "Steal from RustyKettle (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:SoggyBiscuit": "Steal from SoggyBiscuit (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:VelvetMole": "Steal from VelvetMole (robbed 1x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:SaltyPretzel": "Steal from SaltyPretzel (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:MuddyPaws": "Steal from MuddyPaws (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:PaperTiger": "Steal from PaperTiger (robbed 1x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:FoggyGlasses": "Steal from FoggyGlasses (robbed 1x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:SneakyPenguin": "Steal from SneakyPenguin (robbed 1x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "steal:BurntToast": "Steal from BurntToast (robbed 0x so far): take up to 2 rations anonymously. If they are guarding, you are named and pay them 2.",
+        "investigate:NightOwl": "Investigate NightOwl: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:IronSpatula": "Investigate IronSpatula: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:MissingSock": "Investigate MissingSock: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:HollowTin": "Investigate HollowTin: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:LooseCannon": "Investigate LooseCannon: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:RustyKettle": "Investigate RustyKettle: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:SoggyBiscuit": "Investigate SoggyBiscuit: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:VelvetMole": "Investigate VelvetMole: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:SaltyPretzel": "Investigate SaltyPretzel: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:MuddyPaws": "Investigate MuddyPaws: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:PaperTiger": "Investigate PaperTiger: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:FoggyGlasses": "Investigate FoggyGlasses: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:SneakyPenguin": "Investigate SneakyPenguin: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "investigate:BurntToast": "Investigate BurntToast: learn privately what they do tonight. If they steal, they are exposed and pay you 1. You find no food tonight.",
+        "gift:NightOwl": "Secretly give NightOwl 2 ration(s).",
+        "gift:IronSpatula": "Secretly give IronSpatula 2 ration(s).",
+        "gift:MissingSock": "Secretly give MissingSock 2 ration(s).",
+        "gift:HollowTin": "Secretly give HollowTin 2 ration(s).",
+        "gift:LooseCannon": "Secretly give LooseCannon 2 ration(s).",
+        "gift:RustyKettle": "Secretly give RustyKettle 2 ration(s).",
+        "gift:SoggyBiscuit": "Secretly give SoggyBiscuit 2 ration(s).",
+        "gift:VelvetMole": "Secretly give VelvetMole 2 ration(s).",
+        "gift:SaltyPretzel": "Secretly give SaltyPretzel 2 ration(s).",
+        "gift:MuddyPaws": "Secretly give MuddyPaws 2 ration(s).",
+        "gift:PaperTiger": "Secretly give PaperTiger 2 ration(s).",
+        "gift:FoggyGlasses": "Secretly give FoggyGlasses 2 ration(s).",
+        "gift:SneakyPenguin": "Secretly give SneakyPenguin 2 ration(s).",
+        "gift:BurntToast": "Secretly give BurntToast 2 ration(s)."
+      }
+    }
+  },
+  "metadata": {
+    "prior": {
+      "scavenge": 0.8,
+      "steal": 0.05,
+      "guard": 0.1,
+      "investigate": 0.0,
+      "gift": 0.05
+    }
+  }
+}

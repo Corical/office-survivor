@@ -1,0 +1,192 @@
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+SURVIVORS - simulated game (seed 7, 15 players, 10 nights)
+
+Cast:
+  CleverCrow shark        secret goal: make sure PaperTiger doesn't extract
+  CrookedSpoon casual       secret goal: finish with more rations than RustyKettle
+  DustyBoots saint        secret goal: make sure LooseCannon doesn't extract
+  FoggyGlasses farmer       secret goal: make sure SoggyBiscuit doesn't extract
+  GrumpyGecko farmer       secret goal: give away 5 rations over the game
+  IronSpatula casual       secret goal: make sure FoggyGlasses doesn't extract
+  LazyRiver opportunist  secret goal: steal at least 3 times without ever being caught
+  LooseCannon casual       secret goal: get robbed at least 2x and still extract
+  MissingSock casual       secret goal: finish with more rations than RustyKettle
+  NightOwl  farmer       secret goal: make sure CleverCrow doesn't extract
+  PaperTiger casual       secret goal: steal at least 3 times without ever being caught
+  QuietBadger opportunist  secret goal: finish with more rations than CrookedSpoon
+  RustyKettle farmer       secret goal: finish with more rations than CrookedSpoon
+  SaltyPretzel casual       secret goal: get robbed at least 2x and still extract
+  SoggyBiscuit casual       secret goal: get robbed at least 2x and still extract
+
+=== NIGHT 1 - #news, 07:30 ===
+  - Someone hit PaperTiger overnight. PaperTiger is down 2.
+  [behind the scenes]
+    CleverCrow robbed PaperTiger for 2
+    rations: FoggyGlasses 6, CleverCrow 6, SaltyPretzel 5, RustyKettle 5, MissingSock 5, LazyRiver 5, GrumpyGecko 5, DustyBoots 5, SoggyBiscuit 4, QuietBadger 4, PaperTiger 4, NightOwl 4, LooseCannon 4, IronSpatula 4, CrookedSpoon 4
+
+=== NIGHT 2 - #news, 07:30 ===
+  - Someone hit CrookedSpoon overnight. CrookedSpoon is down 2.
+  - Someone hit NightOwl overnight. NightOwl is down 2.
+  - Someone hit FoggyGlasses overnight. FoggyGlasses is down 2.
+  [behind the scenes]
+    CleverCrow robbed CrookedSpoon for 2
+    QuietBadger robbed NightOwl for 2
+    LazyRiver robbed FoggyGlasses for 2
+    SaltyPretzel gave PaperTiger 1
+    LooseCannon missed the deadline (auto-scavenge)
+    rations: CleverCrow 7, RustyKettle 6, LazyRiver 6, QuietBadger 5, IronSpatula 5, DustyBoots 5, PaperTiger 4, MissingSock 4, LooseCannon 4, GrumpyGecko 4, FoggyGlasses 4, SoggyBiscuit 3, SaltyPretzel 3, NightOwl 1, CrookedSpoon 1
+
+=== NIGHT 3 - #news, 07:30 ===
+  - Someone hit CleverCrow overnight. CleverCrow is down 2.
+  - Someone hit RustyKettle overnight. RustyKettle is down 2.
+  - CrookedSpoon ran out of food. CrookedSpoon is back... as a bandit.
+  [behind the scenes]
+    NightOwl robbed CleverCrow for 2
+    CleverCrow robbed RustyKettle for 2
+    IronSpatula missed the deadline (auto-scavenge)
+    CrookedSpoon missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    rations: QuietBadger 6, LazyRiver 6, IronSpatula 6, CleverCrow 6, MissingSock 5, GrumpyGecko 5, DustyBoots 5, RustyKettle 4, PaperTiger 4, LooseCannon 4, FoggyGlasses 3, SoggyBiscuit 2, SaltyPretzel 2, NightOwl 2, CrookedSpoon 0(B)
+
+=== NIGHT 4 - #news, 07:30 ===
+  - Someone hit LooseCannon overnight. LooseCannon is down 2.
+  - Someone hit MissingSock overnight. MissingSock is down 2.
+  [behind the scenes]
+    SaltyPretzel robbed LooseCannon for 2
+    CrookedSpoon robbed MissingSock for 2
+    LooseCannon missed the deadline (auto-scavenge)
+    MissingSock missed the deadline (auto-scavenge)
+    SoggyBiscuit missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    rations: QuietBadger 7, CleverCrow 7, PaperTiger 5, LazyRiver 5, IronSpatula 5, GrumpyGecko 5, FoggyGlasses 4, DustyBoots 4, SaltyPretzel 3, RustyKettle 3, MissingSock 3, LooseCannon 2, CrookedSpoon 2(B), SoggyBiscuit 1, NightOwl 1
+
+=== NIGHT 5 - #news, 07:30 ===
+  - Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 1.
+  - Someone hit GrumpyGecko overnight. GrumpyGecko is down 2.
+  - Someone hit IronSpatula overnight. IronSpatula is down 2.
+  - NightOwl ran out of food. NightOwl is back... as a bandit.
+  - Bandit CrookedSpoon has scraped together enough to rejoin the survivors.
+  - SoggyBiscuit ran out of food. SoggyBiscuit is back... as a bandit.
+  #radio: "Just saying: SaltyPretzel has been very quiet. Too quiet."
+  [behind the scenes]
+    IronSpatula robbed SoggyBiscuit for 1
+    LazyRiver robbed GrumpyGecko for 2
+    CrookedSpoon robbed IronSpatula for 2
+    DustyBoots gave MissingSock 1
+    (radio rumour about SaltyPretzel came from CleverCrow)
+    LooseCannon missed the deadline (auto-scavenge)
+    MissingSock missed the deadline (auto-scavenge)
+    RustyKettle missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    rations: QuietBadger 6, LazyRiver 6, CleverCrow 6, MissingSock 5, FoggyGlasses 5, RustyKettle 4, PaperTiger 4, GrumpyGecko 4, CrookedSpoon 4, IronSpatula 3, SaltyPretzel 2, LooseCannon 2, DustyBoots 2, SoggyBiscuit 0(B), NightOwl 0(B)
+
+=== NIGHT 6 - #news, 07:30 ===
+  - 2 people hit SaltyPretzel overnight. SaltyPretzel is down 2.
+  - Someone hit RustyKettle overnight. RustyKettle is down 2.
+  - Someone hit DustyBoots overnight. DustyBoots is down 2.
+  - Bandit SoggyBiscuit has scraped together enough to rejoin the survivors.
+  - DustyBoots ran out of food. DustyBoots is back... as a bandit.
+  [behind the scenes]
+    LazyRiver robbed SaltyPretzel for 1
+    NightOwl robbed SaltyPretzel for 1
+    CrookedSpoon robbed RustyKettle for 2
+    SoggyBiscuit robbed DustyBoots for 2
+    GrumpyGecko gave SoggyBiscuit 1
+    QuietBadger missed the deadline (auto-scavenge)
+    MissingSock missed the deadline (auto-scavenge)
+    DustyBoots missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    rations: QuietBadger 6, MissingSock 6, LazyRiver 6, FoggyGlasses 5, CrookedSpoon 5, CleverCrow 5, PaperTiger 4, IronSpatula 4, SoggyBiscuit 3, LooseCannon 3, RustyKettle 2, GrumpyGecko 2, SaltyPretzel 1, NightOwl 1(B), DustyBoots 0(B)
+
+=== NIGHT 7 - #news, 07:30 ===
+  - 2 people hit LazyRiver overnight. LazyRiver is down 4.
+  - Someone hit CrookedSpoon overnight. CrookedSpoon is down 2.
+  - Bandit NightOwl has scraped together enough to rejoin the survivors.
+  #radio: "Just saying: QuietBadger has been very quiet. Too quiet."
+  [behind the scenes]
+    NightOwl robbed LazyRiver for 2
+    DustyBoots robbed LazyRiver for 2
+    QuietBadger robbed CrookedSpoon for 2
+    SoggyBiscuit gave RustyKettle 1
+    (radio rumour about QuietBadger came from CleverCrow)
+    IronSpatula missed the deadline (auto-scavenge)
+    SaltyPretzel missed the deadline (auto-scavenge)
+    LooseCannon missed the deadline (auto-scavenge)
+    CrookedSpoon missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    rations: QuietBadger 7, PaperTiger 5, MissingSock 5, LooseCannon 4, IronSpatula 4, FoggyGlasses 4, CleverCrow 4, NightOwl 3, RustyKettle 2, GrumpyGecko 2, DustyBoots 2(B), CrookedSpoon 2, SoggyBiscuit 1, SaltyPretzel 1, LazyRiver 1
+
+=== NIGHT 8 - #news, 07:30 ===
+  - Someone hit MissingSock overnight. MissingSock is down 2.
+  - 2 people hit QuietBadger overnight. QuietBadger is down 4.
+  - Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 1.
+  - Someone hit LooseCannon overnight. LooseCannon is down 2.
+  - SaltyPretzel ran out of food. SaltyPretzel is back... as a bandit.
+  - LazyRiver ran out of food. LazyRiver is back... as a bandit.
+  - SoggyBiscuit ran out of food. SoggyBiscuit is back... as a bandit.
+  - Bandit DustyBoots has scraped together enough to rejoin the survivors.
+  [behind the scenes]
+    NightOwl robbed MissingSock for 2
+    CrookedSpoon robbed QuietBadger for 2
+    CleverCrow robbed QuietBadger for 2
+    QuietBadger robbed SoggyBiscuit for 1
+    DustyBoots robbed LooseCannon for 2
+    LooseCannon missed the deadline (auto-scavenge)
+    RustyKettle missed the deadline (auto-scavenge)
+    SoggyBiscuit missed the deadline (auto-scavenge)
+    rations: PaperTiger 5, IronSpatula 5, CleverCrow 5, NightOwl 4, MissingSock 4, DustyBoots 4, QuietBadger 3, FoggyGlasses 3, CrookedSpoon 3, LooseCannon 2, GrumpyGecko 2, RustyKettle 1, SoggyBiscuit 0(B), SaltyPretzel 0(B), LazyRiver 0(B)
+
+=== NIGHT 9 - #news, 07:30 ===
+  - CAUGHT: IronSpatula was guarding and caught NightOwl red-handed. NightOwl is fined 1.
+  - Someone hit PaperTiger overnight. PaperTiger is down 2.
+  - Someone hit QuietBadger overnight. QuietBadger is down 2.
+  - Someone hit RustyKettle overnight. RustyKettle is down 1.
+  [behind the scenes]
+    NightOwl tried to rob IronSpatula (guarded)
+    SaltyPretzel robbed PaperTiger for 2
+    LazyRiver robbed QuietBadger for 2
+    SoggyBiscuit robbed RustyKettle for 1
+    FoggyGlasses missed the deadline (auto-scavenge)
+    CrookedSpoon missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    rations: DustyBoots 5, PaperTiger 4, IronSpatula 4, CrookedSpoon 4, CleverCrow 4, MissingSock 3, FoggyGlasses 3, SaltyPretzel 2(B), NightOwl 2, LazyRiver 2(B), SoggyBiscuit 1(B), RustyKettle 1, QuietBadger 1, LooseCannon 1, GrumpyGecko 1
+
+=== NIGHT 10 - #news, 07:30 ===
+  - 2 people hit FoggyGlasses overnight. FoggyGlasses is down 3.
+  - 2 people hit CleverCrow overnight. CleverCrow is down 4.
+  - CAUGHT: GrumpyGecko was guarding and caught RustyKettle red-handed. RustyKettle is fined 1.
+  - LooseCannon ran out of food. LooseCannon is back... as a bandit.
+  - Bandit LazyRiver has scraped together enough to rejoin the survivors.
+  - RustyKettle ran out of food. RustyKettle is back... as a bandit.
+  - GrumpyGecko ran out of food. GrumpyGecko is back... as a bandit.
+  [behind the scenes]
+    CleverCrow robbed FoggyGlasses for 2
+    LazyRiver robbed FoggyGlasses for 1
+    FoggyGlasses robbed CleverCrow for 2
+    QuietBadger robbed CleverCrow for 2
+    RustyKettle tried to rob GrumpyGecko (guarded)
+    LooseCannon missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    rations: PaperTiger 5, IronSpatula 4, DustyBoots 4, LazyRiver 3, CrookedSpoon 3, SaltyPretzel 2(B), QuietBadger 2, NightOwl 2, MissingSock 2, SoggyBiscuit 1(B), FoggyGlasses 1, CleverCrow 1, RustyKettle 0(B), LooseCannon 0(B), GrumpyGecko 0(B)
+
+=== EXTRACTION ===
+  5 seats. On the chopper: PaperTiger (5), IronSpatula (4), DustyBoots (4), CrookedSpoon (3), LazyRiver (3)
+
+=== THE REVEAL ===
+  5 pts  IronSpatula casual       extracted  rations 4   stole 1 (1 ok / 0 caught), robbed 1x, goal DONE: make sure FoggyGlasses doesn't extract
+  5 pts  LazyRiver opportunist  extracted  rations 3   stole 8 (5 ok / 0 caught), robbed 1x, goal DONE: steal at least 3 times without ever being caught
+  5 pts  CrookedSpoon casual       extracted  rations 3   stole 8 (4 ok / 0 caught), robbed 2x, goal DONE: finish with more rations than RustyKettle
+  5 pts  DustyBoots saint        extracted  rations 4   stole 4 (2 ok / 0 caught), robbed 1x, goal DONE: make sure LooseCannon doesn't extract
+  3 pts  NightOwl  farmer       survived   rations 2   stole 7 (4 ok / 1 caught), robbed 1x, goal DONE: make sure CleverCrow doesn't extract
+  3 pts  FoggyGlasses farmer       survived   rations 1   stole 2 (1 ok / 0 caught), robbed 2x, goal DONE: make sure SoggyBiscuit doesn't extract
+  3 pts  MissingSock casual       survived   rations 2   stole 0 (0 ok / 0 caught), robbed 2x, goal DONE: finish with more rations than RustyKettle
+  3 pts  PaperTiger casual       extracted  rations 5   stole 0 (0 ok / 0 caught), robbed 2x, goal failed: steal at least 3 times without ever being caught
+  1 pts  CleverCrow shark        survived   rations 1   stole 10 (5 ok / 0 caught), robbed 2x, goal failed: make sure PaperTiger doesn't extract
+  1 pts  QuietBadger opportunist  survived   rations 2   stole 7 (4 ok / 0 caught), robbed 2x, goal failed: finish with more rations than CrookedSpoon
+  0 pts  SaltyPretzel casual       bandit     rations 2   stole 4 (2 ok / 0 caught), robbed 1x, goal failed: get robbed at least 2x and still extract
+  0 pts  LooseCannon casual       bandit     rations 0   stole 0 (0 ok / 0 caught), robbed 2x, goal failed: get robbed at least 2x and still extract
+  0 pts  RustyKettle farmer       bandit     rations 0   stole 0 (0 ok / 1 caught), robbed 3x, goal failed: finish with more rations than CrookedSpoon
+  0 pts  SoggyBiscuit casual       bandit     rations 1   stole 3 (2 ok / 0 caught), robbed 2x, goal failed: get robbed at least 2x and still extract
+  0 pts  GrumpyGecko farmer       bandit     rations 0   stole 0 (0 ok / 0 caught), robbed 1x, goal failed: give away 5 rations over the game
+
+  Winner(s): IronSpatula, LazyRiver, CrookedSpoon, DustyBoots

@@ -1,0 +1,45 @@
+{
+  "_about": "Single source of truth for Survivors. The simulator (sim/) and the explainer video (video/) both read this file. Change a value here, then rerun the simulator and video/build.py. The rules doc is written by hand, so update it too.",
+  "version": "v2 (16 Oct 2026)",
+  "rules": {
+    "players": 15,
+    "rounds": 10,
+    "start_rations": 7,
+    "eat": 1,
+    "scavenge_min": 0,
+    "scavenge_max": 2,
+    "steal_amount": 2,
+    "caught_penalty": 2,
+    "guard_reward": 2,
+    "guard_nights": 2,
+    "guard_limit": 3,
+    "investigate_bounty": 1,
+    "bandit_steal_amount": 1,
+    "bandit_rejoin": 3,
+    "seat_ratio": 0.3333333333,
+    "pts_extract": 3,
+    "pts_objective": 2,
+    "pts_survive": 1,
+    "tiebreak": "kindness",
+    "winner_tiebreak": "kindness",
+    "give_goal": 3,
+    "grudge_goal": "rob",
+    "grudge_robs": 1,
+    "robbed_goal": 1
+  },
+  "presentation": {
+    "deadline": "midnight",
+    "news_time": "07:30",
+    "news_time_spoken": "half past seven",
+    "join_command": "/join",
+    "minutes_per_day": 2,
+    "launch_date": "[LAUNCH DATE]",
+    "example_names": [
+      "RustyKettle",
+      "QuietBadger",
+      "SoggyBiscuit",
+      "LuckyLantern"
+    ],
+    "aliases": "Everyone plays under a secret alias assigned by the bot at /join; all game output uses aliases."
+  }
+}

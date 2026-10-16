@@ -1,0 +1,235 @@
+Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+Brain: jev for 5 of 15 players
+SURVIVORS - simulated game (seed 3, 15 players, 10 nights)
+
+Cast:
+  BurntToast shark        secret goal: steal at least 3 times without ever being caught
+  FoggyGlasses saint        secret goal: steal at least 3 times without ever being caught
+  GrumpyGecko casual       secret goal: give away 3 rations over the game
+  HollowTin shark        secret goal: give away 3 rations over the game
+  IronSpatula farmer       secret goal: give away 3 rations over the game
+  LooseCannon casual       secret goal: successfully rob VelvetMole at least 1x
+  MissingSock shark        secret goal: give away 3 rations over the game
+  MuddyPaws chaos        secret goal: give away 3 rations over the game
+  NightOwl  opportunist  secret goal: successfully rob FoggyGlasses at least 1x
+  PaperTiger opportunist  secret goal: get robbed at least 1x and still extract
+  RustyKettle casual       secret goal: get robbed at least 1x and still extract
+  SaltyPretzel casual       secret goal: get robbed at least 1x and still extract
+  SneakyPenguin opportunist  secret goal: give away 3 rations over the game
+  SoggyBiscuit saint        secret goal: steal at least 3 times without ever being caught
+  VelvetMole farmer       secret goal: finish with more rations than GrumpyGecko
+
+=== NIGHT 1 - #news, 07:30 ===
+  - Someone hit MuddyPaws overnight. MuddyPaws is down 2.
+  [behind the scenes]
+    PaperTiger robbed MuddyPaws for 2
+    HollowTin gave FoggyGlasses 2
+    SneakyPenguin gave LooseCannon 2
+    [jev] GrumpyGecko chose scavenge (p=0.78)
+    [jev] NightOwl chose scavenge (p=0.55)
+    [jev] RustyKettle chose scavenge (p=0.78)
+    [jev] FoggyGlasses chose scavenge (p=0.59)
+    [jev] BurntToast chose guard (p=0.05)
+    rations: LooseCannon 9, FoggyGlasses 9, SoggyBiscuit 8, RustyKettle 8, PaperTiger 8, IronSpatula 8, VelvetMole 7, NightOwl 7, MissingSock 7, GrumpyGecko 7, SaltyPretzel 6, BurntToast 6, SneakyPenguin 4, MuddyPaws 4, HollowTin 4
+
+=== NIGHT 2 - #news, 07:30 ===
+  - Someone hit LooseCannon overnight. LooseCannon is down 2.
+  [behind the scenes]
+    BurntToast robbed LooseCannon for 2
+    IronSpatula gave MuddyPaws 2
+    FoggyGlasses gave VelvetMole 2
+    SoggyBiscuit missed the deadline (auto-scavenge)
+    [jev] GrumpyGecko chose scavenge (p=0.78)
+    [jev] NightOwl chose scavenge (p=0.55)
+    [jev] RustyKettle chose scavenge (p=0.78)
+    [jev] FoggyGlasses chose gift:VelvetMole (p=0.02)
+    [jev] BurntToast chose steal:LooseCannon (p=0.04)
+    rations: VelvetMole 10, SoggyBiscuit 9, PaperTiger 9, RustyKettle 8, NightOwl 7, BurntToast 7, SaltyPretzel 6, MissingSock 6, LooseCannon 6, GrumpyGecko 6, FoggyGlasses 6, SneakyPenguin 5, MuddyPaws 5, IronSpatula 5, HollowTin 3
+
+=== NIGHT 3 - #news, 07:30 ===
+  - Someone hit IronSpatula overnight. IronSpatula is down 2.
+  - Someone hit GrumpyGecko overnight. GrumpyGecko is down 2.
+  - Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 2.
+  #radio: "Just saying: MuddyPaws has been very quiet. Too quiet."
+  [behind the scenes]
+    MissingSock robbed IronSpatula for 2
+    HollowTin robbed GrumpyGecko for 2
+    MuddyPaws robbed SoggyBiscuit for 2
+    SoggyBiscuit gave LooseCannon 2
+    (radio rumour about MuddyPaws came from MissingSock)
+    RustyKettle missed the deadline (auto-scavenge)
+    SaltyPretzel missed the deadline (auto-scavenge)
+    [jev] GrumpyGecko chose scavenge (p=0.78)
+    [jev] NightOwl chose scavenge (p=0.55)
+    [jev] FoggyGlasses chose scavenge (p=0.59)
+    [jev] BurntToast chose scavenge (p=0.29)
+    rations: VelvetMole 11, PaperTiger 10, RustyKettle 8, NightOwl 8, BurntToast 8, MissingSock 7, LooseCannon 7, SneakyPenguin 6, MuddyPaws 6, FoggyGlasses 6, SaltyPretzel 5, GrumpyGecko 5, SoggyBiscuit 4, IronSpatula 4, HollowTin 4
+
+=== NIGHT 4 - #news, 07:30 ===
+  - CAUGHT: IronSpatula was guarding and caught NightOwl red-handed. NightOwl pays IronSpatula 2.
+  - Someone hit SaltyPretzel overnight. SaltyPretzel is down 2.
+  - Someone hit VelvetMole overnight. VelvetMole is down 2.
+  #radio: "Just saying: LooseCannon has been very quiet. Too quiet."
+  [behind the scenes]
+    NightOwl tried to rob IronSpatula (guarded)
+    HollowTin robbed SaltyPretzel for 2
+    PaperTiger robbed VelvetMole for 2
+    MissingSock gave GrumpyGecko 2
+    SoggyBiscuit gave IronSpatula 1
+    MuddyPaws gave SoggyBiscuit 1
+    SneakyPenguin gave GrumpyGecko 1
+    (radio rumour about LooseCannon came from MuddyPaws)
+    FoggyGlasses missed the deadline (auto-scavenge)
+    [jev] GrumpyGecko chose guard (p=0.10)
+    [jev] NightOwl chose steal:IronSpatula (p=0.02)
+    [jev] RustyKettle chose guard (p=0.10)
+    [jev] BurntToast chose scavenge (p=0.29)
+    rations: PaperTiger 11, BurntToast 9, VelvetMole 8, RustyKettle 7, LooseCannon 7, GrumpyGecko 7, IronSpatula 6, FoggyGlasses 6, NightOwl 5, HollowTin 5, SneakyPenguin 4, MuddyPaws 4, MissingSock 4, SoggyBiscuit 3, SaltyPretzel 3
+
+=== NIGHT 5 - #news, 07:30 ===
+  - Someone hit BurntToast overnight. BurntToast is down 2.
+  - Someone hit HollowTin overnight. HollowTin is down 2.
+  - Someone hit MissingSock overnight. MissingSock is down 2.
+  - CAUGHT: VelvetMole was guarding and caught BurntToast red-handed. BurntToast pays VelvetMole 2.
+  #radio: "Just saying: SneakyPenguin has been very quiet. Too quiet."
+  [behind the scenes]
+    MissingSock robbed BurntToast for 2
+    SaltyPretzel robbed HollowTin for 2
+    MuddyPaws robbed MissingSock for 2
+    BurntToast tried to rob VelvetMole (guarded)
+    IronSpatula gave VelvetMole 1
+    (radio rumour about SneakyPenguin came from HollowTin)
+    RustyKettle missed the deadline (auto-scavenge)
+    [jev] GrumpyGecko chose scavenge (p=0.87)
+    [jev] NightOwl chose scavenge (p=0.55)
+    [jev] FoggyGlasses chose scavenge (p=0.59)
+    [jev] BurntToast chose steal:VelvetMole (p=0.04)
+    rations: PaperTiger 12, VelvetMole 10, LooseCannon 8, GrumpyGecko 8, RustyKettle 7, NightOwl 6, MuddyPaws 5, FoggyGlasses 5, SaltyPretzel 4, IronSpatula 4, BurntToast 4, SneakyPenguin 3, MissingSock 3, HollowTin 3, SoggyBiscuit 2
+
+=== NIGHT 6 - #news, 07:30 ===
+  - Someone hit FoggyGlasses overnight. FoggyGlasses is down 2.
+  - Someone hit BurntToast overnight. BurntToast is down 2.
+  [behind the scenes]
+    SoggyBiscuit robbed FoggyGlasses for 2
+    MuddyPaws robbed BurntToast for 2
+    HollowTin gave BurntToast 1
+    GrumpyGecko missed the deadline (auto-scavenge)
+    LooseCannon missed the deadline (auto-scavenge)
+    FoggyGlasses missed the deadline (auto-scavenge)
+    BurntToast missed the deadline (auto-scavenge)
+    [jev] NightOwl chose scavenge (p=0.55)
+    [jev] RustyKettle chose scavenge (p=0.78)
+    rations: PaperTiger 12, VelvetMole 9, LooseCannon 8, RustyKettle 7, GrumpyGecko 7, MuddyPaws 6, NightOwl 5, FoggyGlasses 4, SoggyBiscuit 3, SaltyPretzel 3, IronSpatula 3, BurntToast 3, SneakyPenguin 2, MissingSock 2, HollowTin 1
+
+=== NIGHT 7 - #news, 07:30 ===
+  - 3 people hit RustyKettle overnight. RustyKettle is down 6.
+  - Someone hit PaperTiger overnight. PaperTiger is down 2.
+  - EXPOSED: an investigator saw NightOwl rob RustyKettle. NightOwl pays them 1.
+  - RustyKettle ran out of food. RustyKettle is back... as a bandit.
+  #radio: "Just saying: SoggyBiscuit has been very quiet. Too quiet."
+  [behind the scenes]
+    SneakyPenguin robbed RustyKettle for 2
+    NightOwl robbed RustyKettle for 2
+    HollowTin robbed RustyKettle for 2
+    BurntToast robbed PaperTiger for 2
+    SoggyBiscuit gave BurntToast 1
+    MuddyPaws gave BurntToast 1
+    (radio rumour about SoggyBiscuit came from MuddyPaws)
+    SaltyPretzel missed the deadline (auto-scavenge)
+    PaperTiger missed the deadline (auto-scavenge)
+    [jev] GrumpyGecko chose scavenge (p=0.78)
+    [jev] NightOwl chose steal:RustyKettle (p=0.02)
+    [jev] RustyKettle chose scavenge (p=0.78)
+    [jev] FoggyGlasses chose scavenge (p=0.59)
+    [jev] BurntToast chose steal:PaperTiger (p=0.04)
+    rations: PaperTiger 9, VelvetMole 8, GrumpyGecko 8, LooseCannon 7, BurntToast 6, NightOwl 5, SaltyPretzel 4, MuddyPaws 4, SneakyPenguin 3, IronSpatula 3, FoggyGlasses 3, HollowTin 2, SoggyBiscuit 1, MissingSock 1, RustyKettle 0(B)
+
+=== NIGHT 8 - #news, 07:30 ===
+  - 2 people hit SneakyPenguin overnight. SneakyPenguin is down 3.
+  - CAUGHT: VelvetMole was guarding and caught LooseCannon red-handed. LooseCannon pays VelvetMole 2.
+  - CAUGHT: VelvetMole was guarding and caught RustyKettle red-handed. RustyKettle pays VelvetMole 2.
+  - CAUGHT: VelvetMole was guarding and caught BurntToast red-handed. BurntToast pays VelvetMole 2.
+  - Someone hit FoggyGlasses overnight. FoggyGlasses is down 2.
+  - FoggyGlasses ran out of food. FoggyGlasses is back... as a bandit.
+  - SneakyPenguin ran out of food. SneakyPenguin is back... as a bandit.
+  #radio: "Just saying: SoggyBiscuit has been very quiet. Too quiet."
+  [behind the scenes]
+    MissingSock robbed SneakyPenguin for 2
+    HollowTin robbed SneakyPenguin for 1
+    LooseCannon tried to rob VelvetMole (guarded)
+    RustyKettle tried to rob VelvetMole (guarded)
+    BurntToast tried to rob VelvetMole (guarded)
+    MuddyPaws robbed FoggyGlasses for 2
+    (radio rumour about SoggyBiscuit came from HollowTin)
+    SaltyPretzel missed the deadline (auto-scavenge)
+    [jev] GrumpyGecko chose investigate:FoggyGlasses (p=0.00)
+    [jev] NightOwl chose guard (p=0.10)
+    [jev] RustyKettle chose steal:VelvetMole (p=0.05)
+    [jev] FoggyGlasses chose gift:BurntToast (p=0.02)
+    [jev] BurntToast chose steal:VelvetMole (p=0.04)
+    rations: VelvetMole 15, PaperTiger 8, GrumpyGecko 7, MuddyPaws 5, NightOwl 4, LooseCannon 4, SaltyPretzel 3, IronSpatula 3, BurntToast 3, MissingSock 2, HollowTin 2, SoggyBiscuit 1, SneakyPenguin 0(B), RustyKettle 0(B), FoggyGlasses 0(B)
+
+=== NIGHT 9 - #news, 07:30 ===
+  - Someone hit HollowTin overnight. HollowTin is down 2.
+  - 3 people hit SaltyPretzel overnight. SaltyPretzel is down 3.
+  - HollowTin ran out of food. HollowTin is back... as a bandit.
+  - SaltyPretzel ran out of food. SaltyPretzel is back... as a bandit.
+  [behind the scenes]
+    NightOwl robbed HollowTin for 2
+    MissingSock robbed SaltyPretzel for 1
+    SneakyPenguin robbed SaltyPretzel for 1
+    RustyKettle robbed SaltyPretzel for 1
+    MuddyPaws gave SneakyPenguin 1
+    LooseCannon missed the deadline (auto-scavenge)
+    BurntToast missed the deadline (auto-scavenge)
+    [jev] GrumpyGecko chose scavenge (p=0.78)
+    [jev] NightOwl chose steal:HollowTin (p=0.02)
+    [jev] RustyKettle chose steal:SaltyPretzel (p=0.05)
+    [jev] FoggyGlasses chose investigate:PaperTiger (p=0.05)
+    rations: VelvetMole 14, PaperTiger 7, GrumpyGecko 6, NightOwl 5, LooseCannon 4, IronSpatula 4, MuddyPaws 3, SneakyPenguin 2(B), MissingSock 2, BurntToast 2, SoggyBiscuit 1, RustyKettle 1(B), SaltyPretzel 0(B), HollowTin 0(B), FoggyGlasses 0(B)
+
+=== NIGHT 10 - #news, 07:30 ===
+  - 2 people hit GrumpyGecko overnight. GrumpyGecko is down 3.
+  - Someone hit NightOwl overnight. NightOwl is down 1.
+  - CAUGHT: PaperTiger was guarding and caught RustyKettle red-handed. RustyKettle pays PaperTiger 2.
+  - Someone hit MissingSock overnight. MissingSock is down 2.
+  - CAUGHT: MuddyPaws was guarding and caught SneakyPenguin red-handed. SneakyPenguin pays MuddyPaws 2.
+  - Someone hit IronSpatula overnight. IronSpatula is down 2.
+  [behind the scenes]
+    MissingSock robbed GrumpyGecko for 2
+    SaltyPretzel robbed GrumpyGecko for 1
+    HollowTin robbed NightOwl for 1
+    RustyKettle tried to rob PaperTiger (guarded)
+    SoggyBiscuit robbed MissingSock for 2
+    SneakyPenguin tried to rob MuddyPaws (guarded)
+    BurntToast robbed IronSpatula for 2
+    GrumpyGecko missed the deadline (auto-scavenge)
+    [jev] NightOwl chose scavenge (p=0.55)
+    [jev] RustyKettle chose steal:PaperTiger (p=0.05)
+    [jev] FoggyGlasses chose investigate:GrumpyGecko (p=0.05)
+    [jev] BurntToast chose steal:IronSpatula (p=0.04)
+    rations: VelvetMole 13, PaperTiger 8, LooseCannon 5, MuddyPaws 4, NightOwl 3, IronSpatula 3, GrumpyGecko 3, BurntToast 3, SoggyBiscuit 2, SaltyPretzel 1(B), MissingSock 1, HollowTin 1(B), SneakyPenguin 0(B), RustyKettle 0(B), FoggyGlasses 0(B)
+
+=== EXTRACTION ===
+  5 seats. On the chopper: VelvetMole (13), PaperTiger (8), LooseCannon (5), MuddyPaws (4), IronSpatula (3)
+
+=== THE REVEAL ===
+  5 pts  IronSpatula farmer       extracted  rations 3   stole 0 (0 ok / 0 caught), robbed 2x, goal DONE: give away 3 rations over the game
+  5 pts  VelvetMole farmer       extracted  rations 13  stole 0 (0 ok / 0 caught), robbed 1x, goal DONE: finish with more rations than GrumpyGecko
+  5 pts  MuddyPaws chaos        extracted  rations 4   stole 8 (4 ok / 0 caught), robbed 1x, goal DONE: give away 3 rations over the game
+  5 pts  PaperTiger opportunist  extracted  rations 8   stole 4 (2 ok / 0 caught), robbed 1x, goal DONE: get robbed at least 1x and still extract
+  3 pts  LooseCannon casual       extracted  rations 5   stole 0 (0 ok / 1 caught), robbed 1x, goal failed: successfully rob VelvetMole at least 1x
+  2 pts  HollowTin shark        bandit     rations 1   stole 8 (5 ok / 0 caught), robbed 2x, goal DONE: give away 3 rations over the game
+  2 pts  SneakyPenguin opportunist  bandit     rations 0   stole 3 (2 ok / 1 caught), robbed 1x, goal DONE: give away 3 rations over the game
+  1 pts  GrumpyGecko casual       survived   rations 3   stole 0 (0 ok / 0 caught), robbed 2x, goal failed: give away 3 rations over the game
+  1 pts  NightOwl  opportunist  survived   rations 3   stole 4 (2 ok / 1 caught), robbed 1x, goal failed: successfully rob FoggyGlasses at least 1x
+  1 pts  MissingSock shark        survived   rations 1   stole 9 (5 ok / 0 caught), robbed 2x, goal failed: give away 3 rations over the game
+  1 pts  SoggyBiscuit saint        survived   rations 2   stole 4 (2 ok / 0 caught), robbed 1x, goal failed: steal at least 3 times without ever being caught
+  1 pts  BurntToast shark        survived   rations 3   stole 6 (3 ok / 2 caught), robbed 2x, goal failed: steal at least 3 times without ever being caught
+  0 pts  RustyKettle casual       bandit     rations 0   stole 1 (1 ok / 2 caught), robbed 1x, goal failed: get robbed at least 1x and still extract
+  0 pts  SaltyPretzel casual       bandit     rations 1   stole 3 (2 ok / 0 caught), robbed 2x, goal failed: get robbed at least 1x and still extract
+  0 pts  FoggyGlasses saint        bandit     rations 0   stole 0 (0 ok / 0 caught), robbed 2x, goal failed: steal at least 3 times without ever being caught
+
+  Winner(s): MuddyPaws
+
+Jev: 42 calls, 51,882 input tokens, about $0.0022 at $0.042/M input, 0 ms average per call, models: jev-mock (MOCK)

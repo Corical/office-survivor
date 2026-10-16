@@ -1,0 +1,42 @@
+[scene_01] Hook (23 words)
+For the next two weeks, the office becomes a survival game. Food is scarce, everyone is hungry, and anyone could turn on you.
+
+[scene_02] The goal (24 words)
+The game runs for ten workdays. Your goal: stay alive, and on the last night, grab one of five seats on the rescue helicopter.
+
+[scene_03] Food (21 words)
+Everyone starts with seven rations. Every night, you eat one. Run out, and you become a bandit. More on that later.
+
+[scene_04] Your daily move (22 words)
+Each day, you pick one secret move in Discord before midnight. Nobody else can see what you chose. You have five options.
+
+[scene_05] Scavenge (20 words)
+Scavenge. Go looking for food and find nothing, one or two rations. If you forget to play, you scavenge automatically.
+
+[scene_06] Steal (20 words)
+Steal. Pick someone and take two of their rations. They'll know they were robbed. They won't know it was you.
+
+[scene_07] Guard (33 words)
+Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you two rations. You only get three guards, so choose your moment.
+
+[scene_08] Investigate (24 words)
+Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration.
+
+[scene_09] Gift (16 words)
+Gift. Give some of your food to someone else. Only the two of you will know.
+
+[scene_10] The morning news (34 words)
+Every morning at half past seven, the news drops in Discord: who got robbed, who got caught, and who ran out of food. You'll always know what happened. You'll rarely know who did it.
+
+[scene_11] Bandits (23 words)
+Run out of food and you're a bandit. Bandits can only steal, but get back to three rations and you rejoin the survivors.
+
+[scene_12] Secret goal and radio (30 words)
+You'll also get a secret goal that only you know about. And once a day you can post an anonymous message on the radio channel. Tips, accusations, lies. Your call.
+
+[scene_13] Extraction and the reveal (45 words)
+On the last night, the helicopter lands. The five survivors with the most food get a seat. A seat and your secret goal both earn points, and the most points wins. Then comes the big reveal: every theft and every secret, out in the open.
+
+[scene_14] How to join (41 words)
+It takes two minutes a day, it's completely optional, and nothing in the game touches real work or real money. Type slash join in Discord and you'll get a secret alias, so nobody knows who's who. And remember: trust no one.
+
