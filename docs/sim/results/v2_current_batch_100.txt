@@ -1,44 +1,44 @@
-Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+Rules from: C:\Personal\office-survivor\docs\game.json (v2 (16 Oct 2026))
 SURVIVORS - 100 simulated games, 15 players, 10 nights
 Rules changed from default: none
 
 Metric                                                mean     p10     p90
-Survivors at the end                                  10.9    9.00    13.0
-Bandits at the end                                    4.09    2.00    6.00
-Players who were ever a bandit                        5.29    3.00    8.00
-Bandit comebacks                                      1.51    0.00    3.00
-Died without ever being robbed                        0.64    0.00    2.00
+Survivors at the end                                  10.8    9.00    13.0
+Bandits at the end                                    4.24    2.00    6.00
+Players who were ever a bandit                        5.41    3.00    8.00
+Bandit comebacks                                      1.44    0.00    3.00
+Died without ever being robbed                        0.72    0.00    2.00
 First death on night                                  4.60    3.00    6.10
-Steal attempts per game                               33.2    24.0    41.1
+Steal attempts per game                               33.1    23.9    42.0
 Share of steals caught by a guard                     0.25    0.13    0.38
-Steals that found nothing                             0.32    0.00    1.10
-Robberies per night                                   1.93    1.40    2.40
-Quiet nights (no robbery/catch/death)                 0.33    0.00    1.00
-Richest player's rations                              10.8    7.00    15.0
-Median survivor rations                               4.28    3.00    6.00
-Rations needed for the last seat                      4.94    4.00    6.00
+Steals that found nothing                             0.48    0.00    2.00
+Robberies per night                                   1.91    1.40    2.40
+Quiet nights (no robbery/catch/death)                 0.32    0.00    1.00
+Richest player's rations                              9.71    7.00    13.0
+Median survivor rations                               4.06    3.00    5.55
+Rations needed for the last seat                      4.58    3.00    6.00
 Last seat decided by coin flip                        0.18    0.00    1.00
 Empty seats on the chopper                             0.0    0.00    0.00
-Deaths on the final night                             1.15    0.00    2.00
-Share of seats won by heavy thieves (3+ steals)       0.23    0.00    0.40
-Joint winners per game                                1.17    1.00    2.00
+Deaths on the final night                             1.21    0.00    3.00
+Share of seats won by heavy thieves (3+ steals)       0.25    0.00    0.42
+Joint winners per game                                1.20    1.00    2.00
 
 Personality    share  avg pts  extract  win share  
-shark             7%     2.40      36%        11%
-farmer           20%     2.31      39%        22%
-paranoid         10%     2.25      43%        10%
-opportunist      15%     2.22      35%        15%
-casual           25%     2.17      36%        24%
-detective         7%     2.09      28%        10%
-saint             8%     1.39      13%         6%
-chaos             7%     1.28      17%         1%
+shark             7%     2.38      36%         9%
+farmer           20%     2.29      39%        24%
+paranoid         10%     2.22      41%        11%
+opportunist      15%     2.21      37%        17%
+casual           25%     2.16      36%        27%
+detective         7%     2.02      25%         5%
+saint             8%     1.40      12%         6%
+chaos             7%     1.32      20%         2%
 
 Secret objective                                   completed
 finish with more rations than @player                    47%
-get robbed at least 1x and still extract                 29%
+get robbed at least 1x and still extract                 28%
 steal at least 3 times without ever being caught         17%
-give away 3 rations over the game                        38%
-successfully rob @player at least 1x                     43%
+give away 3 rations over the game                        37%
+successfully rob @player at least 1x                     44%
 
 Flags:
   - nothing obviously broken

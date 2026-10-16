@@ -1,24 +1,24 @@
-Rules from: /home/claude/survivors/game.json (v2 (16 Oct 2026))
+Rules from: C:\Personal\office-survivor\docs\game.json (v2 (16 Oct 2026))
 300 games per variant
 
-                       v1_original r1_first_pick      baseline       steal_1
-Survivors                     7.15          10.6          10.9          11.4
-Ever bandit                   11.2          5.59          5.34          4.71
-Comebacks                     5.63          1.56          1.54          1.36
-Unrobbed deaths               0.92          0.68          0.67          0.99
-Catch rate                    0.13          0.28          0.24          0.23
-Robberies/night               2.57          1.89          1.96          1.96
-Quiet nights                  0.31          0.38          0.36          0.42
-Coin-flip finale              0.39          0.17          0.18          0.17
-Empty seats                   0.34          0.00           0.0           0.0
-Thief seat share              0.49          0.25          0.26          0.16
+                          baseline   v1_original r1_first_pick       steal_1
+Survivors                     10.6          6.99          10.4          11.2
+Ever bandit                   5.56          11.2          5.74          4.82
+Comebacks                     1.51          5.54          1.56          1.31
+Unrobbed deaths               0.75          0.95          0.82          1.10
+Catch rate                    0.25          0.13          0.28          0.23
+Robberies/night               1.95          2.55          1.88          1.94
+Quiet nights                  0.35          0.31          0.38          0.43
+Coin-flip finale              0.19          0.38          0.16          0.18
+Empty seats                    0.0          0.42          0.00           0.0
+Thief seat share              0.27          0.49          0.25          0.16
 
 Win share by personality
-casual                         26%           25%           22%           27%
-farmer                         18%           18%           22%           25%
-opportunist                    18%           16%           21%           12%
-shark                           9%           10%           10%            5%
-paranoid                       11%           14%           10%           14%
-saint                           6%            7%            5%            9%
-detective                       7%            4%            6%            4%
-chaos                           6%            7%            4%            4%
+casual                         26%           27%           24%           27%
+farmer                         21%           19%           17%           27%
+opportunist                    19%           18%           19%           12%
+shark                          10%            9%            9%            4%
+paranoid                       10%           11%           14%           14%
+saint                           5%            6%            7%            9%
+detective                       4%            6%            3%            4%
+chaos                           5%            6%            6%            4%
