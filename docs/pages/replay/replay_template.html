@@ -184,7 +184,10 @@ tbody tr.sel td { background: var(--hl-soft); }
     for (let n = 1; n <= R; n++) {
       for (const e of nights[n].happen) {
         if (e.type === 'steal' && e.outcome === 'success') cur[e.target] -= e.amount;
-        else if (e.type === 'steal' && e.outcome === 'caught') { cur[e.thief] -= rl.caught_penalty; cur[e.target] += rl.guard_reward; }
+        else if (e.type === 'steal' && e.outcome === 'caught') {
+          const paid = e.paid !== undefined ? e.paid : rl.caught_penalty;     // #news prints what was actually paid
+          cur[e.thief] -= paid; cur[e.target] += Math.min(paid, rl.guard_reward);
+        }
         else if (e.type === 'exposed') cur[e.thief] -= e.paid;
         else if (e.type === 'became_bandit') { cur[e.player] = 0; band[e.player] = true; }
         else if (e.type === 'rejoined') { cur[e.player] = rl.bandit_rejoin; band[e.player] = false; }
@@ -268,7 +271,7 @@ tbody tr.sel td { background: var(--hl-soft); }
   }
 
   const LEDGER = { robbed: 'robbed by', stole: 'stole from', caught_penalty: 'caught, paid', guard_reward: 'guard paid by', scavenge: 'scavenged',
-    guard_income: 'guard bonus', gift_out: 'gave to', gift_in: 'gift from', bounty_paid: 'exposed, paid', bounty_received: 'bounty from', eat: 'ate' };
+    guard_income: 'guard bonus', fine: 'fined, caught by', gift_out: 'gave to', gift_in: 'gift from', gift_bonus: 'gift bonus from', bounty_paid: 'exposed, paid', bounty_received: 'bounty from', eat: 'ate' };
   const ledger = items => (items || []).filter(e => e.delta !== 0).map(e => `${e.delta > 0 ? '+' : ''}${e.delta} ${LEDGER[e.reason] || e.reason}${e.detail && e.detail !== 'auto' ? ' ' + esc(e.detail) : ''}`).join(' · ');
 
   function say(e) {
@@ -276,7 +279,7 @@ tbody tr.sel td { background: var(--hl-soft); }
       case 'guard_up': return ['guard', `${who(e.player)} set a guard, protected through night ${e.until_night} (guard ${e.guards_used} of 3)`];
       case 'guard_wasted': return ['guard', `${who(e.player)} tried to guard while already protected; the night was wasted`];
       case 'steal':
-        if (e.outcome === 'caught') return ['caught', `${who(e.thief)} tried to rob ${who(e.target)} and walked into a guard`];
+        if (e.outcome === 'caught') return ['caught', `${who(e.thief)} tried to rob ${who(e.target)} and walked into a guard${e.paid !== undefined ? `; paid ${e.paid}` : ''}`];
         if (e.outcome === 'empty') return ['steal', `${who(e.thief)} broke into ${who(e.target)}'s place and found nothing`];
         return ['steal', `${who(e.thief)} stole ${e.amount} from ${who(e.target)}${e.split_with ? ` (shared with ${e.split_with} other thief)` : ''}`];
       case 'scavenge': return ['scavenge', `${who(e.player)} found ${e.found}${e.auto ? ' (missed the deadline)' : ''}`];

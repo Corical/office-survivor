@@ -1,0 +1,328 @@
+<title>Survivors Season View</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: the whole two weeks on one screen. Game picker, a Mon-Fri calendar for two weeks, then a
+   player-by-day grid ranked by the final result. */
+:root {
+  --bg: #f1f2ec; --panel: #ffffff; --panel2: #e8eae1; --ink: #1c2019; --ink2: #575d52; --ink3: #8a8f84; --line: #cfd3c6;
+  --accent: #4b5a1c; --hl: #b2410f; --hl-soft: #f6e3d6; --dead: #2b2f28; --dead-ink: #d9dccf;
+  --a-scavenge: #1baf7a; --a-steal: #eb6834; --a-guard: #2a78d6; --a-investigate: #eda100; --a-gift: #e87ba4;
+  --bad: #b3261e; --good: #2d7a37;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131611; --panel: #1b1f18; --panel2: #242920; --ink: #e5e8de; --ink2: #a6ac9d; --ink3: #737a6c; --line: #363c31;
+  --accent: #bccb7c; --hl: #ff8a4c; --hl-soft: #3a2619; --dead: #0b0d0a; --dead-ink: #8b9184;
+  --a-scavenge: #199e70; --a-steal: #d95926; --a-guard: #3987e5; --a-investigate: #c98500; --a-gift: #d55181;
+  --bad: #ef6b5d; --good: #6cc070; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #131611; --panel: #1b1f18; --panel2: #242920; --ink: #e5e8de; --ink2: #a6ac9d; --ink3: #737a6c; --line: #363c31;
+  --accent: #bccb7c; --hl: #ff8a4c; --hl-soft: #3a2619; --dead: #0b0d0a; --dead-ink: #8b9184;
+  --a-scavenge: #199e70; --a-steal: #d95926; --a-guard: #3987e5; --a-investigate: #c98500; --a-gift: #d55181;
+  --bad: #ef6b5d; --good: #6cc070; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.45; }
+main { max-width: none; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 60px; display: grid; gap: 22px; }
+h1, h2 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(28px, 3.6vw, 42px); font-weight: 800; }
+h2 { font-size: 20px; font-weight: 600; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--ink2); }
+.lede { margin: 6px 0 0; color: var(--ink2); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--hl); outline-offset: 2px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; min-width: 0; display: grid; gap: 10px; }
+
+.games { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.game { text-align: left; background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 4px; }
+.game[aria-pressed="true"] { border-color: var(--hl); box-shadow: inset 0 0 0 1px var(--hl); }
+.game .name { font-weight: 600; }
+.game .stats { font-family: var(--f-mono); font-size: 12px; color: var(--ink2); }
+
+.week { display: grid; grid-template-columns: 70px repeat(5, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+.week + .week { margin-top: 8px; }
+.wk { font-family: var(--f-mono); font-size: 12px; color: var(--ink3); text-transform: uppercase; letter-spacing: .05em; padding-top: 8px; }
+.day { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; display: grid; gap: 6px; align-content: start; background: var(--panel); min-width: 0; }
+.day h3 { margin: 0; font-size: 13px; font-family: var(--f-body); font-weight: 600; display: flex; justify-content: space-between; gap: 6px; }
+.day h3 span { font-family: var(--f-mono); font-weight: 400; color: var(--ink3); font-size: 11.5px; }
+.counts { display: flex; flex-wrap: wrap; gap: 4px; }
+.cnt { font-family: var(--f-mono); font-size: 11px; padding: 0 6px; border-radius: 99px; border: 1px solid var(--line); color: var(--ink2); white-space: nowrap; }
+.cnt.r { border-color: var(--a-steal); } .cnt.c { border-color: var(--a-guard); } .cnt.x { border-color: var(--a-investigate); } .cnt.b { border-color: var(--bad); color: var(--bad); }
+.news { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 12.5px; color: var(--ink2); }
+.news li { border-left: 2px solid var(--line); padding-left: 7px; }
+@media (max-width: 900px) { .week { grid-template-columns: 1fr; } .wk { padding-top: 0; } }
+
+.gridwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 12.5px; }
+th, td { padding: 4px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+thead th { font-family: var(--f-mono); font-weight: 500; font-size: 11px; color: var(--ink2); background: var(--panel2); text-align: center; position: sticky; top: 0; z-index: 1; }
+thead th.wk1, thead th.wk2 { border-bottom: 2px solid var(--accent); }
+th.who, td.who { text-align: left; position: sticky; left: 0; background: var(--panel); z-index: 2; padding: 4px 10px; }
+thead th.who { background: var(--panel2); z-index: 3; }
+td.who b { font-weight: 600; } td.who .muted { font-size: 11.5px; }
+td.c { min-width: 92px; }
+.cell { display: grid; grid-template-columns: 4px 1fr auto; gap: 0 6px; align-items: center; border-radius: 5px; padding: 3px 6px 3px 0; background: var(--panel2); min-height: 36px; cursor: default; }
+.cell .bar { align-self: stretch; border-radius: 5px 0 0 5px; }
+.cell .mv { font-weight: 600; font-size: 12px; line-height: 1.15; }
+.cell .tg { display: block; font-weight: 400; font-size: 11px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; max-width: 88px; }
+.cell .rt { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 500; text-align: right; }
+.cell .mk { grid-column: 2 / 4; display: flex; gap: 3px; flex-wrap: wrap; }
+.mark { font-family: var(--f-mono); font-size: 10px; padding: 0 4px; border-radius: 3px; border: 1px solid; line-height: 1.4; }
+.mark.robbed { color: var(--a-steal); border-color: var(--a-steal); }
+.mark.caught { color: var(--a-guard); border-color: var(--a-guard); }
+.mark.exposed { color: var(--a-investigate); border-color: var(--a-investigate); }
+.mark.bandit { color: var(--bad); border-color: var(--bad); }
+.mark.back { color: var(--good); border-color: var(--good); }
+.mark.miss { color: var(--ink3); border-color: var(--ink3); border-style: dashed; }
+.cell.dead { background: var(--dead); color: var(--dead-ink); }
+.cell.dead .tg { color: var(--dead-ink); }
+.b-scavenge { background: var(--a-scavenge); } .b-steal { background: var(--a-steal); } .b-guard { background: var(--a-guard); }
+.b-investigate { background: var(--a-investigate); } .b-gift { background: var(--a-gift); }
+td.end { padding: 4px 10px; }
+.seat { font-weight: 600; color: var(--good); } .lost { color: var(--bad); }
+/* "Watch it play out": rows are absolutely placed and slide to their rank; bar width follows rations. */
+.play { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(280px, 1fr); gap: 16px; }
+@media (max-width: 900px) { .play { grid-template-columns: 1fr; } }
+.controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.controls button { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 6px 12px; font-family: var(--f-mono); font-size: 13px; }
+.controls button.primary { background: var(--hl); border-color: var(--hl); color: var(--panel); font-weight: 600; min-width: 84px; }
+.controls input[type=range] { flex: 1; min-width: 160px; accent-color: var(--hl); }
+.controls .when { font-family: var(--f-mono); font-size: 13px; min-width: 190px; }
+.race { position: relative; height: calc(15 * 34px); }
+.racer { position: absolute; left: 0; right: 0; height: 30px; display: grid; grid-template-columns: 150px minmax(0, 1fr) 150px; gap: 8px; align-items: center;
+  transition: transform .9s cubic-bezier(.4, 0, .2, 1); }
+.racer .nm { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.racer .nm small { font-weight: 400; color: var(--ink3); margin-left: 4px; }
+.track { height: 22px; background: var(--panel2); border-radius: 4px; position: relative; overflow: hidden; }
+.fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .9s cubic-bezier(.4, 0, .2, 1), background-color .4s; display: flex; align-items: center; justify-content: flex-end; }
+.fill b { font-family: var(--f-mono); font-size: 12px; color: var(--panel); padding-right: 6px; font-variant-numeric: tabular-nums; }
+.racer.dead .fill { background: var(--ink3); }
+.racer.dead .nm { color: var(--ink3); }
+.racer.seat .fill { background: var(--good); }
+.racer .tags { display: flex; gap: 3px; flex-wrap: wrap; }
+.racer.flash .track { box-shadow: 0 0 0 2px var(--hl); }
+.ticker { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; align-content: start; background: var(--bg); min-height: 200px; }
+.ticker h3 { margin: 0; font-family: var(--f-display); font-size: 18px; }
+.ticker .news li { font-size: 13px; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .racer, .fill { transition: none; } }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink2); align-items: center; }
+.legend .sw { display: inline-block; width: 4px; height: 14px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+.legend .dk { display: inline-block; width: 18px; height: 12px; border-radius: 3px; background: var(--dead); vertical-align: middle; margin-right: 5px; }
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">Survivors · simulated games · the whole season at once</div>
+    <h1>Two weeks of Survivors</h1>
+    <p class="lede">One game from the first move to the chopper: every weekday's news on a calendar, then every player's two weeks side by side. Hover any cell for that player's reasons that night.</p>
+  </header>
+
+  <section aria-label="Choose a game"><div class="games" id="games-pick"></div></section>
+
+  <section class="panel" aria-labelledby="play-h">
+    <h2 id="play-h">Watch it play out</h2>
+    <p class="muted">Each bar is one player's food. Press play to run the two weeks: players re-rank every night, the morning's #news appears on the right, bandits grey out, and the last frame shows who got a chopper seat.</p>
+    <div class="controls">
+      <button class="primary" id="pp">▶ Play</button>
+      <button id="back" aria-label="Previous night">◀</button>
+      <button id="fwd" aria-label="Next night">▶</button>
+      <input type="range" id="scrub" min="0" max="11" value="0" aria-label="Night">
+      <span class="when" id="when"></span>
+    </div>
+    <div class="play">
+      <div class="race" id="race" aria-live="off"></div>
+      <div class="ticker" id="ticker" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="cal-h">
+    <h2 id="cal-h">The two weeks, day by day</h2>
+    <p class="muted">Each day is one round: moves during the day, the night resolves, and this is what #news said at 07:30 the next morning.</p>
+    <div id="calendar"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="grid-h">
+    <h2 id="grid-h">Everyone's two weeks</h2>
+    <div class="legend">
+      <span><i class="sw b-scavenge"></i>Scavenge</span><span><i class="sw b-steal"></i>Steal</span><span><i class="sw b-guard"></i>Guard</span>
+      <span><i class="sw b-investigate"></i>Investigate</span><span><i class="sw b-gift"></i>Gift</span>
+      <span><i class="dk"></i>Bandit that night</span>
+      <span>Number: food after the night</span>
+      <span><span class="mark robbed">−2</span> robbed</span><span><span class="mark caught">caught</span> walked into a guard</span>
+      <span><span class="mark exposed">exposed</span> seen stealing</span><span><span class="mark miss">missed</span> no move, auto-scavenge</span>
+    </div>
+    <div class="gridwrap"><table id="grid"></table></div>
+  </section>
+</main>
+
+<script type="application/json" id="games">/*__GAMES__*/</script>
+<script>
+(function () {
+  const GAMES = JSON.parse(document.getElementById('games').textContent);
+  const ACT = { scavenge: 'Scavenge', steal: 'Steal', guard: 'Guard', investigate: 'Investigate', gift: 'Gift' };
+  const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function prep(g) {
+    const ev = g.events, start = ev[0], R = start.rules.rounds;
+    const players = start.players.map(p => ({ name: p.name, arch: p.personality, smart: p.smart, start: p.start_rations }));
+    const goal = {}; for (const e of ev) if (e.type === 'objective') goal[e.player] = e.text;
+    const nights = []; for (let n = 1; n <= R; n++) nights[n] = { actions: {}, news: [], end: null, robbed: {}, caught: {}, exposed: {}, rejoined: {}, count: { robbed: 0, caught: 0, exposed: 0, bandit: 0, gift: 0 } };
+    const results = {}; let gameEnd = null, extraction = null;
+    for (const e of ev) {
+      if (e.type === 'result') { results[e.player] = e; continue; }
+      if (e.type === 'game_end') { gameEnd = e; continue; }
+      if (e.type === 'extraction') { extraction = e; continue; }
+      const N = nights[e.night]; if (!N) continue;
+      if (e.type === 'action') N.actions[e.player] = e;
+      else if (e.type === 'news_post') N.news = e.lines;
+      else if (e.type === 'night_end') N.end = e;
+      else if (e.type === 'ration' && e.reason === 'robbed') N.robbed[e.player] = (N.robbed[e.player] || 0) - e.delta;
+      else if (e.type === 'steal' && e.outcome === 'caught') { N.caught[e.thief] = true; N.count.caught++; }
+      else if (e.type === 'steal' && e.outcome === 'success') N.count.robbed += 0;
+      else if (e.type === 'exposed') { N.exposed[e.thief] = true; N.count.exposed++; }
+      else if (e.type === 'became_bandit') N.count.bandit++;
+      else if (e.type === 'rejoined') N.rejoined[e.player] = true;
+      else if (e.type === 'gift') N.count.gift++;
+    }
+    for (let n = 1; n <= R; n++) nights[n].count.robbed = Object.keys(nights[n].robbed).length;
+    const order = players.slice().sort((a, b) => (results[b.name].score - results[a.name].score) || (results[b.name].rations - results[a.name].rations));
+    const st = { alive: players.length - nights[R].end.bandits.length,
+                 caught: ev.filter(e => e.type === 'steal' && e.outcome === 'caught').length,
+                 exposed: ev.filter(e => e.type === 'exposed').length, comebacks: ev.filter(e => e.type === 'rejoined').length };
+    return Object.assign({}, g, { R, players, goal, nights, results, gameEnd, extraction, order, st });
+  }
+  const games = GAMES.map(prep);
+  let gi = 0;
+  try { const s = JSON.parse(localStorage.getItem('survivors-season') || '{}'); if (games[s.gi]) gi = s.gi; } catch (e) {}
+
+  function renderPicker() {
+    document.getElementById('games-pick').innerHTML = games.map((g, i) => `
+      <button class="game" aria-pressed="${i === gi}" data-g="${i}">
+        <span class="name">${esc(g.label)}</span><span class="muted">${esc(g.blurb)}</span>
+        <span class="stats">${g.st.alive}/15 alive · ${g.st.caught} caught · ${g.st.exposed} exposed · ${g.st.comebacks} comebacks · winner ${esc(g.gameEnd.winners.join(', '))}</span>
+      </button>`).join('');
+  }
+
+  function renderCalendar() {
+    const g = games[gi]; let h = '';
+    for (let w = 0; w < Math.ceil(g.R / 5); w++) {
+      h += `<div class="week"><div class="wk">Week ${w + 1}</div>`;
+      for (let d = 0; d < 5; d++) {
+        const n = w * 5 + d + 1; if (n > g.R) { h += '<div></div>'; continue; }
+        const N = g.nights[n], c = N.count;
+        const chips = [c.robbed && `<span class="cnt r">${c.robbed} robbed</span>`, c.caught && `<span class="cnt c">${c.caught} caught</span>`,
+                       c.exposed && `<span class="cnt x">${c.exposed} exposed</span>`, c.bandit && `<span class="cnt b">${c.bandit} out of food</span>`,
+                       c.gift && `<span class="cnt">${c.gift} secret gifts</span>`].filter(Boolean).join('') || '<span class="cnt">quiet night</span>';
+        const news = (N.news.length ? N.news : ['A quiet night. Nobody lost anything. Suspicious.']).map(l => `<li>${esc(l)}</li>`).join('');
+        h += `<div class="day"><h3>${DAYS[d]}${n === g.R ? ' · final night' : ''}<span>night ${n}</span></h3><div class="counts">${chips}</div><ul class="news">${news}</ul></div>`;
+      }
+      h += '</div>';
+    }
+    document.getElementById('calendar').innerHTML = h;
+  }
+
+  function cell(g, n, name) {
+    const N = g.nights[n], a = N.actions[name], after = N.end.rations[name], dead = N.end.bandits.includes(name);
+    const why = a.decided_by === 'jev' ? ['decided by Jev: ' + (a.decision || '')] : (a.why || []);
+    const title = `Night ${n} (${DAYS[(n - 1) % 5]}, week ${Math.ceil(n / 5)}): ${ACT[a.action]}${a.target ? ' ' + a.target : ''}, ${a.rations_before} → ${after}` + (why.length ? '\n- ' + why.join('\n- ') : '');
+    const marks = [];
+    if (a.auto) marks.push('<span class="mark miss">missed</span>');
+    if (N.robbed[name]) marks.push(`<span class="mark robbed">−${N.robbed[name]}</span>`);
+    if (N.caught[name]) marks.push('<span class="mark caught">caught</span>');
+    if (N.exposed[name]) marks.push('<span class="mark exposed">exposed</span>');
+    if (N.rejoined[name]) marks.push('<span class="mark back">back</span>');
+    const wasAlive = n === 1 || !g.nights[n - 1].end.bandits.includes(name);
+    if (dead && wasAlive) marks.push('<span class="mark bandit">bandit</span>');
+    return `<td class="c"><div class="cell${dead ? ' dead' : ''}" title="${esc(title)}"><i class="bar b-${a.action}"></i>
+      <span class="mv">${ACT[a.action]}${a.target ? `<span class="tg">${esc(a.target)}</span>` : ''}</span><span class="rt">${after}</span>
+      ${marks.length ? `<span class="mk">${marks.join('')}</span>` : ''}</div></td>`;
+  }
+
+  function renderGrid() {
+    const g = games[gi];
+    let h = '<thead><tr><th class="who">Player · final rank</th>';
+    for (let n = 1; n <= g.R; n++) h += `<th class="wk${Math.ceil(n / 5)}">W${Math.ceil(n / 5)} ${DAYS[(n - 1) % 5]}</th>`;
+    h += '<th>Chopper &amp; points</th></tr></thead><tbody>';
+    g.order.forEach((p, i) => {
+      const r = g.results[p.name];
+      h += `<tr><td class="who"><b>${i + 1}. ${esc(p.name)}</b>${p.smart ? ' <span class="mark caught">Jev</span>' : ''}<br><span class="muted">${esc(p.arch)} · ${esc(g.goal[p.name])}</span></td>`;
+      for (let n = 1; n <= g.R; n++) h += cell(g, n, p.name);
+      h += `<td class="end"><span class="${r.extracted ? 'seat' : r.survived ? '' : 'lost'}">${r.extracted ? 'Seat' : r.survived ? 'Survived' : 'Bandit'}</span> · <b>${r.score} pts</b><br>
+        <span class="muted">goal ${r.objective_done ? 'done' : 'failed'} · stole ${r.steals_ok}, caught ${r.steals_caught} · gave ${r.gave_away}</span></td></tr>`;
+    });
+    document.getElementById('grid').innerHTML = h + '</tbody>';
+  }
+
+  // ---- Watch it play out: frame 0 = start, 1..R = after each night, R+1 = the chopper ----
+  let frame = 0, timer = null;
+  const ROW = 34;
+  function buildRace() {
+    const g = games[gi], race = document.getElementById('race');
+    race.innerHTML = g.players.map(p => `<div class="racer" data-p="${esc(p.name)}"><span class="nm">${esc(p.name)}<small>${esc(p.arch)}</small></span>
+      <div class="track"><div class="fill" style="width:0%"><b>${p.start}</b></div></div><span class="tags"></span></div>`).join('');
+    const scrub = document.getElementById('scrub'); scrub.max = g.R + 1;
+  }
+  function showFrame(f) {
+    const g = games[gi]; frame = Math.max(0, Math.min(g.R + 1, f));
+    const n = Math.min(frame, g.R), N = n ? g.nights[n] : null;
+    const val = name => n === 0 ? g.players.find(p => p.name === name).start : N.end.rations[name];
+    const dead = name => n > 0 && N.end.bandits.includes(name);
+    const seats = frame === g.R + 1 ? new Set(g.extraction.extracted) : new Set();
+    const max = Math.max(10, ...g.players.map(p => Math.max(...[p.start].concat(g.nights.slice(1).map(M => M.end.rations[p.name])))));
+    const ranked = g.players.map(p => p.name).sort((a, b) =>
+      (seats.has(b) - seats.has(a)) || (dead(a) - dead(b)) || (val(b) - val(a)) || a.localeCompare(b));
+    ranked.forEach((name, i) => {
+      const row = document.querySelector(`.racer[data-p="${CSS.escape(name)}"]`);
+      row.style.transform = `translateY(${i * ROW}px)`;
+      const v = val(name);
+      row.querySelector('.fill').style.width = `${Math.max(v / max * 100, v ? 4 : 0)}%`;
+      row.querySelector('.fill b').textContent = v;
+      row.classList.toggle('dead', dead(name)); row.classList.toggle('seat', seats.has(name));
+      const tags = [];
+      if (n && frame <= g.R) {
+        if (N.robbed[name]) tags.push(`<span class="mark robbed">−${N.robbed[name]} robbed</span>`);
+        if (N.caught[name]) tags.push('<span class="mark caught">caught</span>');
+        if (N.exposed[name]) tags.push('<span class="mark exposed">exposed</span>');
+        if (N.rejoined[name]) tags.push('<span class="mark back">back</span>');
+        const wasAlive = n === 1 || !g.nights[n - 1].end.bandits.includes(name);
+        if (dead(name) && wasAlive) tags.push('<span class="mark bandit">bandit</span>');
+      }
+      if (seats.has(name)) tags.push(`<span class="mark back">seat · ${g.results[name].score} pts</span>`);
+      row.querySelector('.tags').innerHTML = tags.join('');
+      row.classList.toggle('flash', tags.length > 0 && frame <= g.R);
+    });
+    const label = frame === 0 ? 'Start · everyone has 7' : frame > g.R ? 'The chopper' : `Night ${n} · ${DAYS[(n - 1) % 5]}, week ${Math.ceil(n / 5)}`;
+    document.getElementById('when').textContent = label;
+    document.getElementById('scrub').value = frame;
+    const t = document.getElementById('ticker');
+    if (frame === 0) t.innerHTML = `<h3>Before night 1</h3><p class="muted">15 players, 7 rations each, one secret goal each.</p>`;
+    else if (frame > g.R) t.innerHTML = `<h3>The chopper</h3><ul class="news">${g.extraction.extracted.map(s => `<li><b>${esc(s)}</b> takes a seat with ${g.results[s].rations} rations</li>`).join('')}</ul>
+      <p>Winner: <b>${esc(g.gameEnd.winners.join(', '))}</b>${g.extraction.decided_by_coin_flip ? '. The last seat was a coin flip.' : '.'}</p>`;
+    else t.innerHTML = `<h3>${esc(label)}</h3><div class="muted">#news at 07:30</div><ul class="news">${(N.news.length ? N.news : ['A quiet night. Nobody lost anything. Suspicious.']).map(l => `<li>${esc(l)}</li>`).join('')}</ul>`;
+  }
+  function stop() { clearInterval(timer); timer = null; document.getElementById('pp').textContent = '▶ Play'; }
+  function play() {
+    const g = games[gi]; if (frame >= g.R + 1) showFrame(0);
+    document.getElementById('pp').textContent = '❚❚ Pause';
+    timer = setInterval(() => { if (frame >= games[gi].R + 1) return stop(); showFrame(frame + 1); }, 2200);
+  }
+  document.getElementById('pp').addEventListener('click', () => timer ? stop() : play());
+  document.getElementById('back').addEventListener('click', () => { stop(); showFrame(frame - 1); });
+  document.getElementById('fwd').addEventListener('click', () => { stop(); showFrame(frame + 1); });
+  document.getElementById('scrub').addEventListener('input', ev => { stop(); showFrame(+ev.target.value); });
+
+  function render() { stop(); renderPicker(); buildRace(); requestAnimationFrame(() => showFrame(0)); renderCalendar(); renderGrid(); }
+  document.addEventListener('click', ev => {
+    const t = ev.target.closest('[data-g]'); if (!t) return;
+    gi = +t.dataset.g; try { localStorage.setItem('survivors-season', JSON.stringify({ gi })); } catch (e) {}
+    render();
+  });
+  render();
+})();
+</script>
