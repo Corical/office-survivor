@@ -282,3 +282,51 @@ Answer: barely. Cautious players do a bit better, but guarding isn't used much m
 | `sim/results/sample_game_v2_log.jsonl` | A complete replay log of one simulated game (seed 11) |
 | `sim/results/sample_game_v2_replay.txt` | That game rebuilt from the log alone and told night by night |
 | `sim/results/sample_game_v2_frames.json` | Per-night frames from the same game, the input for a recap animation |
+
+## Second session, 16 Oct 2026 evening
+
+### What was added
+
+| Thing | Where | Notes |
+| --- | --- | --- |
+| Architecture page | `pages/survivors-architecture.html`, live at https://claude.ai/artifact/CQd8CUW8CvGVx8AHWDuveK | Where everything runs, one game day, logging, every part, code split, open items |
+| Game replay page | `pages/replay/` (template + `build_replay.py`), live at https://claude.ai/artifact/CdXPvaG1qs5M8oZDGrkk4b | Night by night: what #news showed, what really happened, every move and why, what players can see, others' guess vs real rations |
+| Replay logs behind it | `sim/results/replays/` | Typical game (seed 30), most dramatic of 300 (seed 33), handover sample (seed 11), seed 11 with 5 live Jev players |
+| "Why" in the log | `survivors_sim.py` (`choose` / `_choose`, target pickers) | Every rules-brain `action` event now has `why` (reasons) and `odds`. Proven not to change results: batch, adaptive batch and seed 11 log identical apart from the new fields |
+| Tools | `sim/tools/pick_games.py`, `sim/tools/leader_hold.py` | Pick typical/dramatic games; how often the mid-game leader wins |
+| Jev wired for real | `sim/brains.py` | Key read from `../.secrets/typesafe.env` (git-ignored) or `TYPESAFE_API_KEY`. `metadata` now only sent to the mock (undocumented in TypeSafe's API). Live calls work: model `jev-1.13.0`, ~2,900 input tokens and ~420 ms per decision, ~$0.006 per 5-player game |
+| CPU cap | `sim/experiments.py` | Defaults to half the logical processors and below-normal priority (it pinned every core before) |
+| Secrets slots | `../.secrets/typesafe.env`, `../.secrets/discord.env` | Outside `docs/`, git-ignored |
+
+### Verified
+
+- `check_invariants.py` passes; `replay.py --check` passes on every log.
+- All 43 configs in `experiments.csv` reproduce exactly on the current engine (rerun on a copy).
+- The night order (thefts from start-of-night rations → scavenge → gifts → investigations → eat → bandit check) is what every run used. Nobody can go below 0; death is only checked at the end of the night.
+
+### Found
+
+1. **Rations created from nothing.** When a caught thief can't pay, the thief pays only what they have (down to 0), but the guard still receives the full `guard_reward`. Same when someone is robbed and caught the same night. 19 cases in 3 games. Present in every balance result so far, so guarding is slightly flattered. Needs a rule decision, then rerun the tables.
+2. **Double bounty.** Two investigators watching the same thief both get paid (seed 30, night 4).
+3. **Leader after night 5** takes a seat 77% of the time but wins only 21% (random 7%), because secret goals carry points. Use this as the gate for random events: an event that pushes it up is rejected.
+4. **Public guess vs truth.** From #news alone, the guess of someone's rations is exact only 15–34% of nights; off by 3+ on 12–21%.
+5. **Jev play quality.** One flat 45-option question with prose state: no Jev player guarded in 100 decisions, players fixated on one target, one fed the rival it had to beat. Same seed + top pick still gives a different game each run. Parked by the owner; fix would be split questions + structured state.
+6. **Action colours** (green/red/blue/amber/purple, from the video style) fail colour-blind checks (red–green ΔE 2.0). Keep the action word on every use.
+7. **Grysstof** (`grysstof-discord.service` on the Pi) captures every channel of every server it's in, with backfill. Keep it out of the game's server or deny it View Channel.
+8. **"Two minutes a day" is unmeasured.** The pilot's command log (timestamps, `/status` checks, work-hours activity) should measure it.
+
+### Decisions still open (owner)
+
+| Decision | Options |
+| --- | --- |
+| Guard payout when the thief can't pay | Guard gets only what's paid · game pays the difference |
+| #radio timing | Batched with 07:30 news · batched at 17:00 · live (only daytime interruption today) |
+| Double bounty | Both paid · first only · split |
+| Bounty on an empty or caught steal | Counts · doesn't |
+| Pilot | 5 rounds on the test server first |
+
+### Bot preparation
+
+- Separate Discord app and bot, test server first. Token and server id go in `../.secrets/discord.env`. No privileged intents needed.
+- Pi: Raspberry Pi 4, Debian 13, Python 3.13.5, ~1.8 GB RAM free, 87 GB disk, already on Africa/Johannesburg, 18 systemd services, `notify-relay.service` available for alerts.
+- Stack: discord.py 2.x, SQLite, `season.jsonl`, systemd, no Docker. Engine stays chat-agnostic behind a Messenger/Clock/Random/EventLog/Store contract; Discord is one adapter.
