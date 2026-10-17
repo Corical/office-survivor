@@ -40,6 +40,7 @@ class NightResult:
 
 def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, obs=None):
     obs = obs or Observer()
+    moves = dict(sorted(moves.items()))    # player-id order, never arrival order: same moves, same night
     P = {p.pid: p for p in players}
 
     def ledger(p, delta, reason, balance, **extra):

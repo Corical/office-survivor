@@ -40,7 +40,8 @@ from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass, field, fields, replace
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-from engine import Observer, Rules, resolve_night  # noqa: E402  (the game's rules live in the shared engine)
+from engine import Observer, Rules, resolve_night  # noqa: E402
+from engine.finish import finish as engine_finish, objective_text  # noqa: E402  (the game's rules live in the shared engine)
 
 # --------------------------------------------------------------------------
 # Rules (every knob the game exposes)
@@ -151,14 +152,7 @@ OBJECTIVES = ("beat", "robbed2_extract", "steal3_clean", "give", "grudge")
 
 
 def obj_text(o, rules, t="@player"):
-    return {
-        "beat": f"finish with more rations than {t}",
-        "robbed2_extract": (f"get robbed at least {rules.robbed_goal}x and still extract"),
-        "steal3_clean": "steal at least 3 times without ever being caught",
-        "give": f"give away {rules.give_goal} rations over the game",
-        "grudge": (f"make sure {t} doesn't extract" if rules.grudge_goal == "deny"
-                   else f"successfully rob {t} at least {rules.grudge_robs}x"),
-    }[o]
+    return objective_text(o, rules, t)
 
 # --------------------------------------------------------------------------
 # Game state
@@ -646,59 +640,7 @@ class Game:
 
     # ---------------- end of game ----------------
     def finish(self):
-        r, rng = self.r, self.rng
-        seats = max(1, round(r.players * r.seat_ratio))
-        eligible = [p for p in self.players if not p.bandit or r.bandit_can_extract]
-        rng.shuffle(eligible)                          # coin flips for whatever is still tied
-        if r.tiebreak == "kindness":
-            key = lambda p: (p.rations, p.gifted_out, -p.steals_caught)
-        else:
-            key = lambda p: (p.rations,)
-        eligible.sort(key=key, reverse=True)
-        extracted = eligible[:seats]
-        coin_flip = (len(eligible) > seats and key(eligible[seats - 1]) == key(eligible[seats]))
-        ext_ids = {p.pid for p in extracted}
-
-        for p in self.players:
-            p.extracted = p.pid in ext_ids
-            p.survived = not p.bandit
-            o = p.objective
-            if o == "beat":
-                done = p.rations > self.P(p.obj_target).rations
-            elif o == "robbed2_extract":
-                done = p.times_robbed >= r.robbed_goal and p.extracted
-            elif o == "steal3_clean":
-                done = p.steals_ok >= 3 and p.steals_caught == 0
-            elif o == "give":
-                done = p.gifted_out >= r.give_goal
-            elif r.grudge_goal == "deny":
-                done = p.obj_target not in ext_ids
-            else:  # rob
-                done = p.grudge_hits >= r.grudge_robs
-            p.obj_done = done
-            p.score = (r.pts_extract if p.extracted else (r.pts_survive if p.survived else 0)) \
-                + (r.pts_objective if done else 0)
-
-        if self.logging:
-            self.L("extraction", seats=seats, extracted=[p.name for p in extracted],
-                   ranking=[{"player": p.name, "rations": p.rations, "gave_away": p.gifted_out} for p in eligible],
-                   tiebreak=r.tiebreak, decided_by_coin_flip=coin_flip, visibility="public")
-            for p in self.players:
-                tgt = self.P(p.obj_target).name if p.obj_target >= 0 else ""
-                self.L("result", player=p.name, rations=p.rations, survived=p.survived, extracted=p.extracted,
-                       objective=obj_text(p.objective, r, tgt), objective_done=p.obj_done, score=p.score,
-                       stole=p.rations_stolen, steals_ok=p.steals_ok, steals_caught=p.steals_caught,
-                       times_robbed=p.times_robbed, gave_away=p.gifted_out, visibility="public_at_reveal")
-        top = max(p.score for p in self.players)
-        winners = [p for p in self.players if p.score == top]
-        if r.winner_tiebreak != "none":
-            wkey = (lambda p: (p.gifted_out, p.rations)) if r.winner_tiebreak == "kindness" else (lambda p: (p.rations,))
-            best = max(wkey(p) for p in winners)
-            winners = [p for p in winners if wkey(p) == best]
-        self.L("game_end", winners=[p.name for p in winners], winner_tiebreak=r.winner_tiebreak, visibility="public")
-        return dict(seats=seats, extracted=extracted, coin_flip=coin_flip, winners=winners,
-                    cutoff=extracted[-1].rations if extracted else 0,
-                    survivors=len(eligible))
+        return engine_finish(self.players, self.r, self.rng, emit=self.L)
 
     def run(self):
         for _ in range(self.r.rounds):
