@@ -8,3 +8,7 @@ survivors_kit.zip
 # Python
 __pycache__/
 *.pyc
+
+# Local virtual environment and bot data
+.venv/
+bot/data/

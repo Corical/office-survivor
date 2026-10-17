@@ -1,0 +1,23 @@
+[Unit]
+Description=Torch - the Survivors game bot
+Wants=network-online.target time-sync.target
+After=network-online.target time-sync.target
+
+[Service]
+User=torch
+Group=torch
+WorkingDirectory=/opt/torch
+Environment=TORCH_ENV=/etc/torch/torch.env
+Environment=TORCH_DATA=/var/lib/torch
+Environment=PYTHONUNBUFFERED=1
+# The Pi has no hardware clock: wait (up to 2 minutes) until NTP says the time is right before running a game clock.
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 60); do [ "$(timedatectl show -p NTPSynchronized --value)" = yes ] && exit 0; sleep 2; done; exit 1'
+ExecStart=/opt/torch/.venv/bin/python -m bot.discord_app
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=300
+StartLimitBurst=10
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
