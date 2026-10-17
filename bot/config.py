@@ -43,7 +43,8 @@ def load():
     known = {f.name for f in fields(Rules)}
     rules = Rules(**{k: v for k, v in game.get("rules", {}).items() if k in known})
     pres = game.get("presentation", {})
-    aliases = pres.get("aliases") or pres.get("example_names") or []
+    # game.json's "aliases" is a sentence describing the rule, not a list: only ever take real lists of names
+    aliases = [a for k in ("alias_pool", "example_names") if isinstance(pres.get(k), list) for a in pres[k]]
     if len(aliases) < 20:
         import sys
         sys.path.insert(0, os.path.join(ROOT, "docs", "sim"))

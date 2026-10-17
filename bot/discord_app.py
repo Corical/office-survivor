@@ -32,6 +32,7 @@ class Torch(discord.Client):
         self.conf = conf
         self.tree = app_commands.CommandTree(self)
         self.lock = asyncio.Lock()
+        self.send_lock = asyncio.Lock()   # one delivery at a time, or two callers send the same message twice
         self.game = self.open_season()
         self.channels = {}
         register(self)
@@ -100,6 +101,10 @@ class Torch(discord.Client):
             await asyncio.sleep(5)
 
     async def deliver(self):
+        async with self.send_lock:
+            await self._deliver()
+
+    async def _deliver(self):
         for intent in self.game.pending_outbox():
             text = self.game.outbox_text(intent)
             to = intent["to"]
