@@ -20,7 +20,7 @@ if [ -n "$SECRETS" ]; then
   sudo install -m 640 -o root -g torch "$SECRETS" /etc/torch/torch.env
   rm -f "$SECRETS"
 fi
-[ -f /etc/torch/torch.env ] || { echo "no /etc/torch/torch.env: pass the secrets file"; exit 1; }
+sudo test -f /etc/torch/torch.env || { echo "no /etc/torch/torch.env: pass the secrets file"; exit 1; }
 
 [ -x /opt/torch/.venv/bin/python ] || sudo python3 -m venv /opt/torch/.venv
 sudo /opt/torch/.venv/bin/pip install -q --disable-pip-version-check -r /opt/torch/bot/requirements.txt

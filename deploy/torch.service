@@ -2,6 +2,8 @@
 Description=Torch - the Survivors game bot
 Wants=network-online.target time-sync.target
 After=network-online.target time-sync.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
 
 [Service]
 User=torch
@@ -15,8 +17,6 @@ ExecStartPre=/bin/sh -c 'for i in $(seq 1 60); do [ "$(timedatectl show -p NTPSy
 ExecStart=/opt/torch/.venv/bin/python -m bot.discord_app
 Restart=always
 RestartSec=5
-StartLimitIntervalSec=300
-StartLimitBurst=10
 UMask=0077
 
 [Install]

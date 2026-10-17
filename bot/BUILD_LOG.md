@@ -71,6 +71,25 @@ Run tests: `python -m unittest discover -s engine/tests -t .` and `python -m uni
 - A crash between `identity.put` and the `join` record leaves an identity with no player.
 - Outbox resend after a crash can double-post until the Discord adapter checks history for the intent id.
 
+## Step 3/4: Torch live on the Pi (17 Oct 2026, 07:48)
+
+`deploy/install.sh` installed it as `torch.service` (user `torch`, `/opt/torch`, data `/var/lib/torch`, secrets
+`/etc/torch/torch.env`), enabled at boot, waits for NTP before starting. Log: "ready as Torch#4231 in F x D".
+Update the Pi: build the tarball (see install.sh header), upload to /tmp, run `sh deploy/install.sh <tarball>`.
+Logs: `ssh pi sudo journalctl -u torch -f`.
+
+| Date | Trap | Fix |
+| --- | --- | --- |
+| 17 Oct 2026 | Installer checked `/etc/torch/torch.env` as the login user; `/etc/torch` is 0750 root:torch, so the check failed after a successful install | `sudo test -f` |
+| 17 Oct 2026 | `StartLimitIntervalSec` under `[Service]` is ignored ("Unknown key") | it belongs in `[Unit]` |
+| 17 Oct 2026 | After 3 logins in a few minutes, the 4th sat at "logging in" for ~40 s before the gateway connected | Discord throttling; wait, don't restart again |
+| 17 Oct 2026 | Git Bash `tar -f C:/…` treats `C:` as a remote host | `tar --force-local` |
+
+### The 5-minute test (owner runs it; GM = the server owner)
+`/join` (you and any prospects) → `/gm add-sims count:8` → `/gm start day_minutes:5`. Then every 5 minutes the
+night resolves, 10 s later #news posts and DMs go out; 10 rounds ≈ 50 minutes; the reveal posts at the end.
+`/gm new-season confirm:True` archives a game and starts a clean one.
+
 ## Golden master for the engine extraction
 
 `docs/sim/tools/golden_master.py record|check bot/tests/golden`: 20 rules-player games and 10 adaptive games
