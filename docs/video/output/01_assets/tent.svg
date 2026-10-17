@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="450" height="160" viewBox="0 0 450 160">
+  <title>tent.svg</title>
+  <g id="top_down">
+    <path d="M30 20 L170 20 C175.523 20 180 24.477 180 30 L180 120 C180 125.523 175.523 130 170 130 L30 130 C24.477 130 20 125.523 20 120 L20 30 C20 24.477 24.477 20 30 20 Z" fill="#3e7bfa" opacity="0.9"/>
+    <path d="M20 75 L180 75" fill="#000000" stroke="#ffffff" stroke-opacity="0.6" stroke-width="5"/>
+    <path d="M20 20 L100 75 L20 130 M180 20 L100 75 L180 130" fill="none" stroke="#0b1222" stroke-opacity="0.35" stroke-width="3"/>
+  </g>
+  <g id="front_with_window">
+    <path d="M240 140 L330 20 L420 140 Z" fill="#2ec4b6"/>
+    <path d="M310 140 L330 70 L350 140 Z" fill="#0b1222" opacity="0.55"/>
+    <path d="M346 62 C346 70.837 338.837 78 330 78 C321.163 78 314 70.837 314 62 C314 53.163 321.163 46 330 46 C338.837 46 346 53.163 346 62 Z" fill="#ffe7a3"/>
+    <path d="M346 62 C346 70.837 338.837 78 330 78 C321.163 78 314 70.837 314 62 C314 53.163 321.163 46 330 46 C338.837 46 346 53.163 346 62 Z" fill="none" stroke="#0b1222" stroke-width="3"/>
+    <path d="M229 138 L431 138 C432.657 138 434 139.343 434 141 L434 141 C434 142.657 432.657 144 431 144 L229 144 C227.343 144 226 142.657 226 141 L226 141 C226 139.343 227.343 138 229 138 Z" fill="#0b1222" opacity="0.5"/>
+  </g>
+</svg>

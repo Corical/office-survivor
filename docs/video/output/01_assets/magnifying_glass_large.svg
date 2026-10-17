@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="520" height="520" viewBox="0 0 520 520">
+  <title>magnifying_glass_large.svg</title>
+  <g id="magnifying_glass_large">
+    <path d="M360 200 C360 288.366 288.366 360 200 360 C111.634 360 40 288.366 40 200 C40 111.634 111.634 40 200 40 C288.366 40 360 111.634 360 200 Z" fill="none" stroke="#2b2f3a" stroke-width="34"/>
+    <path d="M360 200 C360 288.366 288.366 360 200 360 C111.634 360 40 288.366 40 200 C40 111.634 111.634 40 200 40 C288.366 40 360 111.634 360 200 Z" fill="none" stroke="#f5a524" stroke-width="14"/>
+    <path d="M110 120 C136.667 86.667 170 68.667 210 66" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="12" stroke-linecap="round"/>
+    <path d="M318 318 L470 470" fill="#000000" stroke="#2b2f3a" stroke-width="52" stroke-linecap="round"/>
+    <path d="M340 340 L460 460" fill="#000000" stroke="#f5a524" stroke-width="20" stroke-linecap="round"/>
+  </g>
+</svg>

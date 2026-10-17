@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="120" height="140" viewBox="0 0 120 140">
+  <title>ration_tin.svg</title>
+  <g id="ration_tin">
+    <path d="M28 18 L92 18 C98.627 18 104 23.373 104 30 L104 114 C104 120.627 98.627 126 92 126 L28 126 C21.373 126 16 120.627 16 114 L16 30 C16 23.373 21.373 18 28 18 Z" fill="#d4a72c"/>
+    <path d="M104 22 C104 29.732 84.301 36 60 36 C35.699 36 16 29.732 16 22 C16 14.268 35.699 8 60 8 C84.301 8 104 14.268 104 22 Z" fill="#e8c35a"/>
+    <path d="M16 54 L104 54 L104 94 L16 94 Z" fill="#8c2f1b"/>
+    <path d="M33 38 L33 38 C35.761 38 38 40.239 38 43 L38 105 C38 107.761 35.761 110 33 110 L33 110 C30.239 110 28 107.761 28 105 L28 43 C28 40.239 30.239 38 33 38 Z" fill="#f3dc8b" opacity="0.8"/>
+  </g>
+</svg>

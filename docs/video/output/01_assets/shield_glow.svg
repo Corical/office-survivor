@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="320" height="300" viewBox="0 0 320 300">
+  <title>shield_glow.svg</title>
+  <g id="shield_glow">
+    <path d="M20 280 C20 136.406 82.68 20 160 20 C237.32 20 300 136.406 300 280 Z" fill="#3e7bfa" fill-opacity="0.28" stroke="#3e7bfa" stroke-width="6"/>
+    <path d="M70 150 C103.333 96.667 143.333 66.667 190 60" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="10" stroke-linecap="round"/>
+  </g>
+</svg>

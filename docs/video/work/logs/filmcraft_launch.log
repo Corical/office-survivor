@@ -1,0 +1,9 @@
+2026-10-17T03:28:12.646Z INFO  [main] filmcraft: FilmCraft 0.8.0 (windows x86_64)
+2026-10-17T03:28:12.648Z INFO  [main] filmcraft: log file C:\Users\Corne\AppData\Roaming\FilmCraft\Logs\filmcraft.log
+2026-10-17T03:28:12.649Z INFO  [main] filmcraft: hardware decoding: Available("Media Foundation")
+2026-10-17T03:28:12.649Z INFO  [nvenc-hevc-probe] filmcraft_platform::nvenc: no hardware HEVC encoder: no NVIDIA encoder driver
+2026-10-17T03:28:12.650Z WARN  [main] filmcraft::graphics: the last start with graphics mode default died before its window painted
+2026-10-17T03:28:12.932Z INFO  [main] filmcraft_gpu::adapter: graphics adapter available: "Intel(R) Iris(R) Xe Graphics" (Vulkan, integrated GPU, driver Intel Corporation Intel driver, 53 features)
+2026-10-17T03:28:12.932Z INFO  [main] filmcraft_gpu::adapter: graphics adapter available: "Intel(R) Iris(R) Xe Graphics" (Dx12, integrated GPU, driver 30.0.101.1692, 42 features, bus 0000:00:02.0)
+2026-10-17T03:28:12.932Z INFO  [main] filmcraft_gpu::adapter: graphics adapter available: "Microsoft Basic Render Driver" (Dx12, software, driver 10.0.26100.9278, 52 features)
+2026-10-17T03:28:12.933Z INFO  [main] filmcraft_gpu::adapter: graphics adapter chosen: "Intel(R) Iris(R) Xe Graphics" (Vulkan, integrated GPU, driver Intel Corporation Intel driver, 53 features)

@@ -352,12 +352,12 @@
       "id": "scoreboard",
       "tool": "VectorCraft",
       "type": "prop",
-      "description": "Scoreboard panel with two rows: 'Seat +3' and 'Secret goal +2'.",
+      "description": "Scoreboard panel with three rows: 'Seat +3', 'Alive, no seat +1' and 'Secret goal +2'.",
       "variants": [],
       "separate_layers": [],
       "size": "vector, as needed",
       "output": "output/01_assets/scoreboard.svg (+ .png at 2x)",
-      "hash": "61341d3ee97c"
+      "hash": "e5aec8334af2"
     },
     {
       "id": "curtain",

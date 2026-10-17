@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="130" viewBox="0 0 300 130">
+  <title>shield_counter.svg</title>
+  <g id="shield_1">
+    <path d="M55 14 L95 28 L95 62 C95 86 81.667 104 55 116 C28.333 104 15 86 15 62 L15 28 Z" fill="#3e7bfa"/>
+    <path d="M55 30 L81 40 L81 62 C81 78 72.333 90 55 98" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="6"/>
+  </g>
+  <g id="shield_2">
+    <path d="M150 14 L190 28 L190 62 C190 86 176.667 104 150 116 C123.333 104 110 86 110 62 L110 28 Z" fill="#3e7bfa"/>
+    <path d="M150 30 L176 40 L176 62 C176 78 167.333 90 150 98" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="6"/>
+  </g>
+  <g id="shield_3">
+    <path d="M245 14 L285 28 L285 62 C285 86 271.667 104 245 116 C218.333 104 205 86 205 62 L205 28 Z" fill="#3e7bfa"/>
+    <path d="M245 30 L271 40 L271 62 C271 78 262.333 90 245 98" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="6"/>
+  </g>
+</svg>

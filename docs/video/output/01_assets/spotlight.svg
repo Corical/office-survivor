@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="500" height="700" viewBox="0 0 500 700">
+  <defs>
+    <linearGradient id="linear-gradient-1" x1="20" y1="0" x2="20" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff6d6" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#fff6d6" stop-opacity="0.25"/>
+    </linearGradient>
+  </defs>
+  <title>spotlight.svg</title>
+  <g id="spotlight">
+    <path d="M210 0 L290 0 L480 640 L20 640 Z" fill="url(#linear-gradient-1)"/>
+    <path d="M480 640 C480 667.614 377.025 690 250 690 C122.975 690 20 667.614 20 640 C20 612.386 122.975 590 250 590 C377.025 590 480 612.386 480 640 Z" fill="#fff6d6" fill-opacity="0.45"/>
+  </g>
+</svg>

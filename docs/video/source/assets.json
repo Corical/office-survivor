@@ -225,7 +225,7 @@
       "id": "scoreboard",
       "tool": "VectorCraft",
       "type": "prop",
-      "description": "Scoreboard panel with two rows: 'Seat +{pts_extract}' and 'Secret goal +{pts_objective}'.",
+      "description": "Scoreboard panel with three rows: 'Seat +{pts_extract}', 'Alive, no seat +{pts_survive}' and 'Secret goal +{pts_objective}'.",
       "variants": [],
       "separate_layers": [],
       "size": "vector, as needed"
