@@ -493,6 +493,37 @@ def register(bot):
                 return f"Moved: {', '.join(done) or 'nobody'}\nWaiting: {', '.join(waiting) or 'nobody'}"
             await call(i, show)
 
+    @gm.command(name="pilot", description="One step: new season, you join, add sims, start (defaults = usual pilot)")
+    @app_commands.describe(sims="Simulated colleagues", day_minutes="Minutes per round",
+                           events="Wilderness events", ranges="Morning ration ranges in #news",
+                           confirm="Needed only if a game is still running: it gets archived unfinished")
+    @app_commands.choices(events=[app_commands.Choice(name="gentle", value="gentle"),
+                                  app_commands.Choice(name="off", value="off")])
+    async def pilot(i: discord.Interaction, sims: app_commands.Range[int, 1, 20] = 8,
+                    day_minutes: app_commands.Range[float, 1, 1440] = 5.0,
+                    events: app_commands.Choice[str] = None, ranges: bool = True, confirm: bool = False):
+        if not await gm_only(i):
+            return
+        mode = events.value if events else "gentle"
+        async with bot.lock:
+            running = bot.game.started and not bot.game.finished
+            if running and not confirm:
+                return await private(i, "⚠️ A game is still running. Nothing changed. To end it unfinished and start "
+                                        "a new one, run /gm pilot again with confirm: True.")
+            if bot.game.started:                     # a waiting season keeps whoever already joined
+                bot.archive_and_reset()
+            try:
+                alias = bot.game.join(key(i)).split("**")[1]
+                bot.game.gm_add_sims(sims, rng=random.Random())
+                bot.game.gm_start(day_seconds=day_minutes * 60, news_delay=10, now=time.time(), events=mode,
+                                  ranges=ranges)
+            except GameError as e:
+                return await private(i, f"⚠️ {e}")
+        await private(i, f"🔥 Started: you're **{alias}** (secret), {sims} sims, a round every {day_minutes:g} "
+                         f"minutes, events {mode}, ranges {'on' if ranges else 'off'}. Tap 🎮 Play on the board "
+                         f"in #news.")
+        await bot.deliver()
+
     @gm.command(name="new-season", description="Archive this game and start an empty one")
     async def new_season(i: discord.Interaction, confirm: bool):
         if await gm_only(i):
