@@ -128,70 +128,72 @@ You'll always know what happened.
 You'll rarely know who did it.
 
 29
-00:01:37,950 --> 00:01:40,585
-Run out of food and you're a bandit.
+00:01:37,950 --> 00:01:41,919
+Run out of food and you're
+a bandit. Bandits don't eat.
 
 30
-00:01:40,635 --> 00:01:43,419
-Bandits can only steal or investigate,
+00:01:41,969 --> 00:01:46,084
+They can only steal one ration
+at a time, or investigate.
 
 31
-00:01:43,469 --> 00:01:47,820
-but get back to three rations
+00:01:46,134 --> 00:01:50,103
+Get back to three rations
 and you rejoin the survivors.
 
 32
-00:01:48,650 --> 00:01:52,699
+00:01:50,950 --> 00:01:54,999
 You'll also get a secret goal
 that only you know about.
 
 33
-00:01:52,749 --> 00:01:57,917
+00:01:55,049 --> 00:02:00,217
 And once a day you can post an
 anonymous message on the radio channel.
 
 34
-00:01:57,967 --> 00:02:00,525
+00:02:00,267 --> 00:02:02,825
 Tips, accusations, lies. Your call.
 
 35
-00:02:01,350 --> 00:02:04,141
+00:02:03,650 --> 00:02:06,441
 On the last night, the helicopter lands.
 
 36
-00:02:04,191 --> 00:02:07,621
+00:02:06,491 --> 00:02:09,921
 The five survivors with
 the most food get a seat.
 
 37
-00:02:07,671 --> 00:02:13,020
+00:02:09,971 --> 00:02:15,320
 Staying alive earns points, a seat earns
 more, and so does your secret goal.
 
 38
-00:02:13,070 --> 00:02:14,227
+00:02:15,370 --> 00:02:16,527
 Most points wins.
 
 39
-00:02:14,277 --> 00:02:19,412
+00:02:16,577 --> 00:02:21,712
 Then comes the big reveal: every theft
 and every secret, out in the open.
 
 40
-00:02:20,250 --> 00:02:23,926
+00:02:22,550 --> 00:02:26,226
 It takes two minutes a day,
 it's completely optional,
 
 41
-00:02:23,976 --> 00:02:27,863
+00:02:26,276 --> 00:02:30,163
 and nothing in the game touches
 real work or real money.
 
 42
-00:02:27,913 --> 00:02:33,768
+00:02:30,213 --> 00:02:36,068
 Type slash join in Discord and you'll get
 a secret alias, so nobody knows who's who.
 
 43
-00:02:33,818 --> 00:02:35,667
+00:02:36,118 --> 00:02:37,967
 And remember: trust no one.

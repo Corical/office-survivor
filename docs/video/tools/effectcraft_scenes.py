@@ -27,6 +27,7 @@ UI = os.path.join(VIDEO, "output", "02_ui").replace("\\", "/")
 OUT = os.path.join(VIDEO, "output", "04_scenes").replace("\\", "/")
 NIGHT, MAIN_UI, BOX_UI = PAL["night_bg"], "#1A2747", "#223159"
 TEXT_Y = 200          # on-screen text: upper third, inside the 96 px safe margin
+SWAP = 0.04           # an instant swap's two keys: over one frame (1/30 s) apart, or EffectCraft keeps only one
 BADGE = (166, 166)    # action badge pinned top-left
 
 
@@ -78,6 +79,8 @@ class Scene:
                 if len(spec) > 1:
                     steps += [("keys.deselectAll", {}), ("prop.select", {"layer": layer, "path": path, "selectKeys": True}),
                               ("keys.easyEase", {})]
+                    if name == "position":  # spatial Bezier bulges between equal keys: a held layer drifts
+                        steps.append(("keys.interpolation", {"spatial": "linear"}))
             else:
                 steps.append(("prop.set", {"layer": layer, "path": path, "value": spec}))
         if steps:
@@ -173,7 +176,7 @@ def s01():
     t = sc.B(3)
     sc.shape("rect", [1920, 1080], NIGHT, 960, 540, "dim", opacity=[(0, 0), (t - 0.2, 0), (t + 0.3, 55)])
     sc.img(f"{PARTS}/title_large.png", 960, 540, name="title",
-           scale=[(0, [0, 0]), (t, [0, 0]), (t + 0.01, [80, 80]), (t + 0.3, [50, 50])], opacity=sc.appear(t, 0.15))
+           scale=[(0, [0, 0]), (t, [0, 0]), (t + SWAP, [80, 80]), (t + 0.3, [50, 50])], opacity=sc.appear(t, 0.15))
     return sc
 
 
@@ -253,11 +256,11 @@ def s05():
     seg = (sc.B(3) - t0 - 0.4) / 3
     for d in range(3):
         a, b = t0 + d * seg, t0 + (d + 1) * seg
-        op = [(0, 0), (a, 0), (a + 0.01, 100), (b, 100), (b + 0.01, 0)] if d < 2 else [(0, 0), (a, 0), (a + 0.01, 100)]
+        op = [(0, 0), (a, 0), (a + SWAP, 100), (b, 100), (b + SWAP, 0)] if d < 2 else [(0, 0), (a, 0), (a + SWAP, 100)]
         sc.text(str(d), cx, cy + 34, 96, PAL["text_dark"], name=f"digit_{d}", opacity=op)
         for k in range(d):
             tin(sc, cx - 60 + k * 120, 720, name=f"tin_{d}_{k}",
-                scale=[(0, [0, 0]), (a, [0, 0]), (a + 0.3, [35, 35]), (b, [35, 35]), (b + 0.01, [0, 0])] if d < 2 else sc.pop(a, 35))
+                scale=[(0, [0, 0]), (a, [0, 0]), (a + 0.3, [35, 35]), (b, [35, 35]), (b + SWAP, [0, 0])] if d < 2 else sc.pop(a, 35))
     sc.text("Missed it? Auto-scavenge.", 960, 960, 48, name="missed_note", opacity=sc.appear(sc.B(3)))
     sc.caption()
     return sc
@@ -268,8 +271,8 @@ def s06():
     sc.badge("steal")
     feet, ax = 820, 620
     wake = sc.B(3)
-    avatar(sc, "sleeping", ax, feet + 40, opacity=[(0, 100), (wake, 100), (wake + 0.01, 0)])
-    avatar(sc, "startled", ax, feet, opacity=[(0, 0), (wake, 0), (wake + 0.01, 100)])
+    avatar(sc, "sleeping", ax, feet + 40, opacity=[(0, 100), (wake, 100), (wake + SWAP, 0)])
+    avatar(sc, "startled", ax, feet, opacity=[(0, 0), (wake, 0), (wake + SWAP, 100)])
     t_in, t_take = sc.B(1), sc.B(2)
     thief_x = 1180
     exit_t = t_take + 1.2
@@ -351,8 +354,8 @@ def s09():
     feet = 820
     t_pass, t_hush = sc.B(1), sc.B(2)
     for i, (x, normal, hush) in enumerate([(780, "colours_1", "finger_to_lips"), (1140, "colours_2", "finger_to_lips_2")]):
-        avatar(sc, normal, x, feet, opacity=[(0, 100), (t_hush, 100), (t_hush + 0.01, 0)])
-        avatar(sc, hush, x, feet, opacity=[(0, 0), (t_hush, 0), (t_hush + 0.01, 100)])
+        avatar(sc, normal, x, feet, opacity=[(0, 100), (t_hush, 100), (t_hush + SWAP, 0)])
+        avatar(sc, hush, x, feet, opacity=[(0, 0), (t_hush, 0), (t_hush + SWAP, 100)])
     tin(sc, 840, feet - 90, name="gift_tin", position=[(0, [840, feet - 90]), (t_pass, [840, feet - 90]),
                                                      (t_pass + 1.0, [1080, feet - 90])])
     sc.caption()
@@ -389,9 +392,9 @@ def s11():
         a = t0 + (n - 1) * step if n else 0
         op = [(0, 0 if n else 100)]
         if n:
-            op += [(a, 0), (a + 0.01, 100)]
+            op += [(a, 0), (a + SWAP, 100)]
         if n < 3:
-            op += [(t0 + n * step, 100), (t0 + n * step + 0.01, 0)]
+            op += [(t0 + n * step, 100), (t0 + n * step + SWAP, 0)]
         sc.text(f"{n} / {FACTS['bandit_rejoin']}", 960, 380, 96, PAL["ration_tin"], name=f"count_{n}", opacity=op)
     sc.caption()
     return sc

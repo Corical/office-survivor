@@ -28,6 +28,8 @@
     "robbed_goal": 1
   },
   "presentation": {
+    "bot_name": "Torch",
+    "bot_emoji": "🔥",
     "deadline": "midnight",
     "news_time": "07:30",
     "news_time_spoken": "half past seven",

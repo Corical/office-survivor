@@ -41,7 +41,7 @@
               "id": 2,
               "name": "Bass",
               "start": 0,
-              "length": 7502313,
+              "length": 7612688,
               "content": {
                 "Midi": {
                   "sequence": {
@@ -3459,7 +3459,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 215194,
+                        "start": 204480,
                         "length": 400
                       },
                       {
@@ -3467,7 +3467,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 215674,
+                        "start": 204960,
                         "length": 400
                       },
                       {
@@ -3475,7 +3475,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 216154,
+                        "start": 205440,
                         "length": 400
                       },
                       {
@@ -3483,7 +3483,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 216634,
+                        "start": 205920,
                         "length": 400
                       },
                       {
@@ -3491,7 +3491,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 217114,
+                        "start": 206400,
                         "length": 400
                       },
                       {
@@ -3499,87 +3499,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 217594,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 92,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 218074,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 70,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 218554,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 92,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 219034,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 70,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 219514,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 92,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 219994,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 70,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 220474,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 92,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 220954,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 70,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 221434,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 92,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 221914,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 70,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 222394,
+                        "start": 206880,
                         "length": 400
                       },
                       {
@@ -3587,7 +3507,87 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 222874,
+                        "start": 207360,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 70,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 218726,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 92,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 219206,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 70,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 219686,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 92,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 220166,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 70,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 220646,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 92,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 221126,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 70,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 221606,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 92,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 222086,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 70,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 222566,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 29,
+                        "velocity": 92,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 223046,
                         "length": 400
                       },
                       {
@@ -3595,7 +3595,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 223354,
+                        "start": 223526,
                         "length": 400
                       },
                       {
@@ -3603,7 +3603,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 223834,
+                        "start": 224006,
                         "length": 400
                       },
                       {
@@ -3611,7 +3611,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 224314,
+                        "start": 224486,
                         "length": 400
                       },
                       {
@@ -3619,7 +3619,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 224794,
+                        "start": 224966,
                         "length": 400
                       },
                       {
@@ -3627,7 +3627,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 225274,
+                        "start": 225446,
                         "length": 400
                       },
                       {
@@ -3635,7 +3635,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 225754,
+                        "start": 225926,
                         "length": 400
                       },
                       {
@@ -3643,7 +3643,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 226234,
+                        "start": 226406,
                         "length": 400
                       },
                       {
@@ -3651,7 +3651,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 226714,
+                        "start": 226886,
                         "length": 400
                       },
                       {
@@ -3659,7 +3659,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 227194,
+                        "start": 227366,
                         "length": 400
                       },
                       {
@@ -3667,23 +3667,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 227674,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 31,
-                        "velocity": 70,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 228154,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 31,
-                        "velocity": 92,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 228634,
+                        "start": 227846,
                         "length": 400
                       },
                       {
@@ -3691,7 +3675,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 229114,
+                        "start": 228326,
                         "length": 400
                       },
                       {
@@ -3699,7 +3683,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 229594,
+                        "start": 228806,
                         "length": 400
                       },
                       {
@@ -3707,7 +3691,23 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 230074,
+                        "start": 229286,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 31,
+                        "velocity": 92,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 229766,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 31,
+                        "velocity": 70,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 230246,
                         "length": 400
                       },
                       {
@@ -3715,7 +3715,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 230554,
+                        "start": 230726,
                         "length": 400
                       },
                       {
@@ -3723,7 +3723,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 231034,
+                        "start": 231206,
                         "length": 400
                       },
                       {
@@ -3731,7 +3731,7 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 231514,
+                        "start": 231686,
                         "length": 400
                       },
                       {
@@ -3739,7 +3739,7 @@
                         "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 231994,
+                        "start": 232166,
                         "length": 400
                       },
                       {
@@ -3747,127 +3747,183 @@
                         "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 232474,
+                        "start": 232646,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 66,
+                        "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 232954,
+                        "start": 233126,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 81,
+                        "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 233434,
+                        "start": 233606,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 57,
+                        "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 233914,
+                        "start": 234086,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 69,
+                        "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 234394,
+                        "start": 234566,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 48,
+                        "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 234874,
+                        "start": 235046,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 58,
+                        "velocity": 92,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 235354,
+                        "start": 235526,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 40,
+                        "velocity": 70,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 235834,
+                        "start": 236006,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 46,
+                        "velocity": 87,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 236314,
+                        "start": 236486,
                         "length": 400
                       },
                       {
                         "pitch": 33,
-                        "velocity": 31,
+                        "velocity": 61,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 236794,
+                        "start": 236966,
                         "length": 400
                       },
                       {
                         "pitch": 33,
+                        "velocity": 75,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 237446,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 33,
+                        "velocity": 53,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 237926,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 29,
+                        "velocity": 64,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 238406,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 29,
+                        "velocity": 44,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 238886,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 29,
+                        "velocity": 52,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 239366,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 29,
                         "velocity": 35,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 237274,
-                        "length": 400
-                      },
-                      {
-                        "pitch": 33,
-                        "velocity": 22,
-                        "release_velocity": 0,
-                        "channel": 0,
-                        "start": 237754,
+                        "start": 239846,
                         "length": 400
                       },
                       {
                         "pitch": 29,
-                        "velocity": 23,
+                        "velocity": 41,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 238234,
+                        "start": 240326,
                         "length": 400
                       },
                       {
                         "pitch": 29,
-                        "velocity": 13,
+                        "velocity": 26,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 238714,
+                        "start": 240806,
                         "length": 400
                       },
                       {
                         "pitch": 29,
-                        "velocity": 12,
+                        "velocity": 29,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 239194,
+                        "start": 241286,
                         "length": 400
                       },
                       {
                         "pitch": 29,
-                        "velocity": 7,
+                        "velocity": 18,
                         "release_velocity": 0,
                         "channel": 0,
-                        "start": 239674,
+                        "start": 241766,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 31,
+                        "velocity": 18,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 242246,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 31,
+                        "velocity": 9,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 242726,
+                        "length": 400
+                      },
+                      {
+                        "pitch": 31,
+                        "velocity": 9,
+                        "release_velocity": 0,
+                        "channel": 0,
+                        "start": 243206,
                         "length": 400
                       }
                     ],
@@ -3902,7 +3958,7 @@
       ],
       "active_playlist": 0,
       "mixer": {
-        "volume_db": -7.3999996,
+        "volume_db": -7.4,
         "pan": [
           -1.0,
           1.0
@@ -4002,7 +4058,7 @@
               "id": 4,
               "name": "Drums",
               "start": 0,
-              "length": 7493563,
+              "length": 7603938,
               "content": {
                 "Midi": {
                   "sequence": {
@@ -7352,11 +7408,59 @@
                         "length": 120
                       },
                       {
+                        "pitch": 36,
+                        "velocity": 64,
+                        "release_velocity": 0,
+                        "channel": 9,
+                        "start": 204480,
+                        "length": 240
+                      },
+                      {
+                        "pitch": 42,
+                        "velocity": 34,
+                        "release_velocity": 0,
+                        "channel": 9,
+                        "start": 204960,
+                        "length": 120
+                      },
+                      {
+                        "pitch": 36,
+                        "velocity": 64,
+                        "release_velocity": 0,
+                        "channel": 9,
+                        "start": 205440,
+                        "length": 240
+                      },
+                      {
+                        "pitch": 42,
+                        "velocity": 34,
+                        "release_velocity": 0,
+                        "channel": 9,
+                        "start": 205920,
+                        "length": 120
+                      },
+                      {
+                        "pitch": 36,
+                        "velocity": 64,
+                        "release_velocity": 0,
+                        "channel": 9,
+                        "start": 206400,
+                        "length": 240
+                      },
+                      {
+                        "pitch": 42,
+                        "velocity": 34,
+                        "release_velocity": 0,
+                        "channel": 9,
+                        "start": 206880,
+                        "length": 120
+                      },
+                      {
                         "pitch": 38,
                         "velocity": 40,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 204748,
+                        "start": 208282,
                         "length": 100
                       },
                       {
@@ -7364,7 +7468,7 @@
                         "velocity": 53,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 204868,
+                        "start": 208402,
                         "length": 100
                       },
                       {
@@ -7372,7 +7476,7 @@
                         "velocity": 66,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 204988,
+                        "start": 208522,
                         "length": 100
                       },
                       {
@@ -7380,7 +7484,7 @@
                         "velocity": 80,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 205108,
+                        "start": 208642,
                         "length": 100
                       },
                       {
@@ -7388,7 +7492,7 @@
                         "velocity": 93,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 205228,
+                        "start": 208762,
                         "length": 100
                       },
                       {
@@ -7396,7 +7500,7 @@
                         "velocity": 106,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 205348,
+                        "start": 208882,
                         "length": 100
                       },
                       {
@@ -7404,7 +7508,7 @@
                         "velocity": 120,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 205468,
+                        "start": 209002,
                         "length": 100
                       },
                       {
@@ -7412,7 +7516,7 @@
                         "velocity": 110,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 205516,
+                        "start": 209050,
                         "length": 480
                       },
                       {
@@ -7420,7 +7524,7 @@
                         "velocity": 112,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 205516,
+                        "start": 209050,
                         "length": 1920
                       },
                       {
@@ -7428,7 +7532,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 219034,
+                        "start": 222566,
                         "length": 240
                       },
                       {
@@ -7436,7 +7540,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 219514,
+                        "start": 223046,
                         "length": 120
                       },
                       {
@@ -7444,7 +7548,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 219994,
+                        "start": 223526,
                         "length": 240
                       },
                       {
@@ -7452,7 +7556,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 220474,
+                        "start": 224006,
                         "length": 120
                       },
                       {
@@ -7460,7 +7564,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 220954,
+                        "start": 224486,
                         "length": 240
                       },
                       {
@@ -7468,7 +7572,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 221434,
+                        "start": 224966,
                         "length": 120
                       },
                       {
@@ -7476,7 +7580,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 221914,
+                        "start": 225446,
                         "length": 240
                       },
                       {
@@ -7484,7 +7588,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 222394,
+                        "start": 225926,
                         "length": 120
                       },
                       {
@@ -7492,7 +7596,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 222874,
+                        "start": 226406,
                         "length": 240
                       },
                       {
@@ -7500,7 +7604,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 223354,
+                        "start": 226886,
                         "length": 120
                       },
                       {
@@ -7508,7 +7612,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 223834,
+                        "start": 227366,
                         "length": 240
                       },
                       {
@@ -7516,7 +7620,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 224314,
+                        "start": 227846,
                         "length": 120
                       },
                       {
@@ -7524,7 +7628,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 224794,
+                        "start": 228326,
                         "length": 240
                       },
                       {
@@ -7532,7 +7636,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 225274,
+                        "start": 228806,
                         "length": 120
                       },
                       {
@@ -7540,7 +7644,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 225754,
+                        "start": 229286,
                         "length": 240
                       },
                       {
@@ -7548,7 +7652,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 226234,
+                        "start": 229766,
                         "length": 120
                       },
                       {
@@ -7556,7 +7660,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 226714,
+                        "start": 230246,
                         "length": 240
                       },
                       {
@@ -7564,7 +7668,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 227194,
+                        "start": 230726,
                         "length": 120
                       },
                       {
@@ -7572,7 +7676,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 227674,
+                        "start": 231206,
                         "length": 240
                       },
                       {
@@ -7580,7 +7684,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 228154,
+                        "start": 231686,
                         "length": 120
                       },
                       {
@@ -7588,7 +7692,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 228634,
+                        "start": 232166,
                         "length": 240
                       },
                       {
@@ -7596,7 +7700,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 229114,
+                        "start": 232646,
                         "length": 120
                       },
                       {
@@ -7604,7 +7708,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 229594,
+                        "start": 233126,
                         "length": 240
                       },
                       {
@@ -7612,7 +7716,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 230074,
+                        "start": 233606,
                         "length": 120
                       },
                       {
@@ -7620,7 +7724,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 230554,
+                        "start": 234086,
                         "length": 240
                       },
                       {
@@ -7628,7 +7732,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 231034,
+                        "start": 234566,
                         "length": 120
                       },
                       {
@@ -7636,7 +7740,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 231514,
+                        "start": 235046,
                         "length": 240
                       },
                       {
@@ -7644,7 +7748,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 231994,
+                        "start": 235526,
                         "length": 120
                       },
                       {
@@ -7652,7 +7756,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 232474,
+                        "start": 236006,
                         "length": 240
                       },
                       {
@@ -7660,7 +7764,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 232954,
+                        "start": 236486,
                         "length": 120
                       },
                       {
@@ -7668,7 +7772,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 233434,
+                        "start": 236966,
                         "length": 240
                       },
                       {
@@ -7676,7 +7780,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 233914,
+                        "start": 237446,
                         "length": 120
                       },
                       {
@@ -7684,7 +7788,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 234394,
+                        "start": 237926,
                         "length": 240
                       },
                       {
@@ -7692,7 +7796,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 234874,
+                        "start": 238406,
                         "length": 120
                       },
                       {
@@ -7700,7 +7804,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 235354,
+                        "start": 238886,
                         "length": 240
                       },
                       {
@@ -7708,7 +7812,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 235834,
+                        "start": 239366,
                         "length": 120
                       },
                       {
@@ -7716,7 +7820,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 236314,
+                        "start": 239846,
                         "length": 240
                       },
                       {
@@ -7724,7 +7828,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 236794,
+                        "start": 240326,
                         "length": 120
                       },
                       {
@@ -7732,7 +7836,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 237274,
+                        "start": 240806,
                         "length": 240
                       },
                       {
@@ -7740,7 +7844,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 237754,
+                        "start": 241286,
                         "length": 120
                       },
                       {
@@ -7748,7 +7852,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 238234,
+                        "start": 241766,
                         "length": 240
                       },
                       {
@@ -7756,7 +7860,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 238714,
+                        "start": 242246,
                         "length": 120
                       },
                       {
@@ -7764,7 +7868,7 @@
                         "velocity": 64,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 239194,
+                        "start": 242726,
                         "length": 240
                       },
                       {
@@ -7772,7 +7876,7 @@
                         "velocity": 34,
                         "release_velocity": 0,
                         "channel": 9,
-                        "start": 239674,
+                        "start": 243206,
                         "length": 120
                       }
                     ],
@@ -7807,7 +7911,7 @@
       ],
       "active_playlist": 0,
       "mixer": {
-        "volume_db": -5.3999996,
+        "volume_db": -5.4,
         "pan": [
           -1.0,
           1.0
@@ -8217,7 +8321,7 @@
               "id": 27,
               "name": "scene_11",
               "start": 4694400,
-              "length": 476160,
+              "length": 585728,
               "content": {
                 "Audio": {
                   "source": 26,
@@ -8249,7 +8353,7 @@
             {
               "id": 29,
               "name": "scene_12",
-              "start": 5208000,
+              "start": 5318400,
               "length": 572416,
               "content": {
                 "Audio": {
@@ -8282,7 +8386,7 @@
             {
               "id": 31,
               "name": "scene_13",
-              "start": 5817600,
+              "start": 5928000,
               "length": 869376,
               "content": {
                 "Audio": {
@@ -8315,7 +8419,7 @@
             {
               "id": 33,
               "name": "scene_14",
-              "start": 6724800,
+              "start": 6835200,
               "length": 742400,
               "content": {
                 "Audio": {
@@ -8519,9 +8623,9 @@
     {
       "id": 26,
       "name": "scene_11",
-      "path": "Audio Files/scene_11.wav",
+      "path": "Audio Files/scene_11_01.wav",
       "channels": 1,
-      "frames": 476160,
+      "frames": 585728,
       "sample_rate": 48000,
       "format": "Wav",
       "time_reference": 0,

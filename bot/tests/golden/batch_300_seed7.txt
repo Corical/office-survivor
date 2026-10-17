@@ -1,0 +1,43 @@
+SURVIVORS - 300 simulated games, 15 players, 10 nights
+Rules changed from default: none
+
+Metric                                                mean     p10     p90
+Survivors at the end                                  10.6    8.00    13.0
+Bandits at the end                                    4.36    2.00    7.00
+Players who were ever a bandit                        5.56    3.00    8.00
+Bandit comebacks                                      1.51    0.00    3.00
+Died without ever being robbed                        0.75    0.00    2.00
+First death on night                                  4.57    3.00    7.00
+Steal attempts per game                               34.1    22.0    45.0
+Share of steals caught by a guard                     0.25    0.13    0.38
+Steals that found nothing                             0.47    0.00    2.00
+Robberies per night                                   1.95    1.40    2.60
+Quiet nights (no robbery/catch/death)                 0.35    0.00    1.00
+Richest player's rations                              9.85    7.00    13.0
+Median survivor rations                               3.97    3.00    5.00
+Rations needed for the last seat                      4.39    3.00    6.00
+Last seat decided by coin flip                        0.19    0.00    1.00
+Empty seats on the chopper                             0.0    0.00    0.00
+Deaths on the final night                             1.20    0.00    2.10
+Share of seats won by heavy thieves (3+ steals)       0.27    0.00    0.60
+Joint winners per game                                1.14    1.00    2.00
+
+Personality    share  avg pts  extract  win share  
+shark             7%     2.33      39%        10%
+opportunist      16%     2.32      40%        19%
+farmer           19%     2.22      38%        21%
+paranoid         11%     2.16      39%        10%
+casual           25%     2.14      36%        26%
+detective         7%     1.78      25%         4%
+chaos             7%     1.38      19%         5%
+saint             8%     1.24      10%         5%
+
+Secret objective                                   completed
+finish with more rations than @player                    46%
+get robbed at least 1x and still extract                 29%
+steal at least 3 times without ever being caught         16%
+give away 3 rations over the game                        34%
+successfully rob @player at least 1x                     40%
+
+Flags:
+  - nothing obviously broken

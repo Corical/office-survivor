@@ -371,8 +371,8 @@
       "id": "scene_11",
       "title": "Bandits",
       "base_duration_s": 9,
-      "narration": "Run out of food and you're a bandit. Bandits can only steal or investigate, but get back to {bandit_rejoin:rations} and you rejoin the survivors.",
-      "on_screen_text": "BANDIT: steal or investigate · back at {bandit_rejoin}",
+      "narration": "Run out of food and you're a bandit. Bandits don't eat. They can only steal {bandit_steal_amount:rations} at a time, or investigate. Get back to {bandit_rejoin:rations} and you rejoin the survivors.",
+      "on_screen_text": "BANDIT: steal {bandit_steal_amount} or investigate · back at {bandit_rejoin}",
       "beats": [
         {
           "at_s": 0.0,

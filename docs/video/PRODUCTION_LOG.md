@@ -111,6 +111,11 @@ and every keyed property is eased with `prop.select {selectKeys}` + `keys.easyEa
 | 17 Oct 2026 | FilmCraft export | `export.quick` ignored the `audio: {bitrate_kbps: 192}` override (file has 320 kbps); the preset's audio wins | save a custom preset with `export.presets.save {name, from, …}` and export with it |
 | 17 Oct 2026 | FilmCraft export | `export.quick {wait: false}` doesn't appear in `export.queue.list`; the MP4 has no moov atom until it's finished | wait until `ffprobe` can read the file (loop every 5 s); 156 s took ~410 s in software mode |
 | 17 Oct 2026 | Final check | `ffmpeg -af ebur128=peak=true` reads LUFS of the export; one 8-frame `tile` strip across the cut confirms burned-in captions | — |
+| 17 Oct 2026 | EffectCraft keys | Owner saw the calendar "sway" while the ticks stayed put (scene 2). Position keys default to spatial Bezier, so a hold between two equal keys bulges: keyed at x 960 from 1.0–5.9 s, the strip read x 1125 at 3.0 s | after easing, `keys.interpolation {spatial: linear}` on every position property |
+| 17 Oct 2026 | EffectCraft keys | Owner saw text overlapping mid-video (scene 11 counters). Two keys 0.01 s apart land on the same frame and EffectCraft keeps one, so an instant swap became a 1.8 s crossfade (`count_0` was 42% and `count_1` 58% at 1.0 s) | swap keys at least one frame apart (`SWAP = 0.04` s); check with `prop.get {layer, path, time}`, which returns the kept keys |
+| 17 Oct 2026 | Facts | Owner asked whether bandits steal 2. Engine: bandits steal 1 (`bandit_steal_amount`), don't eat, rejoin at ≥3 and keep those 3. The video never said so, and "take up to two" in scene 6 implied 2 | scene 11 narration and on-screen text now state it; check every number a viewer could infer, not only the ones the script states |
+| 17 Oct 2026 | Laptop load | FilmCraft's export took 87% of all 8 cores (software graphics on the Iris Xe), EffectCraft renders similar; the owner felt it | before a render or export: `(Get-Process filmcraft).PriorityClass = 'BelowNormal'` (same for effectcraft); see memory `cap-cpu-on-local-batch-runs` |
+| 17 Oct 2026 | Laptop load | FilmCraft kept ~20% CPU idle after its export finished; the owner had to ask | save each project and close every Craft app as soon as its stage is done (`CloseMainWindow`, then check none remain) |
 | 17 Oct 2026 | Animation | Variants on one sheet (8 poses, 5 icons) can't be animated separately | `assets_svg.py --parts`: one image per pose/icon; stacked pieces keep the parent's canvas so they line up |
 
 ## Command reference that worked
@@ -149,6 +154,17 @@ backgroundColor: #rrggbbaa, align, anchor: bottom, margin}`, `export.resolve {pr
 setting key, `export.quick {preset, path, wait, …overrides}`. Settings keys that matter here:
 `burnCaptions`, `crf`, `bitrateMode`, `audio.bitrate_kbps`, `frameRate`. Preset used:
 "High Quality 1080p HD" (H.264 1920×1080, 20 Mbps VBR). Time is 254016000000 ticks per second.
+
+## Decisions
+
+| Date | Decision | Where it lives |
+| --- | --- | --- |
+| 17 Oct 2026 | Voice: `bm_george`, speed 0.9 (owner's pick from the audition page) | `tools/tts_kokoro.py` defaults |
+| 17 Oct 2026 | The bot is called **🔥 Torch** (a nod to Survivor's torches, not a real person's name) | `game.json` → `presentation.bot_name` / `bot_emoji`; the chat screens read it |
+| 17 Oct 2026 | Bandit facts stated in scene 11: bandits don't eat, steal 1 at a time, rejoin at 3 and keep them | `source/script.json` from `game.json` placeholders |
+
+Changing a chat screen after scenes are built: re-export it from FigCraft, then in EffectCraft
+`file.reloadFootage {items: ["ui_news_post.png", …]}` and rebuild only the scenes that show it.
 
 ## Open questions carried forward
 

@@ -264,7 +264,7 @@
       "id": "ui_news_post",
       "tool": "FigCraft",
       "type": "ui",
-      "description": "The #news channel in the same generic chat app. 'Survivors Bot' posts '{news_time} MORNING NEWS' with three lines, each its own layer: 'Someone hit {name1} overnight. Down {steal_amount}.' / 'CAUGHT: {name2} caught {name3} red-handed. {name3} pays {name2} {caught_penalty}.' / '{name4} ran out of food.'",
+      "description": "The #news channel in the same generic chat app. '{bot_name}' (flame avatar) posts '{news_time} MORNING NEWS' with three lines, each its own layer: 'Someone hit {name1} overnight. Down {steal_amount}.' / 'CAUGHT: {name2} caught {name3} red-handed. {name3} pays {name2} {caught_penalty}.' / '{name4} ran out of food.'",
       "variants": [],
       "separate_layers": [],
       "size": "1920x1080"

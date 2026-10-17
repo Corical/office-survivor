@@ -9,7 +9,7 @@
   "vo:scene_08": "243cfddb098e",
   "vo:scene_09": "eb0061125c17",
   "vo:scene_10": "0ac05185b616",
-  "vo:scene_11": "c4129b724022",
+  "vo:scene_11": "db510d0f107e",
   "vo:scene_12": "62da2eec3183",
   "vo:scene_13": "91cd9fb9e820",
   "vo:scene_14": "a14e8fe5180f",
@@ -38,7 +38,7 @@
   "asset:curtain": "920bbd77d653",
   "asset:news_clipping_wall": "070811b774c9",
   "asset:ui_phone_chat": "2b4e6af80241",
-  "asset:ui_news_post": "d72bb1b5b017",
+  "asset:ui_news_post": "6be9fbb9d5a6",
   "asset:ui_radio_channel": "07f2fc7fb952",
   "asset:ui_join": "76f73ce36a86",
   "scene:scene_01": "1e93677ba349",
@@ -50,11 +50,11 @@
   "scene:scene_07": "dc309c88d848",
   "scene:scene_08": "40fb37b23682",
   "scene:scene_09": "0869defc0c23",
-  "scene:scene_10": "f28d1adc419d",
-  "scene:scene_11": "d189c1e69489",
+  "scene:scene_10": "c22caada67d2",
+  "scene:scene_11": "cb54a53174e0",
   "scene:scene_12": "b92bf048115b",
   "scene:scene_13": "6e51178086e6",
   "scene:scene_14": "a27a9d1418dc",
-  "audio_mix": "e03ea20ed6f0",
-  "final": "3fb41c3a961c"
+  "audio_mix": "f5a4bce90ec3",
+  "final": "dd3c84ff4196"
 }

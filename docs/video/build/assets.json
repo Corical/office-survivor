@@ -399,12 +399,12 @@
       "id": "ui_news_post",
       "tool": "FigCraft",
       "type": "ui",
-      "description": "The #news channel in the same generic chat app. 'Survivors Bot' posts '07:30 MORNING NEWS' with three lines, each its own layer: 'Someone hit RustyKettle overnight. Down 2.' / 'CAUGHT: QuietBadger caught SoggyBiscuit red-handed. SoggyBiscuit pays QuietBadger 2.' / 'LuckyLantern ran out of food.'",
+      "description": "The #news channel in the same generic chat app. 'Torch' (flame avatar) posts '07:30 MORNING NEWS' with three lines, each its own layer: 'Someone hit RustyKettle overnight. Down 2.' / 'CAUGHT: QuietBadger caught SoggyBiscuit red-handed. SoggyBiscuit pays QuietBadger 2.' / 'LuckyLantern ran out of food.'",
       "variants": [],
       "separate_layers": [],
       "size": "1920x1080",
       "output": "output/02_ui/ui_news_post.svg (+ .png at 2x)",
-      "hash": "d72bb1b5b017"
+      "hash": "6be9fbb9d5a6"
     },
     {
       "id": "ui_radio_channel",

@@ -1,0 +1,630 @@
+{"log_format": 1, "night": 0, "players": [{"id": 0, "name": "VelvetMole", "personality": "opportunist", "smart": true, "start_rations": 7}, {"id": 1, "name": "MissingSock", "personality": "farmer", "smart": true, "start_rations": 7}, {"id": 2, "name": "NightOwl", "personality": "casual", "smart": true, "start_rations": 7}, {"id": 3, "name": "QuietBadger", "personality": "detective", "smart": true, "start_rations": 7}, {"id": 4, "name": "LuckyLantern", "personality": "casual", "smart": true, "start_rations": 7}, {"id": 5, "name": "GrumpyGecko", "personality": "opportunist", "smart": true, "start_rations": 7}, {"id": 6, "name": "HollowTin", "personality": "detective", "smart": true, "start_rations": 7}, {"id": 7, "name": "SoggyBiscuit", "personality": "casual", "smart": true, "start_rations": 7}, {"id": 8, "name": "LooseCannon", "personality": "opportunist", "smart": true, "start_rations": 7}, {"id": 9, "name": "WobblyTable", "personality": "shark", "smart": true, "start_rations": 7}, {"id": 10, "name": "BurntToast", "personality": "casual", "smart": true, "start_rations": 7}, {"id": 11, "name": "IronSpatula", "personality": "farmer", "smart": true, "start_rations": 7}, {"id": 12, "name": "SaltyPretzel", "personality": "paranoid", "smart": true, "start_rations": 7}, {"id": 13, "name": "LazyRiver", "personality": "opportunist", "smart": true, "start_rations": 7}, {"id": 14, "name": "SilentGoose", "personality": "paranoid", "smart": true, "start_rations": 7}], "rules": {"bandit_can_extract": false, "bandit_rejoin": 3, "bandit_steal_amount": 1, "caught_penalty": 2, "eat": 1, "gift_bonus": 0, "give_goal": 3, "grudge_goal": "rob", "grudge_robs": 1, "guard_cooldown": 0, "guard_income_max": 0, "guard_limit": 3, "guard_nights": 2, "guard_reward": 2, "investigate_bounty": 1, "miss_scale": 1.0, "missed_scavenge_max": -1, "players": 15, "pts_extract": 3, "pts_objective": 2, "pts_survive": 1, "robbed_goal": 1, "rounds": 10, "scavenge_max": 2, "scavenge_min": 0, "seat_ratio": 0.3333333333333333, "start_rations": 7, "steal_amount": 2, "tiebreak": "kindness", "winner_tiebreak": "kindness"}, "seats": 5, "seed": 9, "seq": 1, "type": "game_start"}
+{"night": 0, "objective": "give", "player": "VelvetMole", "seq": 2, "target": null, "text": "give away 3 rations over the game", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "beat", "player": "MissingSock", "seq": 3, "target": "LazyRiver", "text": "finish with more rations than LazyRiver", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "steal3_clean", "player": "NightOwl", "seq": 4, "target": null, "text": "steal at least 3 times without ever being caught", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "robbed2_extract", "player": "QuietBadger", "seq": 5, "target": null, "text": "get robbed at least 1x and still extract", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "give", "player": "LuckyLantern", "seq": 6, "target": null, "text": "give away 3 rations over the game", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "steal3_clean", "player": "GrumpyGecko", "seq": 7, "target": null, "text": "steal at least 3 times without ever being caught", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "steal3_clean", "player": "HollowTin", "seq": 8, "target": null, "text": "steal at least 3 times without ever being caught", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "beat", "player": "SoggyBiscuit", "seq": 9, "target": "QuietBadger", "text": "finish with more rations than QuietBadger", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "beat", "player": "LooseCannon", "seq": 10, "target": "HollowTin", "text": "finish with more rations than HollowTin", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "beat", "player": "WobblyTable", "seq": 11, "target": "HollowTin", "text": "finish with more rations than HollowTin", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "give", "player": "BurntToast", "seq": 12, "target": null, "text": "give away 3 rations over the game", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "robbed2_extract", "player": "IronSpatula", "seq": 13, "target": null, "text": "get robbed at least 1x and still extract", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "beat", "player": "SaltyPretzel", "seq": 14, "target": "QuietBadger", "text": "finish with more rations than QuietBadger", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "give", "player": "LazyRiver", "seq": 15, "target": null, "text": "give away 3 rations over the game", "type": "objective", "visibility": "private"}
+{"night": 0, "objective": "beat", "player": "SilentGoose", "seq": 16, "target": "WobblyTable", "text": "finish with more rations than WobblyTable", "type": "objective", "visibility": "private"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "VelvetMole", "rations_before": 7, "seq": 17, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "MissingSock", "rations_before": 7, "seq": 18, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "NightOwl", "rations_before": 7, "seq": 19, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "QuietBadger", "rations_before": 7, "seq": 20, "target": "VelvetMole", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "LuckyLantern", "rations_before": 7, "seq": 21, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "GrumpyGecko", "rations_before": 7, "seq": 22, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "HollowTin", "rations_before": 7, "seq": 23, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "SoggyBiscuit", "rations_before": 7, "seq": 24, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "LooseCannon", "rations_before": 7, "seq": 25, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "WobblyTable", "rations_before": 7, "seq": 26, "target": "SoggyBiscuit", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "BurntToast", "rations_before": 7, "seq": 27, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "IronSpatula", "rations_before": 7, "seq": 28, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "guard", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "SaltyPretzel", "rations_before": 7, "seq": 29, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "LazyRiver", "rations_before": 7, "seq": 30, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 1, "odds": null, "player": "SilentGoose", "rations_before": 7, "seq": 31, "target": "SaltyPretzel", "type": "action", "visibility": "private", "why": null}
+{"guards_used": 1, "night": 1, "player": "SaltyPretzel", "seq": 32, "type": "guard_up", "until_night": 2, "visibility": "private"}
+{"balance": 5, "delta": -2, "detail": "WobblyTable", "night": 1, "player": "SoggyBiscuit", "reason": "robbed", "seq": 33, "type": "ration"}
+{"balance": 9, "delta": 2, "detail": "SoggyBiscuit", "night": 1, "player": "WobblyTable", "reason": "stole", "seq": 34, "type": "ration"}
+{"amount": 2, "night": 1, "outcome": "success", "seq": 35, "split_with": 0, "target": "SoggyBiscuit", "thief": "WobblyTable", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": true, "found": 0, "night": 1, "player": "VelvetMole", "seq": 36, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 1, "player": "MissingSock", "seq": 37, "type": "scavenge", "visibility": "private"}
+{"balance": 9, "delta": 2, "detail": "", "night": 1, "player": "MissingSock", "reason": "scavenge", "seq": 38, "type": "ration"}
+{"auto": true, "found": 1, "night": 1, "player": "NightOwl", "seq": 39, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 1, "detail": "auto", "night": 1, "player": "NightOwl", "reason": "scavenge", "seq": 40, "type": "ration"}
+{"auto": true, "found": 0, "night": 1, "player": "LuckyLantern", "seq": 41, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 1, "player": "GrumpyGecko", "seq": 42, "type": "scavenge", "visibility": "private"}
+{"balance": 9, "delta": 2, "detail": "", "night": 1, "player": "GrumpyGecko", "reason": "scavenge", "seq": 43, "type": "ration"}
+{"auto": false, "found": 1, "night": 1, "player": "HollowTin", "seq": 44, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 1, "detail": "", "night": 1, "player": "HollowTin", "reason": "scavenge", "seq": 45, "type": "ration"}
+{"auto": false, "found": 0, "night": 1, "player": "SoggyBiscuit", "seq": 46, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 1, "player": "LooseCannon", "seq": 47, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 1, "player": "BurntToast", "seq": 48, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 1, "player": "IronSpatula", "seq": 49, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 1, "detail": "", "night": 1, "player": "IronSpatula", "reason": "scavenge", "seq": 50, "type": "ration"}
+{"auto": false, "found": 0, "night": 1, "player": "LazyRiver", "seq": 51, "type": "scavenge", "visibility": "private"}
+{"investigator": "QuietBadger", "night": 1, "saw_action": "scavenge", "saw_target": null, "seq": 52, "target": "VelvetMole", "type": "investigate", "visibility": "private"}
+{"investigator": "SilentGoose", "night": 1, "saw_action": "guard", "saw_target": null, "seq": 53, "target": "SaltyPretzel", "type": "investigate", "visibility": "private"}
+{"balance": 6, "delta": -1, "night": 1, "player": "VelvetMole", "reason": "eat", "seq": 54, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 1, "player": "MissingSock", "reason": "eat", "seq": 55, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 1, "player": "NightOwl", "reason": "eat", "seq": 56, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 1, "player": "QuietBadger", "reason": "eat", "seq": 57, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 1, "player": "LuckyLantern", "reason": "eat", "seq": 58, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 1, "player": "GrumpyGecko", "reason": "eat", "seq": 59, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 1, "player": "HollowTin", "reason": "eat", "seq": 60, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 1, "player": "SoggyBiscuit", "reason": "eat", "seq": 61, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 1, "player": "LooseCannon", "reason": "eat", "seq": 62, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 1, "player": "WobblyTable", "reason": "eat", "seq": 63, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 1, "player": "BurntToast", "reason": "eat", "seq": 64, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 1, "player": "IronSpatula", "reason": "eat", "seq": 65, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 1, "player": "SaltyPretzel", "reason": "eat", "seq": 66, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 1, "player": "LazyRiver", "reason": "eat", "seq": 67, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 1, "player": "SilentGoose", "reason": "eat", "seq": 68, "type": "ration"}
+{"channel": "#news", "lines": ["Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 2."], "night": 1, "seq": 69, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"SaltyPretzel": 2}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 0, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 1, "SilentGoose": 0, "SoggyBiscuit": 0, "VelvetMole": 0, "WobblyTable": 0}, "night": 1, "rations": {"BurntToast": 6, "GrumpyGecko": 8, "HollowTin": 7, "IronSpatula": 7, "LazyRiver": 6, "LooseCannon": 6, "LuckyLantern": 6, "MissingSock": 8, "NightOwl": 7, "QuietBadger": 6, "SaltyPretzel": 6, "SilentGoose": 6, "SoggyBiscuit": 4, "VelvetMole": 6, "WobblyTable": 8}, "seq": 70, "type": "night_end"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "VelvetMole", "rations_before": 6, "seq": 71, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "MissingSock", "rations_before": 8, "seq": 72, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "NightOwl", "rations_before": 7, "seq": 73, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "QuietBadger", "rations_before": 6, "seq": 74, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "LuckyLantern", "rations_before": 6, "seq": 75, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "GrumpyGecko", "rations_before": 8, "seq": 76, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "HollowTin", "rations_before": 7, "seq": 77, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "guard", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "SoggyBiscuit", "rations_before": 4, "seq": 78, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "LooseCannon", "rations_before": 6, "seq": 79, "target": "HollowTin", "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "WobblyTable", "rations_before": 8, "seq": 80, "target": "HollowTin", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "BurntToast", "rations_before": 6, "seq": 81, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "IronSpatula", "rations_before": 7, "seq": 82, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "SaltyPretzel", "rations_before": 6, "seq": 83, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "LazyRiver", "rations_before": 6, "seq": 84, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 2, "odds": null, "player": "SilentGoose", "rations_before": 6, "seq": 85, "target": null, "type": "action", "visibility": "private", "why": null}
+{"guards_used": 1, "night": 2, "player": "SoggyBiscuit", "seq": 86, "type": "guard_up", "until_night": 3, "visibility": "private"}
+{"balance": 5, "delta": -2, "detail": "WobblyTable", "night": 2, "player": "HollowTin", "reason": "robbed", "seq": 87, "type": "ration"}
+{"balance": 10, "delta": 2, "detail": "HollowTin", "night": 2, "player": "WobblyTable", "reason": "stole", "seq": 88, "type": "ration"}
+{"amount": 2, "night": 2, "outcome": "success", "seq": 89, "split_with": 1, "target": "HollowTin", "thief": "WobblyTable", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"balance": 3, "delta": -2, "detail": "LooseCannon", "night": 2, "player": "HollowTin", "reason": "robbed", "seq": 90, "type": "ration"}
+{"balance": 8, "delta": 2, "detail": "HollowTin", "night": 2, "player": "LooseCannon", "reason": "stole", "seq": 91, "type": "ration"}
+{"amount": 2, "night": 2, "outcome": "success", "seq": 92, "split_with": 1, "target": "HollowTin", "thief": "LooseCannon", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 0, "night": 2, "player": "VelvetMole", "seq": 93, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 0, "night": 2, "player": "MissingSock", "seq": 94, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 2, "night": 2, "player": "NightOwl", "seq": 95, "type": "scavenge", "visibility": "private"}
+{"balance": 9, "delta": 2, "detail": "auto", "night": 2, "player": "NightOwl", "reason": "scavenge", "seq": 96, "type": "ration"}
+{"auto": false, "found": 1, "night": 2, "player": "QuietBadger", "seq": 97, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "", "night": 2, "player": "QuietBadger", "reason": "scavenge", "seq": 98, "type": "ration"}
+{"auto": false, "found": 1, "night": 2, "player": "LuckyLantern", "seq": 99, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "", "night": 2, "player": "LuckyLantern", "reason": "scavenge", "seq": 100, "type": "ration"}
+{"auto": false, "found": 0, "night": 2, "player": "GrumpyGecko", "seq": 101, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 2, "player": "HollowTin", "seq": 102, "type": "scavenge", "visibility": "private"}
+{"balance": 4, "delta": 1, "detail": "", "night": 2, "player": "HollowTin", "reason": "scavenge", "seq": 103, "type": "ration"}
+{"auto": true, "found": 2, "night": 2, "player": "BurntToast", "seq": 104, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "auto", "night": 2, "player": "BurntToast", "reason": "scavenge", "seq": 105, "type": "ration"}
+{"auto": false, "found": 2, "night": 2, "player": "IronSpatula", "seq": 106, "type": "scavenge", "visibility": "private"}
+{"balance": 9, "delta": 2, "detail": "", "night": 2, "player": "IronSpatula", "reason": "scavenge", "seq": 107, "type": "ration"}
+{"auto": false, "found": 0, "night": 2, "player": "SaltyPretzel", "seq": 108, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 2, "player": "LazyRiver", "seq": 109, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "", "night": 2, "player": "LazyRiver", "reason": "scavenge", "seq": 110, "type": "ration"}
+{"auto": false, "found": 2, "night": 2, "player": "SilentGoose", "seq": 111, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "", "night": 2, "player": "SilentGoose", "reason": "scavenge", "seq": 112, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 2, "player": "VelvetMole", "reason": "eat", "seq": 113, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 2, "player": "MissingSock", "reason": "eat", "seq": 114, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 2, "player": "NightOwl", "reason": "eat", "seq": 115, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 2, "player": "QuietBadger", "reason": "eat", "seq": 116, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 2, "player": "LuckyLantern", "reason": "eat", "seq": 117, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 2, "player": "GrumpyGecko", "reason": "eat", "seq": 118, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 2, "player": "HollowTin", "reason": "eat", "seq": 119, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 2, "player": "SoggyBiscuit", "reason": "eat", "seq": 120, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 2, "player": "LooseCannon", "reason": "eat", "seq": 121, "type": "ration"}
+{"balance": 9, "delta": -1, "night": 2, "player": "WobblyTable", "reason": "eat", "seq": 122, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 2, "player": "BurntToast", "reason": "eat", "seq": 123, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 2, "player": "IronSpatula", "reason": "eat", "seq": 124, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 2, "player": "SaltyPretzel", "reason": "eat", "seq": 125, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 2, "player": "LazyRiver", "reason": "eat", "seq": 126, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 2, "player": "SilentGoose", "reason": "eat", "seq": 127, "type": "ration"}
+{"author": "WobblyTable", "kind": "rumour", "night": 2, "seq": 128, "text": "\"Just saying: QuietBadger has been very quiet. Too quiet.\"", "true": false, "type": "radio", "visibility": "public_anonymous"}
+{"channel": "#news", "lines": ["2 people hit HollowTin overnight. HollowTin is down 4."], "night": 2, "seq": 129, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"SaltyPretzel": 2, "SoggyBiscuit": 3}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 0, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 1, "SilentGoose": 0, "SoggyBiscuit": 1, "VelvetMole": 0, "WobblyTable": 0}, "night": 2, "rations": {"BurntToast": 7, "GrumpyGecko": 7, "HollowTin": 3, "IronSpatula": 8, "LazyRiver": 7, "LooseCannon": 7, "LuckyLantern": 6, "MissingSock": 7, "NightOwl": 8, "QuietBadger": 6, "SaltyPretzel": 5, "SilentGoose": 7, "SoggyBiscuit": 3, "VelvetMole": 5, "WobblyTable": 9}, "seq": 130, "type": "night_end"}
+{"action": "guard", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "VelvetMole", "rations_before": 5, "seq": 131, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "MissingSock", "rations_before": 7, "seq": 132, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "NightOwl", "rations_before": 8, "seq": 133, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "QuietBadger", "rations_before": 6, "seq": 134, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "gift", "amount": 1, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "LuckyLantern", "rations_before": 6, "seq": 135, "target": "HollowTin", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "GrumpyGecko", "rations_before": 7, "seq": 136, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "HollowTin", "rations_before": 3, "seq": 137, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "SoggyBiscuit", "rations_before": 3, "seq": 138, "target": "QuietBadger", "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "LooseCannon", "rations_before": 7, "seq": 139, "target": "GrumpyGecko", "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "WobblyTable", "rations_before": 9, "seq": 140, "target": "NightOwl", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "BurntToast", "rations_before": 7, "seq": 141, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "IronSpatula", "rations_before": 8, "seq": 142, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "SaltyPretzel", "rations_before": 5, "seq": 143, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "LazyRiver", "rations_before": 7, "seq": 144, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 3, "odds": null, "player": "SilentGoose", "rations_before": 7, "seq": 145, "target": null, "type": "action", "visibility": "private", "why": null}
+{"guards_used": 1, "night": 3, "player": "VelvetMole", "seq": 146, "type": "guard_up", "until_night": 4, "visibility": "private"}
+{"balance": 5, "delta": -2, "detail": "LooseCannon", "night": 3, "player": "GrumpyGecko", "reason": "robbed", "seq": 147, "type": "ration"}
+{"balance": 9, "delta": 2, "detail": "GrumpyGecko", "night": 3, "player": "LooseCannon", "reason": "stole", "seq": 148, "type": "ration"}
+{"amount": 2, "night": 3, "outcome": "success", "seq": 149, "split_with": 0, "target": "GrumpyGecko", "thief": "LooseCannon", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"balance": 6, "delta": -2, "detail": "WobblyTable", "night": 3, "player": "NightOwl", "reason": "robbed", "seq": 150, "type": "ration"}
+{"balance": 11, "delta": 2, "detail": "NightOwl", "night": 3, "player": "WobblyTable", "reason": "stole", "seq": 151, "type": "ration"}
+{"amount": 2, "night": 3, "outcome": "success", "seq": 152, "split_with": 0, "target": "NightOwl", "thief": "WobblyTable", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 0, "night": 3, "player": "MissingSock", "seq": 153, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 3, "player": "NightOwl", "seq": 154, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "", "night": 3, "player": "NightOwl", "reason": "scavenge", "seq": 155, "type": "ration"}
+{"auto": false, "found": 1, "night": 3, "player": "QuietBadger", "seq": 156, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "", "night": 3, "player": "QuietBadger", "reason": "scavenge", "seq": 157, "type": "ration"}
+{"auto": false, "found": 0, "night": 3, "player": "GrumpyGecko", "seq": 158, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 1, "night": 3, "player": "HollowTin", "seq": 159, "type": "scavenge", "visibility": "private"}
+{"balance": 4, "delta": 1, "detail": "auto", "night": 3, "player": "HollowTin", "reason": "scavenge", "seq": 160, "type": "ration"}
+{"auto": false, "found": 0, "night": 3, "player": "BurntToast", "seq": 161, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 0, "night": 3, "player": "IronSpatula", "seq": 162, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 3, "player": "SaltyPretzel", "seq": 163, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 1, "detail": "", "night": 3, "player": "SaltyPretzel", "reason": "scavenge", "seq": 164, "type": "ration"}
+{"auto": false, "found": 2, "night": 3, "player": "LazyRiver", "seq": 165, "type": "scavenge", "visibility": "private"}
+{"balance": 9, "delta": 2, "detail": "", "night": 3, "player": "LazyRiver", "reason": "scavenge", "seq": 166, "type": "ration"}
+{"auto": false, "found": 0, "night": 3, "player": "SilentGoose", "seq": 167, "type": "scavenge", "visibility": "private"}
+{"amount": 1, "giver": "LuckyLantern", "night": 3, "receiver": "HollowTin", "seq": 168, "type": "gift", "visibility": "giver_and_receiver"}
+{"balance": 5, "delta": -1, "detail": "HollowTin", "night": 3, "player": "LuckyLantern", "reason": "gift_out", "seq": 169, "type": "ration"}
+{"balance": 5, "delta": 1, "detail": "LuckyLantern", "night": 3, "player": "HollowTin", "reason": "gift_in", "seq": 170, "type": "ration"}
+{"investigator": "SoggyBiscuit", "night": 3, "saw_action": "scavenge", "saw_target": null, "seq": 171, "target": "QuietBadger", "type": "investigate", "visibility": "private"}
+{"balance": 4, "delta": -1, "night": 3, "player": "VelvetMole", "reason": "eat", "seq": 172, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 3, "player": "MissingSock", "reason": "eat", "seq": 173, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 3, "player": "NightOwl", "reason": "eat", "seq": 174, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 3, "player": "QuietBadger", "reason": "eat", "seq": 175, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 3, "player": "LuckyLantern", "reason": "eat", "seq": 176, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 3, "player": "GrumpyGecko", "reason": "eat", "seq": 177, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 3, "player": "HollowTin", "reason": "eat", "seq": 178, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 3, "player": "SoggyBiscuit", "reason": "eat", "seq": 179, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 3, "player": "LooseCannon", "reason": "eat", "seq": 180, "type": "ration"}
+{"balance": 10, "delta": -1, "night": 3, "player": "WobblyTable", "reason": "eat", "seq": 181, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 3, "player": "BurntToast", "reason": "eat", "seq": 182, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 3, "player": "IronSpatula", "reason": "eat", "seq": 183, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 3, "player": "SaltyPretzel", "reason": "eat", "seq": 184, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 3, "player": "LazyRiver", "reason": "eat", "seq": 185, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 3, "player": "SilentGoose", "reason": "eat", "seq": 186, "type": "ration"}
+{"channel": "#news", "lines": ["Someone hit GrumpyGecko overnight. GrumpyGecko is down 2.", "Someone hit NightOwl overnight. NightOwl is down 2."], "night": 3, "seq": 187, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"SoggyBiscuit": 3, "VelvetMole": 4}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 0, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 1, "SilentGoose": 0, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 3, "rations": {"BurntToast": 6, "GrumpyGecko": 4, "HollowTin": 4, "IronSpatula": 7, "LazyRiver": 8, "LooseCannon": 8, "LuckyLantern": 4, "MissingSock": 6, "NightOwl": 6, "QuietBadger": 6, "SaltyPretzel": 5, "SilentGoose": 6, "SoggyBiscuit": 2, "VelvetMole": 4, "WobblyTable": 10}, "seq": 188, "type": "night_end"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "VelvetMole", "rations_before": 4, "seq": 189, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "MissingSock", "rations_before": 6, "seq": 190, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "NightOwl", "rations_before": 6, "seq": 191, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "QuietBadger", "rations_before": 6, "seq": 192, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "LuckyLantern", "rations_before": 4, "seq": 193, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "GrumpyGecko", "rations_before": 4, "seq": 194, "target": "LazyRiver", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "HollowTin", "rations_before": 4, "seq": 195, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "SoggyBiscuit", "rations_before": 2, "seq": 196, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "LooseCannon", "rations_before": 8, "seq": 197, "target": "MissingSock", "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "WobblyTable", "rations_before": 10, "seq": 198, "target": "VelvetMole", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "BurntToast", "rations_before": 6, "seq": 199, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "IronSpatula", "rations_before": 7, "seq": 200, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "guard", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "SaltyPretzel", "rations_before": 5, "seq": 201, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "LazyRiver", "rations_before": 8, "seq": 202, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "guard", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 4, "odds": null, "player": "SilentGoose", "rations_before": 6, "seq": 203, "target": null, "type": "action", "visibility": "private", "why": null}
+{"guards_used": 2, "night": 4, "player": "SaltyPretzel", "seq": 204, "type": "guard_up", "until_night": 5, "visibility": "private"}
+{"guards_used": 1, "night": 4, "player": "SilentGoose", "seq": 205, "type": "guard_up", "until_night": 5, "visibility": "private"}
+{"balance": 8, "delta": -2, "detail": "VelvetMole", "night": 4, "player": "WobblyTable", "reason": "caught_penalty", "seq": 206, "type": "ration"}
+{"balance": 6, "delta": 2, "detail": "WobblyTable", "night": 4, "player": "VelvetMole", "reason": "guard_reward", "seq": 207, "type": "ration"}
+{"amount": 0, "night": 4, "outcome": "caught", "paid": 2, "seq": 208, "target": "VelvetMole", "thief": "WobblyTable", "type": "steal", "visibility": "public"}
+{"balance": 6, "delta": -2, "detail": "GrumpyGecko", "night": 4, "player": "LazyRiver", "reason": "robbed", "seq": 209, "type": "ration"}
+{"balance": 6, "delta": 2, "detail": "LazyRiver", "night": 4, "player": "GrumpyGecko", "reason": "stole", "seq": 210, "type": "ration"}
+{"amount": 2, "night": 4, "outcome": "success", "seq": 211, "split_with": 0, "target": "LazyRiver", "thief": "GrumpyGecko", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"balance": 4, "delta": -2, "detail": "LooseCannon", "night": 4, "player": "MissingSock", "reason": "robbed", "seq": 212, "type": "ration"}
+{"balance": 10, "delta": 2, "detail": "MissingSock", "night": 4, "player": "LooseCannon", "reason": "stole", "seq": 213, "type": "ration"}
+{"amount": 2, "night": 4, "outcome": "success", "seq": 214, "split_with": 0, "target": "MissingSock", "thief": "LooseCannon", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 2, "night": 4, "player": "VelvetMole", "seq": 215, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "", "night": 4, "player": "VelvetMole", "reason": "scavenge", "seq": 216, "type": "ration"}
+{"auto": false, "found": 0, "night": 4, "player": "MissingSock", "seq": 217, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 1, "night": 4, "player": "NightOwl", "seq": 218, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "auto", "night": 4, "player": "NightOwl", "reason": "scavenge", "seq": 219, "type": "ration"}
+{"auto": false, "found": 0, "night": 4, "player": "QuietBadger", "seq": 220, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 1, "night": 4, "player": "LuckyLantern", "seq": 221, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 1, "detail": "auto", "night": 4, "player": "LuckyLantern", "reason": "scavenge", "seq": 222, "type": "ration"}
+{"auto": false, "found": 0, "night": 4, "player": "HollowTin", "seq": 223, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 4, "player": "SoggyBiscuit", "seq": 224, "type": "scavenge", "visibility": "private"}
+{"balance": 4, "delta": 2, "detail": "", "night": 4, "player": "SoggyBiscuit", "reason": "scavenge", "seq": 225, "type": "ration"}
+{"auto": true, "found": 2, "night": 4, "player": "BurntToast", "seq": 226, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "auto", "night": 4, "player": "BurntToast", "reason": "scavenge", "seq": 227, "type": "ration"}
+{"auto": false, "found": 0, "night": 4, "player": "IronSpatula", "seq": 228, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 1, "night": 4, "player": "LazyRiver", "seq": 229, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "auto", "night": 4, "player": "LazyRiver", "reason": "scavenge", "seq": 230, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 4, "player": "VelvetMole", "reason": "eat", "seq": 231, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 4, "player": "MissingSock", "reason": "eat", "seq": 232, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 4, "player": "NightOwl", "reason": "eat", "seq": 233, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 4, "player": "QuietBadger", "reason": "eat", "seq": 234, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 4, "player": "LuckyLantern", "reason": "eat", "seq": 235, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 4, "player": "GrumpyGecko", "reason": "eat", "seq": 236, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 4, "player": "HollowTin", "reason": "eat", "seq": 237, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 4, "player": "SoggyBiscuit", "reason": "eat", "seq": 238, "type": "ration"}
+{"balance": 9, "delta": -1, "night": 4, "player": "LooseCannon", "reason": "eat", "seq": 239, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 4, "player": "WobblyTable", "reason": "eat", "seq": 240, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 4, "player": "BurntToast", "reason": "eat", "seq": 241, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 4, "player": "IronSpatula", "reason": "eat", "seq": 242, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 4, "player": "SaltyPretzel", "reason": "eat", "seq": 243, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 4, "player": "LazyRiver", "reason": "eat", "seq": 244, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 4, "player": "SilentGoose", "reason": "eat", "seq": 245, "type": "ration"}
+{"channel": "#news", "lines": ["CAUGHT: VelvetMole was guarding and caught WobblyTable red-handed. WobblyTable pays VelvetMole 2.", "Someone hit LazyRiver overnight. LazyRiver is down 2.", "Someone hit MissingSock overnight. MissingSock is down 2."], "night": 4, "seq": 246, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"SaltyPretzel": 5, "SilentGoose": 5, "VelvetMole": 4}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 0, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 2, "SilentGoose": 1, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 4, "rations": {"BurntToast": 7, "GrumpyGecko": 5, "HollowTin": 3, "IronSpatula": 6, "LazyRiver": 6, "LooseCannon": 9, "LuckyLantern": 4, "MissingSock": 3, "NightOwl": 6, "QuietBadger": 5, "SaltyPretzel": 4, "SilentGoose": 5, "SoggyBiscuit": 3, "VelvetMole": 7, "WobblyTable": 7}, "seq": 247, "type": "night_end"}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "VelvetMole", "rations_before": 7, "seq": 248, "target": "LuckyLantern", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "MissingSock", "rations_before": 3, "seq": 249, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "NightOwl", "rations_before": 6, "seq": 250, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "QuietBadger", "rations_before": 5, "seq": 251, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "LuckyLantern", "rations_before": 4, "seq": 252, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "GrumpyGecko", "rations_before": 5, "seq": 253, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "HollowTin", "rations_before": 3, "seq": 254, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "SoggyBiscuit", "rations_before": 3, "seq": 255, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "LooseCannon", "rations_before": 9, "seq": 256, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "WobblyTable", "rations_before": 7, "seq": 257, "target": "IronSpatula", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "BurntToast", "rations_before": 7, "seq": 258, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "IronSpatula", "rations_before": 6, "seq": 259, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "SaltyPretzel", "rations_before": 4, "seq": 260, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "LazyRiver", "rations_before": 6, "seq": 261, "target": "QuietBadger", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 5, "odds": null, "player": "SilentGoose", "rations_before": 5, "seq": 262, "target": null, "type": "action", "visibility": "private", "why": null}
+{"balance": 2, "delta": -2, "detail": "VelvetMole", "night": 5, "player": "LuckyLantern", "reason": "robbed", "seq": 263, "type": "ration"}
+{"balance": 9, "delta": 2, "detail": "LuckyLantern", "night": 5, "player": "VelvetMole", "reason": "stole", "seq": 264, "type": "ration"}
+{"amount": 2, "night": 5, "outcome": "success", "seq": 265, "split_with": 0, "target": "LuckyLantern", "thief": "VelvetMole", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"balance": 4, "delta": -2, "detail": "WobblyTable", "night": 5, "player": "IronSpatula", "reason": "robbed", "seq": 266, "type": "ration"}
+{"balance": 9, "delta": 2, "detail": "IronSpatula", "night": 5, "player": "WobblyTable", "reason": "stole", "seq": 267, "type": "ration"}
+{"amount": 2, "night": 5, "outcome": "success", "seq": 268, "split_with": 0, "target": "IronSpatula", "thief": "WobblyTable", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"balance": 3, "delta": -2, "detail": "LazyRiver", "night": 5, "player": "QuietBadger", "reason": "robbed", "seq": 269, "type": "ration"}
+{"balance": 8, "delta": 2, "detail": "QuietBadger", "night": 5, "player": "LazyRiver", "reason": "stole", "seq": 270, "type": "ration"}
+{"amount": 2, "night": 5, "outcome": "success", "seq": 271, "split_with": 0, "target": "QuietBadger", "thief": "LazyRiver", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 0, "night": 5, "player": "MissingSock", "seq": 272, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 5, "player": "NightOwl", "seq": 273, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 5, "player": "LuckyLantern", "seq": 274, "type": "scavenge", "visibility": "private"}
+{"balance": 4, "delta": 2, "detail": "", "night": 5, "player": "LuckyLantern", "reason": "scavenge", "seq": 275, "type": "ration"}
+{"auto": false, "found": 1, "night": 5, "player": "GrumpyGecko", "seq": 276, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 1, "detail": "", "night": 5, "player": "GrumpyGecko", "reason": "scavenge", "seq": 277, "type": "ration"}
+{"auto": false, "found": 2, "night": 5, "player": "SoggyBiscuit", "seq": 278, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 2, "detail": "", "night": 5, "player": "SoggyBiscuit", "reason": "scavenge", "seq": 279, "type": "ration"}
+{"auto": true, "found": 1, "night": 5, "player": "LooseCannon", "seq": 280, "type": "scavenge", "visibility": "private"}
+{"balance": 10, "delta": 1, "detail": "auto", "night": 5, "player": "LooseCannon", "reason": "scavenge", "seq": 281, "type": "ration"}
+{"auto": false, "found": 0, "night": 5, "player": "BurntToast", "seq": 282, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 5, "player": "IronSpatula", "seq": 283, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 5, "player": "SaltyPretzel", "seq": 284, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 5, "player": "SilentGoose", "seq": 285, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 2, "detail": "", "night": 5, "player": "SilentGoose", "reason": "scavenge", "seq": 286, "type": "ration"}
+{"investigator": "QuietBadger", "night": 5, "saw_action": "steal", "saw_target": "IronSpatula", "seq": 287, "target": "WobblyTable", "type": "investigate", "visibility": "private"}
+{"investigator": "QuietBadger", "night": 5, "paid": 1, "seq": 288, "thief": "WobblyTable", "type": "exposed", "victim": "IronSpatula", "visibility": "public_without_investigator"}
+{"balance": 8, "delta": -1, "detail": "QuietBadger", "night": 5, "player": "WobblyTable", "reason": "bounty_paid", "seq": 289, "type": "ration"}
+{"balance": 4, "delta": 1, "detail": "WobblyTable", "night": 5, "player": "QuietBadger", "reason": "bounty_received", "seq": 290, "type": "ration"}
+{"investigator": "HollowTin", "night": 5, "saw_action": "steal", "saw_target": "IronSpatula", "seq": 291, "target": "WobblyTable", "type": "investigate", "visibility": "private"}
+{"investigator": "HollowTin", "night": 5, "paid": 1, "seq": 292, "thief": "WobblyTable", "type": "exposed", "victim": "IronSpatula", "visibility": "public_without_investigator"}
+{"balance": 7, "delta": -1, "detail": "HollowTin", "night": 5, "player": "WobblyTable", "reason": "bounty_paid", "seq": 293, "type": "ration"}
+{"balance": 4, "delta": 1, "detail": "WobblyTable", "night": 5, "player": "HollowTin", "reason": "bounty_received", "seq": 294, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 5, "player": "VelvetMole", "reason": "eat", "seq": 295, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 5, "player": "MissingSock", "reason": "eat", "seq": 296, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 5, "player": "NightOwl", "reason": "eat", "seq": 297, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 5, "player": "QuietBadger", "reason": "eat", "seq": 298, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 5, "player": "LuckyLantern", "reason": "eat", "seq": 299, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 5, "player": "GrumpyGecko", "reason": "eat", "seq": 300, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 5, "player": "HollowTin", "reason": "eat", "seq": 301, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 5, "player": "SoggyBiscuit", "reason": "eat", "seq": 302, "type": "ration"}
+{"balance": 9, "delta": -1, "night": 5, "player": "LooseCannon", "reason": "eat", "seq": 303, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 5, "player": "WobblyTable", "reason": "eat", "seq": 304, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 5, "player": "BurntToast", "reason": "eat", "seq": 305, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 5, "player": "IronSpatula", "reason": "eat", "seq": 306, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 5, "player": "SaltyPretzel", "reason": "eat", "seq": 307, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 5, "player": "LazyRiver", "reason": "eat", "seq": 308, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 5, "player": "SilentGoose", "reason": "eat", "seq": 309, "type": "ration"}
+{"channel": "#news", "lines": ["Someone hit LuckyLantern overnight. LuckyLantern is down 2.", "Someone hit IronSpatula overnight. IronSpatula is down 2.", "Someone hit QuietBadger overnight. QuietBadger is down 2.", "EXPOSED: an investigator saw WobblyTable rob IronSpatula. WobblyTable pays them 1.", "EXPOSED: an investigator saw WobblyTable rob IronSpatula. WobblyTable pays them 1."], "night": 5, "seq": 310, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"SaltyPretzel": 5, "SilentGoose": 5}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 0, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 2, "SilentGoose": 1, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 5, "rations": {"BurntToast": 6, "GrumpyGecko": 5, "HollowTin": 3, "IronSpatula": 3, "LazyRiver": 7, "LooseCannon": 9, "LuckyLantern": 3, "MissingSock": 2, "NightOwl": 5, "QuietBadger": 3, "SaltyPretzel": 3, "SilentGoose": 6, "SoggyBiscuit": 4, "VelvetMole": 8, "WobblyTable": 6}, "seq": 311, "type": "night_end"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "VelvetMole", "rations_before": 8, "seq": 312, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "guard", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "MissingSock", "rations_before": 2, "seq": 313, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "NightOwl", "rations_before": 5, "seq": 314, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "QuietBadger", "rations_before": 3, "seq": 315, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "LuckyLantern", "rations_before": 3, "seq": 316, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "GrumpyGecko", "rations_before": 5, "seq": 317, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "HollowTin", "rations_before": 3, "seq": 318, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "SoggyBiscuit", "rations_before": 4, "seq": 319, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "LooseCannon", "rations_before": 9, "seq": 320, "target": "BurntToast", "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "WobblyTable", "rations_before": 6, "seq": 321, "target": "MissingSock", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "BurntToast", "rations_before": 6, "seq": 322, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "IronSpatula", "rations_before": 3, "seq": 323, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "SaltyPretzel", "rations_before": 3, "seq": 324, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "LazyRiver", "rations_before": 7, "seq": 325, "target": "LooseCannon", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 6, "odds": null, "player": "SilentGoose", "rations_before": 6, "seq": 326, "target": null, "type": "action", "visibility": "private", "why": null}
+{"guards_used": 1, "night": 6, "player": "MissingSock", "seq": 327, "type": "guard_up", "until_night": 7, "visibility": "private"}
+{"balance": 4, "delta": -2, "detail": "MissingSock", "night": 6, "player": "WobblyTable", "reason": "caught_penalty", "seq": 328, "type": "ration"}
+{"balance": 4, "delta": 2, "detail": "WobblyTable", "night": 6, "player": "MissingSock", "reason": "guard_reward", "seq": 329, "type": "ration"}
+{"amount": 0, "night": 6, "outcome": "caught", "paid": 2, "seq": 330, "target": "MissingSock", "thief": "WobblyTable", "type": "steal", "visibility": "public"}
+{"balance": 4, "delta": -2, "detail": "LooseCannon", "night": 6, "player": "BurntToast", "reason": "robbed", "seq": 331, "type": "ration"}
+{"balance": 11, "delta": 2, "detail": "BurntToast", "night": 6, "player": "LooseCannon", "reason": "stole", "seq": 332, "type": "ration"}
+{"amount": 2, "night": 6, "outcome": "success", "seq": 333, "split_with": 0, "target": "BurntToast", "thief": "LooseCannon", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"balance": 9, "delta": -2, "detail": "LazyRiver", "night": 6, "player": "LooseCannon", "reason": "robbed", "seq": 334, "type": "ration"}
+{"balance": 9, "delta": 2, "detail": "LooseCannon", "night": 6, "player": "LazyRiver", "reason": "stole", "seq": 335, "type": "ration"}
+{"amount": 2, "night": 6, "outcome": "success", "seq": 336, "split_with": 0, "target": "LooseCannon", "thief": "LazyRiver", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 1, "night": 6, "player": "VelvetMole", "seq": 337, "type": "scavenge", "visibility": "private"}
+{"balance": 9, "delta": 1, "detail": "", "night": 6, "player": "VelvetMole", "reason": "scavenge", "seq": 338, "type": "ration"}
+{"auto": false, "found": 2, "night": 6, "player": "NightOwl", "seq": 339, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 2, "detail": "", "night": 6, "player": "NightOwl", "reason": "scavenge", "seq": 340, "type": "ration"}
+{"auto": false, "found": 2, "night": 6, "player": "QuietBadger", "seq": 341, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 2, "detail": "", "night": 6, "player": "QuietBadger", "reason": "scavenge", "seq": 342, "type": "ration"}
+{"auto": false, "found": 0, "night": 6, "player": "LuckyLantern", "seq": 343, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 6, "player": "GrumpyGecko", "seq": 344, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 2, "detail": "", "night": 6, "player": "GrumpyGecko", "reason": "scavenge", "seq": 345, "type": "ration"}
+{"auto": false, "found": 2, "night": 6, "player": "SoggyBiscuit", "seq": 346, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 2, "detail": "", "night": 6, "player": "SoggyBiscuit", "reason": "scavenge", "seq": 347, "type": "ration"}
+{"auto": true, "found": 1, "night": 6, "player": "BurntToast", "seq": 348, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 1, "detail": "auto", "night": 6, "player": "BurntToast", "reason": "scavenge", "seq": 349, "type": "ration"}
+{"auto": false, "found": 2, "night": 6, "player": "IronSpatula", "seq": 350, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 2, "detail": "", "night": 6, "player": "IronSpatula", "reason": "scavenge", "seq": 351, "type": "ration"}
+{"auto": false, "found": 0, "night": 6, "player": "SaltyPretzel", "seq": 352, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 6, "player": "SilentGoose", "seq": 353, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "", "night": 6, "player": "SilentGoose", "reason": "scavenge", "seq": 354, "type": "ration"}
+{"investigator": "HollowTin", "night": 6, "saw_action": "steal", "saw_target": "MissingSock", "seq": 355, "target": "WobblyTable", "type": "investigate", "visibility": "private"}
+{"investigator": "HollowTin", "night": 6, "paid": 1, "seq": 356, "thief": "WobblyTable", "type": "exposed", "victim": "MissingSock", "visibility": "public_without_investigator"}
+{"balance": 3, "delta": -1, "detail": "HollowTin", "night": 6, "player": "WobblyTable", "reason": "bounty_paid", "seq": 357, "type": "ration"}
+{"balance": 4, "delta": 1, "detail": "WobblyTable", "night": 6, "player": "HollowTin", "reason": "bounty_received", "seq": 358, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 6, "player": "VelvetMole", "reason": "eat", "seq": 359, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 6, "player": "MissingSock", "reason": "eat", "seq": 360, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 6, "player": "NightOwl", "reason": "eat", "seq": 361, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 6, "player": "QuietBadger", "reason": "eat", "seq": 362, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 6, "player": "LuckyLantern", "reason": "eat", "seq": 363, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 6, "player": "GrumpyGecko", "reason": "eat", "seq": 364, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 6, "player": "HollowTin", "reason": "eat", "seq": 365, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 6, "player": "SoggyBiscuit", "reason": "eat", "seq": 366, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 6, "player": "LooseCannon", "reason": "eat", "seq": 367, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 6, "player": "WobblyTable", "reason": "eat", "seq": 368, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 6, "player": "BurntToast", "reason": "eat", "seq": 369, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 6, "player": "IronSpatula", "reason": "eat", "seq": 370, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 6, "player": "SaltyPretzel", "reason": "eat", "seq": 371, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 6, "player": "LazyRiver", "reason": "eat", "seq": 372, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 6, "player": "SilentGoose", "reason": "eat", "seq": 373, "type": "ration"}
+{"author": "WobblyTable", "kind": "rumour", "night": 6, "seq": 374, "text": "\"Just saying: SilentGoose has been very quiet. Too quiet.\"", "true": false, "type": "radio", "visibility": "public_anonymous"}
+{"channel": "#news", "lines": ["CAUGHT: MissingSock was guarding and caught WobblyTable red-handed. WobblyTable pays MissingSock 2.", "Someone hit BurntToast overnight. BurntToast is down 2.", "Someone hit LooseCannon overnight. LooseCannon is down 2.", "EXPOSED: an investigator saw WobblyTable rob MissingSock. WobblyTable pays them 1."], "night": 6, "seq": 375, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"MissingSock": 7}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 1, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 2, "SilentGoose": 1, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 6, "rations": {"BurntToast": 4, "GrumpyGecko": 6, "HollowTin": 3, "IronSpatula": 4, "LazyRiver": 8, "LooseCannon": 8, "LuckyLantern": 2, "MissingSock": 3, "NightOwl": 6, "QuietBadger": 4, "SaltyPretzel": 2, "SilentGoose": 6, "SoggyBiscuit": 5, "VelvetMole": 8, "WobblyTable": 2}, "seq": 376, "type": "night_end"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "VelvetMole", "rations_before": 8, "seq": 377, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "MissingSock", "rations_before": 3, "seq": 378, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "NightOwl", "rations_before": 6, "seq": 379, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "QuietBadger", "rations_before": 4, "seq": 380, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "LuckyLantern", "rations_before": 2, "seq": 381, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "gift", "amount": 1, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "GrumpyGecko", "rations_before": 6, "seq": 382, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "HollowTin", "rations_before": 3, "seq": 383, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "SoggyBiscuit", "rations_before": 5, "seq": 384, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "LooseCannon", "rations_before": 8, "seq": 385, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "WobblyTable", "rations_before": 2, "seq": 386, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "BurntToast", "rations_before": 4, "seq": 387, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "IronSpatula", "rations_before": 4, "seq": 388, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "guard", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "SaltyPretzel", "rations_before": 2, "seq": 389, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "LazyRiver", "rations_before": 8, "seq": 390, "target": "VelvetMole", "type": "action", "visibility": "private", "why": null}
+{"action": "gift", "amount": 1, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 7, "odds": null, "player": "SilentGoose", "rations_before": 6, "seq": 391, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"guards_used": 3, "night": 7, "player": "SaltyPretzel", "seq": 392, "type": "guard_up", "until_night": 8, "visibility": "private"}
+{"balance": 6, "delta": -2, "detail": "LazyRiver", "night": 7, "player": "VelvetMole", "reason": "robbed", "seq": 393, "type": "ration"}
+{"balance": 10, "delta": 2, "detail": "VelvetMole", "night": 7, "player": "LazyRiver", "reason": "stole", "seq": 394, "type": "ration"}
+{"amount": 2, "night": 7, "outcome": "success", "seq": 395, "split_with": 0, "target": "VelvetMole", "thief": "LazyRiver", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 2, "night": 7, "player": "VelvetMole", "seq": 396, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "", "night": 7, "player": "VelvetMole", "reason": "scavenge", "seq": 397, "type": "ration"}
+{"auto": false, "found": 0, "night": 7, "player": "MissingSock", "seq": 398, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 7, "player": "NightOwl", "seq": 399, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "", "night": 7, "player": "NightOwl", "reason": "scavenge", "seq": 400, "type": "ration"}
+{"auto": false, "found": 1, "night": 7, "player": "LuckyLantern", "seq": 401, "type": "scavenge", "visibility": "private"}
+{"balance": 3, "delta": 1, "detail": "", "night": 7, "player": "LuckyLantern", "reason": "scavenge", "seq": 402, "type": "ration"}
+{"auto": false, "found": 0, "night": 7, "player": "SoggyBiscuit", "seq": 403, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 7, "player": "LooseCannon", "seq": 404, "type": "scavenge", "visibility": "private"}
+{"balance": 9, "delta": 1, "detail": "", "night": 7, "player": "LooseCannon", "reason": "scavenge", "seq": 405, "type": "ration"}
+{"auto": false, "found": 2, "night": 7, "player": "WobblyTable", "seq": 406, "type": "scavenge", "visibility": "private"}
+{"balance": 4, "delta": 2, "detail": "", "night": 7, "player": "WobblyTable", "reason": "scavenge", "seq": 407, "type": "ration"}
+{"auto": true, "found": 2, "night": 7, "player": "BurntToast", "seq": 408, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 2, "detail": "auto", "night": 7, "player": "BurntToast", "reason": "scavenge", "seq": 409, "type": "ration"}
+{"auto": false, "found": 2, "night": 7, "player": "IronSpatula", "seq": 410, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 2, "detail": "", "night": 7, "player": "IronSpatula", "reason": "scavenge", "seq": 411, "type": "ration"}
+{"amount": 1, "giver": "GrumpyGecko", "night": 7, "receiver": "WobblyTable", "seq": 412, "type": "gift", "visibility": "giver_and_receiver"}
+{"balance": 5, "delta": -1, "detail": "WobblyTable", "night": 7, "player": "GrumpyGecko", "reason": "gift_out", "seq": 413, "type": "ration"}
+{"balance": 5, "delta": 1, "detail": "GrumpyGecko", "night": 7, "player": "WobblyTable", "reason": "gift_in", "seq": 414, "type": "ration"}
+{"amount": 1, "giver": "SilentGoose", "night": 7, "receiver": "WobblyTable", "seq": 415, "type": "gift", "visibility": "giver_and_receiver"}
+{"balance": 5, "delta": -1, "detail": "WobblyTable", "night": 7, "player": "SilentGoose", "reason": "gift_out", "seq": 416, "type": "ration"}
+{"balance": 6, "delta": 1, "detail": "SilentGoose", "night": 7, "player": "WobblyTable", "reason": "gift_in", "seq": 417, "type": "ration"}
+{"investigator": "QuietBadger", "night": 7, "saw_action": "scavenge", "saw_target": null, "seq": 418, "target": "WobblyTable", "type": "investigate", "visibility": "private"}
+{"investigator": "HollowTin", "night": 7, "saw_action": "scavenge", "saw_target": null, "seq": 419, "target": "WobblyTable", "type": "investigate", "visibility": "private"}
+{"balance": 7, "delta": -1, "night": 7, "player": "VelvetMole", "reason": "eat", "seq": 420, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 7, "player": "MissingSock", "reason": "eat", "seq": 421, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 7, "player": "NightOwl", "reason": "eat", "seq": 422, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 7, "player": "QuietBadger", "reason": "eat", "seq": 423, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 7, "player": "LuckyLantern", "reason": "eat", "seq": 424, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 7, "player": "GrumpyGecko", "reason": "eat", "seq": 425, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 7, "player": "HollowTin", "reason": "eat", "seq": 426, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 7, "player": "SoggyBiscuit", "reason": "eat", "seq": 427, "type": "ration"}
+{"balance": 8, "delta": -1, "night": 7, "player": "LooseCannon", "reason": "eat", "seq": 428, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 7, "player": "WobblyTable", "reason": "eat", "seq": 429, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 7, "player": "BurntToast", "reason": "eat", "seq": 430, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 7, "player": "IronSpatula", "reason": "eat", "seq": 431, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 7, "player": "SaltyPretzel", "reason": "eat", "seq": 432, "type": "ration"}
+{"balance": 9, "delta": -1, "night": 7, "player": "LazyRiver", "reason": "eat", "seq": 433, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 7, "player": "SilentGoose", "reason": "eat", "seq": 434, "type": "ration"}
+{"channel": "#news", "lines": ["Someone hit VelvetMole overnight. VelvetMole is down 2."], "night": 7, "seq": 435, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"MissingSock": 7, "SaltyPretzel": 8}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 1, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 3, "SilentGoose": 1, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 7, "rations": {"BurntToast": 5, "GrumpyGecko": 4, "HollowTin": 2, "IronSpatula": 5, "LazyRiver": 9, "LooseCannon": 8, "LuckyLantern": 2, "MissingSock": 2, "NightOwl": 7, "QuietBadger": 3, "SaltyPretzel": 1, "SilentGoose": 4, "SoggyBiscuit": 4, "VelvetMole": 7, "WobblyTable": 5}, "seq": 436, "type": "night_end"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "VelvetMole", "rations_before": 7, "seq": 437, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "MissingSock", "rations_before": 2, "seq": 438, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "NightOwl", "rations_before": 7, "seq": 439, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "QuietBadger", "rations_before": 3, "seq": 440, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "LuckyLantern", "rations_before": 2, "seq": 441, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "GrumpyGecko", "rations_before": 4, "seq": 442, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "HollowTin", "rations_before": 2, "seq": 443, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "SoggyBiscuit", "rations_before": 4, "seq": 444, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "LooseCannon", "rations_before": 8, "seq": 445, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "WobblyTable", "rations_before": 5, "seq": 446, "target": "SilentGoose", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "BurntToast", "rations_before": 5, "seq": 447, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "IronSpatula", "rations_before": 5, "seq": 448, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "SaltyPretzel", "rations_before": 1, "seq": 449, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "LazyRiver", "rations_before": 9, "seq": 450, "target": "SaltyPretzel", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 8, "odds": null, "player": "SilentGoose", "rations_before": 4, "seq": 451, "target": null, "type": "action", "visibility": "private", "why": null}
+{"balance": 7, "delta": -2, "detail": "SaltyPretzel", "night": 8, "player": "LazyRiver", "reason": "caught_penalty", "seq": 452, "type": "ration"}
+{"balance": 3, "delta": 2, "detail": "LazyRiver", "night": 8, "player": "SaltyPretzel", "reason": "guard_reward", "seq": 453, "type": "ration"}
+{"amount": 0, "night": 8, "outcome": "caught", "paid": 2, "seq": 454, "target": "SaltyPretzel", "thief": "LazyRiver", "type": "steal", "visibility": "public"}
+{"balance": 2, "delta": -2, "detail": "WobblyTable", "night": 8, "player": "SilentGoose", "reason": "robbed", "seq": 455, "type": "ration"}
+{"balance": 7, "delta": 2, "detail": "SilentGoose", "night": 8, "player": "WobblyTable", "reason": "stole", "seq": 456, "type": "ration"}
+{"amount": 2, "night": 8, "outcome": "success", "seq": 457, "split_with": 0, "target": "SilentGoose", "thief": "WobblyTable", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 0, "night": 8, "player": "VelvetMole", "seq": 458, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 0, "night": 8, "player": "MissingSock", "seq": 459, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 1, "night": 8, "player": "NightOwl", "seq": 460, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 1, "detail": "auto", "night": 8, "player": "NightOwl", "reason": "scavenge", "seq": 461, "type": "ration"}
+{"auto": false, "found": 2, "night": 8, "player": "QuietBadger", "seq": 462, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 2, "detail": "", "night": 8, "player": "QuietBadger", "reason": "scavenge", "seq": 463, "type": "ration"}
+{"auto": false, "found": 0, "night": 8, "player": "LuckyLantern", "seq": 464, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 8, "player": "GrumpyGecko", "seq": 465, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 8, "player": "HollowTin", "seq": 466, "type": "scavenge", "visibility": "private"}
+{"balance": 3, "delta": 1, "detail": "", "night": 8, "player": "HollowTin", "reason": "scavenge", "seq": 467, "type": "ration"}
+{"auto": true, "found": 2, "night": 8, "player": "SoggyBiscuit", "seq": 468, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 2, "detail": "auto", "night": 8, "player": "SoggyBiscuit", "reason": "scavenge", "seq": 469, "type": "ration"}
+{"auto": false, "found": 0, "night": 8, "player": "LooseCannon", "seq": 470, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 8, "player": "BurntToast", "seq": 471, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 1, "detail": "", "night": 8, "player": "BurntToast", "reason": "scavenge", "seq": 472, "type": "ration"}
+{"auto": false, "found": 2, "night": 8, "player": "IronSpatula", "seq": 473, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 2, "detail": "", "night": 8, "player": "IronSpatula", "reason": "scavenge", "seq": 474, "type": "ration"}
+{"auto": false, "found": 0, "night": 8, "player": "SaltyPretzel", "seq": 475, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 8, "player": "SilentGoose", "seq": 476, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": -1, "night": 8, "player": "VelvetMole", "reason": "eat", "seq": 477, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 8, "player": "MissingSock", "reason": "eat", "seq": 478, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 8, "player": "NightOwl", "reason": "eat", "seq": 479, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 8, "player": "QuietBadger", "reason": "eat", "seq": 480, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 8, "player": "LuckyLantern", "reason": "eat", "seq": 481, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 8, "player": "GrumpyGecko", "reason": "eat", "seq": 482, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 8, "player": "HollowTin", "reason": "eat", "seq": 483, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 8, "player": "SoggyBiscuit", "reason": "eat", "seq": 484, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 8, "player": "LooseCannon", "reason": "eat", "seq": 485, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 8, "player": "WobblyTable", "reason": "eat", "seq": 486, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 8, "player": "BurntToast", "reason": "eat", "seq": 487, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 8, "player": "IronSpatula", "reason": "eat", "seq": 488, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 8, "player": "SaltyPretzel", "reason": "eat", "seq": 489, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 8, "player": "LazyRiver", "reason": "eat", "seq": 490, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 8, "player": "SilentGoose", "reason": "eat", "seq": 491, "type": "ration"}
+{"author": "WobblyTable", "kind": "rumour", "night": 8, "seq": 492, "text": "\"Just saying: VelvetMole has been very quiet. Too quiet.\"", "true": false, "type": "radio", "visibility": "public_anonymous"}
+{"channel": "#news", "lines": ["CAUGHT: SaltyPretzel was guarding and caught LazyRiver red-handed. LazyRiver pays SaltyPretzel 2.", "Someone hit SilentGoose overnight. SilentGoose is down 2."], "night": 8, "seq": 493, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {"SaltyPretzel": 8}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 1, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 3, "SilentGoose": 1, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 8, "rations": {"BurntToast": 5, "GrumpyGecko": 3, "HollowTin": 2, "IronSpatula": 6, "LazyRiver": 6, "LooseCannon": 7, "LuckyLantern": 1, "MissingSock": 1, "NightOwl": 7, "QuietBadger": 4, "SaltyPretzel": 2, "SilentGoose": 1, "SoggyBiscuit": 5, "VelvetMole": 6, "WobblyTable": 6}, "seq": 494, "type": "night_end"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "VelvetMole", "rations_before": 6, "seq": 495, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "MissingSock", "rations_before": 1, "seq": 496, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "NightOwl", "rations_before": 7, "seq": 497, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "QuietBadger", "rations_before": 4, "seq": 498, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "LuckyLantern", "rations_before": 1, "seq": 499, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "GrumpyGecko", "rations_before": 3, "seq": 500, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "HollowTin", "rations_before": 2, "seq": 501, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "SoggyBiscuit", "rations_before": 5, "seq": 502, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "LooseCannon", "rations_before": 7, "seq": 503, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "WobblyTable", "rations_before": 6, "seq": 504, "target": "IronSpatula", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "BurntToast", "rations_before": 5, "seq": 505, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "IronSpatula", "rations_before": 6, "seq": 506, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "SaltyPretzel", "rations_before": 2, "seq": 507, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "LazyRiver", "rations_before": 6, "seq": 508, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 9, "odds": null, "player": "SilentGoose", "rations_before": 1, "seq": 509, "target": null, "type": "action", "visibility": "private", "why": null}
+{"balance": 4, "delta": -2, "detail": "WobblyTable", "night": 9, "player": "IronSpatula", "reason": "robbed", "seq": 510, "type": "ration"}
+{"balance": 8, "delta": 2, "detail": "IronSpatula", "night": 9, "player": "WobblyTable", "reason": "stole", "seq": 511, "type": "ration"}
+{"amount": 2, "night": 9, "outcome": "success", "seq": 512, "split_with": 0, "target": "IronSpatula", "thief": "WobblyTable", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 1, "night": 9, "player": "VelvetMole", "seq": 513, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "", "night": 9, "player": "VelvetMole", "reason": "scavenge", "seq": 514, "type": "ration"}
+{"auto": false, "found": 1, "night": 9, "player": "MissingSock", "seq": 515, "type": "scavenge", "visibility": "private"}
+{"balance": 2, "delta": 1, "detail": "", "night": 9, "player": "MissingSock", "reason": "scavenge", "seq": 516, "type": "ration"}
+{"auto": true, "found": 0, "night": 9, "player": "NightOwl", "seq": 517, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 9, "player": "QuietBadger", "seq": 518, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 1, "night": 9, "player": "LuckyLantern", "seq": 519, "type": "scavenge", "visibility": "private"}
+{"balance": 2, "delta": 1, "detail": "auto", "night": 9, "player": "LuckyLantern", "reason": "scavenge", "seq": 520, "type": "ration"}
+{"auto": false, "found": 1, "night": 9, "player": "GrumpyGecko", "seq": 521, "type": "scavenge", "visibility": "private"}
+{"balance": 4, "delta": 1, "detail": "", "night": 9, "player": "GrumpyGecko", "reason": "scavenge", "seq": 522, "type": "ration"}
+{"auto": false, "found": 0, "night": 9, "player": "SoggyBiscuit", "seq": 523, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 9, "player": "LooseCannon", "seq": 524, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 9, "player": "BurntToast", "seq": 525, "type": "scavenge", "visibility": "private"}
+{"balance": 6, "delta": 1, "detail": "", "night": 9, "player": "BurntToast", "reason": "scavenge", "seq": 526, "type": "ration"}
+{"auto": false, "found": 1, "night": 9, "player": "IronSpatula", "seq": 527, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 1, "detail": "", "night": 9, "player": "IronSpatula", "reason": "scavenge", "seq": 528, "type": "ration"}
+{"auto": false, "found": 0, "night": 9, "player": "SaltyPretzel", "seq": 529, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 9, "player": "LazyRiver", "seq": 530, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 9, "player": "SilentGoose", "seq": 531, "type": "scavenge", "visibility": "private"}
+{"balance": 2, "delta": 1, "detail": "", "night": 9, "player": "SilentGoose", "reason": "scavenge", "seq": 532, "type": "ration"}
+{"investigator": "HollowTin", "night": 9, "saw_action": "steal", "saw_target": "IronSpatula", "seq": 533, "target": "WobblyTable", "type": "investigate", "visibility": "private"}
+{"investigator": "HollowTin", "night": 9, "paid": 1, "seq": 534, "thief": "WobblyTable", "type": "exposed", "victim": "IronSpatula", "visibility": "public_without_investigator"}
+{"balance": 7, "delta": -1, "detail": "HollowTin", "night": 9, "player": "WobblyTable", "reason": "bounty_paid", "seq": 535, "type": "ration"}
+{"balance": 3, "delta": 1, "detail": "WobblyTable", "night": 9, "player": "HollowTin", "reason": "bounty_received", "seq": 536, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 9, "player": "VelvetMole", "reason": "eat", "seq": 537, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 9, "player": "MissingSock", "reason": "eat", "seq": 538, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 9, "player": "NightOwl", "reason": "eat", "seq": 539, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 9, "player": "QuietBadger", "reason": "eat", "seq": 540, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 9, "player": "LuckyLantern", "reason": "eat", "seq": 541, "type": "ration"}
+{"balance": 3, "delta": -1, "night": 9, "player": "GrumpyGecko", "reason": "eat", "seq": 542, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 9, "player": "HollowTin", "reason": "eat", "seq": 543, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 9, "player": "SoggyBiscuit", "reason": "eat", "seq": 544, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 9, "player": "LooseCannon", "reason": "eat", "seq": 545, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 9, "player": "WobblyTable", "reason": "eat", "seq": 546, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 9, "player": "BurntToast", "reason": "eat", "seq": 547, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 9, "player": "IronSpatula", "reason": "eat", "seq": 548, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 9, "player": "SaltyPretzel", "reason": "eat", "seq": 549, "type": "ration"}
+{"balance": 5, "delta": -1, "night": 9, "player": "LazyRiver", "reason": "eat", "seq": 550, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 9, "player": "SilentGoose", "reason": "eat", "seq": 551, "type": "ration"}
+{"author": "WobblyTable", "kind": "rumour", "night": 9, "seq": 552, "text": "\"Just saying: VelvetMole has been very quiet. Too quiet.\"", "true": false, "type": "radio", "visibility": "public_anonymous"}
+{"channel": "#news", "lines": ["Someone hit IronSpatula overnight. IronSpatula is down 2.", "EXPOSED: an investigator saw WobblyTable rob IronSpatula. WobblyTable pays them 1."], "night": 9, "seq": 553, "type": "news_post", "visibility": "public"}
+{"bandits": [], "guarded_until": {}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 1, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 3, "SilentGoose": 1, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 9, "rations": {"BurntToast": 5, "GrumpyGecko": 3, "HollowTin": 2, "IronSpatula": 4, "LazyRiver": 5, "LooseCannon": 6, "LuckyLantern": 1, "MissingSock": 1, "NightOwl": 6, "QuietBadger": 3, "SaltyPretzel": 1, "SilentGoose": 1, "SoggyBiscuit": 4, "VelvetMole": 6, "WobblyTable": 6}, "seq": 554, "type": "night_end"}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "VelvetMole", "rations_before": 6, "seq": 555, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "MissingSock", "rations_before": 1, "seq": 556, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "NightOwl", "rations_before": 6, "seq": 557, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "QuietBadger", "rations_before": 3, "seq": 558, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "LuckyLantern", "rations_before": 1, "seq": 559, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "GrumpyGecko", "rations_before": 3, "seq": 560, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "investigate", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "HollowTin", "rations_before": 2, "seq": 561, "target": "WobblyTable", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "SoggyBiscuit", "rations_before": 4, "seq": 562, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "LooseCannon", "rations_before": 6, "seq": 563, "target": "SoggyBiscuit", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "WobblyTable", "rations_before": 6, "seq": 564, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "BurntToast", "rations_before": 5, "seq": 565, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "IronSpatula", "rations_before": 4, "seq": 566, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "SaltyPretzel", "rations_before": 1, "seq": 567, "target": null, "type": "action", "visibility": "private", "why": null}
+{"action": "steal", "amount": null, "as_bandit": false, "auto": false, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "LazyRiver", "rations_before": 5, "seq": 568, "target": "QuietBadger", "type": "action", "visibility": "private", "why": null}
+{"action": "scavenge", "amount": null, "as_bandit": false, "auto": true, "decided_by": "adaptive", "decision": null, "night": 10, "odds": null, "player": "SilentGoose", "rations_before": 1, "seq": 569, "target": null, "type": "action", "visibility": "private", "why": null}
+{"balance": 2, "delta": -2, "detail": "LooseCannon", "night": 10, "player": "SoggyBiscuit", "reason": "robbed", "seq": 570, "type": "ration"}
+{"balance": 8, "delta": 2, "detail": "SoggyBiscuit", "night": 10, "player": "LooseCannon", "reason": "stole", "seq": 571, "type": "ration"}
+{"amount": 2, "night": 10, "outcome": "success", "seq": 572, "split_with": 0, "target": "SoggyBiscuit", "thief": "LooseCannon", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"balance": 1, "delta": -2, "detail": "LazyRiver", "night": 10, "player": "QuietBadger", "reason": "robbed", "seq": 573, "type": "ration"}
+{"balance": 7, "delta": 2, "detail": "QuietBadger", "night": 10, "player": "LazyRiver", "reason": "stole", "seq": 574, "type": "ration"}
+{"amount": 2, "night": 10, "outcome": "success", "seq": 575, "split_with": 0, "target": "QuietBadger", "thief": "LazyRiver", "type": "steal", "visibility": "victim_sees_amount_only"}
+{"auto": false, "found": 0, "night": 10, "player": "VelvetMole", "seq": 576, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 2, "night": 10, "player": "MissingSock", "seq": 577, "type": "scavenge", "visibility": "private"}
+{"balance": 3, "delta": 2, "detail": "", "night": 10, "player": "MissingSock", "reason": "scavenge", "seq": 578, "type": "ration"}
+{"auto": false, "found": 2, "night": 10, "player": "NightOwl", "seq": 579, "type": "scavenge", "visibility": "private"}
+{"balance": 8, "delta": 2, "detail": "", "night": 10, "player": "NightOwl", "reason": "scavenge", "seq": 580, "type": "ration"}
+{"auto": false, "found": 2, "night": 10, "player": "QuietBadger", "seq": 581, "type": "scavenge", "visibility": "private"}
+{"balance": 3, "delta": 2, "detail": "", "night": 10, "player": "QuietBadger", "reason": "scavenge", "seq": 582, "type": "ration"}
+{"auto": true, "found": 1, "night": 10, "player": "LuckyLantern", "seq": 583, "type": "scavenge", "visibility": "private"}
+{"balance": 2, "delta": 1, "detail": "auto", "night": 10, "player": "LuckyLantern", "reason": "scavenge", "seq": 584, "type": "ration"}
+{"auto": false, "found": 0, "night": 10, "player": "GrumpyGecko", "seq": 585, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 0, "night": 10, "player": "SoggyBiscuit", "seq": 586, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 1, "night": 10, "player": "WobblyTable", "seq": 587, "type": "scavenge", "visibility": "private"}
+{"balance": 7, "delta": 1, "detail": "auto", "night": 10, "player": "WobblyTable", "reason": "scavenge", "seq": 588, "type": "ration"}
+{"auto": false, "found": 0, "night": 10, "player": "BurntToast", "seq": 589, "type": "scavenge", "visibility": "private"}
+{"auto": false, "found": 1, "night": 10, "player": "IronSpatula", "seq": 590, "type": "scavenge", "visibility": "private"}
+{"balance": 5, "delta": 1, "detail": "", "night": 10, "player": "IronSpatula", "reason": "scavenge", "seq": 591, "type": "ration"}
+{"auto": false, "found": 0, "night": 10, "player": "SaltyPretzel", "seq": 592, "type": "scavenge", "visibility": "private"}
+{"auto": true, "found": 2, "night": 10, "player": "SilentGoose", "seq": 593, "type": "scavenge", "visibility": "private"}
+{"balance": 3, "delta": 2, "detail": "auto", "night": 10, "player": "SilentGoose", "reason": "scavenge", "seq": 594, "type": "ration"}
+{"investigator": "HollowTin", "night": 10, "saw_action": "scavenge", "saw_target": null, "seq": 595, "target": "WobblyTable", "type": "investigate", "visibility": "private"}
+{"balance": 5, "delta": -1, "night": 10, "player": "VelvetMole", "reason": "eat", "seq": 596, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 10, "player": "MissingSock", "reason": "eat", "seq": 597, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 10, "player": "NightOwl", "reason": "eat", "seq": 598, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 10, "player": "QuietBadger", "reason": "eat", "seq": 599, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 10, "player": "LuckyLantern", "reason": "eat", "seq": 600, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 10, "player": "GrumpyGecko", "reason": "eat", "seq": 601, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 10, "player": "HollowTin", "reason": "eat", "seq": 602, "type": "ration"}
+{"balance": 1, "delta": -1, "night": 10, "player": "SoggyBiscuit", "reason": "eat", "seq": 603, "type": "ration"}
+{"balance": 7, "delta": -1, "night": 10, "player": "LooseCannon", "reason": "eat", "seq": 604, "type": "ration"}
+{"balance": 6, "delta": -1, "night": 10, "player": "WobblyTable", "reason": "eat", "seq": 605, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 10, "player": "BurntToast", "reason": "eat", "seq": 606, "type": "ration"}
+{"balance": 4, "delta": -1, "night": 10, "player": "IronSpatula", "reason": "eat", "seq": 607, "type": "ration"}
+{"balance": 0, "delta": -1, "night": 10, "player": "SaltyPretzel", "reason": "eat", "seq": 608, "type": "ration"}
+{"night": 10, "player": "SaltyPretzel", "seq": 609, "type": "became_bandit", "visibility": "public"}
+{"balance": 6, "delta": -1, "night": 10, "player": "LazyRiver", "reason": "eat", "seq": 610, "type": "ration"}
+{"balance": 2, "delta": -1, "night": 10, "player": "SilentGoose", "reason": "eat", "seq": 611, "type": "ration"}
+{"channel": "#news", "lines": ["Someone hit SoggyBiscuit overnight. SoggyBiscuit is down 2.", "Someone hit QuietBadger overnight. QuietBadger is down 2.", "SaltyPretzel ran out of food. SaltyPretzel is back... as a bandit."], "night": 10, "seq": 612, "type": "news_post", "visibility": "public"}
+{"bandits": ["SaltyPretzel"], "guarded_until": {}, "guards_used": {"BurntToast": 0, "GrumpyGecko": 0, "HollowTin": 0, "IronSpatula": 0, "LazyRiver": 0, "LooseCannon": 0, "LuckyLantern": 0, "MissingSock": 1, "NightOwl": 0, "QuietBadger": 0, "SaltyPretzel": 3, "SilentGoose": 1, "SoggyBiscuit": 1, "VelvetMole": 1, "WobblyTable": 0}, "night": 10, "rations": {"BurntToast": 4, "GrumpyGecko": 2, "HollowTin": 1, "IronSpatula": 4, "LazyRiver": 6, "LooseCannon": 7, "LuckyLantern": 1, "MissingSock": 2, "NightOwl": 7, "QuietBadger": 2, "SaltyPretzel": 0, "SilentGoose": 2, "SoggyBiscuit": 1, "VelvetMole": 5, "WobblyTable": 6}, "seq": 613, "type": "night_end"}
+{"decided_by_coin_flip": false, "extracted": ["NightOwl", "LooseCannon", "LazyRiver", "WobblyTable", "VelvetMole"], "night": 10, "ranking": [{"gave_away": 0, "player": "NightOwl", "rations": 7}, {"gave_away": 0, "player": "LooseCannon", "rations": 7}, {"gave_away": 0, "player": "LazyRiver", "rations": 6}, {"gave_away": 0, "player": "WobblyTable", "rations": 6}, {"gave_away": 0, "player": "VelvetMole", "rations": 5}, {"gave_away": 0, "player": "BurntToast", "rations": 4}, {"gave_away": 0, "player": "IronSpatula", "rations": 4}, {"gave_away": 1, "player": "GrumpyGecko", "rations": 2}, {"gave_away": 1, "player": "SilentGoose", "rations": 2}, {"gave_away": 0, "player": "MissingSock", "rations": 2}, {"gave_away": 0, "player": "QuietBadger", "rations": 2}, {"gave_away": 1, "player": "LuckyLantern", "rations": 1}, {"gave_away": 0, "player": "HollowTin", "rations": 1}, {"gave_away": 0, "player": "SoggyBiscuit", "rations": 1}], "seats": 5, "seq": 614, "tiebreak": "kindness", "type": "extraction", "visibility": "public"}
+{"extracted": true, "gave_away": 0, "night": 10, "objective": "give away 3 rations over the game", "objective_done": false, "player": "VelvetMole", "rations": 5, "score": 3, "seq": 615, "steals_caught": 0, "steals_ok": 1, "stole": 2, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 0, "night": 10, "objective": "finish with more rations than LazyRiver", "objective_done": false, "player": "MissingSock", "rations": 2, "score": 1, "seq": 616, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": true, "gave_away": 0, "night": 10, "objective": "steal at least 3 times without ever being caught", "objective_done": false, "player": "NightOwl", "rations": 7, "score": 3, "seq": 617, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 0, "night": 10, "objective": "get robbed at least 1x and still extract", "objective_done": false, "player": "QuietBadger", "rations": 2, "score": 1, "seq": 618, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 2, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 1, "night": 10, "objective": "give away 3 rations over the game", "objective_done": false, "player": "LuckyLantern", "rations": 1, "score": 1, "seq": 619, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 1, "night": 10, "objective": "steal at least 3 times without ever being caught", "objective_done": false, "player": "GrumpyGecko", "rations": 2, "score": 1, "seq": 620, "steals_caught": 0, "steals_ok": 1, "stole": 2, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 0, "night": 10, "objective": "steal at least 3 times without ever being caught", "objective_done": false, "player": "HollowTin", "rations": 1, "score": 1, "seq": 621, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 0, "night": 10, "objective": "finish with more rations than QuietBadger", "objective_done": false, "player": "SoggyBiscuit", "rations": 1, "score": 1, "seq": 622, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 2, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": true, "gave_away": 0, "night": 10, "objective": "finish with more rations than HollowTin", "objective_done": true, "player": "LooseCannon", "rations": 7, "score": 5, "seq": 623, "steals_caught": 0, "steals_ok": 5, "stole": 10, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": true, "gave_away": 0, "night": 10, "objective": "finish with more rations than HollowTin", "objective_done": true, "player": "WobblyTable", "rations": 6, "score": 5, "seq": 624, "steals_caught": 2, "steals_ok": 6, "stole": 12, "survived": true, "times_robbed": 0, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 0, "night": 10, "objective": "give away 3 rations over the game", "objective_done": false, "player": "BurntToast", "rations": 4, "score": 1, "seq": 625, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 0, "night": 10, "objective": "get robbed at least 1x and still extract", "objective_done": false, "player": "IronSpatula", "rations": 4, "score": 1, "seq": 626, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 2, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 0, "night": 10, "objective": "finish with more rations than QuietBadger", "objective_done": false, "player": "SaltyPretzel", "rations": 0, "score": 0, "seq": 627, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": false, "times_robbed": 0, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": true, "gave_away": 0, "night": 10, "objective": "give away 3 rations over the game", "objective_done": false, "player": "LazyRiver", "rations": 6, "score": 3, "seq": 628, "steals_caught": 1, "steals_ok": 4, "stole": 8, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"extracted": false, "gave_away": 1, "night": 10, "objective": "finish with more rations than WobblyTable", "objective_done": false, "player": "SilentGoose", "rations": 2, "score": 1, "seq": 629, "steals_caught": 0, "steals_ok": 0, "stole": 0, "survived": true, "times_robbed": 1, "type": "result", "visibility": "public_at_reveal"}
+{"night": 10, "seq": 630, "type": "game_end", "visibility": "public", "winner_tiebreak": "kindness", "winners": ["LooseCannon"]}

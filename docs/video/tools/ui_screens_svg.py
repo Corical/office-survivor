@@ -68,9 +68,19 @@ def message_box(placeholder, typed=None):
     return g("message_box", f'<rect x="{x0}" y="966" width="{W - x0 - 40}" height="76" rx="14" fill="{C["box"]}"/>', inner)
 
 
+def flame(cx, cy):
+    """The bot's avatar mark: a two-tone flame (the bot is Torch)."""
+    return (f'<path d="M{cx} {cy - 22} C{cx + 6} {cy - 10} {cx + 18} {cy - 4} {cx + 16} {cy + 8} C{cx + 14} {cy + 20} {cx + 6} {cy + 24} '
+            f'{cx} {cy + 24} C{cx - 8} {cy + 24} {cx - 16} {cy + 18} {cx - 16} {cy + 6} C{cx - 16} {cy - 4} {cx - 8} {cy - 6} '
+            f'{cx - 6} {cy - 14} C{cx - 2} {cy - 8} {cx - 2} {cy - 4} {cx} {cy - 22} Z" fill="#E5484D"/>'
+            f'<path d="M{cx} {cy - 2} C{cx + 6} {cy + 6} {cx + 8} {cy + 12} {cx + 6} {cy + 16} C{cx + 4} {cy + 21} {cx - 4} {cy + 21} '
+            f'{cx - 6} {cy + 16} C{cx - 8} {cy + 10} {cx - 4} {cy + 6} {cx} {cy - 2} Z" fill="#FFC93C"/>')
+
+
 def author(x, y, name, time, colour, glyph, tag=None):
-    parts = [f'<circle cx="{x + 34}" cy="{y + 30}" r="34" fill="{colour}"/>',
-             t(x + 34, y + 42, glyph, 32, C["rail"], 700, "middle"), t(x + 96, y + 26, name, 28, C["text"], 700)]
+    mark = flame(x + 34, y + 30) if glyph == "flame" else t(x + 34, y + 42, glyph, 32, C["rail"], 700, "middle")
+    parts = [f'<circle cx="{x + 34}" cy="{y + 30}" r="34" fill="{colour}"/>', mark,
+             t(x + 96, y + 26, name, 28, C["text"], 700)]
     nx = x + 96 + width(name, 28, True) + 18
     if tag:
         parts += [f'<rect x="{nx}" y="{y + 2}" width="62" height="30" rx="6" fill="{C["accent"]}"/>',
@@ -95,7 +105,7 @@ def news_post():
              [f"CAUGHT: {names[1]} caught {names[2]} red-handed.", f"{names[2]} pays {names[1]} {facts['caught_penalty']}."],
              [f"{names[3]} ran out of food."]]
     body = app_shell("news", "Every morning at " + facts["news_time"])
-    body += g("bot_author", author(X, 150, "Survivors Bot", f"Today at {facts['news_time']}", C["bot"], "S", "BOT"))
+    body += g("bot_author", author(X, 150, facts["bot_name"], f"Today at {facts['news_time']}", C["bot"], "flame", "BOT"))
     body += g("headline", t(X + 96, 252, f"{facts['news_time']} MORNING NEWS", 34, C["bot"], 800))
     y = 322
     for i, rows in enumerate(lines):
@@ -119,7 +129,7 @@ def join():
     alias = facts["name1"]
     reply = [f"You're in. Your secret alias is {alias}.", "Tell no one.", "Day 1 starts [LAUNCH DATE] at " + facts["news_time"] + "."]
     body = app_shell("town-square", "Say hello. Trust no one.")
-    body += g("bot_reply", author(X, 560, "Survivors Bot", "Only you can see this", C["bot"], "S", "BOT"),
+    body += g("bot_reply", author(X, 560, facts["bot_name"], "Only you can see this", C["bot"], "flame", "BOT"),
               *[t(X + 96, 650 + i * 52, s, 32, C["text"], 500 if i else 700) for i, s in enumerate(reply)])
     return svg(body + message_box("Message #town-square", facts["join_command"]))
 

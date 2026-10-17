@@ -28,8 +28,8 @@ Gift. Give some of your food to someone else. Nobody is told, unless someone was
 [scene_10] The morning news (34 words)
 Every morning at half past seven, the news drops in Discord: who got robbed, who got caught, and who ran out of food. You'll always know what happened. You'll rarely know who did it.
 
-[scene_11] Bandits (25 words)
-Run out of food and you're a bandit. Bandits can only steal or investigate, but get back to three rations and you rejoin the survivors.
+[scene_11] Bandits (32 words)
+Run out of food and you're a bandit. Bandits don't eat. They can only steal one ration at a time, or investigate. Get back to three rations and you rejoin the survivors.
 
 [scene_12] Secret goal and radio (30 words)
 You'll also get a secret goal that only you know about. And once a day you can post an anonymous message on the radio channel. Tips, accusations, lies. Your call.

@@ -1,5 +1,5 @@
 {
-  "total_duration_s": 156.4,
+  "total_duration_s": 158.7,
   "game_facts": {
     "players": 15,
     "rounds": 10,
@@ -25,6 +25,8 @@
     "grudge_goal": "rob",
     "grudge_robs": 1,
     "robbed_goal": 1,
+    "bot_name": "Torch",
+    "bot_emoji": "🔥",
     "deadline": "midnight",
     "news_time": "07:30",
     "news_time_spoken": "half past seven",
@@ -590,29 +592,29 @@
       "voiceover_file": "output/03_audio/vo/scene_10.wav",
       "output": "output/04_scenes/scene_10.mp4",
       "vo_hash": "0ac05185b616",
-      "hash": "f28d1adc419d"
+      "hash": "c22caada67d2"
     },
     {
       "id": "scene_11",
       "number": 11,
       "title": "Bandits",
       "start_s": 97.8,
-      "duration_s": 10.7,
+      "duration_s": 13.0,
       "timing_source": "voiceover",
-      "narration": "Run out of food and you're a bandit. Bandits can only steal or investigate, but get back to three rations and you rejoin the survivors.",
-      "word_count": 25,
-      "on_screen_text": "BANDIT: steal or investigate · back at 3",
+      "narration": "Run out of food and you're a bandit. Bandits don't eat. They can only steal one ration at a time, or investigate. Get back to three rations and you rejoin the survivors.",
+      "word_count": 32,
+      "on_screen_text": "BANDIT: steal 1 or investigate · back at 3",
       "beats": [
         {
           "at_s": 0.0,
           "do": "Avatar wearing bandit_mask sneaks between tents."
         },
         {
-          "at_s": 1.8,
+          "at_s": 2.2,
           "do": "Steals 1 tin at a time; a counter above them climbs from 0 to 3."
         },
         {
-          "at_s": 7.7,
+          "at_s": 9.4,
           "do": "bandit_mask flies off; the avatar's colours brighten back to normal."
         }
       ],
@@ -630,14 +632,14 @@
       "transition_in": "0.3 s crossfade",
       "voiceover_file": "output/03_audio/vo/scene_11.wav",
       "output": "output/04_scenes/scene_11.mp4",
-      "vo_hash": "c4129b724022",
-      "hash": "d189c1e69489"
+      "vo_hash": "db510d0f107e",
+      "hash": "cb54a53174e0"
     },
     {
       "id": "scene_12",
       "number": 12,
       "title": "Secret goal and radio",
-      "start_s": 108.5,
+      "start_s": 110.8,
       "duration_s": 12.7,
       "timing_source": "voiceover",
       "narration": "You'll also get a secret goal that only you know about. And once a day you can post an anonymous message on the radio channel. Tips, accusations, lies. Your call.",
@@ -677,7 +679,7 @@
       "id": "scene_13",
       "number": 13,
       "title": "Extraction and the reveal",
-      "start_s": 121.2,
+      "start_s": 123.5,
       "duration_s": 18.9,
       "timing_source": "voiceover",
       "narration": "On the last night, the helicopter lands. The five survivors with the most food get a seat. Staying alive earns points, a seat earns more, and so does your secret goal. Most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
@@ -728,7 +730,7 @@
       "id": "scene_14",
       "number": 14,
       "title": "How to join",
-      "start_s": 140.1,
+      "start_s": 142.4,
       "duration_s": 16.3,
       "timing_source": "voiceover",
       "narration": "It takes two minutes a day, it's completely optional, and nothing in the game touches real work or real money. Type slash join in Discord and you'll get a secret alias, so nobody knows who's who. And remember: trust no one.",
