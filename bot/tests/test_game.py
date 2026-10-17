@@ -37,6 +37,32 @@ class FullGame(unittest.TestCase):
         self.assertEqual({p: (s.rations, s.bandit) for p, s in again.players.items()},
                          {p: (s.rations, s.bandit) for p, s in g.players.items()})
 
+    def test_reveal_picture_is_built_from_the_finish_record(self):
+        from bot.reveal_image import awards, render
+        g = service()
+        self.assertIsNone(g.reveal_data())                       # nothing to show before the end
+        g.join("a", rng=random.Random(1))
+        g.gm_add_sims(6, rng=random.Random(3))
+        g.gm_start(day_seconds=300, now=0)
+        for night in range(1, 11):
+            g.tick(now=night * 300 + 10)
+        rows, winners = g.reveal_data()
+        self.assertEqual(len(rows), 7)
+        self.assertEqual([r["score"] for r in rows], sorted((r["score"] for r in rows), reverse=True))
+        self.assertTrue(set(winners) <= {r["player"] for r in rows})
+        self.assertTrue(render(rows, winners).startswith(b"\x89PNG"))
+        intent = next(i for i in g.pending_outbox() if i.get("image") == "reveal")
+        head = g.outbox_text(intent).split("\n\n**The reveal**")[0]
+        self.assertIn("helicopter", head)
+        self.assertFalse(any(r["player"] + ":" in head for r in rows))   # per-player lines live in the picture
+
+    def test_awards_share_ties_and_say_nobody_for_zero(self):
+        from bot.reveal_image import awards
+        rows = [{"player": n, "stole": s, "times_robbed": 1, "gave_away": 0, "rations": 3} for n, s in (("A", 2), ("B", 2))]
+        got = {t: (who, top) for t, who, top in awards(rows)}
+        self.assertEqual(got["Biggest thief"], ("A, B", 2))
+        self.assertEqual(got["Most generous"], ("nobody", 0))
+
     def test_tampered_log_refuses_to_load(self):
         store = MemoryEventStore()
         g = service(store)

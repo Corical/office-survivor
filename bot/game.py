@@ -375,7 +375,19 @@ class GameService:
             lines.append(f"- {e['player']}: {e['score']} pts, {e['rations']} rations, goal: {e['objective']} "
                          f"({'done' if e['objective_done'] else 'missed'}); stole {e['stole']}, robbed "
                          f"{e['times_robbed']}x, gave away {e['gave_away']}")
-        self._append({"type": "finish", "events": events, "outbox": self._intents(("news", "\n".join(lines), None))})
+        intents = self._intents(("news", "\n".join(lines), None))
+        intents[0]["image"] = "reveal"     # the adapter posts the reveal table as a picture, this text as fallback
+        self._append({"type": "finish", "events": events, "outbox": intents})
+
+    def reveal_data(self):
+        """(rows, winners) for the reveal picture, from the finish record; None before the game ends."""
+        from .reveal_image import rows_from_results
+        rec = next((r for r in self.store.load() if r["type"] == "finish"), None)
+        if rec is None:
+            return None
+        ext = next(e for e in rec["events"] if e["type"] == "extraction")["extracted"]
+        end = next(e for e in rec["events"] if e["type"] == "game_end")
+        return rows_from_results([e for e in rec["events"] if e["type"] == "result"], ext), end["winners"]
 
     def _night_record(self, night):
         for rec in self.store.load():

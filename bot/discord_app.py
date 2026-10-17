@@ -109,7 +109,12 @@ class Torch(discord.Client):
             text = self.game.outbox_text(intent)
             to = intent["to"]
             try:
-                if to in ("news", "radio"):
+                if to == "news" and intent.get("image") == "reveal" and (pic := self.reveal_picture()):
+                    head = text.split("\n\n**The reveal**")[0]
+                    msg = await self.channels[to].send(head[:1990], file=discord.File(pic, "reveal.png"),
+                                                       allowed_mentions=NONE)
+                    ref = str(msg.id)
+                elif to in ("news", "radio"):
                     body = text if to == "news" else f"📻 *Anonymous on the radio:* {discord.utils.escape_markdown(text)}"
                     msg = await self.channels[to].send(body[:1990], allowed_mentions=NONE)
                     ref = str(msg.id)
@@ -128,6 +133,17 @@ class Torch(discord.Client):
             except discord.HTTPException:
                 log.exception("sending %s failed; will retry", intent["id"])
                 return
+
+    def reveal_picture(self):
+        """The reveal table as PNG bytes, or None (then the text reveal goes out instead: it must never go missing)."""
+        try:
+            import io
+            from .reveal_image import render
+            rows, winners = self.game.reveal_data()
+            return io.BytesIO(render(rows, winners))
+        except Exception:
+            log.exception("reveal picture failed; posting the text reveal")
+            return None
 
     def is_gm(self, interaction):
         return interaction.user.id in self.conf.gm_ids or interaction.user.id == interaction.guild.owner_id
