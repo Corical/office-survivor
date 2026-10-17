@@ -393,6 +393,32 @@ class FullGame(unittest.TestCase):
         self.assertIn("had a hidden idol", thief)
         self.assertNotIn("beat you to it", thief)
 
+    def test_a_game_replays_under_its_own_rules_after_a_rule_change(self):
+        """Played with exposure_undo='none'; Torch restarts with 'full' configured: it must load the game as it
+        was played (not refuse it, not rewrite it), while a NEW game uses the new rule."""
+        from dataclasses import replace
+        from engine import Rules
+        for seed in range(40):                         # find a game that had an exposure (where the rules differ)
+            store, ident, texts = MemoryEventStore(), MemoryIdentityStore(), MemoryTextStore()
+            g = GameService(replace(Rules(), exposure_undo="none"), store, ident, texts, ALIASES, "s", clock=lambda: 0)
+            g.gm_add_sims(9, rng=random.Random(seed))
+            g.gm_start(day_seconds=300, now=0)
+            for night in range(1, 11):
+                g.tick(now=night * 300 + 10)
+            if any(e["type"] == "exposed" for r in store.records if r["type"] == "night" for e in r["events"]):
+                break
+        else:
+            self.fail("no exposure in 40 games: the test can't tell the rules apart")
+        new_rules = replace(Rules(), exposure_undo="full")
+        again = GameService(new_rules, store, ident, texts, ALIASES, "s", clock=lambda: 0)   # must not raise
+        self.assertEqual(again.rules.exposure_undo, "none")
+        self.assertEqual({p: s.rations for p, s in again.players.items()}, {p: s.rations for p, s in g.players.items()})
+        fresh = GameService(new_rules, MemoryEventStore(), MemoryIdentityStore(), MemoryTextStore(), ALIASES, "t",
+                            clock=lambda: 0)
+        fresh.gm_add_sims(3, rng=random.Random(1))
+        fresh.gm_start(day_seconds=300, now=0)
+        self.assertEqual(fresh.rules.exposure_undo, "full")
+
     def test_tampered_log_refuses_to_load(self):
         store = MemoryEventStore()
         g = service(store)

@@ -10,7 +10,7 @@ import logging
 import random
 import time
 from collections import Counter
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, fields, replace
 
 from engine import ENGINE_VERSION, PlayerState, Rules, resolve_night
 from engine import events as wild
@@ -149,6 +149,12 @@ class GameService:
         elif t == "start":
             self.started = True
             self.schedule = Schedule(rec["start_ts"], rec["day_seconds"], rec["news_delay"])
+            # A game is played and replayed under the rules it STARTED with, never today's: a rule change between
+            # restarts must not rewrite (or refuse to load) a game already in progress. Fields newer than the log
+            # take their defaults, which is what that game ran on.
+            known = {f.name for f in fields(Rules)}
+            self.rules = Rules(**{k: v for k, v in rec.get("rules", {}).items() if k in known}) \
+                if rec.get("rules") else self.rules
             self.events_mode = rec.get("events", "off")            # older logs have no key: events off
             self.ranges = rec.get("ranges", False)                  # morning ration ranges in #news
             self.rules = replace(self.rules, **EVENT_MODES[self.events_mode])
