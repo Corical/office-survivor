@@ -14,6 +14,7 @@
     "guard_nights": 2,
     "guard_limit": 3,
     "investigate_bounty": 1,
+    "exposure_undo": "full",
     "bandit_steal_amount": 1,
     "bandit_rejoin": 3,
     "seat_ratio": 0.3333333333,

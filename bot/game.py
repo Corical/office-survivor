@@ -543,7 +543,9 @@ def news_lines(events):
         elif e["type"] == "steal" and e["outcome"] in ("success", "empty"):
             robbed.setdefault(e["target"], []).append(e["amount"])
         elif e["type"] == "exposed":
-            out.append(f"🕵️ EXPOSED: an investigator saw {e['thief']} rob {e['victim']}. {e['thief']} pays them {e['paid']}.")
+            back = f" and gives {e['victim']} back the {e['to_victim']} they stole" if e.get("to_victim") else ""
+            out.append(f"🕵️ EXPOSED: an investigator saw {e['thief']} rob {e['victim']}. "
+                       f"{e['thief']} pays them {e['paid']}{back}.")
         elif e["type"] == "became_bandit":
             out.append(f"🏴‍☠️ {e['player']} ran out of food. {e['player']} is back... as a bandit.")
         elif e["type"] == "rejoined":
@@ -607,7 +609,11 @@ def private_lines(events, p, before, night=None, guard_nights=2):
         elif t == "exposed" and e["investigator"] == me:
             out.append(f"🕵️ You exposed {e['thief']}; they paid you {e['paid']}.")
         elif t == "exposed" and e["thief"] == me:
-            out.append(f"🕵️ EXPOSED: an investigator saw you rob {e['victim']}. You paid them {e['paid']}.")
+            back = f" and gave back the {e['to_victim']} you stole" if e.get("to_victim") else ""
+            out.append(f"🕵️ EXPOSED: an investigator saw you rob {e['victim']}. You paid them {e['paid']}{back}.")
+        elif t == "exposed" and e["victim"] == me and e.get("to_victim"):
+            out.append(f"🕵️ An investigator caught the thief who robbed you: {e['thief']}. "
+                       f"You got your {e['to_victim']} back.")
         elif t == "gift" and e["giver"] == me:
             out.append(f"🎁 You gave {e['receiver']} {e['amount']}.")
         elif t == "gift" and e["receiver"] == me:

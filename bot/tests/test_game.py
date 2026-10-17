@@ -279,7 +279,8 @@ class FullGame(unittest.TestCase):
                             "stole": "You stole", "robbed": "stole", "gift_in": "gave you", "gift_out": "You gave",
                             "caught_penalty": "you were caught", "fine": "you were caught",
                             "event_found": "+", "event_lost": "-", "bounty_received": "paid you",
-                            "bounty_paid": "EXPOSED", "gift_bonus": "gave you", "guard_income": "guard"}
+                            "bounty_paid": "EXPOSED", "gift_bonus": "gave you", "guard_income": "guard",
+                            "exposed_return": "back", "exposed_loot": "back"}
         seen = set()
         for seed in range(25):
             g = service()
@@ -306,6 +307,27 @@ class FullGame(unittest.TestCase):
                             self.assertIn(word, dm, f"seed {seed} night {rec['night']}: {name}'s "
                                                     f"{e['reason']} {e['delta']:+} isn't in their DM:\n{dm}")
         self.assertTrue({"eat", "scavenge", "stole", "robbed"} <= seen, f"the games never produced: {seen}")
+
+    def test_exposed_theft_is_returned_and_everyone_involved_is_told(self):
+        from dataclasses import replace
+        from engine import PlayerState, Rules, resolve_night
+        r = replace(Rules(), exposure_undo="full")
+        for seed in range(30):                                   # find a night where the thief lands the steal
+            ps = [PlayerState(pid=i, name=n, rations=6) for i, n in enumerate(("Thief", "Victim", "Eye"))]
+            evs = []
+            moves = {0: ("steal", 1, 0, False), 1: ("scavenge", None, 0, False), 2: ("investigate", 0, 0, False)}
+            resolve_night(ps, moves, r, random.Random(seed), 1, emit=lambda t, **f: evs.append({"type": t, **f}))
+            exp = next(e for e in evs if e["type"] == "exposed")
+            if exp.get("to_victim"):
+                break
+        self.assertEqual(exp["to_victim"], 2)
+        self.assertIn("gives Victim back the 2 they stole", " ".join(news_lines(evs)))
+        self.assertIn("gave back the 2 you stole", " ".join(private_lines(evs, ps[0], 6)))
+        self.assertIn("You got your 2 back", " ".join(private_lines(evs, ps[1], 6)))
+        self.assertIn("You exposed Thief", " ".join(private_lines(evs, ps[2], 6)))
+        victim_booked = sum(e["delta"] for e in evs if e["type"] == "ration" and e["player"] == "Victim"
+                            and e["reason"] in ("robbed", "exposed_return"))
+        self.assertEqual(victim_booked, 0)                       # robbed 2, got 2 back: whole again
 
     def test_status_shows_goal_progress_and_a_quit_target_voids_it(self):
         g = service()
