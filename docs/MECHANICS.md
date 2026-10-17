@@ -548,7 +548,7 @@ The picture marks the top of each highlighted column in orange, winner rows in g
 
 ### Everything is private except #news and #radio
 
-Every reply to a player is ephemeral (only they see it). Only Torch posts in #news and #radio (threads are shut). Public output uses aliases only. DMs carry the night's private results; if a player's DMs are closed, `/results` shows the same lines. Messages are written to the log first and delivered after, and retried until sent.
+Every reply to a player is ephemeral (only they see it) and silent (it makes no sound or notification, because the player just tapped it themselves: owner, 17 October 2026). The night DM and the morning #news post are the only things that notify. Only Torch posts in #news and #radio (threads are shut). Public output uses aliases only. DMs carry the night's private results; if a player's DMs are closed, `/results` shows the same lines. Messages are written to the log first and delivered after, and retried until sent.
 
 ### Slash commands
 

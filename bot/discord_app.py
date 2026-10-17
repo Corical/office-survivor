@@ -227,11 +227,12 @@ class Torch(discord.Client):
 
 
 async def private(interaction, text):
-    """The only way Torch answers a player: ephemeral, so nobody else sees who did what."""
+    """The only way Torch answers a player: ephemeral (nobody else sees who did what) and silent (a tap you made
+    yourself needs no sound; owner, 17 Oct 2026)."""
     if interaction.response.is_done():
-        await interaction.followup.send(text, ephemeral=True, allowed_mentions=NONE)
+        await interaction.followup.send(text, ephemeral=True, silent=True, allowed_mentions=NONE)
     else:
-        await interaction.response.send_message(text, ephemeral=True, allowed_mentions=NONE)
+        await interaction.response.send_message(text, ephemeral=True, silent=True, allowed_mentions=NONE)
 
 
 BUTTONS = {"scavenge": ("🥫", "Scavenge"), "guard": ("🛡️", "Guard"), "steal": ("🥷", "Steal"),
@@ -283,7 +284,10 @@ class RadioView(discord.ui.View):
         except GameError as e:
             text = f"⚠️ {e}"
         self.stop()
-        await i.response.edit_message(content=f"📻 {text}", view=None, allowed_mentions=NONE)
+        try:
+            await i.response.edit_message(content=f"📻 {text}", view=None, allowed_mentions=NONE)
+        except discord.NotFound:       # the 3-second window lapsed; the radio line IS saved
+            log.warning("radio line saved but its confirmation expired (Discord answered >3 s late)")
         await self.bot.deliver()
 
 
@@ -367,7 +371,10 @@ class PlayView(discord.ui.View):
         except GameError as e:
             text = f"⚠️ {e}"
         self.stop()
-        await i.response.edit_message(content=text, view=None, allowed_mentions=NONE)
+        try:
+            await i.response.edit_message(content=text, view=None, allowed_mentions=NONE)
+        except discord.NotFound:       # Discord's 3-second window lapsed (a slow gateway); the move IS saved
+            log.warning("move saved but its confirmation expired (Discord answered >3 s late)")
         await self.bot.deliver()
 
 
@@ -379,7 +386,7 @@ async def open_play(bot, i):
     except GameError as e:
         return await private(i, f"⚠️ {e}")
     await i.response.send_message(menu["header"], view=PlayView(bot, str(i.user.id), menu), ephemeral=True,
-                                  allowed_mentions=NONE)
+                                  silent=True, allowed_mentions=NONE)
 
 
 async def open_radio(bot, i):
@@ -392,7 +399,8 @@ async def open_radio(bot, i):
     if not menu["available"]:
         return await private(i, "📻 You've already used today's radio message. It goes out with the morning news.")
     await i.response.send_message("📻 Pick a line. It goes out anonymously with the morning news.",
-                                  view=RadioView(bot, str(i.user.id), menu), ephemeral=True, allowed_mentions=NONE)
+                                  view=RadioView(bot, str(i.user.id), menu), ephemeral=True, silent=True,
+                                  allowed_mentions=NONE)
 
 
 class BoardView(discord.ui.View):
@@ -624,7 +632,7 @@ def register(bot):
             await bot.channels["news"].send(text[:1990], file=file(), allowed_mentions=NONE)
             return await private(i, "Posted in #news.")
         await i.response.send_message(text + "\n\n*Only you see this. Run again with post: True to share it in #news.*",
-                                      file=file(), ephemeral=True, allowed_mentions=NONE)
+                                      file=file(), ephemeral=True, silent=True, allowed_mentions=NONE)
 
     @gm.command(name="new-season", description="Archive this game and start an empty one")
     async def new_season(i: discord.Interaction, confirm: bool):
