@@ -42,6 +42,8 @@ from dataclasses import asdict, dataclass, field, fields, replace
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from engine import Observer, Rules, resolve_night  # noqa: E402
 from engine.finish import finish as engine_finish, objective_text  # noqa: E402  (the game's rules live in the shared engine)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import visibility as V  # noqa: E402  (opt-in: what players are told about rations, and how well they remember it)
 
 # --------------------------------------------------------------------------
 # Rules (every knob the game exposes)
@@ -209,10 +211,15 @@ class SimObserver(Observer):
         g.public_delta[tp.pid] -= paid
         g.public_susp[tp.pid] += 2
         g.known_guard[t.pid] = night
+        if g.mem:
+            g.mem.touch(tp.pid, t.pid)
+            g.mem.touch(t.pid, tp.pid)
         tp.notes.append(f"Night {night}: you tried to rob {t.name}, who was guarding. You paid {paid}.")
         t.notes.append(f"Night {night}: your guard caught {tp.name}; they paid you {to_guard}.")
 
     def stole(self, night, tp, t, got):
+        if self.g.mem:
+            self.g.mem.touch(tp.pid, t.pid)
         if got > 0:
             tp.notes.append(f"Night {night}: you stole {got} from {t.name}.")
         else:
@@ -227,11 +234,16 @@ class SimObserver(Observer):
             p.notes.append(f"Night {night}: you scavenged and found {found}.")
 
     def gifted(self, night, giver, recv, amt):
+        if self.g.mem:
+            self.g.mem.touch(giver.pid, recv.pid)
+            self.g.mem.touch(recv.pid, giver.pid)
         recv.notes.append(f"Night {night}: {giver.name} secretly gave you {amt}.")
         giver.notes.append(f"Night {night}: you gave {recv.name} {amt}.")
 
     def investigated(self, night, inv, tgt, seen, exposed_paid):
         g = self.g
+        if g.mem:
+            g.mem.touch(inv.pid, tgt.pid)
         inv.notes.append(f"Night {night}: you watched {tgt.name}: they "
                          + self.DID[seen[0]].format(g.P(seen[1]).name if seen[1] is not None else "") + ".")
         if seen[0] != "steal" or seen[1] is None:
@@ -256,7 +268,10 @@ class SimObserver(Observer):
 
 class Game:
     def __init__(self, rules: Rules, seed: int, mix=None, record=False, force=None, brain=None, smart=None,
-                 log=False):
+                 log=False, vis="hidden", memory=None, edges=V.BAND_EDGES):
+        if vis not in V.VISIBILITIES:
+            raise ValueError(f"vis must be one of {V.VISIBILITIES}, not {vis!r}")
+        self.vis, self.edges = vis, tuple(edges)    # information for the AI only; the rules never see it
         self.r = rules
         self.brain = brain
         self.logging = log
@@ -283,6 +298,7 @@ class Game:
             p.objective = self.rng.choice(OBJECTIVES)
             if p.objective in ("beat", "grudge"):
                 p.obj_target = self.rng.choice([q.pid for q in self.players if q.pid != p.pid])
+        self.mem = V.Memory(memory, self) if memory else None     # None = bot-accurate players (today)
         self.night_stats = []
         self.event_tally = Counter()       # wilderness events: how many fired, rations found and lost
         n_smart = rules.players if smart is None else max(0, min(smart, rules.players))
@@ -314,13 +330,25 @@ class Game:
     def P(self, pid):
         return self.players[pid]
 
-    def perceived(self, viewer, q):
-        """What `viewer` guesses q has: start minus publicly known losses, plus noise."""
+    def fresh(self, q):
+        """What the information on offer says q holds, before judgement noise. hidden: start minus publicly known
+        losses (a bandit counts as 1). ranges: that guess pulled into q's posted band, so the exact count never
+        reaches the AI. exact: the true count."""
+        if self.vis == "exact":
+            return float(q.rations)
         if q.bandit:
-            base = 1
-        else:
-            base = self.r.start_rations + self.public_delta[q.pid]
-        return base + self.rng.gauss(0, 1.5)
+            return 1
+        guess = self.r.start_rations + self.public_delta[q.pid]
+        if self.vis == "ranges":
+            lo, hi = V.band_bounds(V.band_index(q, self.edges), self.edges)
+            return min(max(guess, lo), hi)
+        return guess
+
+    def perceived(self, viewer, q):
+        """What `viewer` guesses q has: the information on offer (remembered, for human-memory players) plus noise."""
+        base = self.mem.est[viewer.pid][q.pid] if self.mem else self.fresh(q)
+        sd = V.NOISE_SD[self.vis]
+        return base + (self.rng.gauss(0, sd) if sd else self.rng.random() * V.EXACT_TIE_JITTER)
 
     def weighted(self, weights: dict):
         keys = [k for k, v in weights.items() if v > 0]
@@ -524,7 +552,8 @@ class Game:
             if p.objective in ("beat", "grudge") and q.pid == p.obj_target:
                 s += 2
                 flags.append("your secret-goal target")
-            if q.pid in self.known_guard and self.night - self.known_guard[q.pid] <= 2:
+            if (q.pid in self.mem.guard_seen[p.pid]) if self.mem else \
+                    (q.pid in self.known_guard and self.night - self.known_guard[q.pid] <= 2):
                 s -= 4
             if q.bandit:
                 s -= 3
@@ -574,6 +603,8 @@ class Game:
         if r.events_per_night > 0:                 # wilderness events: their own dice, the main stream is untouched
             import events as wilderness
             flags, event_news = wilderness.run_night_events(self, wilderness.rng_for(self.seed, self.night))
+        if self.mem:
+            self.mem.morning()                     # human memory: refresh what each player follows, fade the rest
         if not self.brain:
             acts = {p.pid: self.choose(p) for p in self.players}
         else:
