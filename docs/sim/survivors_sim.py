@@ -187,6 +187,7 @@ class Player:
     guard_until: int = 0
     guards_used: int = 0
     next_guard_night: int = 0
+    idol: bool = False                 # a wilderness-event shield: the next theft against this player fails
     actions: Counter = field(default_factory=Counter)
     notes: list = field(default_factory=list)       # what only this player knows (used by smart brains)
 
@@ -283,10 +284,14 @@ class Game:
             if p.objective in ("beat", "grudge"):
                 p.obj_target = self.rng.choice([q.pid for q in self.players if q.pid != p.pid])
         self.night_stats = []
+        self.event_tally = Counter()       # wilderness events: how many fired, rations found and lost
         n_smart = rules.players if smart is None else max(0, min(smart, rules.players))
         self.smart_ids = set(random.Random(seed * 7919 + 1).sample(range(rules.players), n_smart)) if brain else set()
         if self.logging:
-            self.L("game_start", seed=seed, log_format=LOG_FORMAT_VERSION, rules=asdict(rules),
+            rules_logged = asdict(rules)
+            if not rules.events_per_night:         # events off: the log is exactly what it was before they existed
+                rules_logged.pop("events_per_night"), rules_logged.pop("events_bias")
+            self.L("game_start", seed=seed, log_format=LOG_FORMAT_VERSION, rules=rules_logged,
                    seats=max(1, round(rules.players * rules.seat_ratio)),
                    players=[{"id": p.pid, "name": p.name, "personality": p.arch, "start_rations": p.rations,
                              "smart": p.pid in self.smart_ids} for p in self.players])
@@ -564,6 +569,10 @@ class Game:
         self.night += 1
         r, rng = self.r, self.rng
         self.why = {}
+        flags, event_news = frozenset(), []
+        if r.events_per_night > 0:                 # wilderness events: their own dice, the main stream is untouched
+            import events as wilderness
+            flags, event_news = wilderness.run_night_events(self, wilderness.rng_for(self.seed, self.night))
         if not self.brain:
             acts = {p.pid: self.choose(p) for p in self.players}
         else:
@@ -592,7 +601,9 @@ class Game:
                        odds=self.why.get(pid, {}).get("odds"), visibility="private")
         radio = []
         sim_obs = SimObserver(self, radio)
-        res = resolve_night(self.players, acts, r, rng, self.night, emit=self.L, obs=sim_obs)
+        res = resolve_night(self.players, acts, r, rng, self.night, emit=self.L, obs=sim_obs, flags=flags)
+        if event_news:
+            res.news[:0] = event_news              # the morning post opens with what the wilderness did
         start, news, truth, robbed_by = res.start, res.news, res.truth, res.robbed_by
         ev = res.ev
         ev.update(sim_obs.ev)

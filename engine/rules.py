@@ -35,3 +35,6 @@ class Rules:
     pts_extract: int = 3
     pts_objective: int = 2
     pts_survive: int = 1
+    # wilderness events (prototype, simulator only; 0 = off, and then nothing below is read)
+    events_per_night: float = 0.0  # average events per night, camp-wide
+    events_bias: str = "random"    # "random", or "trailing" (good events lean to players below the median, bad above)

@@ -38,7 +38,10 @@ class NightResult:
     robbed_by: dict = field(default_factory=dict)  # victim pid -> thief pids who got something
 
 
-def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, obs=None):
+def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, obs=None, flags=frozenset()):
+    """`flags` is the camp-wide weather for tonight (wilderness events, default none): "storm" = nobody finds food
+    scavenging, "feast" = nobody eats. A player may carry `idol` = True (set by an event): the next theft against
+    them takes nothing. With no flags and no idols this is exactly the original night."""
     obs = obs or Observer()
     moves = dict(sorted(moves.items()))    # player-id order, never arrival order: same moves, same night
     P = {p.pid: p for p in players}
@@ -115,8 +118,15 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
             continue
         t = P[tgt]
         wants = [(th, r.bandit_steal_amount if P[th].bandit else r.steal_amount) for th in thieves]
+        shielded = getattr(t, "idol", False)
         take = min(can_lose[tgt], sum(w for _, w in wants))
-        rng.shuffle(wants)                 # split as evenly as possible, random order for remainders
+        if shielded:                       # a hidden idol: this night's thieves get nothing, and the idol is spent
+            take = 0
+            t.idol = False
+            ev["idol_used"] += 1
+            emit("event", event="idol_used", player=t.name, visibility="public")
+            news.append(f"IDOL: someone tried to rob {t.name} and left with nothing. The idol is spent.")
+        rng.shuffle(wants)                # split as evenly as possible, random order for remainders
         shares = {th: 0 for th, _ in wants}
         left = take
         while left > 0:
@@ -152,7 +162,8 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
             obs.robbed(night, t, take)
         else:
             ev["empty_steal"] += 1
-            news.append(f"Someone broke into {t.name}'s place and found nothing.")
+            if not shielded:
+                news.append(f"Someone broke into {t.name}'s place and found nothing.")
     res.robbed_by = dict(robbed_by)
 
     # 4. scavenging (and guard income, where a rule set has it) is the only thing that creates food
@@ -163,6 +174,9 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
                 found = rng.randint(0, r.missed_scavenge_max)
             else:
                 found = rng.randint(r.scavenge_min, r.scavenge_max)
+            if "storm" in flags:           # the roll is still drawn, so the random stream matches a calm night
+                ev["storm_lost"] += found
+                found = 0
             bal[pid] += found
             emit("scavenge", player=p.name, found=found, auto=bool(a[3]), visibility="private")
             if found:
@@ -228,7 +242,10 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
         was_bandit = p.bandit
         if not p.bandit:
             before = p.rations
-            p.rations = max(0, p.rations - r.eat)
+            eat = 0 if "feast" in flags else r.eat
+            if eat == 0 and r.eat and before > 0:
+                ev["feast_saved"] += r.eat
+            p.rations = max(0, p.rations - eat)
             if before != p.rations or before == 0:
                 ledger(p, p.rations - before, "eat", p.rations)
             if p.rations == 0:

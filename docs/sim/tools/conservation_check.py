@@ -7,8 +7,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import survivors_sim as S  # noqa: E402
 
-CREATE = {"scavenge", "guard_income", "gift_bonus"}
-DESTROY = {"eat", "fine"}
+CREATE = {"scavenge", "guard_income", "gift_bonus", "event_found"}
+DESTROY = {"eat", "fine", "event_lost"}
 
 rules = S.load_game_rules(S.DEFAULT_GAME)[0]
 GAMES = 300
