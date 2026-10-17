@@ -209,8 +209,8 @@ class GameService:
             raise GameError(why)
         self._append({"type": "move", "night": night, "pid": pid, "move": list(move), "at": at})
         log.info("move night=%d pid=%d kind=%s", night, pid, kind)
-        what = {"scavenge": "scavenge", "guard": "guard", "steal": f"steal from {target_alias}",
-                "investigate": f"investigate {target_alias}", "gift": f"give {target_alias} {amount}"}[kind]
+        what = {"scavenge": "🥫 scavenge", "guard": "🛡️ guard", "steal": f"🥷 steal from {target_alias}",
+                "investigate": f"🔍 investigate {target_alias}", "gift": f"🎁 give {target_alias} {amount}"}[kind]
         return f"Tonight you'll {what}. You can change your mind until the deadline."
 
     def radio(self, user_key, phrase, about=None):
@@ -242,7 +242,7 @@ class GameService:
         move = self.moves.get(pid)
         tonight = ("not chosen yet (you'll scavenge if you forget)" if not move else
                    move[0] + (f" {self.players[move[1]].name}" if move[1] is not None else ""))
-        return (f"**{alias}**: {p.rations} rations{' (BANDIT)' if p.bandit else ''}, {guards}"
+        return (f"**{alias}**: 🥫 {p.rations} rations{' 🏴‍☠️ BANDIT' if p.bandit else ''}, 🛡️ {guards}"
                 f"{', guarded tonight' if p.guard_until > self.night else ''}.\n"
                 f"Secret goal: {objective_text(p.objective, self.rules, tgt)}.\nTonight: {tonight}.")
 
@@ -327,10 +327,10 @@ class GameService:
 
     def _post_news(self, night):
         rec = self._night_record(night)
-        lines = news_lines(rec["events"]) or ["A quiet night. Nobody lost anything."]
-        msgs = [("news", f"**Morning {night} news**\n" + "\n".join(f"- {l}" for l in lines), None)]
+        lines = news_lines(rec["events"]) or ["🌙 A quiet night. Nobody lost anything."]
+        msgs = [("news", f"📰 **Morning {night} news**\n" + "\n".join(f"- {l}" for l in lines), None)]
         msgs += [("radio", None, ref) for ref in self.radio_pending]
-        msgs += [(f"dm:{pid}", f"**Night {night}**\n" + "\n".join(plines), None)
+        msgs += [(f"dm:{pid}", f"🌙 **Night {night}**\n" + "\n".join(plines), None)
                  for pid, plines in rec["private"].items() if int(pid) not in self.quit_ids]
         self._append({"type": "news", "night": night, "outbox": self._intents(*msgs)})
 
@@ -372,21 +372,21 @@ def news_lines(events):
     robbed = {}
     for e in events:
         if e["type"] == "steal" and e["outcome"] == "caught":
-            out.append(f"CAUGHT: {e['target']} was guarding and caught {e['thief']} red-handed. "
+            out.append(f"🚨 CAUGHT: {e['target']} was guarding and caught {e['thief']} red-handed. "
                        f"{e['thief']} paid {e['paid']}.")
         elif e["type"] == "steal" and e["outcome"] in ("success", "empty"):
             robbed.setdefault(e["target"], []).append(e["amount"])
         elif e["type"] == "exposed":
-            out.append(f"EXPOSED: an investigator saw {e['thief']} rob {e['victim']}. {e['thief']} pays them {e['paid']}.")
+            out.append(f"🕵️ EXPOSED: an investigator saw {e['thief']} rob {e['victim']}. {e['thief']} pays them {e['paid']}.")
         elif e["type"] == "became_bandit":
-            out.append(f"{e['player']} ran out of food. {e['player']} is back... as a bandit.")
+            out.append(f"🏴‍☠️ {e['player']} ran out of food. {e['player']} is back... as a bandit.")
         elif e["type"] == "rejoined":
-            out.append(f"Bandit {e['player']} has scraped together enough to rejoin the survivors.")
+            out.append(f"🎉 Bandit {e['player']} has scraped together enough to rejoin the survivors.")
     for victim, amounts in robbed.items():
         total = sum(amounts)
         who = "Someone" if len(amounts) == 1 else f"{len(amounts)} people"
-        out.insert(0, f"{who} hit {victim} overnight. {victim} is down {total}." if total
-                   else f"Someone broke into {victim}'s place and found nothing.")
+        out.insert(0, f"🥷 {who} hit {victim} overnight. {victim} is down {total}." if total
+                   else f"🥷 Someone broke into {victim}'s place and found nothing.")
     return out
 
 
@@ -396,32 +396,32 @@ def private_lines(events, p, before):
     for e in events:
         t = e["type"]
         if t == "scavenge" and e["player"] == me:
-            out.append(f"You scavenged and found {e['found']}.")
+            out.append(f"🥫 You scavenged and found {e['found']}.")
         elif t == "guard_up" and e["player"] == me:
-            out.append(f"You're guarding until the end of night {e['until_night']}.")
+            out.append(f"🛡️ You're guarding until the end of night {e['until_night']}.")
         elif t == "steal" and e["thief"] == me:
             if e["outcome"] == "success":
-                out.append(f"You stole {e['amount']} from {e['target']}.")
+                out.append(f"🥷 You stole {e['amount']} from {e['target']}.")
             elif e["outcome"] == "empty":
-                out.append(f"You broke into {e['target']}'s place and found nothing.")
+                out.append(f"🥷 You broke into {e['target']}'s place and found nothing.")
             else:
-                out.append(f"{e['target']} was guarding: you were caught and paid {e['paid']}.")
+                out.append(f"🚨 {e['target']} was guarding: you were caught and paid {e['paid']}.")
         elif t == "steal" and e["target"] == me and e["outcome"] == "success":
-            out.append(f"Someone stole {e['amount']} from you.")
+            out.append(f"🥷 Someone stole {e['amount']} from you.")
         elif t == "steal" and e["target"] == me and e["outcome"] == "caught":
-            out.append(f"Your guard caught {e['thief']} red-handed.")
+            out.append(f"🚨 Your guard caught {e['thief']} red-handed.")
         elif t == "investigate" and e["investigator"] == me:
             saw = e["saw_action"] + (f" ({e['saw_target']})" if e["saw_target"] else "")
-            out.append(f"You watched {e['target']}: they chose {saw}.")
+            out.append(f"🔍 You watched {e['target']}: they chose {saw}.")
         elif t == "exposed" and e["investigator"] == me:
-            out.append(f"You exposed {e['thief']}; they paid you {e['paid']}.")
+            out.append(f"🕵️ You exposed {e['thief']}; they paid you {e['paid']}.")
         elif t == "gift" and e["giver"] == me:
-            out.append(f"You gave {e['receiver']} {e['amount']}.")
+            out.append(f"🎁 You gave {e['receiver']} {e['amount']}.")
         elif t == "gift" and e["receiver"] == me:
-            out.append(f"{e['giver']} secretly gave you {e['amount']}.")
+            out.append(f"🎁 {e['giver']} secretly gave you {e['amount']}.")
         elif t == "became_bandit" and e["player"] == me:
-            out.append("You ran out of food. You're a bandit now: steal or investigate until you get back to 3.")
+            out.append("🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.")
         elif t == "rejoined" and e["player"] == me:
-            out.append("You've scraped together enough to rejoin the survivors.")
-    out.append(f"You now have {p.rations} rations.")
+            out.append("🎉 You've scraped together enough to rejoin the survivors.")
+    out.append(f"🥫 You now have {p.rations} rations.")
     return out
