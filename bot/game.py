@@ -20,6 +20,7 @@ from engine.finish import finish, goal_progress, objective_text
 from engine.moves import can_guard, legal_moves, validate
 
 from . import sims
+from .brain import SimBrain, SimSeat
 
 log = logging.getLogger("torch.game")
 # Radio is fixed phrases so nobody can be recognised by their writing style (owner, 17 Oct 2026).
@@ -102,9 +103,10 @@ class GameError(Exception):
 
 
 class GameService:
-    def __init__(self, rules: Rules, store, identity, texts, aliases, season_id, clock=time.time):
+    def __init__(self, rules: Rules, store, identity, texts, aliases, season_id, clock=time.time, avoid_aliases=()):
         self.rules, self.store, self.identity, self.texts = rules, store, identity, texts
         self.aliases, self.season_id, self.clock = list(aliases), season_id, clock
+        self.avoid_aliases = set(avoid_aliases)    # last season's aliases: handed out only when nothing else is free
         self._reset()
         self._load()
 
@@ -126,6 +128,7 @@ class GameService:
         self.news_posted = set()   # nights whose news intents exist
         self.intents, self.sent = {}, set()
         self.last_private = {}     # pid -> [lines] from the last resolved night
+        self.brain = None          # the sims' beliefs (bot/brain.py): rebuilt from the log, never saved
 
     def _load(self):
         for rec in self.store.load():
@@ -159,8 +162,11 @@ class GameService:
             self.ranges = rec.get("ranges", False)                  # morning ration ranges in #news
             self.rules = replace(self.rules, **EVENT_MODES[self.events_mode])
             for c in rec["roster"]:
-                self.players[c["pid"]] = PlayerState(pid=c["pid"], name=c["alias"], rations=self.rules.start_rations,
-                                                     objective=c["objective"], obj_target=c["target"])
+                self.players[c["pid"]] = SimSeat(pid=c["pid"], name=c["alias"], rations=self.rules.start_rations,
+                                                 objective=c["objective"], obj_target=c["target"],
+                                                 arch=self.personality.get(c["pid"], ""))
+            if self.sims:
+                self.brain = SimBrain(self.rules, self.players, night_seed(self.season_id, -2), self.ranges)
         elif t == "move":
             if rec["night"] == self.night + 1:
                 self.moves[rec["pid"]] = tuple(rec["move"])
@@ -202,13 +208,17 @@ class GameService:
         flags = frozenset()
         if self.rules.events_per_night > 0:      # wilderness events first, from their own dice (engine/events.py)
             ctx = _EventCtx(self._active(), self.rules, night, self.season_id, emit)
+            if self.brain:
+                ctx.public_delta = self.brain.public_delta     # public event finds and losses reach the sims' beliefs
             ctx.event_tally.update(self.event_counts)          # earlier nights count, so story decks don't restart
             flags, lines = wild.run_night_events(ctx, wild.rng_for(self.season_id, night))
             public = [e for e in events if e["type"] == "event" and e["visibility"] == "public"]
             for e, line in zip(public, lines):   # each public event wrote one #news line, in the same order
                 e["line"] = line
-        resolve_night(self._active(), moves, self.rules, random.Random(night_seed(self.season_id, night)), night,
-                      emit=emit, flags=flags)
+        res = resolve_night(self._active(), moves, self.rules, random.Random(night_seed(self.season_id, night)), night,
+                            emit=emit, flags=flags, obs=self.brain.observer if self.brain else None)
+        if self.brain:       # live and replayed nights both pass here exactly once: that is how a restart rebuilds it
+            self.brain.end_night(night, res)
         return events
 
     def _run_finish(self, check=None):
@@ -245,19 +255,20 @@ class GameService:
         return sorted(p.name for pid, p in self.players.items() if pid not in self.quit_ids and pid != me)
 
     # ---------------- player commands ----------------
-    def join(self, user_key, sim=False, rng=None):
+    def join(self, user_key, sim=False, rng=None, personality=None):
         if self.started:
             raise GameError("The game has already started; joining is closed.")
         if self.identity.get(user_key):
             return f"You're already in as **{self.identity.get(user_key)['alias']}**."
         taken = {a for _, a, _, _ in self.joined}
         free = [a for a in self.aliases if a not in taken]
+        free = [a for a in free if a not in self.avoid_aliases] or free      # a fresh name if there is one
         if not free:
             raise GameError("The game is full.")
         rng = rng or random.Random()
         alias = rng.choice(free)
         pid = len(self.joined)
-        personality = sims.pick_personality(rng) if sim else None
+        personality = (personality or sims.pick_personality(rng)) if sim else None
         self.identity.put(user_key, pid, alias, sim=sim)
         self._append({"type": "join", "pid": pid, "alias": alias, "sim": sim, **({"personality": personality} if sim else {})})
         log.info("join pid=%d sim=%s", pid, sim)
@@ -355,13 +366,19 @@ class GameService:
         needs_player = "{a}" in RADIO_PHRASES[phrase]
         if needs_player and not about:
             raise GameError("Pick who it's about.")
-        text = RADIO_PHRASES[phrase].format(a=self.players[self._pid_by_alias(about)].name if needs_player else "")
+        about_pid = self._pid_by_alias(about) if needs_player else None
         if any(r.startswith(f"r{self.night + 1}-{pid}-") for r in self.radio_pending):
             raise GameError("One radio message a day. Yours goes out with the morning news.")
+        self._post_radio(pid, phrase, about_pid)
+        return "Your anonymous message goes out with the morning news."
+
+    def _post_radio(self, pid, phrase, about_pid):
+        """The one way a radio line reaches #radio, for players and sims alike: text to the text store, a record in the
+        log, posted with the next morning news."""
+        text = RADIO_PHRASES[phrase].format(a=self.players[about_pid].name if about_pid is not None else "")
         ref = f"r{self.night + 1}-{pid}-{len(self.radio_pending)}"
         self.texts.put(ref, text)
         self._append({"type": "radio", "ref": ref, "night": self.night + 1})
-        return "Your anonymous message goes out with the morning news."
 
     def status(self, user_key):
         pid, alias = self._who(user_key)
@@ -398,9 +415,17 @@ class GameService:
         return "You've left the game. Thanks for playing."
 
     # ---------------- Game Master ----------------
-    def gm_add_sims(self, n, rng=None):
+    def gm_add_sims(self, n, rng=None, cast="balanced"):
+        """Add n sims. cast "balanced": one of each of the eight personalities before any repeats (continuing the cycle
+        across batches); "office": each drawn from the simulator's office mix (a saint is only 8%)."""
+        if cast not in sims.CASTS:
+            raise ValueError(f"cast must be one of {sims.CASTS}, not {cast!r}")
         rng = rng or random.Random()
-        return [self.join(f"sim:{len(self.joined)}", sim=True, rng=rng) for _ in range(n)]
+        out = []
+        for _ in range(n):
+            pick = sims.balanced_pick(rng, self.personality.values()) if cast == "balanced" else None
+            out.append(self.join(f"sim:{len(self.joined)}", sim=True, rng=rng, personality=pick))
+        return out
 
     def gm_start(self, day_seconds, news_delay=5.0, now=None, events="off", ranges=False):
         if events not in EVENT_MODES:
@@ -449,6 +474,19 @@ class GameService:
         if self.night == self.rules.rounds and self.night in self.news_posted and not self.finished:
             self._finish_game()
 
+    def _sim_radio(self, night):
+        """The sims' radio for day `night`, decided at the deadline from what each knew then, so it goes out with this
+        morning's news like any player's. Its own dice (season and night), so it never moves a sim's choice. Safe to
+        run again after a crash: every sim is decided again identically and one that already has a line today is skipped."""
+        rng = random.Random(night_seed(self.season_id, night) ^ 0x7AD10)
+        quit_ids = frozenset(self.quit_ids)
+        for p in self._active():
+            if p.pid not in self.sims:
+                continue
+            pick = self.brain.radio(p, night, rng, quit_ids)
+            if pick and not any(r.startswith(f"r{night}-{p.pid}-") for r in self.radio_pending):
+                self._post_radio(p.pid, pick[0], pick[1])
+
     def _resolve_due(self, night):
         rng = random.Random(night_seed(self.season_id, night) ^ 0x51A5)
         active = self._active()
@@ -458,10 +496,11 @@ class GameService:
             if m is not None and validate(active, p.pid, m, self.rules, night, frozenset(self.quit_ids)) is None:
                 moves[p.pid] = m
             elif p.pid in self.sims:
-                moves[p.pid] = sims.decide(p, self.personality[p.pid], active, self.rules, night, rng,
-                                           frozenset(self.quit_ids)) or ("scavenge", None, 0, True)
+                moves[p.pid] = self.brain.decide(p, active, night, rng, self.quit_ids)
             else:
                 moves[p.pid] = ("scavenge", None, 0, True)      # missed the deadline (or the move went stale)
+        if self.brain:
+            self._sim_radio(night)          # before the night record: a crash between the two is repaired on the retry
         before = {pid: (p.rations, p.bandit) for pid, p in self.players.items()}
         events = self._resolve(night, moves)
         private = {pid: private_lines(events, self.players[pid], before[pid], night, self.rules.guard_nights)
@@ -618,6 +657,8 @@ def private_lines(events, p, before, night=None, guard_nights=2):
                 out.append(f"🔍 While watching, you found {found} ration{'s' if found > 1 else ''}.")
         elif t == "exposed" and e["investigator"] == me:
             out.append(f"🕵️ You exposed {e['thief']}; they paid you {e['paid']}.")
+            if e["victim"] == me and e.get("to_victim"):      # you watched your own thief: the loot comes back to you
+                out.append(f"🕵️ You also got your {e['to_victim']} back from {e['thief']}, who robbed you.")
         elif t == "exposed" and e["thief"] == me:
             back = f" and gave back the {e['to_victim']} you stole" if e.get("to_victim") else ""
             out.append(f"🕵️ EXPOSED: an investigator saw you rob {e['victim']}. You paid them {e['paid']}{back}.")

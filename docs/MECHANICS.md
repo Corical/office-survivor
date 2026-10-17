@@ -34,7 +34,7 @@ Tables that follow a line like `<!-- check:rules -->` are read by the test. The 
 | Joining | `/join` before the game starts. After the start, joining is closed ("The game has already started; joining is closed."). |
 | Minimum to start | The Game Master can only start with at least `MIN_PLAYERS_TO_START` players (see constants). |
 | Maximum | One player per alias in the pool. The pool is the four example names in `docs/game.json` plus the simulator's name list, without repeats: `ALIAS_POOL_SIZE` names. When all are taken: "The game is full." |
-| Alias | Torch picks a random free alias for you. You never choose it. |
+| Alias | Torch picks a random free alias for you. You never choose it. A new season avoids every alias used in the newest archived season (so nobody is handed last game's name and mistakes it for their own); those names are used only if no other is free. |
 | Why aliases (owner decision 17) | Betrayals cannot be pinned on a person. Torch assigns the names because a familiar handle would give its owner away. Everything public (#news, #radio, the reveal) uses aliases only. The link from Discord account to alias is kept in a separate file (`identity.json`), never in the game log. |
 | Real names | Nothing official ever confirms who an alias is during a season. #town-square is normal chat where people may say what they like. After a season has ended, the Game Master can see who played which alias (`/gm history`, `/gm hall-of-fame`, section 9). Never during a game. |
 
@@ -63,6 +63,7 @@ Start announcements: #news gets "The game has begun" (with extra sentences when 
 | `events` | `gentle` or `off` | `gentle` |
 | `ranges` | on or off | on |
 | `confirm` | needed only if a game is still running | off |
+| `cast` | `balanced` or `office` (see "Simulated colleagues") | `balanced` |
 
 Note the defaults differ from `/gm start` (events and ranges are on here). A season that has not started keeps whoever already joined.
 
@@ -129,7 +130,28 @@ If you have no valid move when the night resolves, you scavenge automatically (a
 
 ### Simulated colleagues
 
-`/gm add-sims` (1 to `GM_ADD_SIMS_MAX`, before the start) adds computer players for test games. They use the simulator's office personalities (casual, farmer, opportunist, shark, paranoid, saint, detective, chaos) and play through the same rules. They sometimes miss the deadline (chance depends on the personality, times `miss_scale`). They never receive DMs and never use the radio.
+`/gm add-sims` (1 to `GM_ADD_SIMS_MAX`, before the start) adds computer players for test games. They have the simulator's office personalities (casual, farmer, opportunist, shark, paranoid, saint, detective, chaos) and play through the same rules. They never receive DMs.
+
+**Cast (`cast` option on `/gm add-sims` and `/gm pilot`, default `balanced`).** `balanced` deals one of each of the eight personalities before any repeats, in a shuffled order, and carries on the cycle when sims are added in several batches (8 sims = all eight, 16 = two of each). `office` draws each sim from the simulator's office mix (casual 25%, farmer 20%, opportunist 15%, paranoid 10%, saint 8%, detective 8%, shark 7%, chaos 7%), so a saint is often missing. The personality is stored in the sim's join record.
+
+**How a sim decides (`bot/brain.py`, `docs/sim/simbrain.py`).** It is the simulator's own AI, the same code, not a copy: it rolls a move from its personality's odds (and sometimes misses the deadline, chance depends on the personality, times `miss_scale`), nudged by its secret goal, being short of food, being robbed last night, the last night, and having been caught or exposed (it then steals less). It picks targets by what it believes about people, with some noise. It gives food back to whoever gave to it. Investigating and gifting are weighed up for the food they bring (`investigate_find`, `gift_bonus`).
+
+What a sim knows is only what a player in its seat knows: its own state, its own private night results (what it saw when watching someone, who gave it food, who its guard caught; never who robbed it), the public #news facts (robberies, catches, exposures, bandits, events), and the morning ration ranges when the game has them (otherwise it estimates from the start rations and what #news said). Like a human it forgets: it follows about three people closely and its guesses about the rest drift to the camp average. It does not listen to #radio.
+
+**Restarts.** A sim's knowledge is never saved. It is rebuilt from the log: every night is re-resolved on load, and the same code that resolves a night updates the sims' beliefs, live or replayed. Each night's choices use dice seeded by season and night, so a restarted Torch decides exactly what an uninterrupted one would.
+
+**Sim radio.** Each sim may post at most one radio line a day, from the fixed phrases (section 9), never about itself when the line names someone. It is decided at the night's deadline from what the sim knew then (its own dice, season and night), written through the same path as a player's radio (a `radio` record, the text in the text store) and goes out with that morning's news. The chance a sim posts on a given day is `RADIO_RATE` in `bot/brain.py` (casual 3%, farmer 8%, opportunist 15%, paranoid 20%, saint 20%, shark 40%, chaos 45%; a detective 90% when it has something true to say). A full cast of eight averages about 1.7 lines a night.
+
+| Personality | What it says |
+| --- | --- |
+| shark | "Don't trust X" or "X is lying about their rations", about whoever it thinks is richest |
+| opportunist | "X is guarding. Don't waste your night on them." about whoever it thinks is richest (a bluff to keep rivals off its own mark) |
+| paranoid | "I'm innocent. Leave me alone." |
+| saint | "Someone should watch X's back tonight" about someone robbed last night, else "X is innocent" about whoever looks worst off |
+| farmer | "Someone should watch X's back tonight" about someone robbed last night, else "I'm innocent" |
+| casual | rarely: "I'm innocent" or "X is innocent" about a random person |
+| detective | only what it watched: "I saw X sneaking around last night" when it watched X steal last night, later "Don't trust X" about a thief it watched earlier. Never lies. |
+| chaos | any line, any target (bluffs and rumours) |
 
 ## 2. The numbers
 
@@ -544,9 +566,9 @@ Every reply to a player is ephemeral (only they see it). Only Torch posts in #ne
 | `/results` | `-` | What happened to you last night | everyone |
 | `/radio` | `-` | Send an anonymous rumour by clicks (posted with the morning news) | everyone |
 | `/quit` | `-` | Leave the game (your food leaves with you) | everyone |
-| `/gm add-sims` | `count` | Add simulated colleagues (before the start) | Game Master |
+| `/gm add-sims` | `count, cast` | Add simulated colleagues (before the start) | Game Master |
 | `/gm start` | `day_minutes, events, ranges` | Start the game | Game Master |
-| `/gm pilot` | `sims, day_minutes, events, ranges, confirm` | One step: new season, you join, add sims, start (defaults = usual pilot) | Game Master |
+| `/gm pilot` | `sims, day_minutes, events, ranges, confirm, cast` | One step: new season, you join, add sims, start (defaults = usual pilot) | Game Master |
 | `/gm who-moved` | `-` | Who has chosen tonight's move (never rations) | Game Master |
 | `/gm history` | `member` | Who played which alias, in FINISHED seasons only (private to you) | Game Master |
 | `/gm hall-of-fame` | `since, post` | Totals per person over finished seasons; post:True puts it in #news | Game Master |
@@ -564,7 +586,7 @@ For the last `FINAL_STRETCH` (3) nights, Torch adds a line saying how many night
 
 ### The status board in #news
 
-One live message at the bottom of #news, with three buttons that work for everyone and answer privately: 🎮 Play, 📻 Radio, 📋 My status. It is replaced (old one deleted, new one posted and pinned when Torch may pin) when its content changes: whenever someone joins before the start, at the start, after each night's news, and at the end. It waits until the news is above it. Shown: the player count (and "🌴 Events on" / "📊 Ranges on"), which night is open and when moves close (Discord shows the time in each player's own zone, counting down), and the nights done.
+One live message pinned in #news, with three buttons that work for everyone and answer privately: 🎮 Play, 📻 Radio, 📋 My status. It is edited in place when its content changes (no new message, no sound, no "pinned" notice; posted silently and pinned only the first time, or again if someone deletes it): whenever someone joins before the start, at the start, after each night's news, and at the end. It waits until the news is above it. Shown: the player count (and "🌴 Events on" / "📊 Ranges on"), which night is open and when moves close (Discord shows the time in each player's own zone, counting down), and the nights done.
 
 ### History and Hall of Fame (Game Master only)
 
@@ -646,6 +668,7 @@ Lines are listed with placeholders in braces. The test checks that the fixed wor
 | Guard from last night | DM | `Your guard (still up from night {n})` | `bot/game.py` |
 | Investigated | DM | `🔍 You watched {target}: they chose {action}.` | `bot/game.py` |
 | You exposed a thief | DM | `🕵️ You exposed {thief}; they paid you {n}.` | `bot/game.py` |
+| You exposed your own thief | DM | `🕵️ You also got your {n} back from {thief}, who robbed you.` | `bot/game.py` |
 | You were exposed | DM | `🕵️ EXPOSED: an investigator saw you rob {victim}. You paid them {n}{back}.` | `bot/game.py` |
 | You were exposed, loot returned (the `{back}` part) | DM | `and gave back the {n} you stole` | `bot/game.py` |
 | Your thief was caught | DM to the victim | `🕵️ An investigator caught the thief who robbed you: {thief}. You got your {n} back.` | `bot/game.py` |
@@ -698,7 +721,7 @@ Lines are listed with placeholders in braces. The test checks that the fixed wor
 | Goal text | reply | `They look {band} this morning.` | `engine/finish.py` |
 | Goal text | reply | `decided at the end: who gets a seat is only known when the helicopter comes` | `engine/finish.py` |
 | Goal text | reply | `robbed {target} {n}/{goal}` | `engine/finish.py` |
-| Radio posted | #radio | `📻 *Anonymous on the radio:* {text}` | `bot/discord_app.py` |
+| Radio posted (one silent post per night, then `- {text}` per message) | #radio | `📻 **On the radio last night** (anonymous)` | `bot/discord_app.py` |
 | Radio sent | reply | `Your anonymous message goes out with the morning news.` | `bot/game.py` |
 | Radio used | reply | `One radio message a day. Yours goes out with the morning news.` | `bot/game.py` |
 | Radio closed | reply | `Radio opens when the game starts.` | `bot/game.py` |
@@ -758,7 +781,7 @@ DMs list the night's lines in this order: your event, camp event that took from 
 
 ### The radio
 
-One message per player per day, picked by clicking (a fixed line, then a player if the line names one). The picker lists the players still in the game except you. It is posted to #radio with the next morning's news, anonymously, as "📻 *Anonymous on the radio:* {text}". A message sent between the deadline and the news goes out with that news. Nobody can write their own words, so nobody is recognised by their writing style (owner decision, 17 October 2026).
+One message per player per day, picked by clicking (a fixed line, then a player if the line names one). The picker lists the players still in the game except you. All radio lines of a night go out together, anonymously, as ONE silent post in #radio with the next morning's news ("📻 **On the radio last night** (anonymous)", then one line each), so it does not ping per line (owner, 17 October 2026). A message sent between the deadline and the news goes out with that news. Nobody can write their own words, so nobody is recognised by their writing style (owner decision, 17 October 2026).
 
 <!-- check:radio -->
 | Key | Line |
@@ -837,3 +860,5 @@ Verified on 17 October 2026. Remove an item here when it is fixed.
 | 17 October 2026 | Fair deal of secret goals (like a deck, with a chain of targets) and a sixth goal, Detective. |
 | 17 October 2026 | Gifts are 1 or 2 and the giver keeps at least 1. Quitters cannot be targeted and their food leaves the game. |
 | 17 October 2026 | Night DMs explain every ration and say which night a guard covers. Only Torch speaks in #news and #radio (threads shut). |
+| 17 October 2026 | Sims play with the simulator's own AI (beliefs rebuilt from the log on restart), deal a balanced cast by default (`cast` on `/gm pilot` and `/gm add-sims`), and post radio by personality (about 1.7 lines a night for eight). New DM line for a player who exposes their own thief. |
+| 17 October 2026 | A new season avoids the aliases of the newest archived season. |

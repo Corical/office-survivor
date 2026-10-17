@@ -48,7 +48,17 @@ class Torch(discord.Client):
             else self._new_season_id()
         return GameService(self.conf.rules, JsonlEventStore(os.path.join(d, "season.jsonl")),
                            IdentityStore(os.path.join(d, "identity.json")), TextStore(os.path.join(d, "texts.json")),
-                           self.conf.aliases, season)
+                           self.conf.aliases, season, avoid_aliases=self._last_season_aliases())
+
+    def _last_season_aliases(self):
+        """Aliases used in the newest archived season, so nobody is handed last game's name (it looks like their own)."""
+        import glob
+        import json
+        newest = sorted(glob.glob(os.path.join(self.conf.data_dir, "archive-*", "identity.json")))
+        try:
+            return {v["alias"] for v in json.load(open(newest[-1], encoding="utf-8")).values()} if newest else set()
+        except (OSError, ValueError, KeyError):
+            return set()
 
     def _new_season_id(self):
         sid = datetime.datetime.now().strftime("season-%Y%m%d-%H%M%S")
@@ -122,19 +132,26 @@ class Torch(discord.Client):
         except (OSError, ValueError):
             state = {}
         if state.get("key") == list(key) or self.game.pending_outbox():
-            return                                    # unchanged, or news still going out: wait until it's above
+            return                                    # unchanged, or news still going out
         ch = self.channels["news"]
-        if state.get("message_id"):
-            try:
-                old = await ch.fetch_message(int(state["message_id"]))
-                await old.delete()
+        msg = None
+        if state.get("message_id"):                   # owner, 17 Oct 2026: no repost spam. One pinned board, edited
+            try:                                      # in place (an edit makes no sound and no "pinned" notice)
+                msg = await ch.fetch_message(int(state["message_id"]))
+                await msg.edit(content=text, view=BoardView(self), allowed_mentions=NONE)
             except discord.HTTPException:
-                pass                                  # already gone
-        msg = await ch.send(text, view=BoardView(self), allowed_mentions=NONE)
-        try:
-            await msg.pin(reason="Torch status board")
-        except discord.HTTPException:
-            pass                                      # no pin rights: the board still sits at the bottom of #news
+                msg = None                            # deleted by hand: post a new one below
+        if msg is None:
+            msg = await ch.send(text, view=BoardView(self), allowed_mentions=NONE, silent=True)
+            try:
+                await msg.pin(reason="Torch status board")
+            except discord.HTTPException:
+                pass                                  # no pin rights: it still works, just unpinned
+        if not msg.pinned:
+            try:
+                await msg.pin(reason="Torch status board")
+            except discord.HTTPException:
+                pass
         json.dump({"key": list(key), "message_id": str(msg.id)}, open(path, "w", encoding="utf-8"))
 
     async def deliver(self):
@@ -142,9 +159,13 @@ class Torch(discord.Client):
             await self._deliver()
 
     async def _deliver(self):
+        radio = []                                    # owner: one radio post per round, silent, not a ping per line
         for intent in self.game.pending_outbox():
             text = self.game.outbox_text(intent)
             to = intent["to"]
+            if to == "radio":
+                radio.append((intent, text))
+                continue
             try:
                 if to == "news" and intent.get("image") == "reveal" and (pic := self.reveal_picture()):
                     head = text.split("\n\n**The reveal**")[0]
@@ -170,6 +191,25 @@ class Torch(discord.Client):
             except discord.HTTPException:
                 log.exception("sending %s failed; will retry", intent["id"])
                 return
+        if radio:
+            lines = [f"- {discord.utils.escape_markdown(t)}" for _, t in radio]
+            chunks, cur = [], "📻 **On the radio last night** (anonymous)"
+            for line in lines:                       # stay under Discord's 2000-character limit
+                if len(cur) + len(line) + 1 > 1990:
+                    chunks.append(cur)
+                    cur = "📻 *(more)*"
+                cur += "\n" + line
+            chunks.append(cur)
+            try:
+                ref = None
+                for chunk in chunks:
+                    msg = await self.channels["radio"].send(chunk, allowed_mentions=NONE, silent=True)
+                    ref = ref or str(msg.id)
+                async with self.lock:
+                    for intent, _ in radio:
+                        self.game.mark_sent(intent["id"], ref)
+            except discord.HTTPException:
+                log.exception("sending the radio bundle failed; will retry")
 
     def reveal_picture(self):
         """The reveal table as PNG bytes, or None (then the text reveal goes out instead: it must never go missing)."""
@@ -466,9 +506,15 @@ def register(bot):
         return True
 
     @gm.command(name="add-sims", description="Add simulated colleagues (before the start)")
-    async def add_sims(i: discord.Interaction, count: app_commands.Range[int, 1, 20]):
+    @app_commands.describe(cast="balanced: one of each personality before any repeat; office: random office mix")
+    @app_commands.choices(cast=[app_commands.Choice(name="balanced", value="balanced"),
+                                app_commands.Choice(name="office", value="office")])
+    async def add_sims(i: discord.Interaction, count: app_commands.Range[int, 1, 20],
+                       cast: app_commands.Choice[str] = None):
         if await gm_only(i):
-            await call(i, lambda: (bot.game.gm_add_sims(count, rng=random.Random()), f"Added {count} sim colleagues.")[1])
+            kind = cast.value if cast else "balanced"
+            await call(i, lambda: (bot.game.gm_add_sims(count, rng=random.Random(), cast=kind),
+                                   f"Added {count} sim colleagues.")[1])
 
     @gm.command(name="start", description="Start the game")
     @app_commands.describe(events="Wilderness events: bananas, gorillas, hidden idols (about one a night)")
@@ -498,12 +544,16 @@ def register(bot):
     @gm.command(name="pilot", description="One step: new season, you join, add sims, start (defaults = usual pilot)")
     @app_commands.describe(sims="Simulated colleagues", day_minutes="Minutes per round",
                            events="Wilderness events", ranges="Morning ration ranges in #news",
-                           confirm="Needed only if a game is still running: it gets archived unfinished")
+                           confirm="Needed only if a game is still running: it gets archived unfinished",
+                           cast="balanced: one of each personality before any repeat; office: random office mix")
     @app_commands.choices(events=[app_commands.Choice(name="gentle", value="gentle"),
-                                  app_commands.Choice(name="off", value="off")])
+                                  app_commands.Choice(name="off", value="off")],
+                          cast=[app_commands.Choice(name="balanced", value="balanced"),
+                                app_commands.Choice(name="office", value="office")])
     async def pilot(i: discord.Interaction, sims: app_commands.Range[int, 1, 20] = 8,
                     day_minutes: app_commands.Range[float, 1, 1440] = 5.0,
-                    events: app_commands.Choice[str] = None, ranges: bool = True, confirm: bool = False):
+                    events: app_commands.Choice[str] = None, ranges: bool = True, confirm: bool = False,
+                    cast: app_commands.Choice[str] = None):
         if not await gm_only(i):
             return
         mode = events.value if events else "gentle"
@@ -516,7 +566,7 @@ def register(bot):
                 bot.archive_and_reset()
             try:
                 alias = bot.game.join(key(i)).split("**")[1]
-                bot.game.gm_add_sims(sims, rng=random.Random())
+                bot.game.gm_add_sims(sims, rng=random.Random(), cast=cast.value if cast else "balanced")
                 bot.game.gm_start(day_seconds=day_minutes * 60, news_delay=10, now=time.time(), events=mode,
                                   ranges=ranges)
             except GameError as e:

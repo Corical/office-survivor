@@ -312,7 +312,8 @@ class MechanicsDoc(unittest.TestCase):
                 problems.append(f"Mode `{mode}`: the doc says {S(doc[mode])} but bot/game.py EVENT_MODES has "
                                 f"{S(settings)}. Fix the Settings cell.")
         problems += [f"check:modes lists mode `{m}` that EVENT_MODES does not have." for m in doc if m not in code]
-        choices = set(re.findall(r'Choice\(name="(\w+)", value="\1"\)', read("bot/discord_app.py")))
+        events_lists = re.findall(r"events=\[(.*?)\]", read("bot/discord_app.py"), re.S)      # not the cast= list beside it
+        choices = set(re.findall(r'Choice\(name="(\w+)", value="\1"\)', "\n".join(events_lists)))
         if choices != set(code):
             problems.append(f"/gm start offers the events choices {sorted(choices)} but EVENT_MODES has "
                             f"{sorted(code)}. They must match, then fix the doc.")
