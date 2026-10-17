@@ -30,6 +30,7 @@ RADIO_PHRASES = {
     "guarding": "{a} is guarding. Don't waste your night on them.",
     "easy": "{a} looks like an easy target.",
     "innocent": "{a} is innocent. Leave them alone.",
+    "watch": "Someone should watch {a}'s back tonight.",
     "me": "I'm innocent. Leave me alone.",
 }
 
