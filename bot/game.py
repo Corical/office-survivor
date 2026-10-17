@@ -300,7 +300,7 @@ class GameService:
         nxt = n + 1
         if nxt <= rounds:
             dl = int(self.schedule.deadline(nxt))
-            now_line = f"🌙 **Night {nxt} of {rounds}** · moves close <t:{dl}:R> (<t:{dl}:t>) · use /play"
+            now_line = f"🌙 **Night {nxt} of {rounds}** · moves close <t:{dl}:R> (<t:{dl}:t>) · tap 🎮 Play"
         else:
             now_line = "🚁 The last night is over. The helicopter is coming…"
         return key, "\n".join(x for x in (head + (f" · {modes}" if modes else ""), now_line,

@@ -71,6 +71,7 @@ class Torch(discord.Client):
         guild = discord.Object(id=self.conf.guild_id)
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
+        self.add_view(BoardView(self))           # the board's buttons keep working across restarts
         self.loop.create_task(self.heartbeat())
 
     async def on_ready(self):
@@ -127,7 +128,7 @@ class Torch(discord.Client):
                 await old.delete()
             except discord.HTTPException:
                 pass                                  # already gone
-        msg = await ch.send(text, allowed_mentions=NONE)
+        msg = await ch.send(text, view=BoardView(self), allowed_mentions=NONE)
         try:
             await msg.pin(reason="Torch status board")
         except discord.HTTPException:
@@ -328,6 +329,56 @@ class PlayView(discord.ui.View):
         await self.bot.deliver()
 
 
+async def open_play(bot, i):
+    """The private move menu, for /play and the board's Play button alike."""
+    try:
+        async with bot.lock:
+            menu = bot.game.play_menu(str(i.user.id))
+    except GameError as e:
+        return await private(i, f"⚠️ {e}")
+    await i.response.send_message(menu["header"], view=PlayView(bot, str(i.user.id), menu), ephemeral=True,
+                                  allowed_mentions=NONE)
+
+
+async def open_radio(bot, i):
+    """The private radio picker, for /radio and the board's Radio button alike."""
+    try:
+        async with bot.lock:
+            menu = bot.game.radio_menu(str(i.user.id))
+    except GameError as e:
+        return await private(i, f"⚠️ {e}")
+    if not menu["available"]:
+        return await private(i, "📻 You've already used today's radio message. It goes out with the morning news.")
+    await i.response.send_message("📻 Pick a line. It goes out anonymously with the morning news.",
+                                  view=RadioView(bot, str(i.user.id), menu), ephemeral=True, allowed_mentions=NONE)
+
+
+class BoardView(discord.ui.View):
+    """Buttons on the status board in #news. Persistent (fixed custom ids, no timeout, re-registered at startup), so
+    they keep working on the pinned message after Torch restarts. Every reply is private to whoever tapped."""
+
+    def __init__(self, bot):
+        super().__init__(timeout=None)
+        self.bot = bot
+
+    @discord.ui.button(label="Play", emoji="🎮", style=discord.ButtonStyle.primary, custom_id="torch:play")
+    async def play(self, i, _button):
+        await open_play(self.bot, i)
+
+    @discord.ui.button(label="Radio", emoji="📻", style=discord.ButtonStyle.secondary, custom_id="torch:radio")
+    async def radio(self, i, _button):
+        await open_radio(self.bot, i)
+
+    @discord.ui.button(label="My status", emoji="📋", style=discord.ButtonStyle.secondary, custom_id="torch:status")
+    async def status(self, i, _button):
+        try:
+            async with self.bot.lock:
+                text = self.bot.game.status(str(i.user.id))
+        except GameError as e:
+            text = f"⚠️ {e}"
+        await private(i, text)
+
+
 def register(bot):
     tree = bot.tree
 
@@ -362,13 +413,7 @@ def register(bot):
 
     @tree.command(description="Make tonight's move: just click")
     async def play(i: discord.Interaction):
-        try:
-            async with bot.lock:
-                menu = bot.game.play_menu(key(i))
-        except GameError as e:
-            return await private(i, f"⚠️ {e}")
-        await i.response.send_message(menu["header"], view=PlayView(bot, key(i), menu), ephemeral=True,
-                                      allowed_mentions=NONE)
+        await open_play(bot, i)
 
     @tree.command(description="Look for food tonight (0 to 2 rations)")
     async def scavenge(i: discord.Interaction):
@@ -404,15 +449,7 @@ def register(bot):
 
     @tree.command(description="Send an anonymous rumour by clicks (posted with the morning news)")
     async def radio(i: discord.Interaction):
-        try:
-            async with bot.lock:
-                menu = bot.game.radio_menu(key(i))
-        except GameError as e:
-            return await private(i, f"⚠️ {e}")
-        if not menu["available"]:
-            return await private(i, "📻 You've already used today's radio message. It goes out with the morning news.")
-        await i.response.send_message("📻 Pick a line. It goes out anonymously with the morning news.",
-                                      view=RadioView(bot, key(i), menu), ephemeral=True, allowed_mentions=NONE)
+        await open_radio(bot, i)
 
     @tree.command(name="quit", description="Leave the game (your food leaves with you)")
     async def quit_(i: discord.Interaction):
