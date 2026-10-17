@@ -85,8 +85,8 @@ BY_ID = {e["id"]: e for e in EVENTS}
 VARIANTS = {
     "storm": [
         ("⛈️", "A storm rolled in. Nobody finds any food tonight."),
-        ("\U0001F32B️", "Thick fog all night. Nobody could find a thing to eat."),
-        ("\U0001F32A️", "A whirlwind tore through the island. Foraging was hopeless tonight."),
+        ("\U0001F32B️", "Thick fog all night. Nobody finds any food tonight."),
+        ("\U0001F32A️", "A whirlwind tore through the island. Nobody finds any food tonight."),
         ("\U0001F30A", "A storm surge flooded the foraging grounds. Nobody finds any food tonight."),
     ],
     "feast": [

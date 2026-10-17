@@ -26,8 +26,14 @@ class Variations(unittest.TestCase):
         import sys, os
         sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "docs", "sim"))
         import events as E
+        weather = {"storm": "Nobody finds any food tonight.", "feast": "Nobody eats tonight."}
         for eid, options in E.VARIANTS.items():
             eff = E.BY_ID[eid]["effect"]
+            if eff["op"] == "flag":                 # camp weather: names nobody, must say what it does
+                for _, text in options:
+                    self.assertIn(weather[eff["flag"]], text, f"{eid}: '{text}' doesn't say what it does")
+                    self.assertNotIn("{who}", text)
+                continue
             tag = f"{'+' if eff['op'] == 'find' else '-'}{eff['amount']} ration"
             for _, text in options:
                 self.assertIn(tag, text, f"{eid}: '{text}' doesn't say {tag}")
