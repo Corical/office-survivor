@@ -17,6 +17,27 @@ def can_guard(p, rules, night):
     return night >= p.next_guard_night
 
 
+def legal_moves(players, pid, rules, night, quit_ids=frozenset()):
+    """What this player may do tonight, as {kind: [target ids]} ({kind: []} for untargeted kinds), plus the legal gift
+    amounts under the key 'gift_amounts'. Built from `validate` itself, so a menu can never offer what the server
+    would refuse."""
+    others = [p.pid for p in players if p.pid != pid and p.pid not in quit_ids]
+    out = {}
+    for kind in KINDS:
+        if kind in TARGETED:
+            amt = GIFT_MIN if kind == "gift" else 0
+            ok = [t for t in others if validate(players, pid, (kind, t, amt, False), rules, night, quit_ids) is None]
+            if ok:
+                out[kind] = ok
+        elif validate(players, pid, (kind, None, 0, False), rules, night, quit_ids) is None:
+            out[kind] = []
+    if "gift" in out:
+        t = out["gift"][0]
+        out["gift_amounts"] = [a for a in range(GIFT_MIN, GIFT_MAX + 1)
+                               if validate(players, pid, ("gift", t, a, False), rules, night, quit_ids) is None]
+    return out
+
+
 def validate(players, pid, move, rules, night, quit_ids=frozenset()):
     """None if the move is allowed, else a short reason a player can read."""
     P = {p.pid: p for p in players}

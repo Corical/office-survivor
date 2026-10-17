@@ -109,6 +109,45 @@ class Rules_(unittest.TestCase):
         self.assertEqual(night_label(real, 1), "Night 1 (Mon)")            # closes at Tuesday 00:00: Monday's night
         self.assertEqual(night_label(real, 2), "Night 2 (Tue)")
 
+    def test_play_menu_offers_only_what_the_server_accepts(self):
+        me, other = self.g.identity.get("a")["alias"], self.g.identity.get("b")["alias"]
+        m = self.g.play_menu("a")
+        self.assertEqual(set(m["moves"]), {"scavenge", "guard", "steal", "investigate", "gift"})
+        self.assertNotIn(me, m["moves"]["steal"])
+        # every offered move is accepted by submit
+        for kind, targets in m["moves"].items():
+            for t in targets or [None]:
+                self.g.submit("a", kind, t, m["gift_amounts"][0] if kind == "gift" else 0, at=1)
+        # a bandit is offered steal and investigate only, and no guard after guards run out
+        p = self.g.players[self.g.identity.get("a")["pid"]]
+        p.bandit = True
+        self.assertEqual(set(self.g.play_menu("a")["moves"]), {"steal", "investigate"})
+        p.bandit, p.guards_used = False, self.g.rules.guard_limit
+        self.assertNotIn("guard", self.g.play_menu("a")["moves"])
+        p.rations = 1                                     # can't gift: must keep 1
+        self.assertNotIn("gift", self.g.play_menu("a")["moves"])
+        p.rations = 2
+        self.assertEqual(self.g.play_menu("a")["gift_amounts"], [1])
+        self.assertIn(other, self.g.play_menu("a")["moves"]["gift"])
+
+    def test_play_menu_refused_before_start_and_for_strangers(self):
+        g = service()
+        g.join("x", rng=random.Random(5))
+        with self.assertRaises(GameError):
+            g.play_menu("x")
+        with self.assertRaises(GameError):
+            self.g.play_menu("nobody")
+
+    def test_unlucky_thief_learns_someone_beat_them_to_it(self):
+        from types import SimpleNamespace
+        from bot.game import private_lines
+        p = SimpleNamespace(name="Unlucky", rations=3)
+        shared = [{"type": "steal", "thief": "Unlucky", "target": "Wobbly", "outcome": "empty", "amount": 0, "split_with": 1}]
+        alone = [{"type": "steal", "thief": "Unlucky", "target": "Wobbly", "outcome": "empty", "amount": 0, "split_with": 0}]
+        self.assertIn("someone beat you to it", " ".join(private_lines(shared, p, 3)))
+        self.assertIn("found nothing", " ".join(private_lines(alone, p, 3)))
+        self.assertNotIn("beat you", " ".join(private_lines(alone, p, 3)))
+
     def test_join_closed_after_start(self):
         with self.assertRaises(GameError):
             self.g.join("late")

@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from engine import ENGINE_VERSION, PlayerState, Rules, resolve_night
 from engine.deal import deal
 from engine.finish import finish, objective_text
-from engine.moves import can_guard, validate
+from engine.moves import can_guard, legal_moves, validate
 
 from . import sims
 
@@ -225,6 +225,23 @@ class GameService:
                 "investigate": f"🔍 investigate {target_alias}", "gift": f"🎁 give {target_alias} {amount}"}[kind]
         return f"{night_label(self.schedule, night)}: you'll {what}. You can change your mind until the deadline."
 
+    def play_menu(self, user_key):
+        """What /play offers this player right now: a header line and the legal moves with target aliases.
+        {'header': str, 'moves': {kind: [aliases]}, 'gift_amounts': [ints]}"""
+        if not self.started or self.finished:
+            raise GameError("There's no round open right now.")
+        pid, alias = self._who(user_key)
+        if pid in self.quit_ids:
+            raise GameError("You're not in this game.")
+        night = self.night + 1
+        p = self.players[pid]
+        legal = legal_moves(self._active(), pid, self.rules, night, frozenset(self.quit_ids))
+        amounts = legal.pop("gift_amounts", [])
+        moves = {k: sorted(self.players[t].name for t in v) for k, v in legal.items()}
+        state = "🏴‍☠️ bandit" if p.bandit else f"🥫 {p.rations} rations"
+        return {"header": f"**{night_label(self.schedule, night)}**: {alias}, {state}. What will you do tonight?",
+                "moves": moves, "gift_amounts": amounts}
+
     def radio(self, user_key, phrase, about=None):
         pid, _ = self._who(user_key)
         if not self.started or self.finished:
@@ -416,7 +433,8 @@ def private_lines(events, p, before):
             if e["outcome"] == "success":
                 out.append(f"🥷 You stole {e['amount']} from {e['target']}.")
             elif e["outcome"] == "empty":
-                out.append(f"🥷 You broke into {e['target']}'s place and found nothing.")
+                out.append(f"🥷 You broke into {e['target']}'s place, but someone beat you to it."
+                           if e.get("split_with") else f"🥷 You broke into {e['target']}'s place and found nothing.")
             else:
                 out.append(f"🚨 {e['target']} was guarding: you were caught and paid {e['paid']}.")
         elif t == "steal" and e["target"] == me and e["outcome"] == "success":

@@ -141,6 +141,80 @@ async def private(interaction, text):
         await interaction.response.send_message(text, ephemeral=True, allowed_mentions=NONE)
 
 
+BUTTONS = {"scavenge": ("🥫", "Scavenge"), "guard": ("🛡️", "Guard"), "steal": ("🥷", "Steal"),
+           "investigate": ("🔍", "Investigate"), "gift": ("🎁", "Gift")}
+VERB = {"steal": "Steal from whom?", "investigate": "Watch whom?", "gift": "Give to whom?"}
+
+
+class PlayView(discord.ui.View):
+    """/play: buttons for tonight's legal moves, then a player list, then (gifts) the amount. Only the player sees it;
+    every click is still checked by GameService.submit, judged at the click's own timestamp."""
+
+    def __init__(self, bot, user_key, menu):
+        super().__init__(timeout=600)
+        self.bot, self.user_key, self.menu = bot, user_key, menu
+        self.show_moves()
+
+    def show_moves(self):
+        self.clear_items()
+        for kind, (emoji, label) in BUTTONS.items():
+            if kind in self.menu["moves"]:
+                b = discord.ui.Button(label=label, emoji=emoji, style=discord.ButtonStyle.secondary)
+                b.callback = self._pick(kind)
+                self.add_item(b)
+
+    def _pick(self, kind):
+        async def cb(i):
+            targets = self.menu["moves"][kind]
+            if not targets:
+                return await self.finish(i, kind)
+            self.clear_items()
+            sel = discord.ui.Select(placeholder=VERB[kind], options=[discord.SelectOption(label=a) for a in targets[:25]])
+            sel.callback = self._target(kind, sel)
+            self.add_item(sel)
+            self._back()
+            await i.response.edit_message(view=self)
+        return cb
+
+    def _target(self, kind, sel):
+        async def cb(i):
+            target = sel.values[0]
+            amounts = self.menu["gift_amounts"]
+            if kind != "gift" or len(amounts) == 1:
+                return await self.finish(i, kind, target, amounts[0] if kind == "gift" else 0)
+            self.clear_items()
+            for a in amounts:
+                b = discord.ui.Button(label=f"Give {a}", emoji="🎁", style=discord.ButtonStyle.secondary)
+                b.callback = self._amount(target, a)
+                self.add_item(b)
+            self._back()
+            await i.response.edit_message(view=self)
+        return cb
+
+    def _amount(self, target, amount):
+        async def cb(i):
+            await self.finish(i, "gift", target, amount)
+        return cb
+
+    def _back(self):
+        b = discord.ui.Button(label="Back", style=discord.ButtonStyle.secondary)
+        async def cb(i):
+            self.show_moves()
+            await i.response.edit_message(view=self)
+        b.callback = cb
+        self.add_item(b)
+
+    async def finish(self, i, kind, target=None, amount=0):
+        try:
+            async with self.bot.lock:
+                text = self.bot.game.submit(self.user_key, kind, target, amount, at=i.created_at.timestamp())
+        except GameError as e:
+            text = f"⚠️ {e}"
+        self.stop()
+        await i.response.edit_message(content=text, view=None, allowed_mentions=NONE)
+        await self.bot.deliver()
+
+
 def register(bot):
     tree = bot.tree
 
@@ -172,6 +246,16 @@ def register(bot):
     @tree.command(description="Join the game and get your secret alias")
     async def join(i: discord.Interaction):
         await call(i, bot.game.join, key(i))
+
+    @tree.command(description="Make tonight's move: just click")
+    async def play(i: discord.Interaction):
+        try:
+            async with bot.lock:
+                menu = bot.game.play_menu(key(i))
+        except GameError as e:
+            return await private(i, f"⚠️ {e}")
+        await i.response.send_message(menu["header"], view=PlayView(bot, key(i), menu), ephemeral=True,
+                                      allowed_mentions=NONE)
 
     @tree.command(description="Look for food tonight (0 to 2 rations)")
     async def scavenge(i: discord.Interaction):
