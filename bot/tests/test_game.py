@@ -164,6 +164,21 @@ class Rules_(unittest.TestCase):
         self.assertEqual(self.g.play_menu("a")["gift_amounts"], [1])
         self.assertIn(other, self.g.play_menu("a")["moves"]["gift"])
 
+    def test_radio_menu_matches_what_radio_accepts_and_tracks_the_daily_message(self):
+        me, other = self.g.identity.get("a")["alias"], self.g.identity.get("b")["alias"]
+        m = self.g.radio_menu("a")
+        self.assertTrue(m["available"] and self.g.play_menu("a")["radio"])
+        self.assertNotIn(me, m["about"])
+        self.assertFalse(any("{a}" in t for _, t in m["lines"]))          # placeholders shown as '…'
+        phrase = next(k for k, _ in m["lines"] if GameService.radio_needs_player(k))
+        self.g.radio("a", phrase, m["about"][0])
+        self.assertFalse(self.g.radio_menu("a")["available"])           # one a day: the button goes away
+        self.assertFalse(self.g.play_menu("a")["radio"])
+        self.assertTrue(self.g.radio_menu("b")["available"])            # other players unaffected
+        self.g.tick(now=310)
+        self.assertTrue(self.g.radio_menu("a")["available"])            # a new day, a new message
+        self.assertEqual(other, m["about"][0])
+
     def test_play_menu_refused_before_start_and_for_strangers(self):
         g = service()
         g.join("x", rng=random.Random(5))

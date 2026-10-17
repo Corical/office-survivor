@@ -162,6 +162,54 @@ BUTTONS = {"scavenge": ("🥫", "Scavenge"), "guard": ("🛡️", "Guard"), "ste
 VERB = {"steal": "Steal from whom?", "investigate": "Watch whom?", "gift": "Give to whom?"}
 
 
+class RadioView(discord.ui.View):
+    """Radio by clicks: pick a line, then (if it names someone) a player. Torch words it, so nobody's writing style
+    gives them away. Only the sender sees this; the message goes out anonymously with the morning news."""
+
+    def __init__(self, bot, user_key, menu):
+        super().__init__(timeout=600)
+        self.bot, self.user_key, self.menu = bot, user_key, menu
+        self.show_lines()
+
+    def show_lines(self):
+        self.clear_items()
+        sel = discord.ui.Select(placeholder="📻 What should the radio say?",
+                                options=[discord.SelectOption(label=t[:100], value=k) for k, t in self.menu["lines"]])
+
+        async def cb(i):
+            phrase = sel.values[0]
+            if not GameService.radio_needs_player(phrase):
+                return await self.send(i, phrase)
+            self.clear_items()
+            who = discord.ui.Select(placeholder="About whom?",
+                                    options=[discord.SelectOption(label=a) for a in self.menu["about"][:25]])
+
+            async def cb2(i2):
+                await self.send(i2, phrase, who.values[0])
+            who.callback = cb2
+            self.add_item(who)
+            back = discord.ui.Button(label="Back", style=discord.ButtonStyle.secondary)
+
+            async def go_back(i3):
+                self.show_lines()
+                await i3.response.edit_message(view=self)
+            back.callback = go_back
+            self.add_item(back)
+            await i.response.edit_message(view=self)
+        sel.callback = cb
+        self.add_item(sel)
+
+    async def send(self, i, phrase, about=None):
+        try:
+            async with self.bot.lock:
+                text = self.bot.game.radio(self.user_key, phrase, about)
+        except GameError as e:
+            text = f"⚠️ {e}"
+        self.stop()
+        await i.response.edit_message(content=f"📻 {text}", view=None, allowed_mentions=NONE)
+        await self.bot.deliver()
+
+
 class PlayView(discord.ui.View):
     """/play: buttons for tonight's legal moves, then a player list, then (gifts) the amount. Only the player sees it;
     every click is still checked by GameService.submit, judged at the click's own timestamp."""
@@ -178,6 +226,21 @@ class PlayView(discord.ui.View):
                 b = discord.ui.Button(label=label, emoji=emoji, style=discord.ButtonStyle.secondary)
                 b.callback = self._pick(kind)
                 self.add_item(b)
+        if self.menu.get("radio"):                         # today's anonymous message, on its own row
+            r = discord.ui.Button(label="Radio", emoji="📻", style=discord.ButtonStyle.primary, row=1)
+            r.callback = self._radio
+            self.add_item(r)
+
+    async def _radio(self, i):
+        try:
+            async with self.bot.lock:
+                menu = self.bot.game.radio_menu(self.user_key)
+        except GameError as e:
+            return await i.response.edit_message(content=f"⚠️ {e}", view=None)
+        self.stop()
+        await i.response.edit_message(content="📻 Pick a line. It goes out anonymously with the morning news, "
+                                              "and you still choose tonight's move with /play.",
+                                      view=RadioView(self.bot, self.user_key, menu))
 
     def _pick(self, kind):
         async def cb(i):
@@ -305,13 +368,17 @@ def register(bot):
     async def results(i: discord.Interaction):
         await call(i, bot.game.results, key(i))
 
-    @tree.command(description="Send an anonymous rumour (posted with the morning news)")
-    @app_commands.describe(line="What to say", about="Who it's about")
-    @app_commands.choices(line=[app_commands.Choice(name=t.replace("{a}", "…"), value=k)
-                                for k, t in __import__("bot.game", fromlist=["RADIO_PHRASES"]).RADIO_PHRASES.items()])
-    @app_commands.autocomplete(about=alias_complete)
-    async def radio(i: discord.Interaction, line: app_commands.Choice[str], about: str = None):
-        await call(i, bot.game.radio, key(i), line.value, about)
+    @tree.command(description="Send an anonymous rumour by clicks (posted with the morning news)")
+    async def radio(i: discord.Interaction):
+        try:
+            async with bot.lock:
+                menu = bot.game.radio_menu(key(i))
+        except GameError as e:
+            return await private(i, f"⚠️ {e}")
+        if not menu["available"]:
+            return await private(i, "📻 You've already used today's radio message. It goes out with the morning news.")
+        await i.response.send_message("📻 Pick a line. It goes out anonymously with the morning news.",
+                                      view=RadioView(bot, key(i), menu), ephemeral=True, allowed_mentions=NONE)
 
     @tree.command(name="quit", description="Leave the game (your food leaves with you)")
     async def quit_(i: discord.Interaction):

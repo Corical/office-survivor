@@ -240,8 +240,23 @@ class GameService:
         amounts = legal.pop("gift_amounts", [])
         moves = {k: sorted(self.players[t].name for t in v) for k, v in legal.items()}
         state = "🏴‍☠️ bandit" if p.bandit else f"🥫 {p.rations} rations"
+        radio_free = not any(r.startswith(f"r{night}-{pid}-") for r in self.radio_pending)
         return {"header": f"**{night_label(self.schedule, night)}**: {alias}, {state}. What will you do tonight?",
-                "moves": moves, "gift_amounts": amounts}
+                "moves": moves, "gift_amounts": amounts, "radio": radio_free}
+
+    def radio_menu(self, user_key):
+        """What the radio picker offers: the fixed lines, the aliases (never your own), and whether today's message
+        is still unused. {'lines': [(key, text with '…')], 'about': [aliases], 'available': bool}"""
+        if not self.started or self.finished:
+            raise GameError("Radio opens when the game starts.")
+        pid, _ = self._who(user_key)
+        used = any(r.startswith(f"r{self.night + 1}-{pid}-") for r in self.radio_pending)
+        return {"lines": [(k, t.replace("{a}", "…")) for k, t in RADIO_PHRASES.items()],
+                "about": self.alias_list(user_key), "available": not used}
+
+    @staticmethod
+    def radio_needs_player(phrase):
+        return "{a}" in RADIO_PHRASES.get(phrase, "")
 
     def radio(self, user_key, phrase, about=None):
         pid, _ = self._who(user_key)
