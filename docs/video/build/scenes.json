@@ -1,5 +1,5 @@
 {
-  "total_duration_s": 154.5,
+  "total_duration_s": 164.5,
   "game_facts": {
     "players": 15,
     "rounds": 10,
@@ -358,26 +358,26 @@
       "number": 6,
       "title": "Steal",
       "start_s": 46.0,
-      "duration_s": 8,
+      "duration_s": 10.0,
       "timing_source": "draft",
-      "narration": "Steal. Pick someone and take two of their rations. They'll know they were robbed. They won't know it was you.",
-      "word_count": 20,
-      "on_screen_text": "STEAL: take 2, stay hidden",
+      "narration": "Steal. Pick someone and take up to two of their rations. They'll know they were robbed. They won't know it was you.",
+      "word_count": 22,
+      "on_screen_text": "STEAL: take up to 2, stay hidden",
       "beats": [
         {
           "at_s": 0.0,
           "do": "icon_steal badge pins top-left. Avatar sleeping beside 4 tins."
         },
         {
-          "at_s": 1.0,
+          "at_s": 1.2,
           "do": "thief_shadow tiptoes in from the right."
         },
         {
-          "at_s": 3.0,
+          "at_s": 3.8,
           "do": "Thief lifts 2 tins and slips away."
         },
         {
-          "at_s": 5.0,
+          "at_s": 6.2,
           "do": "Avatar wakes (startled pose) with question_mark bouncing above."
         }
       ],
@@ -396,42 +396,42 @@
       "transition_in": "0.3 s crossfade",
       "voiceover_file": "output/03_audio/vo/scene_06.wav",
       "output": "output/04_scenes/scene_06.mp4",
-      "vo_hash": "cb80d7a50fba",
-      "hash": "f44079be985e"
+      "vo_hash": "59d05c3eb518",
+      "hash": "8aedb4164333"
     },
     {
       "id": "scene_07",
       "number": 7,
       "title": "Guard",
-      "start_s": 54.0,
-      "duration_s": 13,
+      "start_s": 56.0,
+      "duration_s": 15.0,
       "timing_source": "draft",
-      "narration": "Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you two rations. You only get three guards, so choose your moment.",
-      "word_count": 33,
-      "on_screen_text": "GUARD: 2 nights · thief pays you 2 · 3 per game",
+      "narration": "Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you up to two rations. You only get three guards, so choose your moment.",
+      "word_count": 35,
+      "on_screen_text": "GUARD: 2 nights · thief pays you up to 2 ·3 per game",
       "beats": [
         {
           "at_s": 0.0,
           "do": "icon_guard badge pins top-left. Avatar with shield_glow over them."
         },
         {
-          "at_s": 1.0,
+          "at_s": 1.2,
           "do": "2 nights pass above (moon, sun, moon) to show the shield lasting."
         },
         {
-          "at_s": 4.0,
+          "at_s": 4.6,
           "do": "thief_shadow sneaks in and bounces off the shield."
         },
         {
-          "at_s": 5.5,
+          "at_s": 6.3,
           "do": "spotlight snaps on the thief; small banner 'CAUGHT'."
         },
         {
-          "at_s": 7.0,
+          "at_s": 8.1,
           "do": "Thief hands 2 tins to the guard."
         },
         {
-          "at_s": 9.5,
+          "at_s": 11.0,
           "do": "shield_counter appears: 3 shields, one greys out."
         }
       ],
@@ -454,18 +454,18 @@
       "transition_in": "0.3 s crossfade",
       "voiceover_file": "output/03_audio/vo/scene_07.wav",
       "output": "output/04_scenes/scene_07.mp4",
-      "vo_hash": "de3f752ea271",
-      "hash": "ea4bef917fa5"
+      "vo_hash": "b8a1721be17a",
+      "hash": "adfcb6dfb674"
     },
     {
       "id": "scene_08",
       "number": 8,
       "title": "Investigate",
-      "start_s": 67.0,
-      "duration_s": 10,
+      "start_s": 71.0,
+      "duration_s": 12.0,
       "timing_source": "draft",
-      "narration": "Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration.",
-      "word_count": 24,
+      "narration": "Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration, if they have it.",
+      "word_count": 28,
       "on_screen_text": "INVESTIGATE: catch a thief, get 1",
       "beats": [
         {
@@ -473,19 +473,19 @@
           "do": "icon_investigate badge pins top-left. Row of tents (front_with_window), night."
         },
         {
-          "at_s": 1.0,
+          "at_s": 1.2,
           "do": "magnifying_glass_large sweeps across the tents and stops at one window."
         },
         {
-          "at_s": 3.5,
+          "at_s": 4.2,
           "do": "Through the lens: thief_shadow taking a tin."
         },
         {
-          "at_s": 6.0,
+          "at_s": 7.2,
           "do": "stamp_exposed slams over the window."
         },
         {
-          "at_s": 7.5,
+          "at_s": 9.0,
           "do": "1 tin flies from the thief to the investigator avatar."
         }
       ],
@@ -506,19 +506,19 @@
       "transition_in": "0.3 s crossfade",
       "voiceover_file": "output/03_audio/vo/scene_08.wav",
       "output": "output/04_scenes/scene_08.mp4",
-      "vo_hash": "1777a574d99a",
-      "hash": "1a5d57deb5c7"
+      "vo_hash": "243cfddb098e",
+      "hash": "6c2e257d3297"
     },
     {
       "id": "scene_09",
       "number": 9,
       "title": "Gift",
-      "start_s": 77.0,
+      "start_s": 83.0,
       "duration_s": 7,
       "timing_source": "draft",
-      "narration": "Gift. Give some of your food to someone else. Only the two of you will know.",
-      "word_count": 16,
-      "on_screen_text": "GIFT: your secret",
+      "narration": "Gift. Give some of your food to someone else. Nobody is told, unless someone was spying on you.",
+      "word_count": 18,
+      "on_screen_text": "GIFT: nobody is told",
       "beats": [
         {
           "at_s": 0.0,
@@ -545,14 +545,14 @@
       "transition_in": "0.3 s crossfade",
       "voiceover_file": "output/03_audio/vo/scene_09.wav",
       "output": "output/04_scenes/scene_09.mp4",
-      "vo_hash": "bbeb119cee9f",
-      "hash": "a7ed82a33819"
+      "vo_hash": "eb0061125c17",
+      "hash": "d08c06ae4e01"
     },
     {
       "id": "scene_10",
       "number": 10,
       "title": "The morning news",
-      "start_s": 84.0,
+      "start_s": 90.0,
       "duration_s": 14,
       "timing_source": "draft",
       "narration": "Every morning at half past seven, the news drops in Discord: who got robbed, who got caught, and who ran out of food. You'll always know what happened. You'll rarely know who did it.",
@@ -596,23 +596,23 @@
       "id": "scene_11",
       "number": 11,
       "title": "Bandits",
-      "start_s": 98.0,
-      "duration_s": 9,
+      "start_s": 104.0,
+      "duration_s": 11.0,
       "timing_source": "draft",
-      "narration": "Run out of food and you're a bandit. Bandits can only steal, but get back to three rations and you rejoin the survivors.",
-      "word_count": 23,
-      "on_screen_text": "BANDIT: steal only · back at 3",
+      "narration": "Run out of food and you're a bandit. Bandits can only steal or investigate, but get back to three rations and you rejoin the survivors.",
+      "word_count": 25,
+      "on_screen_text": "BANDIT: steal or investigate · back at 3",
       "beats": [
         {
           "at_s": 0.0,
           "do": "Avatar wearing bandit_mask sneaks between tents."
         },
         {
-          "at_s": 1.5,
+          "at_s": 1.8,
           "do": "Steals 1 tin at a time; a counter above them climbs from 0 to 3."
         },
         {
-          "at_s": 6.5,
+          "at_s": 7.9,
           "do": "bandit_mask flies off; the avatar's colours brighten back to normal."
         }
       ],
@@ -630,14 +630,14 @@
       "transition_in": "0.3 s crossfade",
       "voiceover_file": "output/03_audio/vo/scene_11.wav",
       "output": "output/04_scenes/scene_11.mp4",
-      "vo_hash": "e3e0df547873",
-      "hash": "ba4d27f2fd56"
+      "vo_hash": "c4129b724022",
+      "hash": "aa62b809e028"
     },
     {
       "id": "scene_12",
       "number": 12,
       "title": "Secret goal and radio",
-      "start_s": 107.0,
+      "start_s": 115.0,
       "duration_s": 12,
       "timing_source": "draft",
       "narration": "You'll also get a secret goal that only you know about. And once a day you can post an anonymous message on the radio channel. Tips, accusations, lies. Your call.",
@@ -677,31 +677,31 @@
       "id": "scene_13",
       "number": 13,
       "title": "Extraction and the reveal",
-      "start_s": 119.0,
-      "duration_s": 18,
+      "start_s": 127.0,
+      "duration_s": 20.0,
       "timing_source": "draft",
-      "narration": "On the last night, the helicopter lands. The five survivors with the most food get a seat. A seat and your secret goal both earn points, and the most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
-      "word_count": 45,
-      "on_screen_text": "Seat = 3 pts · secret goal = 2 pts",
+      "narration": "On the last night, the helicopter lands. The five survivors with the most food get a seat. Staying alive earns points, a seat earns more, and so does your secret goal. Most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
+      "word_count": 48,
+      "on_screen_text": "Seat = 3 pts · alive, no seat = 1 pt · secret goal = 2 pts",
       "beats": [
         {
           "at_s": 0.0,
           "do": "Night sky; helicopter descends, rotor spinning, dust blowing."
         },
         {
-          "at_s": 2.0,
+          "at_s": 2.2,
           "do": "5 avatars (mixed colours) climb aboard one by one; seats light up."
         },
         {
-          "at_s": 7.5,
+          "at_s": 8.3,
           "do": "scoreboard flips in."
         },
         {
-          "at_s": 11.5,
+          "at_s": 12.8,
           "do": "MUSIC CUT. Drumroll."
         },
         {
-          "at_s": 12.0,
+          "at_s": 13.3,
           "do": "curtain pulls open on news_clipping_wall with 'THE REVEAL' in the headline font."
         }
       ],
@@ -721,14 +721,14 @@
       "transition_in": "0.3 s crossfade",
       "voiceover_file": "output/03_audio/vo/scene_13.wav",
       "output": "output/04_scenes/scene_13.mp4",
-      "vo_hash": "7d2d7c1c2d98",
-      "hash": "4d894d74fc90"
+      "vo_hash": "91cd9fb9e820",
+      "hash": "b0135fdc614e"
     },
     {
       "id": "scene_14",
       "number": 14,
       "title": "How to join",
-      "start_s": 137.0,
+      "start_s": 147.0,
       "duration_s": 17.5,
       "timing_source": "draft",
       "narration": "It takes two minutes a day, it's completely optional, and nothing in the game touches real work or real money. Type slash join in Discord and you'll get a secret alias, so nobody knows who's who. And remember: trust no one.",

@@ -177,8 +177,8 @@
       "id": "scene_06",
       "title": "Steal",
       "base_duration_s": 8,
-      "narration": "Steal. Pick someone and take {steal_amount:word} of their rations. They'll know they were robbed. They won't know it was you.",
-      "on_screen_text": "STEAL: take {steal_amount}, stay hidden",
+      "narration": "Steal. Pick someone and take up to {steal_amount:word} of their rations. They'll know they were robbed. They won't know it was you.",
+      "on_screen_text": "STEAL: take up to {steal_amount}, stay hidden",
       "beats": [
         {
           "at_s": 0.0,
@@ -214,8 +214,8 @@
       "id": "scene_07",
       "title": "Guard",
       "base_duration_s": 13,
-      "narration": "Guard. You're protected {guard_span}. Anyone who tries to rob you gets caught, named in the news, and pays you {guard_reward:rations}. You only get {guard_limit:word} guards, so choose your moment.",
-      "on_screen_text": "GUARD: {guard_nights} nights · thief pays you {guard_reward} · {guard_limit} per game",
+      "narration": "Guard. You're protected {guard_span}. Anyone who tries to rob you gets caught, named in the news, and pays you up to {guard_reward:rations}. You only get {guard_limit:word} guards, so choose your moment.",
+      "on_screen_text": "GUARD: {guard_nights} nights · thief pays you up to {guard_reward} ·{guard_limit} per game",
       "beats": [
         {
           "at_s": 0.0,
@@ -263,7 +263,7 @@
       "id": "scene_08",
       "title": "Investigate",
       "base_duration_s": 10,
-      "narration": "Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you {investigate_bounty:rations}.",
+      "narration": "Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you {investigate_bounty:rations}, if they have it.",
       "on_screen_text": "INVESTIGATE: catch a thief, get {investigate_bounty}",
       "beats": [
         {
@@ -306,8 +306,8 @@
       "id": "scene_09",
       "title": "Gift",
       "base_duration_s": 7,
-      "narration": "Gift. Give some of your food to someone else. Only the two of you will know.",
-      "on_screen_text": "GIFT: your secret",
+      "narration": "Gift. Give some of your food to someone else. Nobody is told, unless someone was spying on you.",
+      "on_screen_text": "GIFT: nobody is told",
       "beats": [
         {
           "at_s": 0.0,
@@ -371,8 +371,8 @@
       "id": "scene_11",
       "title": "Bandits",
       "base_duration_s": 9,
-      "narration": "Run out of food and you're a bandit. Bandits can only steal, but get back to {bandit_rejoin:rations} and you rejoin the survivors.",
-      "on_screen_text": "BANDIT: steal only · back at {bandit_rejoin}",
+      "narration": "Run out of food and you're a bandit. Bandits can only steal or investigate, but get back to {bandit_rejoin:rations} and you rejoin the survivors.",
+      "on_screen_text": "BANDIT: steal or investigate · back at {bandit_rejoin}",
       "beats": [
         {
           "at_s": 0.0,
@@ -434,8 +434,8 @@
       "id": "scene_13",
       "title": "Extraction and the reveal",
       "base_duration_s": 18,
-      "narration": "On the last night, the helicopter lands. The {seats:word} survivors with the most food get a seat. A seat and your secret goal both earn points, and the most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
-      "on_screen_text": "Seat = {pts_extract} pts · secret goal = {pts_objective} pts",
+      "narration": "On the last night, the helicopter lands. The {seats:word} survivors with the most food get a seat. Staying alive earns points, a seat earns more, and so does your secret goal. Most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
+      "on_screen_text": "Seat = {pts_extract} pts · alive, no seat = {pts_survive} pt · secret goal = {pts_objective} pts",
       "beats": [
         {
           "at_s": 0.0,

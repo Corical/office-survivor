@@ -17,21 +17,21 @@ Fourteen scenes, each teaching one thing. Timings assume a calm pace of about 15
 | 3 | 0:20 | A player with seven tins of food. One tin vanishes each night. When the last one goes, the player pulls on a bandit mask. | Everyone starts with seven rations. Every night, you eat one. Run out, and you become a bandit. More on that later. | Start with 7 · eat 1 a night |
 | 4 | 0:29 | A phone with Discord open, a thumb tapping. Five icons fan out: shovel, hand, shield, magnifying glass, gift box. | Each day, you pick one secret move in Discord before midnight. Nobody else can see what you chose. You have five options. | 1 secret move a day, before midnight |
 | 5 | 0:38 | The player digs through a bin. A slot-machine counter lands on 0, 1 or 2 tins. | Scavenge. Go looking for food and find nothing, one or two rations. If you forget to play, you scavenge automatically. | SCAVENGE: find 0–2 |
-| 6 | 0:46 | A shadow slips two tins from a sleeping player. The player wakes up to a question mark. | Steal. Pick someone and take two of their rations. They'll know they were robbed. They won't know it was you. | STEAL: take 2, stay hidden |
-| 7 | 0:54 | A shield glows over a player for two nights. A thief bounces off, a spotlight hits them, and they hand over two tins. A counter shows 3 shields, one used. | Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you two rations. You only get three guards, so choose your moment. | GUARD: 2 nights · thief pays you 2 · 3 per game |
-| 8 | 1:07 | A magnifying glass at a window catches someone mid-theft. A big red EXPOSED stamp lands. | Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration. | INVESTIGATE: catch a thief, get 1 |
-| 9 | 1:17 | One player quietly passes a tin to another. Finger to lips. | Gift. Give some of your food to someone else. Only the two of you will know. | GIFT: your secret |
+| 6 | 0:46 | A shadow slips two tins from a sleeping player. The player wakes up to a question mark. | Steal. Pick someone and take up to two of their rations. They'll know they were robbed. They won't know it was you. | STEAL: take up to 2, stay hidden |
+| 7 | 0:54 | A shield glows over a player for two nights. A thief bounces off, a spotlight hits them, and they hand over their tins. A counter shows 3 shields, one used. | Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you up to two rations. You only get three guards, so choose your moment. | GUARD: 2 nights · thief pays you up to 2 · 3 per game |
+| 8 | 1:07 | A magnifying glass at a window catches someone mid-theft. A big red EXPOSED stamp lands. | Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration, if they have it. | INVESTIGATE: catch a thief, get 1 |
+| 9 | 1:17 | One player quietly passes a tin to another. Finger to lips. | Gift. Give some of your food to someone else. Nobody is told, unless someone was spying on you. | GIFT: nobody is told |
 | 10 | 1:24 | A Discord #news post appears, one headline at a time: "Someone hit RustyKettle overnight. Down 2." "CAUGHT: QuietBadger caught SoggyBiscuit red-handed." "LuckyLantern ran out of food." | Every morning at half past seven, the news drops in Discord: who got robbed, who got caught, and who ran out of food. You'll always know what happened. You'll rarely know who did it. | 07:30 · #news |
-| 11 | 1:38 | A masked bandit sneaks around stealing. Their tin counter climbs to 3 and the mask comes off. | Run out of food and you're a bandit. Bandits can only steal, but get back to three rations and you rejoin the survivors. | BANDIT: steal only · back at 3 |
+| 11 | 1:38 | A masked bandit sneaks around stealing. Their tin counter climbs to 3 and the mask comes off. | Run out of food and you're a bandit. Bandits can only steal or investigate, but get back to three rations and you rejoin the survivors. | BANDIT: steal or investigate · back at 3 |
 | 12 | 1:47 | A sealed envelope marked SECRET GOAL. Then a radio channel filling with anonymous messages. | You'll also get a secret goal that only you know about. And once a day you can post an anonymous message on the radio channel. Tips, accusations, lies. Your call. | Secret goal · 1 anonymous radio message a day |
-| 13 | 1:59 | The helicopter lands and five players climb aboard. A scoreboard ticks up. A curtain pulls back on THE REVEAL. | On the last night, the helicopter lands. The five survivors with the most food get a seat. A seat and your secret goal both earn points, and the most points wins. Then comes the big reveal: every theft and every secret, out in the open. | Seat = 3 pts · secret goal = 2 pts |
+| 13 | 1:59 | The helicopter lands and five players climb aboard. A scoreboard ticks up. A curtain pulls back on THE REVEAL. | On the last night, the helicopter lands. The five survivors with the most food get a seat. Staying alive earns points, a seat earns more, and so does your secret goal. Most points wins. Then comes the big reveal: every theft and every secret, out in the open. | Seat = 3 pts · alive, no seat = 1 pt · secret goal = 2 pts |
 | 14 | 2:17 | Discord with /join typed in. The bot's private reply shows the secret alias "RustyKettle". The tents fade back into desks. | It takes two minutes a day, it's completely optional, and nothing in the game touches real work or real money. Type slash join in Discord and you'll get a secret alias, so nobody knows who's who. And remember: trust no one. | /join · secret alias · trust no one |
 
 Every name on screen is an alias, the way players appear in the game. Never show real names.
 
 ## Full narration
 
-The voiceover in one piece: 376 words, about 2 minutes 35 seconds at a calm pace. One paragraph per scene, so a pause between paragraphs lines up with a scene change.
+The voiceover in one piece: 391 words, about 2 minutes 36 seconds at a calm pace. One paragraph per scene, so a pause between paragraphs lines up with a scene change.
 
 For the next two weeks, the office becomes a survival game. Food is scarce, everyone is hungry, and anyone could turn on you.
 
@@ -43,21 +43,21 @@ Each day, you pick one secret move in Discord before midnight. Nobody else can s
 
 Scavenge. Go looking for food and find nothing, one or two rations. If you forget to play, you scavenge automatically.
 
-Steal. Pick someone and take two of their rations. They'll know they were robbed. They won't know it was you.
+Steal. Pick someone and take up to two of their rations. They'll know they were robbed. They won't know it was you.
 
-Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you two rations. You only get three guards, so choose your moment.
+Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you up to two rations. You only get three guards, so choose your moment.
 
-Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration.
+Investigate. Spy on one person and find out what they did that night. Catch them stealing, and they're exposed and pay you one ration, if they have it.
 
-Gift. Give some of your food to someone else. Only the two of you will know.
+Gift. Give some of your food to someone else. Nobody is told, unless someone was spying on you.
 
 Every morning at half past seven, the news drops in Discord: who got robbed, who got caught, and who ran out of food. You'll always know what happened. You'll rarely know who did it.
 
-Run out of food and you're a bandit. Bandits can only steal, but get back to three rations and you rejoin the survivors.
+Run out of food and you're a bandit. Bandits can only steal or investigate, but get back to three rations and you rejoin the survivors.
 
 You'll also get a secret goal that only you know about. And once a day you can post an anonymous message on the radio channel. Tips, accusations, lies. Your call.
 
-On the last night, the helicopter lands. The five survivors with the most food get a seat. A seat and your secret goal both earn points, and the most points wins. Then comes the big reveal: every theft and every secret, out in the open.
+On the last night, the helicopter lands. The five survivors with the most food get a seat. Staying alive earns points, a seat earns more, and so does your secret goal. Most points wins. Then comes the big reveal: every theft and every secret, out in the open.
 
 It takes two minutes a day, it's completely optional, and nothing in the game touches real work or real money. Type slash join in Discord and you'll get a secret alias, so nobody knows who's who. And remember: trust no one.
 

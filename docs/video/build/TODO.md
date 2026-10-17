@@ -1,5 +1,5 @@
 # To do
-Video length: 154 s (2:34). Timing: 0 of 14 scenes from recorded voiceover, the rest are estimates.
+Video length: 164 s (2:44). Timing: 0 of 14 scenes from recorded voiceover, the rest are estimates.
 
 ## 1. Voiceover (a person or text-to-speech)
 - [ ] `vo:scene_01` (not made yet)

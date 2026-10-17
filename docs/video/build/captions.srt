@@ -59,130 +59,139 @@ If you forget to play, you
 scavenge automatically.
 
 14
-00:00:46,150 --> 00:00:49,698
-Steal. Pick someone and
-take two of their rations.
+00:00:46,150 --> 00:00:50,461
+Steal. Pick someone and take
+up to two of their rations.
 
 15
-00:00:49,748 --> 00:00:51,857
+00:00:50,511 --> 00:00:52,797
 They'll know they were robbed.
 
 16
-00:00:51,907 --> 00:00:53,800
+00:00:52,847 --> 00:00:54,900
 They won't know it was you.
 
 17
-00:00:54,150 --> 00:00:57,620
+00:00:56,150 --> 00:00:59,858
 Guard. You're protected
 tonight and tomorrow night.
 
 18
-00:00:57,670 --> 00:01:01,692
+00:00:59,908 --> 00:01:04,205
 Anyone who tries to rob you
 gets caught, named in the news,
 
 19
-00:01:01,742 --> 00:01:03,418
-and pays you two rations.
+00:01:04,255 --> 00:01:06,489
+and pays you up to two rations.
 
 20
-00:01:03,468 --> 00:01:06,800
+00:01:06,539 --> 00:01:10,100
 You only get three guards,
 so choose your moment.
 
 21
-00:01:07,150 --> 00:01:12,080
+00:01:11,150 --> 00:01:16,252
 Investigate. Spy on one person and
 find out what they did that night.
 
 22
-00:01:12,130 --> 00:01:16,700
-Catch them stealing, and they're
-exposed and pay you one ration.
+00:01:16,302 --> 00:01:22,300
+Catch them stealing, and they're exposed
+and pay you one ration, if they have it.
 
 23
-00:01:17,150 --> 00:01:20,940
+00:01:23,150 --> 00:01:26,307
 Gift. Give some of your
 food to someone else.
 
 24
-00:01:20,990 --> 00:01:23,500
-Only the two of you will know.
+00:01:26,357 --> 00:01:29,800
+Nobody is told, unless
+someone was spying on you.
 
 25
-00:01:24,150 --> 00:01:29,874
+00:01:30,150 --> 00:01:35,874
 Every morning at half past seven, the
 news drops in Discord: who got robbed,
 
 26
-00:01:29,924 --> 00:01:32,913
+00:01:35,924 --> 00:01:38,913
 who got caught, and who ran out of food.
 
 27
-00:01:32,963 --> 00:01:35,421
+00:01:38,963 --> 00:01:41,421
 You'll always know what happened.
 
 28
-00:01:35,471 --> 00:01:37,700
+00:01:41,471 --> 00:01:43,700
 You'll rarely know who did it.
 
 29
-00:01:38,150 --> 00:01:40,732
+00:01:44,150 --> 00:01:46,807
 Run out of food and you're a bandit.
 
 30
-00:01:40,782 --> 00:01:46,800
-Bandits can only steal, but get back to
-three rations and you rejoin the survivors.
+00:01:46,857 --> 00:01:49,664
+Bandits can only steal or investigate,
 
 31
-00:01:47,150 --> 00:01:51,122
+00:01:49,714 --> 00:01:54,100
+but get back to three rations
+and you rejoin the survivors.
+
+32
+00:01:55,150 --> 00:01:59,122
 You'll also get a secret goal
 that only you know about.
 
-32
-00:01:51,172 --> 00:01:56,241
+33
+00:01:59,172 --> 00:02:04,241
 And once a day you can post an
 anonymous message on the radio channel.
 
-33
-00:01:56,291 --> 00:01:58,800
+34
+00:02:04,291 --> 00:02:06,800
 Tips, accusations, lies. Your call.
 
-34
-00:01:59,150 --> 00:02:02,139
+35
+00:02:07,150 --> 00:02:10,112
 On the last night, the helicopter lands.
 
-35
-00:02:02,189 --> 00:02:05,861
+36
+00:02:10,162 --> 00:02:13,801
 The five survivors with
 the most food get a seat.
 
-36
-00:02:05,911 --> 00:02:11,255
-A seat and your secret goal both earn
-points, and the most points wins.
-
 37
-00:02:11,305 --> 00:02:16,800
+00:02:13,851 --> 00:02:19,524
+Staying alive earns points, a seat earns
+more, and so does your secret goal.
+
+38
+00:02:19,574 --> 00:02:20,804
+Most points wins.
+
+39
+00:02:20,854 --> 00:02:26,300
 Then comes the big reveal: every theft
 and every secret, out in the open.
 
-38
-00:02:17,150 --> 00:02:21,051
+40
+00:02:27,150 --> 00:02:31,051
 It takes two minutes a day,
 it's completely optional,
 
-39
-00:02:21,101 --> 00:02:25,225
+41
+00:02:31,101 --> 00:02:35,225
 and nothing in the game touches
 real work or real money.
 
-40
-00:02:25,275 --> 00:02:31,487
+42
+00:02:35,275 --> 00:02:41,487
 Type slash join in Discord and you'll get
 a secret alias, so nobody knows who's who.
 
-41
-00:02:31,537 --> 00:02:33,500
+43
+00:02:41,537 --> 00:02:43,500
 And remember: trust no one.
