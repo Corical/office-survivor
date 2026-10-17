@@ -21,6 +21,7 @@ class PlayerState:
     steals_ok: int = 0
     steals_caught: int = 0
     clean_steals: int = 0          # successful steals before the first catch (the clean-thief goal counts these)
+    idol: bool = False             # a wilderness-event shield: the next theft against this player fails
     rations_stolen: int = 0
     gifted_out: int = 0
     grudge_hits: int = 0
