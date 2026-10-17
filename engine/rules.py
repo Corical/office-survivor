@@ -20,6 +20,10 @@ class Rules:
     guard_cooldown: int = 0       # nights you must wait after a guard ends before guarding again
     missed_scavenge_max: int = -1 # missed deadline scavenges 0..this (-1 = same as a normal scavenge)
     investigate_bounty: int = 1   # catching a thief by investigation exposes them and they pay this
+    exposure_undo: str = "none"   # what an exposure does to the theft itself: "none" (the theft stands, today),
+                                  # "split" (loot taken back from the thief: half to the victim, rounded UP, the rest
+                                  # to the investigator) or "full" (all the loot back to the victim). Either way the
+                                  # thief also pays investigate_bounty, loot first, then the bounty, from what they hold
     gift_bonus: int = 0           # extra rations the receiver gets on top of each gift
     winner_tiebreak: str = "kindness"  # tied top scores: "none" (shared win), "rations", or "kindness"
     tiebreak: str = "kindness"    # last-seat ties: "coin" or "kindness" (most given away, then fewest caught)
@@ -41,3 +45,10 @@ class Rules:
                                    # "top" (bad player-events only hit the top third, good ones only the bottom third)
     events_raid: float = 0.0       # how many times its library weight the "raid" event is drawn (0 = no raids)
     events_rats_relative: bool = False  # rats tax everyone within 1 of the richest, instead of a fixed 7 or more
+
+    def __post_init__(self):
+        if self.exposure_undo not in EXPOSURE_UNDO:      # a typo must not silently mean "none"
+            raise ValueError(f"exposure_undo must be one of {EXPOSURE_UNDO}, not {self.exposure_undo!r}")
+
+
+EXPOSURE_UNDO = ("none", "split", "full")

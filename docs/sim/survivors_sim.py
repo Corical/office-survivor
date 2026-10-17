@@ -104,6 +104,7 @@ MIXES = {
 }
 
 KINDS = ("scavenge", "steal", "guard", "investigate", "gift")
+AI_BASE_PAYOUT = 1        # an exposure paid the investigator 1 (the bounty) before exposure_undo existed
 LOG_FORMAT_VERSION = 1
 
 # --------------------------------------------------------------------------
@@ -241,6 +242,10 @@ class SimObserver(Observer):
         recv.notes.append(f"Night {night}: {giver.name} secretly gave you {amt}.")
         giver.notes.append(f"Night {night}: you gave {recv.name} {amt}.")
 
+    def restored(self, night, victim, thief, amount):
+        self.g.public_delta[victim.pid] += amount          # the EXPOSED line in #news says the loot went back
+        victim.notes.append(f"Night {night}: an investigator exposed {thief.name}; {amount} of your rations came back.")
+
     def investigated(self, night, inv, tgt, seen, exposed_paid):
         g = self.g
         if g.mem:
@@ -256,6 +261,8 @@ class SimObserver(Observer):
         if exposed_paid is not None:
             g.public_susp[tgt.pid] += 2
             g.public_delta[tgt.pid] -= exposed_paid
+            if g.ai_exposure:
+                tgt.caution *= 0.5
         elif g.rng.random() < max(0.4, ARCH[inv.arch]["radio"]):
             g.public_susp[tgt.pid] += 1.5
             self.radio.append(f"\"I've got proof {tgt.name} went after {g.P(victim).name} last night.\"")
@@ -269,9 +276,12 @@ class SimObserver(Observer):
 
 class Game:
     def __init__(self, rules: Rules, seed: int, mix=None, record=False, force=None, brain=None, smart=None,
-                 log=False, vis="hidden", memory=None, edges=V.BAND_EDGES):
+                 log=False, vis="hidden", memory=None, edges=V.BAND_EDGES, ai_exposure=False):
         if vis not in V.VISIBILITIES:
             raise ValueError(f"vis must be one of {V.VISIBILITIES}, not {vis!r}")
+        # ai_exposure (AI only, the rules never see it): investigating is weighed by what it pays the investigator
+        # relative to today's bounty of 1, and a thief who is exposed turns cautious, like one who was caught.
+        self.ai_exposure = ai_exposure
         self.vis, self.edges = vis, tuple(edges)    # information for the AI only; the rules never see it
         self.r = rules
         self.brain = brain
@@ -309,6 +319,8 @@ class Game:
             if not rules.events_per_night:         # events off: the log is exactly what it was before they existed
                 for k in ("events_per_night", "events_bias", "events_raid", "events_rats_relative"):
                     rules_logged.pop(k)
+            if rules.exposure_undo == "none":       # knob off: the log is exactly what it was before it existed
+                rules_logged.pop("exposure_undo")
             self.L("game_start", seed=seed, log_format=LOG_FORMAT_VERSION, rules=rules_logged,
                    seats=max(1, round(rules.players * rules.seat_ratio)),
                    players=[{"id": p.pid, "name": p.name, "personality": p.arch, "start_rations": p.rations,
@@ -472,6 +484,11 @@ class Game:
         else:
             w = dict(zip(KINDS, a["w"]))
             why.append(f"{p.arch}: {a['desc']}")
+            if self.ai_exposure and self.invest_payout() > 0:
+                w["investigate"] *= self.invest_payout() / AI_BASE_PAYOUT
+                if self.invest_payout() != AI_BASE_PAYOUT:
+                    why.append(f"an exposure pays the investigator {self.invest_payout()} (today {AI_BASE_PAYOUT}), "
+                               "so investigating is weighed up or down by that ratio")
             w["steal"] *= p.caution
             if p.caution < 1:
                 why.append(f"has been caught before, so stealing odds are cut to {p.caution:.0%} of normal")
@@ -538,6 +555,13 @@ class Game:
             amt = 2 if p.rations >= 7 else 1
             return ("gift", tgt, amt, False)
         return (kind, None, 0, False)
+
+    def invest_payout(self):
+        """What one exposure pays the investigator, for a typical theft of steal_amount: the bounty, plus their half
+        of the loot when the rules split it (the victim gets the larger half)."""
+        r = self.r
+        share = (r.steal_amount // 2) if r.exposure_undo == "split" else 0
+        return r.investigate_bounty + share
 
     def pick_steal_target(self, p):
         best, best_s, best_info = None, -1e9, None

@@ -25,6 +25,7 @@ class Observer:
     def robbed(self, night, victim, take): pass
     def scavenged(self, night, player, found): pass
     def gifted(self, night, giver, receiver, amount): pass
+    def restored(self, night, victim, thief, amount): pass     # an exposure gave `amount` of the loot back to the victim
     def investigated(self, night, investigator, target, seen, exposed_paid): pass
     def became_bandit(self, night, player): pass
 
@@ -87,6 +88,7 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
         return moved
 
     robbed_by = defaultdict(list)
+    loot = {}        # thief pid -> (victim pid, rations they took tonight): what an exposure can still take back
     # 2. thieves who walked into a guard pay first, from what they actually hold; the guard receives what was paid,
     #    up to guard_reward, and anything above that is a fine that leaves the game
     for tgt, thieves in steals.items():
@@ -153,6 +155,7 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
                     tp.grudge_hits += 1
                 tp.rations_stolen += got
                 robbed_by[tgt].append(th)
+                loot[th] = (tgt, got)
             obs.stole(night, tp, t, got)
             truth.append(f"{tp.name} robbed {t.name} for {got}")
         if take > 0:
@@ -224,19 +227,45 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
         emit("investigate", investigator=inv.name, target=tgt.name, saw_action=seen[0],
              saw_target=P[seen[1]].name if seen[1] is not None else None, visibility="private")
         exposed_paid = None
-        if seen[0] == "steal" and seen[1] is not None and r.investigate_bounty > 0:
+        undo = r.exposure_undo != "none"
+        if seen[0] == "steal" and seen[1] is not None and (r.investigate_bounty > 0 or undo):
             victim = P[seen[1]]
-            pay = min(r.investigate_bounty, tgt.rations)
-            tgt.rations -= pay
-            inv.rations += pay
-            emit("exposed", thief=tgt.name, investigator=inv.name, victim=victim.name, paid=pay,
-                 visibility="public_without_investigator")
-            ledger(tgt, -pay, "bounty_paid", tgt.rations, detail=inv.name)
-            ledger(inv, pay, "bounty_received", inv.rations, detail=tgt.name)
+            # An exposure takes back what this thief took tonight (only this thief's share, only once, and only
+            # what they still hold: loot first, then the bounty). A thief who hit a guard or an idol took nothing.
+            taken = loot.pop(tgt.pid, None) if undo else None
+            back = min(taken[1], tgt.rations) if taken else 0
+            to_victim = back if r.exposure_undo == "full" else (back + 1) // 2
+            to_inv = back - to_victim
+            pay = min(r.investigate_bounty, tgt.rations - back)
+            if not undo:
+                emit("exposed", thief=tgt.name, investigator=inv.name, victim=victim.name, paid=pay,
+                     visibility="public_without_investigator")
+            else:
+                emit("exposed", thief=tgt.name, investigator=inv.name, victim=victim.name, paid=pay,
+                     loot_back=back, to_victim=to_victim, to_investigator=to_inv,
+                     visibility="public_without_investigator")
+            transfers = [(pay, inv, "bounty_paid", "bounty_received")]
+            if undo:                       # loot goes back before the bounty is paid
+                transfers[:0] = [(to_victim, victim, "exposed_return", "exposed_return"),
+                                 (to_inv, inv, "exposed_loot", "exposed_loot")]
+            for amt, dst, out_reason, in_reason in transfers:
+                if amt or not undo:        # today's books always carry the bounty line, even for 0
+                    tgt.rations -= amt
+                    dst.rations += amt
+                    ledger(tgt, -amt, out_reason, tgt.rations, detail=dst.name)
+                    ledger(dst, amt, in_reason, dst.rations, detail=tgt.name)
             ev["exposed"] += 1
             inv.exposures = getattr(inv, "exposures", 0) + 1
-            news.append(f"EXPOSED: an investigator saw {tgt.name} rob {victim.name}. {tgt.name} pays them {pay}.")
-            exposed_paid = pay
+            if not undo:
+                news.append(f"EXPOSED: an investigator saw {tgt.name} rob {victim.name}. {tgt.name} pays them {pay}.")
+                exposed_paid = pay
+            else:
+                ev["exposed_undone"] += bool(back)
+                news.append(f"EXPOSED: an investigator saw {tgt.name} rob {victim.name}. {tgt.name} hands back "
+                            f"{back} and pays {pay}.")
+                exposed_paid = back + pay
+                if to_victim:
+                    obs.restored(night, victim, tgt, to_victim)
         obs.investigated(night, inv, tgt, seen, exposed_paid)
 
     # 7. eat, run out (bandit), come back
