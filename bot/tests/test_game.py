@@ -325,6 +325,36 @@ class FullGame(unittest.TestCase):
         g.quit("b")
         self.assertIn("❌ **Goal lost:** your target left the game", g.status("a"))
 
+    def test_the_last_three_nights_count_down_everywhere(self):
+        g = service()
+        g.join("a", rng=random.Random(1))
+        g.gm_add_sims(3, rng=random.Random(2))
+        g.gm_start(day_seconds=300, now=0)
+        expect = {7: None, 8: "3 nights left", 9: "2 nights left", 10: "LAST NIGHT"}
+        for night in range(1, 11):
+            reply = g.submit("a", "scavenge", at=night * 300 - 20)
+            header = g.play_menu("a")["header"]
+            board = g.board()[1]
+            want = expect.get(night)
+            for where, text in (("reply", reply), ("/play", header), ("board", board)):
+                if want:
+                    self.assertIn(want, text, f"night {night} {where}")
+                else:
+                    self.assertNotIn("nights left", text, f"night {night} {where}")
+                    self.assertNotIn("LAST NIGHT", text, f"night {night} {where}")
+            g.tick(now=night * 300 + 1)
+            g.tick(now=night * 300 + 10)
+            news = next(g.outbox_text(i) for i in g.pending_outbox()
+                        if i["to"] == "news" and f"News: Night {night} " in g.outbox_text(i))
+            nxt = expect.get(night + 1)
+            if nxt:
+                self.assertIn(nxt, news, f"news after night {night} must warn about night {night + 1}")
+            else:
+                self.assertNotIn("nights left", news)
+                self.assertNotIn("LAST NIGHT", news)
+        self.assertIn("Tonight is the LAST NIGHT", next(g.outbox_text(i) for i in g.pending_outbox()
+                                                        if "News: Night 9 " in g.outbox_text(i)))
+
     def test_idol_stories_reach_news_thief_and_holder(self):
         from types import SimpleNamespace
         evs = [{"type": "event", "event": "idol", "scope": "player", "player": "Holder", "visibility": "private"},

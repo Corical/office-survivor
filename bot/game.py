@@ -70,6 +70,19 @@ class _EventCtx:
             "ration", player=p.name, delta=delta, reason=reason, balance=balance, detail=detail)
 
 
+FINAL_STRETCH = 3       # the last this-many nights get a countdown (owner, 17 Oct 2026)
+
+
+def endgame_note(night, rounds):
+    """'' early on; '⏳ 3 nights left' … '🚁 LAST NIGHT…' for the final stretch, counting the night itself."""
+    left = rounds - night + 1
+    if left <= 0 or left > FINAL_STRETCH:
+        return ""
+    if left == 1:
+        return "🚁 **LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes."
+    return f"⏳ **{left} nights left**, then the helicopter."
+
+
 def night_label(schedule, night, closed=False):
     """'Night 6 (closes 08:34)' while moves are open, 'Night 6 (closed 08:34)' in news and results after it;
     'Night 6 (Tue)' for real days. A real-world anchor for the number."""
@@ -261,7 +274,9 @@ class GameService:
         log.info("move night=%d pid=%d kind=%s", night, pid, kind)
         what = {"scavenge": "🥫 scavenge", "guard": "🛡️ guard", "steal": f"🥷 steal from {target_alias}",
                 "investigate": f"🔍 investigate {target_alias}", "gift": f"🎁 give {target_alias} {amount}"}[kind]
-        return f"{night_label(self.schedule, night)}: you'll {what}. You can change your mind until the deadline."
+        note = endgame_note(night, self.rules.rounds)
+        return (f"{night_label(self.schedule, night)}: you'll {what}. You can change your mind until the deadline."
+                + (f"\n{note}" if note else ""))
 
     def play_menu(self, user_key):
         """What /play offers this player right now: a header line and the legal moves with target aliases.
@@ -278,7 +293,9 @@ class GameService:
         moves = {k: sorted(self.players[t].name for t in v) for k, v in legal.items()}
         state = "🏴‍☠️ bandit" if p.bandit else f"🥫 {p.rations} rations"
         radio_free = not any(r.startswith(f"r{night}-{pid}-") for r in self.radio_pending)
-        return {"header": f"**{night_label(self.schedule, night)}**: {alias}, {state}. What will you do tonight?",
+        note = endgame_note(night, self.rules.rounds)
+        return {"header": f"**{night_label(self.schedule, night)}**: {alias}, {state}. What will you do tonight?"
+                          + (f"\n{note}" if note else ""),
                 "moves": moves, "gift_amounts": amounts, "radio": radio_free}
 
     def board(self):
@@ -302,6 +319,8 @@ class GameService:
         if nxt <= rounds:
             dl = int(self.schedule.deadline(nxt))
             now_line = f"🌙 **Night {nxt} of {rounds}** · moves close <t:{dl}:R> (<t:{dl}:t>) · tap 🎮 Play"
+            note = endgame_note(nxt, rounds)
+            now_line += f"\n{note}" if note else ""
         else:
             now_line = "🚁 The last night is over. The helicopter is coming…"
         return key, "\n".join(x for x in (head + (f" · {modes}" if modes else ""), now_line,
@@ -451,6 +470,9 @@ class GameService:
         lines = news_lines(rec["events"]) or ["🌙 A quiet night. Nobody lost anything."]
         label = night_label(self.schedule, night, closed=True)
         body = f"📰 **News: {label}**\n" + "\n".join(f"- {l}" for l in lines)
+        coming = endgame_note(night + 1, self.rules.rounds)        # about the night that opens now
+        if coming:
+            body += "\n\n" + coming.replace("**LAST NIGHT:**", "**Tonight is the LAST NIGHT:**")
         if self.ranges:          # the morning ration ranges: a band per player, never a count (engine/visibility.py)
             body += "\n\n📊 **Rations this morning**\n" + "\n".join(morning_board(self._active(), "ranges"))
         msgs = [("news", body, None)]
