@@ -401,15 +401,17 @@ def register(bot):
     @app_commands.describe(events="Wilderness events: bananas, gorillas, hidden idols (about one a night)")
     @app_commands.choices(events=[app_commands.Choice(name="off", value="off"),
                                   app_commands.Choice(name="gentle (about 1 a night)", value="gentle")])
+    @app_commands.describe(ranges="Post everyone's ration range in #news each morning (🟢 🟡 🔴 🏴‍☠️, never exact)")
     async def start(i: discord.Interaction, day_minutes: app_commands.Range[float, 1, 1440] = 5.0,
-                    events: app_commands.Choice[str] = None):
+                    events: app_commands.Choice[str] = None, ranges: bool = False):
         if await gm_only(i):
             mode = events.value if events else "off"
 
             def go():
-                bot.game.gm_start(day_seconds=day_minutes * 60, news_delay=10, now=time.time(), events=mode)
+                bot.game.gm_start(day_seconds=day_minutes * 60, news_delay=10, now=time.time(), events=mode,
+                                  ranges=ranges)
                 return (f"Started: {len(bot.game.players)} players, a day every {day_minutes:g} minutes, "
-                        f"events {mode}.")
+                        f"events {mode}, ranges {'on' if ranges else 'off'}.")
             await call(i, go)
 
     @gm.command(name="who-moved", description="Who has chosen tonight's move (never rations)")

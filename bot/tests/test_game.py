@@ -108,6 +108,50 @@ class FullGame(unittest.TestCase):
         with self.assertRaises(GameError):
             service().gm_start(day_seconds=60, now=0, events="chaos")
 
+    def test_morning_ranges_put_every_active_player_in_their_true_band_once(self):
+        from engine.visibility import BAND_LABELS, band_index
+        g = service()
+        g.join("human", rng=random.Random(1))
+        g.gm_add_sims(9, rng=random.Random(3))
+        g.gm_start(day_seconds=300, now=0, ranges=True)
+        g.quit("human") if hasattr(g, "quit") else None
+        for night in range(1, 11):
+            g.tick(now=night * 300 + 10)
+            news = [g.outbox_text(i) for i in g.pending_outbox() if i["to"] == "news" and f"Night {night} " in g.outbox_text(i)]
+            if not news:
+                continue
+            board = news[0].split("📊 **Rations this morning**\n")[1].split("\n")
+            placed = {}
+            for line in board:
+                label, names = line.split(": ", 1)
+                for n in names.split(", "):
+                    self.assertNotIn(n, placed, f"night {night}: {n} listed twice")
+                    placed[n] = label
+            active = [p for pid, p in g.players.items() if pid not in g.quit_ids]
+            self.assertEqual(set(placed), {p.name for p in active}, f"night {night}: wrong roster on the board")
+            for p in active:                                  # bandits under the flag even when holding food
+                self.assertEqual(placed[p.name], BAND_LABELS[band_index(p)], f"night {night}: {p.name} misplaced")
+
+    def test_ranges_off_by_default_and_status_shows_your_band_only_when_on(self):
+        g = service()
+        g.join("a", rng=random.Random(1))
+        g.join("b", rng=random.Random(2))
+        g.gm_start(day_seconds=300, now=0)
+        g.tick(now=310)
+        g.tick(now=320)
+        self.assertFalse(any("Rations this morning" in g.outbox_text(i) for i in g.pending_outbox()))
+        self.assertNotIn("camp sees you", g.status("a"))
+        h = service()
+        h.join("a", rng=random.Random(1))
+        h.join("b", rng=random.Random(2))
+        h.gm_start(day_seconds=300, now=0, ranges=True)
+        from engine.visibility import band_label
+        p = h.players[h.identity.get("a")["pid"]]
+        for rations, bandit in ((9, False), (4, False), (1, False), (2, True)):
+            p.rations, p.bandit = rations, bandit
+            self.assertIn(f"The camp sees you as {band_label(p)}.", h.status("a"))
+        self.assertIn("🏴‍☠️ bandit", h.status("a"))                       # a bandit with food is still a bandit
+
     def test_idol_stories_reach_news_thief_and_holder(self):
         from types import SimpleNamespace
         evs = [{"type": "event", "event": "idol", "scope": "player", "player": "Holder", "visibility": "private"},

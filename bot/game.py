@@ -14,6 +14,7 @@ from dataclasses import dataclass, replace
 
 from engine import ENGINE_VERSION, PlayerState, Rules, resolve_night
 from engine import events as wild
+from engine.visibility import band_label, morning_board
 from engine.deal import deal
 from engine.finish import finish, objective_text
 from engine.moves import can_guard, legal_moves, validate
@@ -105,6 +106,7 @@ class GameService:
         self.radio_pending = []    # text refs to post with the next news
         self.quit_ids = set()
         self.event_counts = Counter()  # wilderness events so far this game, for the no-repeat story decks
+        self.events_mode, self.ranges = "off", False
         self.personality = {}      # pid -> personality for sims
         self.sims = set()
         self.news_posted = set()   # nights whose news intents exist
@@ -134,6 +136,7 @@ class GameService:
             self.started = True
             self.schedule = Schedule(rec["start_ts"], rec["day_seconds"], rec["news_delay"])
             self.events_mode = rec.get("events", "off")            # older logs have no key: events off
+            self.ranges = rec.get("ranges", False)                  # morning ration ranges in #news
             self.rules = replace(self.rules, **EVENT_MODES[self.events_mode])
             for c in rec["roster"]:
                 self.players[c["pid"]] = PlayerState(pid=c["pid"], name=c["alias"], rations=self.rules.start_rations,
@@ -322,7 +325,8 @@ class GameService:
                    move[0] + (f" {self.players[move[1]].name}" if move[1] is not None else ""))
         return (f"**{alias}**: 🥫 {p.rations} rations{' 🏴‍☠️ BANDIT' if p.bandit else ''}, 🛡️ {guards}"
                 f"{', guarded tonight' if p.guard_until > self.night else ''}.\n"
-                f"Secret goal: {objective_text(p.objective, self.rules, tgt)}.\nTonight: {tonight}.")
+                f"Secret goal: {objective_text(p.objective, self.rules, tgt)}.\nTonight: {tonight}."
+                + (f"\nThe camp sees you as {band_label(p)}." if self.ranges else ""))
 
     def results(self, user_key):
         pid, _ = self._who(user_key)
@@ -342,7 +346,7 @@ class GameService:
         rng = rng or random.Random()
         return [self.join(f"sim:{len(self.joined)}", sim=True, rng=rng) for _ in range(n)]
 
-    def gm_start(self, day_seconds, news_delay=5.0, now=None, events="off"):
+    def gm_start(self, day_seconds, news_delay=5.0, now=None, events="off", ranges=False):
         if events not in EVENT_MODES:
             raise GameError(f"events must be one of: {', '.join(EVENT_MODES)}.")
         if self.started:
@@ -359,8 +363,11 @@ class GameService:
                                     "secret goal.", None) for c in roster if c["pid"] not in self.sims]
         if events != "off":
             msgs[0] = ("news", msgs[0][1] + " 🌴 Wilderness events are on: luck, good and bad, can strike anyone.", None)
+        if ranges:
+            msgs[0] = ("news", msgs[0][1] + " 📊 Every morning #news shows everyone's ration range "
+                               "(🟢 7+ · 🟡 3-6 · 🔴 1-2 · 🏴‍☠️ bandit), never the exact count.", None)
         self._append({"type": "start", "start_ts": now, "day_seconds": day_seconds, "news_delay": news_delay,
-                      "events": events,
+                      "events": events, "ranges": bool(ranges),
                       "roster": roster, "engine_version": ENGINE_VERSION, "season": self.season_id,
                       "rules": {**vars(self.rules), "players": len(roster)}, "outbox": self._intents(*msgs)})
         log.info("game started: %d players, day=%ss", len(roster), day_seconds)
@@ -412,7 +419,10 @@ class GameService:
         rec = self._night_record(night)
         lines = news_lines(rec["events"]) or ["🌙 A quiet night. Nobody lost anything."]
         label = night_label(self.schedule, night, closed=True)
-        msgs = [("news", f"📰 **News: {label}**\n" + "\n".join(f"- {l}" for l in lines), None)]
+        body = f"📰 **News: {label}**\n" + "\n".join(f"- {l}" for l in lines)
+        if self.ranges:          # the morning ration ranges: a band per player, never a count (engine/visibility.py)
+            body += "\n\n📊 **Rations this morning**\n" + "\n".join(morning_board(self._active(), "ranges"))
+        msgs = [("news", body, None)]
         msgs += [("radio", None, ref) for ref in self.radio_pending]
         msgs += [(f"dm:{pid}", f"🌙 **{label}**\n" + "\n".join(plines), None)
                  for pid, plines in rec["private"].items() if int(pid) not in self.quit_ids]
