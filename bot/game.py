@@ -612,6 +612,10 @@ def private_lines(events, p, before, night=None, guard_nights=2):
         elif t == "investigate" and e["investigator"] == me:
             saw = e["saw_action"] + (f" ({e['saw_target']})" if e["saw_target"] else "")
             out.append(f"🔍 You watched {e['target']}: they chose {saw}.")
+            found = sum(x["delta"] for x in events if x["type"] == "ration" and x["player"] == me
+                        and x["reason"] == "investigate_find")
+            if found:
+                out.append(f"🔍 While watching, you found {found} ration{'s' if found > 1 else ''}.")
         elif t == "exposed" and e["investigator"] == me:
             out.append(f"🕵️ You exposed {e['thief']}; they paid you {e['paid']}.")
         elif t == "exposed" and e["thief"] == me:
@@ -623,7 +627,10 @@ def private_lines(events, p, before, night=None, guard_nights=2):
         elif t == "gift" and e["giver"] == me:
             out.append(f"🎁 You gave {e['receiver']} {e['amount']}.")
         elif t == "gift" and e["receiver"] == me:
-            out.append(f"🎁 {e['giver']} secretly gave you {e['amount']}.")
+            bonus = sum(x["delta"] for x in events if x["type"] == "ration" and x["player"] == me
+                        and x["reason"] == "gift_bonus" and x.get("detail") == e["giver"])
+            out.append(f"🎁 {e['giver']} secretly gave you {e['amount']}"
+                       + (f", and gifts grow: you got {e['amount'] + bonus}." if bonus else "."))
         elif t == "became_bandit" and e["player"] == me:
             out.append("🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.")
         elif t == "rejoined" and e["player"] == me:

@@ -555,8 +555,8 @@ def register(bot):
         tot = hall.totals(hall.load_seasons(bot.conf.data_dir), since=ts)
         if not tot:
             return await private(i, "No finished seasons in that period.")
-        lines = [f"{e} **{title}:** {', '.join(who(i, k) for k in keys)} ({v})"
-                 for e, title, keys, v in hall.hall_of_fame(tot)]
+        lines = [f"{e} **{title}** ({meaning}): {', '.join(who(i, k) for k in keys)} ({v})"
+                 for e, title, meaning, keys, v in hall.hall_of_fame(tot)]
         games = max(r["games"] for r in tot.values())
         text = (f"🏛️ **Survivors Hall of Fame**{f' since {since}' if since else ''} · {len(tot)} players · "
                 f"up to {games} games each\n" + "\n".join(lines))

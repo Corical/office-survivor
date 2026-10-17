@@ -12,6 +12,18 @@ from engine import Rules
 ALIASES = [f"Alias{i:02d}" for i in range(30)]
 
 
+def _official_rules():
+    """The rules Torch actually plays (docs/game.json), so tests cover what players get."""
+    import json, os
+    from dataclasses import fields
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "game.json")
+    known = {f.name for f in fields(Rules)}
+    return Rules(**{k: v for k, v in json.load(open(path, encoding="utf-8"))["rules"].items() if k in known})
+
+
+OFFICIAL = _official_rules()
+
+
 def service(store=None, ident=None, texts=None):
     return GameService(Rules(), store or MemoryEventStore(), ident or MemoryIdentityStore(),
                        texts or MemoryTextStore(), ALIASES, "test-season", clock=lambda: 0)
@@ -279,11 +291,13 @@ class FullGame(unittest.TestCase):
                             "stole": "You stole", "robbed": "stole", "gift_in": "gave you", "gift_out": "You gave",
                             "caught_penalty": "you were caught", "fine": "you were caught",
                             "event_found": "+", "event_lost": "-", "bounty_received": "paid you",
-                            "bounty_paid": "EXPOSED", "gift_bonus": "gave you", "guard_income": "guard",
-                            "exposed_return": "back", "exposed_loot": "back"}
+                            "bounty_paid": "EXPOSED", "gift_bonus": "gifts grow", "guard_income": "guard",
+                            "exposed_return": "back", "exposed_loot": "back",
+                            "investigate_find": "While watching, you found"}
         seen = set()
         for seed in range(25):
-            g = service()
+            g = GameService(OFFICIAL if seed % 2 else Rules(), MemoryEventStore(), MemoryIdentityStore(),
+                            MemoryTextStore(), ALIASES, "test-season", clock=lambda: 0)   # official rules + defaults
             g.join("h", rng=random.Random(seed))
             g.gm_add_sims(9, rng=random.Random(seed + 50))
             g.gm_start(day_seconds=300, now=0, events="gentle" if seed % 2 else "off")
@@ -306,7 +320,8 @@ class FullGame(unittest.TestCase):
                             seen.add(e["reason"])
                             self.assertIn(word, dm, f"seed {seed} night {rec['night']}: {name}'s "
                                                     f"{e['reason']} {e['delta']:+} isn't in their DM:\n{dm}")
-        self.assertTrue({"eat", "scavenge", "stole", "robbed"} <= seen, f"the games never produced: {seen}")
+        self.assertTrue({"eat", "scavenge", "stole", "robbed", "investigate_find", "gift_bonus"} <= seen,
+                        f"the games never produced: {seen}")
 
     def test_exposed_theft_is_returned_and_everyone_involved_is_told(self):
         from dataclasses import replace

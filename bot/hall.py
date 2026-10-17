@@ -16,12 +16,14 @@ def season_summary(records, identity):
     if not start or not fin:
         return []
     winners = set(next(e for e in fin["events"] if e["type"] == "game_end")["winners"])
-    exposures = defaultdict(int)
+    exposures, guarded = defaultdict(int), defaultdict(int)
     for r in records:
         if r["type"] == "night":
             for e in r["events"]:
                 if e["type"] == "exposed":
                     exposures[e["investigator"]] += 1
+                elif e["type"] == "steal" and e["outcome"] == "caught":
+                    guarded[e["target"]] += 1                # the guard who caught the thief
     by_alias = {e["player"]: e for e in fin["events"] if e["type"] == "result"}
     out = []
     for key, who in identity.items():
@@ -32,7 +34,8 @@ def season_summary(records, identity):
             "key": key, "alias": who["alias"], "season": start.get("season", ""), "started": start["start_ts"],
             "won": who["alias"] in winners, "seat": res["extracted"], "points": res["score"],
             "stolen": res["stole"], "clean_steals": res.get("steals_ok", 0), "caught": res.get("steals_caught", 0),
-            "exposed": exposures[who["alias"]], "given": res["gave_away"], "goal": res["objective_done"],
+            "exposed": exposures[who["alias"]], "guarded": guarded[who["alias"]],
+            "given": res["gave_away"], "goal": res["objective_done"],
             "survived": res["survived"],
         })
     return out
@@ -66,11 +69,17 @@ def history(seasons, key=None):
     return rows
 
 
-TOTALS = ("games", "won", "seat", "points", "stolen", "exposed", "given", "goal")
-AWARDS = [  # praise only (owner): nothing here names a victim or ranks who suffered most
-    ("🏆", "Most wins", "won"), ("🚁", "Most helicopter seats", "seat"), ("⭐", "Most points", "points"),
-    ("🥷", "Most rations stolen", "stolen"), ("🕵️", "Most thieves exposed", "exposed"),
-    ("🎁", "Most generous", "given"), ("🎯", "Most secret goals met", "goal"),
+TOTALS = ("games", "won", "seat", "points", "stolen", "exposed", "guarded", "given", "goal")
+# Praise only (owner): nothing here names a victim or ranks who suffered most. (emoji, title, what it means, field)
+AWARDS = [
+    ("🏆", "Sole Survivor", "most wins", "won"),
+    ("🚁", "Frequent Flyer", "most helicopter seats", "seat"),
+    ("⭐", "Top of the Food Chain", "most points", "points"),
+    ("🥷", "Sticky Fingers", "most rations stolen", "stolen"),
+    ("🕵️", "Herlock Sholmes", "most thieves exposed", "exposed"),
+    ("🛡️", "The Bouncer", "most thieves caught on guard", "guarded"),
+    ("🎁", "Santa Paws", "most rations given away", "given"),
+    ("🎯", "Mission Accomplished", "most secret goals met", "goal"),
 ]
 
 
@@ -89,10 +98,10 @@ def totals(seasons, since=None):
 
 
 def hall_of_fame(tot):
-    """[(emoji, title, [keys], value)] for each award somebody actually earned (a top of 0 earns nothing)."""
+    """[(emoji, title, meaning, [keys], value)] for each award somebody actually earned (a top of 0 earns nothing)."""
     out = []
-    for emoji, title, field in AWARDS:
+    for emoji, title, meaning, field in AWARDS:
         top = max((row[field] for row in tot.values()), default=0)
         if top > 0:
-            out.append((emoji, title, sorted(k for k, row in tot.items() if row[field] == top), top))
+            out.append((emoji, title, meaning, sorted(k for k, row in tot.items() if row[field] == top), top))
     return out

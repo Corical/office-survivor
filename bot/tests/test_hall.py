@@ -75,10 +75,10 @@ class Hall(unittest.TestCase):
         tot = {"a": dict.fromkeys(hall.TOTALS, 0), "b": dict.fromkeys(hall.TOTALS, 0)}
         tot["a"].update(games=2, won=1, stolen=4, given=0)
         tot["b"].update(games=2, won=1, stolen=2, given=0)
-        aw = {title: (keys, v) for _, title, keys, v in hall.hall_of_fame(tot)}
-        self.assertEqual(aw["Most wins"], (["a", "b"], 1))
-        self.assertEqual(aw["Most rations stolen"], (["a"], 4))
-        self.assertNotIn("Most generous", aw)                  # nobody gave: no award, no "0" winner
+        aw = {meaning: (keys, v) for _, _, meaning, keys, v in hall.hall_of_fame(tot)}
+        self.assertEqual(aw["most wins"], (["a", "b"], 1))
+        self.assertEqual(aw["most rations stolen"], (["a"], 4))
+        self.assertNotIn("most rations given away", aw)                  # nobody gave: no award, no "0" winner
         titles = " ".join(aw).lower()
         for banned in ("robbed", "bandit", "caught", "victim", "starv"):
             self.assertNotIn(banned, titles)
