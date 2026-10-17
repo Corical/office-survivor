@@ -101,6 +101,14 @@ class Rules_(unittest.TestCase):
         self.assertIn(other, self.g.alias_list("a"))
         self.assertIn(me, self.g.alias_list("b"))
 
+    def test_night_labels_anchor_to_real_time(self):
+        from bot.game import Schedule, night_label
+        pilot = Schedule(start_ts=1792217089.8, day_seconds=300)          # 17 Oct 2026 08:04:49 SAST
+        self.assertEqual(night_label(pilot, 6), "Night 6 (closes 08:34)")
+        real = Schedule(start_ts=1791756000.0, day_seconds=86400)         # Mon 12 Oct 2026 00:00 SAST
+        self.assertEqual(night_label(real, 1), "Night 1 (Mon)")            # closes at Tuesday 00:00: Monday's night
+        self.assertEqual(night_label(real, 2), "Night 2 (Tue)")
+
     def test_join_closed_after_start(self):
         with self.assertRaises(GameError):
             self.g.join("late")
