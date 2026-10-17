@@ -11,7 +11,7 @@ from engine import PlayerState, Rules, resolve_night
 from engine.finish import finish
 from engine.moves import validate
 
-CREATE = {"scavenge", "guard_income", "gift_bonus"}
+CREATE = {"scavenge", "guard_income", "gift_bonus", "investigate_find"}
 DESTROY = {"eat", "fine"}
 
 

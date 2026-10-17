@@ -36,9 +36,9 @@ Everything that happens in a game is logged, so the whole game can be checked, r
 | `result` | After the last night, one per player | `player`, `rations`, `survived`, `extracted`, `objective`, `objective_done`, `score`, `stole`, `steals_ok`, `steals_caught`, `times_robbed`, `gave_away` | public at the reveal |
 | `game_end` | The very end | `winners`, `winner_tiebreak` | public |
 
-Ration `reason` values: `robbed`, `stole`, `caught_penalty`, `guard_reward`, `fine`, `scavenge`, `guard_income`, `gift_out`, `gift_in`, `gift_bonus`, `bounty_paid`, `bounty_received`, `exposed_return` and `exposed_loot` (transfers from an exposed thief, only when `exposure_undo` is on), `eat`, and (wilderness events, off by default) `event_found` and `event_lost`. Events also write an `event` line (`event`, `scope`, `player`).
+Ration `reason` values: `robbed`, `stole`, `caught_penalty`, `guard_reward`, `fine`, `scavenge`, `guard_income`, `gift_out`, `gift_in`, `gift_bonus`, `bounty_paid`, `bounty_received`, `exposed_return` and `exposed_loot` (transfers from an exposed thief, only when `exposure_undo` is on), `eat`, and (wilderness events, off by default) `event_found` and `event_lost`, `investigate_find` (new food, only with `investigate_find` above 0). Events also write an `event` line (`event`, `scope`, `player`).
 
-**The books must balance.** Food is only created by `scavenge`, `guard_income`, `gift_bonus` and `event_found`, and only destroyed by `eat`, `fine` and `event_lost`. Every other reason is one side of a transfer between two players, so within a night those deltas must add up to exactly zero. A transfer moves only what the payer actually has, and the receiver gets exactly that. `check_invariants.py` enforces this on every logged game.
+**The books must balance.** Food is only created by `scavenge`, `guard_income`, `gift_bonus`, `investigate_find` and `event_found`, and only destroyed by `eat`, `fine` and `event_lost`. Every other reason is one side of a transfer between two players, so within a night those deltas must add up to exactly zero. A transfer moves only what the payer actually has, and the receiver gets exactly that. `check_invariants.py` enforces this on every logged game.
 
 ## Extra events only the bot writes
 

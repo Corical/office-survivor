@@ -37,7 +37,7 @@ from experiments import lower_priority  # noqa: E402
 
 RESULTS = os.path.join(HERE, "..", "results")
 CHECK_NIGHT = 5
-CREATE = {"scavenge", "guard_income", "gift_bonus", "event_found"}
+CREATE = {"scavenge", "guard_income", "gift_bonus", "investigate_find", "event_found"}
 DESTROY = {"eat", "fine", "event_lost"}
 PERSONALITIES = list(S.OFFICE_MIX)
 RAID_X = 4.0          # raid is drawn 4 x its library weight (4): about a fifth of all events

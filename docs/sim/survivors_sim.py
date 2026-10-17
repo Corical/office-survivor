@@ -239,6 +239,11 @@ class SimObserver(Observer):
         if self.g.mem:
             self.g.mem.touch(giver.pid, recv.pid)
             self.g.mem.touch(recv.pid, giver.pid)
+        if self.g.ai_quiet:                # the receiver now owes the giver; a gift back clears what the giver owed them
+            owed = self.g.gift_owed
+            owed[giver.pid] = [x for x in owed.get(giver.pid, []) if x != recv.pid]
+            owed.setdefault(recv.pid, [])
+            owed[recv.pid] = [x for x in owed[recv.pid] if x != giver.pid] + [giver.pid]
         recv.notes.append(f"Night {night}: {giver.name} secretly gave you {amt}.")
         giver.notes.append(f"Night {night}: you gave {recv.name} {amt}.")
 
@@ -276,12 +281,15 @@ class SimObserver(Observer):
 
 class Game:
     def __init__(self, rules: Rules, seed: int, mix=None, record=False, force=None, brain=None, smart=None,
-                 log=False, vis="hidden", memory=None, edges=V.BAND_EDGES, ai_exposure=False):
+                 log=False, vis="hidden", memory=None, edges=V.BAND_EDGES, ai_exposure=False, ai_quiet=False):
         if vis not in V.VISIBILITIES:
             raise ValueError(f"vis must be one of {V.VISIBILITIES}, not {vis!r}")
         # ai_exposure (AI only, the rules never see it): investigating is weighed by what it pays the investigator
         # relative to today's bounty of 1, and a thief who is exposed turns cautious, like one who was caught.
         self.ai_exposure = ai_exposure
+        # ai_quiet (AI only): weigh the investigate_find and gift_bonus rules and give back gifts; see _choose
+        self.ai_quiet = ai_quiet
+        self.gift_owed = {}                # pid -> pids who gave them food they have not returned
         self.vis, self.edges = vis, tuple(edges)    # information for the AI only; the rules never see it
         self.r = rules
         self.brain = brain
@@ -321,6 +329,8 @@ class Game:
                     rules_logged.pop(k)
             if rules.exposure_undo == "none":       # knob off: the log is exactly what it was before it existed
                 rules_logged.pop("exposure_undo")
+            if not rules.investigate_find:          # knob off: same
+                rules_logged.pop("investigate_find")
             self.L("game_start", seed=seed, log_format=LOG_FORMAT_VERSION, rules=rules_logged,
                    seats=max(1, round(rules.players * rules.seat_ratio)),
                    players=[{"id": p.pid, "name": p.name, "personality": p.arch, "start_rations": p.rations,
@@ -489,6 +499,21 @@ class Game:
                 if self.invest_payout() != AI_BASE_PAYOUT:
                     why.append(f"an exposure pays the investigator {self.invest_payout()} (today {AI_BASE_PAYOUT}), "
                                "so investigating is weighed up or down by that ratio")
+            if self.ai_quiet:
+                # opt-in, AI only (identical in every sweep row; does nothing while investigate_find and gift_bonus are 0
+                # and nobody has gifted yet). Investigating is weighed up by its expected find over today's payout of 1;
+                # gifting by what the receiver gets over what the giver pays; and a player who was given food by an
+                # alias and has not returned it is likelier to give back (+0.25).
+                if self.r.investigate_find:
+                    w["investigate"] *= (AI_BASE_PAYOUT + self.r.investigate_find / 2) / AI_BASE_PAYOUT
+                    why.append(f"watching also finds 0..{self.r.investigate_find} food, so investigating is weighed up")
+                g_amt = 2 if p.rations >= 7 else 1
+                if self.r.gift_bonus:
+                    w["gift"] *= (g_amt + self.r.gift_bonus) / g_amt
+                    why.append(f"a gift gives the receiver {self.r.gift_bonus} extra, so gifting is weighed up")
+                if self.owed_to(p):
+                    w["gift"] += 0.25
+                    why.append("was given food and has not returned it: likelier to give back")
             w["steal"] *= p.caution
             if p.caution < 1:
                 why.append(f"has been caught before, so stealing odds are cut to {p.caution:.0%} of normal")
@@ -556,6 +581,10 @@ class Game:
             return ("gift", tgt, amt, False)
         return (kind, None, 0, False)
 
+    def owed_to(self, p):
+        """Players who gave `p` food that `p` has not given back, oldest first (AI memory, only kept when ai_quiet)."""
+        return [q for q in self.gift_owed.get(p.pid, []) if not self.P(q).bandit]
+
     def invest_payout(self):
         """What one exposure pays the investigator, for a typical theft of steal_amount: the bounty, plus their half
         of the loot when the rules split it (the victim gets the larger half)."""
@@ -613,6 +642,12 @@ class Game:
         if not cands:
             return None
         # give to whoever looks worst off; bandits close to rejoining are attractive too
+        if self.ai_quiet:                  # pay back the most recent giver first
+            owed = self.owed_to(p)
+            if owed:
+                q = self.P(owed[-1])
+                self._why.append(f"gave to {q.name}: they gave to you")
+                return q.pid
         scored = [(self.perceived(p, q) - (2 if q.robbed_last else 0), q.pid) for q in cands]
         low = min(scored)
         q = self.P(low[1])

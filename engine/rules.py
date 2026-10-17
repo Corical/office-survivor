@@ -24,7 +24,8 @@ class Rules:
                                   # "split" (loot taken back from the thief: half to the victim, rounded UP, the rest
                                   # to the investigator) or "full" (all the loot back to the victim). Either way the
                                   # thief also pays investigate_bounty, loot first, then the bounty, from what they hold
-    gift_bonus: int = 0           # extra rations the receiver gets on top of each gift
+    investigate_find: int = 0     # an investigator also finds 0..this new rations (uniform) in phase 6; 0 = off, no dice drawn
+    gift_bonus: int = 0          # extra rations the receiver gets on top of each gift
     winner_tiebreak: str = "kindness"  # tied top scores: "none" (shared win), "rations", or "kindness"
     tiebreak: str = "kindness"    # last-seat ties: "coin" or "kindness" (most given away, then fewest caught)
     give_goal: int = 3            # threshold for the give-away objective

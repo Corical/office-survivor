@@ -284,7 +284,7 @@ class HumanMemoryMechanics(unittest.TestCase):
 
 class BooksStillBalance(unittest.TestCase):
     def test_every_combination_conserves_food(self):
-        create = {"scavenge", "guard_income", "gift_bonus", "event_found"}
+        create = {"scavenge", "guard_income", "gift_bonus", "investigate_find", "event_found"}
         destroy = {"eat", "fine", "event_lost"}
         for vis in V.VISIBILITIES:
             for mem in (None, V.HumanMemory()):

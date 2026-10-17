@@ -266,6 +266,12 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
                 exposed_paid = back + pay
                 if to_victim:
                     obs.restored(night, victim, tgt, to_victim)
+        if r.investigate_find > 0:         # opt-in: watching also turns up new food, booked as such. The die is drawn
+            found = rng.randint(0, r.investigate_find)     # for every investigator, and only when the knob is on
+            if found:
+                inv.rations += found
+                ledger(inv, found, "investigate_find", inv.rations, detail="")
+            ev["investigate_find"] += found
         obs.investigated(night, inv, tgt, seen, exposed_paid)
 
     # 7. eat, run out (bandit), come back

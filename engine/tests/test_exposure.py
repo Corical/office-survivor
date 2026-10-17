@@ -12,7 +12,7 @@ from dataclasses import replace
 
 from engine import Observer, PlayerState, Rules, resolve_night
 
-CREATE = {"scavenge", "guard_income", "gift_bonus"}
+CREATE = {"scavenge", "guard_income", "gift_bonus", "investigate_find"}
 DESTROY = {"eat", "fine"}
 
 

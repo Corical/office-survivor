@@ -21,7 +21,7 @@ CONFIGS = ["baseline", "v1_original", "v1_original+gift_bonus+missed_half",
 
 # Food may only enter or leave the game through these. Every other ration movement is a transfer between
 # players and must net to exactly zero each night: nobody can be paid what somebody else didn't give.
-CREATE = {"scavenge", "guard_income", "gift_bonus", "event_found"}
+CREATE = {"scavenge", "guard_income", "gift_bonus", "investigate_find", "event_found"}
 DESTROY = {"eat", "fine", "event_lost"}
 
 
