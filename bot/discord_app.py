@@ -7,6 +7,7 @@ the length of a day when starting (5 minutes for pilots). News goes to #news, ra
 /results as the fallback when DMs are closed.
 """
 import asyncio
+import io
 import json
 import datetime
 import logging
@@ -560,10 +561,20 @@ def register(bot):
         games = max(r["games"] for r in tot.values())
         text = (f"🏛️ **Survivors Hall of Fame**{f' since {since}' if since else ''} · {len(tot)} players · "
                 f"up to {games} games each\n" + "\n".join(lines))
+        pic = None
+        try:
+            from .hall_image import render as render_hall
+            rows = [{"name": who(i, k), **v} for k, v in tot.items()]
+            awards = [(t, m, [who(i, k) for k in keys], v) for _, t, m, keys, v in hall.hall_of_fame(tot)]
+            pic = render_hall(rows, awards, subtitle=f"{len(tot)} players" + (f" · since {since}" if since else ""))
+        except Exception:
+            log.exception("hall of fame picture failed; text only")
+        file = lambda: discord.File(io.BytesIO(pic), "hall-of-fame.png") if pic else discord.utils.MISSING  # noqa: E731
         if post:
-            await bot.channels["news"].send(text[:1990], allowed_mentions=NONE)
+            await bot.channels["news"].send(text[:1990], file=file(), allowed_mentions=NONE)
             return await private(i, "Posted in #news.")
-        await private(i, text + "\n\n*Only you see this. Run again with post: True to share it in #news.*")
+        await i.response.send_message(text + "\n\n*Only you see this. Run again with post: True to share it in #news.*",
+                                      file=file(), ephemeral=True, allowed_mentions=NONE)
 
     @gm.command(name="new-season", description="Archive this game and start an empty one")
     async def new_season(i: discord.Interaction, confirm: bool):
