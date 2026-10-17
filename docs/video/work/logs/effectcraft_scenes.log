@@ -1,0 +1,56 @@
+scene_02: built (9.9 s)
+scene_02: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_02.mp4
+scene_03: built (8.8 s)
+scene_03: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_03.mp4
+scene_04: built (9.3 s)
+scene_04: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_04.mp4
+Traceback (most recent call last):
+  File "C:\Personal\office-survivor\docs\video\tools\effectcraft_scenes.py", line 478, in <module>
+    sc = BUILDERS[sid]()
+  File "C:\Personal\office-survivor\docs\video\tools\effectcraft_scenes.py", line 249, in s05
+    tin(sc, cx - 60 + k * 120, 720, 55, name=f"tin_{d}_{k}",
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        scale=[(0, [0, 0]), (a, [0, 0]), (a + 0.3, [55, 55]), (b, [55, 55]), (b + 0.01, [0, 0])] if d < 2 else sc.pop(a, 55))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: tin() got multiple values for argument 'scale'
+scene_05: built (9.1 s)
+scene_05: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_05.mp4
+scene_06: built (7.5 s)
+scene_06: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_06.mp4
+scene_07: built (13.2 s)
+scene_07: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_07.mp4
+scene_08: built (10.9 s)
+scene_08: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_08.mp4
+effectcraft-cli failed (1): effectcraft-cli run: layer.addItem: invalid parameters for `layer.addItem`: no item `avatar_colours_1.png`
+scene_09: built (7.4 s)
+scene_09: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_09.mp4
+scene_10: built (12.4 s)
+scene_10: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_10.mp4
+scene_11: built (10.7 s)
+scene_11: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_11.mp4
+Traceback (most recent call last):
+  File "C:\Personal\office-survivor\docs\video\tools\effectcraft_scenes.py", line 483, in <module>
+    sc = BUILDERS[sid]()
+  File "C:\Personal\office-survivor\docs\video\tools\effectcraft_scenes.py", line 404, in s12
+    sc.img(f"{ASSETS}/radio_icon.png", 1720, 320, 60, name="radio_icon", scale=sc.pop(t_cut + 0.2, 60))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Scene.img() got multiple values for argument 'scale'
+exit 1
+scene_12: built (12.7 s)
+scene_12: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_12.mp4
+scene_13: built (18.9 s)
+scene_13: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_13.mp4
+scene_14: built (16.3 s)
+scene_14: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_14.mp4
+scene_03: built (8.8 s)
+scene_03: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_03.mp4
+scene_05: built (9.1 s)
+scene_05: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_05.mp4
+scene_06: built (7.5 s)
+scene_06: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_06.mp4
+scene_07: built (13.2 s)
+scene_07: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_07.mp4
+scene_08: built (10.9 s)
+scene_08: rendered -> C:/Personal/office-survivor/docs/video/output/04_scenes/scene_08.mp4
+saved work/survivors_scenes.ecproj
+exit 0

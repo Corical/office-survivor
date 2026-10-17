@@ -40,5 +40,21 @@
   "asset:radio_icon": "6f614ad222c5",
   "asset:scoreboard": "e5aec8334af2",
   "asset:curtain": "920bbd77d653",
-  "asset:news_clipping_wall": "070811b774c9"
+  "asset:news_clipping_wall": "070811b774c9",
+  "audio_mix": "e03ea20ed6f0",
+  "scene:scene_01": "1e93677ba349",
+  "scene:scene_02": "319a34bc9fcc",
+  "scene:scene_03": "db8c1198cd78",
+  "scene:scene_04": "b254d7758e08",
+  "scene:scene_05": "00615673cb73",
+  "scene:scene_06": "799eedebfada",
+  "scene:scene_07": "dc309c88d848",
+  "scene:scene_08": "40fb37b23682",
+  "scene:scene_09": "0869defc0c23",
+  "scene:scene_10": "f28d1adc419d",
+  "scene:scene_11": "d189c1e69489",
+  "scene:scene_12": "b92bf048115b",
+  "scene:scene_13": "6e51178086e6",
+  "scene:scene_14": "a27a9d1418dc",
+  "final": "3fb41c3a961c"
 }

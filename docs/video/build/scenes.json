@@ -408,7 +408,7 @@
       "timing_source": "voiceover",
       "narration": "Guard. You're protected tonight and tomorrow night. Anyone who tries to rob you gets caught, named in the news, and pays you up to two rations. You only get three guards, so choose your moment.",
       "word_count": 35,
-      "on_screen_text": "GUARD: 2 nights · thief pays you up to 2 ·3 per game",
+      "on_screen_text": "GUARD: 2 nights · thief pays up to 2",
       "beats": [
         {
           "at_s": 0.0,
@@ -455,7 +455,7 @@
       "voiceover_file": "output/03_audio/vo/scene_07.wav",
       "output": "output/04_scenes/scene_07.mp4",
       "vo_hash": "b8a1721be17a",
-      "hash": "782623c77065"
+      "hash": "dc309c88d848"
     },
     {
       "id": "scene_08",
@@ -682,7 +682,7 @@
       "timing_source": "voiceover",
       "narration": "On the last night, the helicopter lands. The five survivors with the most food get a seat. Staying alive earns points, a seat earns more, and so does your secret goal. Most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
       "word_count": 48,
-      "on_screen_text": "Seat = 3 pts · alive, no seat = 1 pt · secret goal = 2 pts",
+      "on_screen_text": "Seat 3 · alive 1 · goal 2 pts",
       "beats": [
         {
           "at_s": 0.0,
@@ -722,7 +722,7 @@
       "voiceover_file": "output/03_audio/vo/scene_13.wav",
       "output": "output/04_scenes/scene_13.mp4",
       "vo_hash": "91cd9fb9e820",
-      "hash": "1f6473b39cb5"
+      "hash": "6e51178086e6"
     },
     {
       "id": "scene_14",

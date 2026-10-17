@@ -215,7 +215,7 @@
       "title": "Guard",
       "base_duration_s": 13,
       "narration": "Guard. You're protected {guard_span}. Anyone who tries to rob you gets caught, named in the news, and pays you up to {guard_reward:rations}. You only get {guard_limit:word} guards, so choose your moment.",
-      "on_screen_text": "GUARD: {guard_nights} nights · thief pays you up to {guard_reward} ·{guard_limit} per game",
+      "on_screen_text": "GUARD: {guard_nights} nights · thief pays up to {guard_reward}",
       "beats": [
         {
           "at_s": 0.0,
@@ -435,7 +435,7 @@
       "title": "Extraction and the reveal",
       "base_duration_s": 18,
       "narration": "On the last night, the helicopter lands. The {seats:word} survivors with the most food get a seat. Staying alive earns points, a seat earns more, and so does your secret goal. Most points wins. Then comes the big reveal: every theft and every secret, out in the open.",
-      "on_screen_text": "Seat = {pts_extract} pts · alive, no seat = {pts_survive} pt · secret goal = {pts_objective} pts",
+      "on_screen_text": "Seat {pts_extract} · alive {pts_survive} · goal {pts_objective} pts",
       "beats": [
         {
           "at_s": 0.0,

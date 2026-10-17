@@ -370,9 +370,78 @@ def a_news_clipping_wall():
 
 ASSETS = {name[2:]: fn for name, fn in globals().items() if name.startswith("a_")}
 
+
+def only_groups(full_svg, keep):
+    """The same canvas with only the named top-level groups, so layered parts line up when stacked."""
+    import re
+    head = full_svg[:full_svg.index(">") + 1]
+    defs = "".join(re.findall(r"<defs>.*?</defs>", full_svg, re.S))
+    body = []
+    for name in keep:
+        start = full_svg.index(f'<g id="{name}"')
+        depth, i = 0, start
+        while True:
+            o, c = full_svg.find("<g", i + 1), full_svg.find("</g>", i + 1)
+            if o != -1 and o < c:
+                depth, i = depth + 1, o
+            elif depth:
+                depth, i = depth - 1, c
+            else:
+                body.append(full_svg[start:c + 4])
+                break
+    return head + defs + "".join(body) + "</svg>"
+
+
+def parts():
+    """Single images for EffectCraft: one per pose, icon and moving piece (output/01_assets/parts)."""
+    out = {}
+    for pz in POSES:
+        out[f"avatar_{pz}"] = svg(440, 340, avatar(pz, ox=220, oy=320))
+    for i in range(4):
+        out[f"avatar_colours_{i + 1}"] = svg(440, 340, avatar("standing", P["avatar_skin_tones"][i], P["avatar_shirts"][i],
+                                                              prefix=f"colours_{i + 1}", ox=220, oy=320))
+    out["avatar_finger_to_lips_2"] = svg(440, 340, avatar("finger_to_lips", P["avatar_skin_tones"][1], P["avatar_shirts"][1],
+                                                         prefix="finger_to_lips_2", ox=220, oy=320))
+    logo = a_title_logo()  # the navy backing rect isn't in a group, so only_groups leaves it out
+    out["title_large"] = only_groups(logo, ["title_large"]).replace('viewBox="0 0 1600 420"', 'viewBox="0 40 1600 210"').replace('height="420"', 'height="210"')
+    out["title_small"] = only_groups(logo, ["title_small"]).replace('viewBox="0 0 1600 420"', 'viewBox="520 310 560 90"').replace(
+        'width="1600" height="420"', 'width="560" height="90"')
+    out["avatar_shadow_standing"] = svg(440, 340, avatar("standing", prefix="shadow_standing", ox=220, oy=320, mono=P["shadow"]))
+    icons = a_action_icons()
+    for k, n in enumerate(["icon_scavenge", "icon_steal", "icon_guard", "icon_investigate", "icon_gift"]):
+        out[n] = only_groups(icons, [n]).replace('viewBox="0 0 700 140"', f'viewBox="{k * 140} 0 140 140"').replace(
+            'width="700"', 'width="140"')
+    tent = a_tent()
+    out["tent_top_down"] = only_groups(tent, ["top_down"]).replace('viewBox="0 0 450 160"', 'viewBox="0 0 200 150"').replace('width="450"', 'width="200"')
+    out["tent_front"] = only_groups(tent, ["front_with_window"]).replace('viewBox="0 0 450 160"', 'viewBox="220 0 230 160"').replace('width="450"', 'width="230"')
+    ms = a_moon_sun()
+    out["moon"] = only_groups(ms, ["moon"]).replace('viewBox="0 0 340 160"', 'viewBox="0 0 170 160"').replace('width="340"', 'width="170"')
+    out["sun"] = only_groups(ms, ["sun"]).replace('viewBox="0 0 340 160"', 'viewBox="170 0 170 160"').replace('width="340"', 'width="170"')
+    out["shield"] = only_groups(a_shield_counter(), ["shield_1"]).replace('viewBox="0 0 300 130"', 'viewBox="5 0 100 130"').replace('width="300"', 'width="100"')
+    heli = a_helicopter()
+    out["helicopter_body"] = only_groups(heli, ["body", "door", "seat_1", "seat_2", "seat_3", "seat_4", "seat_5"])
+    out["helicopter_rotor"] = only_groups(heli, ["rotor"])
+    cur = a_curtain()
+    for n in ("reveal_title", "left", "right", "valance"):
+        out[f"curtain_{n}"] = only_groups(cur, [n])
+    plan = a_office_floorplan_night()
+    out["floorplan_base"] = only_groups(plan, ["floor", "desks"])
+    out["floorplan_lamps"] = only_groups(plan, ["lamp_glows"])
+    cal = a_calendar_strip()
+    out["calendar_tiles"] = only_groups(cal, [f"tile_{i:02d}" for i in range(1, 11)])
+    out["calendar_tick"] = only_groups(cal, ["tick_mark"]).replace('viewBox="0 0 1220 140"', 'viewBox="10 10 104 120"').replace('width="1220"', 'width="104"')
+    return out
+
+
 if __name__ == "__main__":
     out, only = sys.argv[1], sys.argv[2:]
     os.makedirs(out, exist_ok=True)
+    if only == ["--parts"]:
+        for name, s in parts().items():
+            path = os.path.join(out, f"{name}.svg")
+            open(path, "w", encoding="utf-8").write(s)
+            print(path)
+        sys.exit()
     for name, fn in ASSETS.items():
         if only and name not in only:
             continue
