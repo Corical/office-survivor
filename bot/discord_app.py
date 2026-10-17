@@ -154,7 +154,7 @@ def register(bot):
         await bot.deliver()
 
     async def alias_complete(interaction, current):
-        return [app_commands.Choice(name=a, value=a) for a in bot.game.alias_list()
+        return [app_commands.Choice(name=a, value=a) for a in bot.game.alias_list(str(interaction.user.id))
                 if current.lower() in a.lower()][:25]
 
     def key(i):

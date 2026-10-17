@@ -95,6 +95,12 @@ class Rules_(unittest.TestCase):
         radio = [self.g.outbox_text(i) for i in self.g.pending_outbox() if i["to"] == "radio"]
         self.assertEqual(sorted(radio), sorted([f"Don't trust {other}.", "I'm innocent. Leave me alone."]))
 
+    def test_player_list_never_offers_your_own_alias(self):
+        me, other = self.g.identity.get("a")["alias"], self.g.identity.get("b")["alias"]
+        self.assertNotIn(me, self.g.alias_list("a"))
+        self.assertIn(other, self.g.alias_list("a"))
+        self.assertIn(me, self.g.alias_list("b"))
+
     def test_join_closed_after_start(self):
         with self.assertRaises(GameError):
             self.g.join("late")

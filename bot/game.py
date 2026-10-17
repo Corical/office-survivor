@@ -169,9 +169,11 @@ class GameService:
         return [{"id": f"o{n + i + 1}", "to": to, **({"text": text} if text else {}), **({"ref": ref} if ref else {})}
                 for i, (to, text, ref) in enumerate(msgs)]
 
-    def alias_list(self):
-        """Aliases still in the game, alphabetical (never join order: that would hint at who is who)."""
-        return sorted(p.name for pid, p in self.players.items() if pid not in self.quit_ids)
+    def alias_list(self, user_key=None):
+        """Aliases still in the game, alphabetical (never join order: that would hint at who is who), without the
+        asking player's own alias: you can't target yourself, so you shouldn't be offered."""
+        me = (self.identity.get(user_key) or {}).get("pid") if user_key else None
+        return sorted(p.name for pid, p in self.players.items() if pid not in self.quit_ids and pid != me)
 
     # ---------------- player commands ----------------
     def join(self, user_key, sim=False, rng=None):
