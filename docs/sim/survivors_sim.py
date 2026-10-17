@@ -290,7 +290,8 @@ class Game:
         if self.logging:
             rules_logged = asdict(rules)
             if not rules.events_per_night:         # events off: the log is exactly what it was before they existed
-                rules_logged.pop("events_per_night"), rules_logged.pop("events_bias")
+                for k in ("events_per_night", "events_bias", "events_raid", "events_rats_relative"):
+                    rules_logged.pop(k)
             self.L("game_start", seed=seed, log_format=LOG_FORMAT_VERSION, rules=rules_logged,
                    seats=max(1, round(rules.players * rules.seat_ratio)),
                    players=[{"id": p.pid, "name": p.name, "personality": p.arch, "start_rations": p.rations,

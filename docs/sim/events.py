@@ -6,6 +6,11 @@ PROTOTYPE, simulator only. Switched on by two rule knobs (both default off, see 
     events_bias        "random": every eligible player is equally likely to be hit
                        "trailing": good events go to players below the median 3 times as often as to the rest,
                                    bad events go to players above the median 3 times as often as to the rest
+                       "top":      bad player-events only strike the top third of rations, good ones only the bottom
+                                   third (a bad one with nobody eligible up there fizzles; a good one falls back)
+    events_raid        times the library weight that the "raid" event (-2, only the top quarter, never the last
+                       ration) is drawn; 0 = no raids
+    events_rats_relative  True = the rats tax everyone within 1 of the richest, instead of everyone on 7 or more
 
 The library below is plain data. To add an event, add one entry; to change how common it is, change `weight`.
 Each entry:
@@ -24,6 +29,7 @@ created / destroyed. Storm and feast change no balance directly (they act inside
 The events use their OWN random stream, seeded from (game seed, night), so switching events on never moves a dice
 roll in the main game, and switching them off gives back exactly the old game.
 """
+import math
 import random
 import statistics
 
@@ -60,6 +66,14 @@ EVENTS = [
     dict(id="feast", name="Feast night", emoji="\U0001F356", good=True, scope="camp", public=True, weight=4,
          text="A feast night. Nobody eats tonight.",
          effect={"op": "flag", "flag": "feast"}),
+    # Round 2 (catch-up experiments). Both are opt-in and have weight 0 in the draw unless a rule knob turns them on
+    # (see _weight); they sit at the END of the list so the draw for every older event is unchanged.
+    dict(id="raid", name="Raid", emoji="\U0001F412", good=False, scope="player", public=True, weight=4,
+         text="{who}'s stash was raided. -2 rations.",
+         effect={"op": "lose", "amount": 2, "floor": 1, "top_quartile": True}),
+    dict(id="rats_top", name="Rats in the richest stores", emoji="\U0001F400", good=False, scope="camp", public=True,
+         weight=3, text="Rats got into the biggest stashes: {who}. -1 ration each.",
+         effect={"op": "tax", "relative": True, "within": 1, "amount": 1, "floor": 1}),
 ]
 BY_ID = {e["id"]: e for e in EVENTS}
 
@@ -107,6 +121,21 @@ VARIANTS = {
         ("\U0001F573️", "{who} dropped a ration down a hole and it's not coming back. -1 ration."),
         ("\U0001F9A0", "Mould got into {who}'s stash. -1 ration."),
     ],
+    "raid": [
+        ("\U0001F412", "A troop of monkeys raided {who}'s stash and made off with two rations. -2 rations."),
+        ("\U0001F43B", "A bear tore open {who}'s food store. -2 rations."),
+        ("\U0001F30A", "A freak wave swept away half of {who}'s stash. -2 rations."),
+        ("\U0001F43A", "Wolves got into {who}'s shelter overnight. -2 rations."),
+        ("\U0001F525", "A brush fire ran through {who}'s corner of the camp. -2 rations."),
+        ("\U0001F40A", "A crocodile dragged off {who}'s supplies. -2 rations."),
+    ],
+    "rats_top": [
+        ("\U0001F400", "Rats got into the biggest stashes: {who}. -1 ration each."),
+        ("\U0001F401", "Mice chewed through the fullest stores: {who}. -1 ration each."),
+        ("\U0001F99D", "Raccoons went for the best-stocked camps: {who}. -1 ration each."),
+        ("\U0001F426", "Crows picked over the biggest piles: {who}. -1 ration each."),
+        ("\U0001F41C", "Ants marched on the fullest stashes: {who}. -1 ration each."),
+    ],
 }
 
 
@@ -123,15 +152,36 @@ def rng_for(seed, night):
     return random.Random(f"wilderness-events:{seed}:{night}")
 
 
+def _alive(game):
+    return [p for p in game.players if not p.bandit]
+
+
+def _third(game):
+    """(bottom cutoff, top cutoff) over the non-bandits: a player is in the bottom third if rations <= the first, in
+    the top third if rations >= the second. Ties at a cutoff are all in (so a fully tied camp is all top AND bottom)."""
+    vals = sorted(p.rations for p in _alive(game))
+    k = max(1, math.ceil(len(vals) / 3))
+    return vals[k - 1], vals[len(vals) - k]
+
+
+def _top_quartile_cutoff(game):
+    """Rations at the 75th percentile of the non-bandits: at or above it counts as the top quarter."""
+    vals = sorted(p.rations for p in _alive(game))
+    return vals[math.ceil(0.75 * len(vals)) - 1]
+
+
 def _eligible(game, ev):
     """Players this player-scope event could happen to. Bandits are left out: events never touch them."""
     op, eff = ev["effect"]["op"], ev["effect"]
+    cutoff = _top_quartile_cutoff(game) if eff.get("top_quartile") and _alive(game) else None
     out = []
     for p in game.players:
         if p.bandit:
             continue
-        if op == "lose" and p.rations <= eff["floor"]:
+        if op == "lose" and p.rations - eff["floor"] < eff["amount"]:
             continue                       # never below the floor, so an event can never create a bandit
+        if cutoff is not None and p.rations < cutoff:
+            continue                       # raids only strike the top quarter
         if op == "idol" and p.idol:
             continue
         if op == "drop_guard" and p.guard_until < game.night:
@@ -141,10 +191,20 @@ def _eligible(game, ev):
 
 
 def _pick(game, ev, pool, rng):
-    if game.r.events_bias == "random" or len(pool) == 1:
+    """Who an event happens to. Returns None when the bias rules out everybody in `pool` (the event then fizzles)."""
+    bias = game.r.events_bias
+    if bias not in ("random", "trailing", "top"):
+        raise ValueError(f"events_bias must be 'random', 'trailing' or 'top', not {bias!r}")
+    if bias == "random" or len(pool) == 1 and bias != "top":
         return rng.choice(pool)
-    if game.r.events_bias != "trailing":
-        raise ValueError(f"events_bias must be 'random' or 'trailing', not {game.r.events_bias!r}")
+    if bias == "top":
+        lo, hi = _third(game)
+        # bad events only strike the top third, good ones the bottom third. A bad event with nobody there fizzles;
+        # a good one with nobody there (e.g. the poor all hold idols already) goes to whoever is eligible.
+        side = [p for p in pool if (p.rations <= lo if ev["good"] else p.rations >= hi)]
+        if side:
+            return rng.choice(side)
+        return rng.choice(pool) if ev["good"] else None
     median = statistics.median(p.rations for p in game.players if not p.bandit)
     # lucky events favour whoever is below the median, unlucky ones whoever is above it
     weights = [TRAILING_FAVOUR if (p.rations < median if ev["good"] else p.rations > median) else 1 for p in pool]
@@ -157,25 +217,49 @@ def _book(game, p, delta, reason, ev):
     game.event_tally["found" if delta > 0 else "lost"] += abs(delta)
 
 
+def _tax_targets(game, eff):
+    """Who the rats tax. Fixed: anyone holding `at_least` or more. Relative: anyone within `within` of the richest
+    non-bandit. Either way nobody drops below the floor (so rats can never make a bandit)."""
+    alive = _alive(game)
+    if not alive:
+        return []
+    floor, amount = eff.get("floor", 0), eff["amount"]
+    if eff.get("relative"):
+        top = max(p.rations for p in alive)
+        return [p for p in alive if p.rations >= top - eff["within"] and p.rations - floor >= amount]
+    return [p for p in alive if p.rations >= eff["at_least"] and p.rations - floor >= amount]
+
+
+def _names(ps):
+    names = [p.name for p in ps]
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
 def _apply(game, ev, rng, flags, news):
     eff, tally = ev["effect"], game.event_tally
     if ev["scope"] == "camp":
-        who = None
+        emoji, text = ev["emoji"], ev["text"]
         if eff["op"] == "flag":
             flags.add(eff["flag"])
         elif eff["op"] == "tax":
-            for p in game.players:
-                if not p.bandit and p.rations >= eff["at_least"]:
-                    _book(game, p, -eff["amount"], "event_lost", ev)
+            hit = _tax_targets(game, eff)
+            for p in hit:
+                _book(game, p, -eff["amount"], "event_lost", ev)
+            if eff.get("relative"):
+                if not hit:
+                    tally["fizzled"] += 1  # nobody is rich enough to tax (everyone at the floor)
+                    return
+                emoji, text = flavour(ev, game.seed, tally[ev["id"]])
+                text = text.format(who=_names(hit))
         game.L("event", event=ev["id"], scope="camp", visibility="public")
-        news.append(f"{ev['emoji']} {ev['text']}")
+        news.append(f"{emoji} {text}")
         tally[ev["id"]] += 1
         return
     pool = _eligible(game, ev)
-    if not pool:
+    p = _pick(game, ev, pool, rng) if pool else None
+    if p is None:
         tally["fizzled"] += 1              # nobody it could happen to (e.g. everyone is at the floor)
         return
-    p = _pick(game, ev, pool, rng)
     op = eff["op"]
     if op == "find":
         _book(game, p, eff["amount"], "event_found", ev)
@@ -195,12 +279,25 @@ def _apply(game, ev, rng, flags, news):
     tally[ev["id"]] += 1
 
 
+def _weight(ev, rules):
+    """How likely the event is to be drawn under these rules. Raid and the relative rats are opt-in (rule knobs); the
+    old fixed-threshold rats step aside when the relative ones are on."""
+    if ev["id"] == "raid":
+        return ev["weight"] * rules.events_raid
+    if ev["id"] == "rats_top":
+        return ev["weight"] if rules.events_rats_relative else 0
+    if ev["id"] == "rats" and rules.events_rats_relative:
+        return 0
+    return ev["weight"]
+
+
 def run_night_events(game, rng):
     """The start-of-night phase. Returns (flags for resolve_night, #news lines). Uses only `rng`, never game.rng."""
     x = game.r.events_per_night
     count = int(x) + (1 if rng.random() < x - int(x) else 0)
     flags, news = set(), []
+    weights = [_weight(e, game.r) for e in EVENTS]
     for _ in range(count):
-        ev = rng.choices(EVENTS, weights=[e["weight"] for e in EVENTS])[0]
+        ev = rng.choices(EVENTS, weights=weights)[0]
         _apply(game, ev, rng, flags, news)
     return frozenset(flags), news

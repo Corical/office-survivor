@@ -37,4 +37,7 @@ class Rules:
     pts_survive: int = 1
     # wilderness events (prototype, simulator only; 0 = off, and then nothing below is read)
     events_per_night: float = 0.0  # average events per night, camp-wide
-    events_bias: str = "random"    # "random", or "trailing" (good events lean to players below the median, bad above)
+    events_bias: str = "random"    # "random", "trailing" (good events lean below the median, bad above), or
+                                   # "top" (bad player-events only hit the top third, good ones only the bottom third)
+    events_raid: float = 0.0       # how many times its library weight the "raid" event is drawn (0 = no raids)
+    events_rats_relative: bool = False  # rats tax everyone within 1 of the richest, instead of a fixed 7 or more
