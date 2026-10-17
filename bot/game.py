@@ -48,13 +48,14 @@ class Schedule:
 SAST = __import__("datetime").timezone(__import__("datetime").timedelta(hours=2), "SAST")   # no daylight saving
 
 
-def night_label(schedule, night):
-    """'Night 6 (closes 08:34)' for pilot days, 'Night 6 (Tue)' for real ones: a real-world anchor for the number."""
+def night_label(schedule, night, closed=False):
+    """'Night 6 (closes 08:34)' while moves are open, 'Night 6 (closed 08:34)' in news and results after it;
+    'Night 6 (Tue)' for real days. A real-world anchor for the number."""
     import datetime
     end = datetime.datetime.fromtimestamp(schedule.deadline(night), SAST)
     if schedule.day_seconds >= 20 * 3600:
         return f"Night {night} ({(end - datetime.timedelta(minutes=1)).strftime('%a')})"
-    return f"Night {night} (closes {end.strftime('%H:%M')})"
+    return f"Night {night} ({'closed' if closed else 'closes'} {end.strftime('%H:%M')})"
 
 
 def night_seed(season_id, night):
@@ -357,7 +358,7 @@ class GameService:
     def _post_news(self, night):
         rec = self._night_record(night)
         lines = news_lines(rec["events"]) or ["🌙 A quiet night. Nobody lost anything."]
-        label = night_label(self.schedule, night)
+        label = night_label(self.schedule, night, closed=True)
         msgs = [("news", f"📰 **News: {label}**\n" + "\n".join(f"- {l}" for l in lines), None)]
         msgs += [("radio", None, ref) for ref in self.radio_pending]
         msgs += [(f"dm:{pid}", f"🌙 **{label}**\n" + "\n".join(plines), None)

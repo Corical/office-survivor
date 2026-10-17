@@ -131,6 +131,14 @@ class Rules_(unittest.TestCase):
         from bot.game import Schedule, night_label
         pilot = Schedule(start_ts=1792217089.8, day_seconds=300)          # 17 Oct 2026 08:04:49 SAST
         self.assertEqual(night_label(pilot, 6), "Night 6 (closes 08:34)")
+        self.assertEqual(night_label(pilot, 6, closed=True), "Night 6 (closed 08:34)")
+        # news and night DMs go out after the deadline, so they say 'closed'; the move reply says 'closes'
+        self.g.tick(now=310)
+        self.g.tick(now=320)
+        posted = [t for t in (self.g.outbox_text(i) for i in self.g.pending_outbox()) if "Night 1" in t]
+        self.assertEqual(len(posted), 3)                                  # #news + a DM for each of the 2 players
+        self.assertTrue(all("(closed " in t and "(closes " not in t for t in posted))
+        self.assertIn("(closes ", self.g.submit("a", "scavenge", at=330))
         real = Schedule(start_ts=1791756000.0, day_seconds=86400)         # Mon 12 Oct 2026 00:00 SAST
         self.assertEqual(night_label(real, 1), "Night 1 (Mon)")            # closes at Tuesday 00:00: Monday's night
         self.assertEqual(night_label(real, 2), "Night 2 (Tue)")
