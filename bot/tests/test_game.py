@@ -213,6 +213,46 @@ class FullGame(unittest.TestCase):
         self.assertGreater(checked["done"], 10)            # the test must actually see both kinds
         self.assertGreater(checked["failed"], 3)
 
+    def test_three_clean_steals_lock_the_goal_even_if_caught_later(self):
+        """Owner's case: 3/3 clean steals, then caught on a later steal: the goal stays met, at the reveal too."""
+        from engine import PlayerState, Rules, resolve_night
+        from engine.finish import finish, goal_progress
+        r = Rules()
+
+        def game():
+            ps = [PlayerState(pid=i, name=f"P{i}", rations=8) for i in range(4)]
+            ps[0].objective, ps[0].obj_target = "steal3_clean", -1
+            for q in ps[1:]:
+                q.objective, q.obj_target = "give", -1
+            return ps
+
+        def night(ps, n, move0, guard_target=None):
+            moves = {q.pid: ("guard", None, 0, False) if q.pid == guard_target else ("scavenge", None, 0, False)
+                     for q in ps}
+            moves[0] = move0
+            resolve_night(ps, moves, r, random.Random(n), n)
+
+        ps = game()                                            # 3 clean steals, then caught on night 4
+        for n, victim in ((1, 1), (2, 2), (3, 3)):
+            night(ps, n, ("steal", victim, 0, False))
+        self.assertEqual(goal_progress(ps[0], ps, r)[0], "done")
+        night(ps, 4, ("steal", 1, 0, False), guard_target=1)
+        self.assertEqual(ps[0].steals_caught, 1)
+        self.assertEqual(goal_progress(ps[0], ps, r)[0], "done")
+        finish(ps, r, random.Random(0))
+        self.assertTrue(ps[0].obj_done)
+
+        ps = game()                                            # caught at 2: lost, even with 5 clean steals after
+        night(ps, 1, ("steal", 1, 0, False))
+        night(ps, 2, ("steal", 2, 0, False))
+        night(ps, 3, ("steal", 3, 0, False), guard_target=3)
+        for n in range(4, 9):
+            night(ps, n, ("steal", 1 + n % 3, 0, False))
+        self.assertGreaterEqual(ps[0].steals_ok, 3)
+        self.assertEqual(goal_progress(ps[0], ps, r)[0], "failed")
+        finish(ps, r, random.Random(0))
+        self.assertFalse(ps[0].obj_done)
+
     def test_status_shows_goal_progress_and_a_quit_target_voids_it(self):
         g = service()
         g.join("a", rng=random.Random(1))

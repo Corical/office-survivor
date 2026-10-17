@@ -179,6 +179,7 @@ class Player:
     times_robbed: int = 0
     steals_ok: int = 0
     steals_caught: int = 0
+    clean_steals: int = 0          # successful steals before the first catch (clean-thief goal)
     rations_stolen: int = 0
     gifted_out: int = 0
     deaths: int = 0
@@ -498,7 +499,7 @@ class Game:
                 w["guard"] += 0.3
                 w["investigate"] = 0          # info is worthless on the last night
                 why.append("last night: grab or protect a seat, information is worthless now")
-            if p.objective == "steal3_clean" and p.steals_ok < 3 and p.steals_caught == 0:
+            if p.objective == "steal3_clean" and p.clean_steals < 3 and p.steals_caught == 0:
                 w["steal"] += 0.2
                 why.append(f"secret goal (steal 3 times clean, {p.steals_ok} so far) nudges toward stealing")
             if p.objective == "give" and p.gifted_out < self.r.give_goal:

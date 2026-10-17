@@ -23,19 +23,19 @@ Share of seats won by heavy thieves (3+ steals)       0.27    0.00    0.60
 Joint winners per game                                1.14    1.00    2.00
 
 Personality    share  avg pts  extract  win share  
-shark             7%     2.33      39%        10%
-opportunist      16%     2.32      40%        19%
+shark             7%     2.43      39%        10%
+opportunist      16%     2.36      40%        19%
 farmer           19%     2.22      38%        21%
 paranoid         11%     2.16      39%        10%
 casual           25%     2.14      36%        26%
-detective         7%     1.78      25%         4%
-chaos             7%     1.38      19%         5%
-saint             8%     1.24      10%         5%
+detective         7%     1.80      25%         4%
+chaos             7%     1.41      19%         5%
+saint             8%     1.25      10%         5%
 
 Secret objective                                   completed
 finish with more rations than @player                    46%
 get robbed at least 1x and still extract                 29%
-steal at least 3 times without ever being caught         16%
+steal 3 times before you're ever caught                  21%
 give away 3 rations over the game                        34%
 successfully rob @player at least 1x                     40%
 

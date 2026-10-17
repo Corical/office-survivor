@@ -147,6 +147,8 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
                  split_with=len(thieves) - 1, visibility="victim_sees_amount_only")
             if got > 0:
                 tp.steals_ok += 1
+                if tp.steals_caught == 0:
+                    tp.clean_steals += 1
                 if tgt == tp.obj_target and tp.objective == "grudge":
                     tp.grudge_hits += 1
                 tp.rations_stolen += got

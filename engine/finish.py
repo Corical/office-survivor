@@ -6,7 +6,7 @@ def objective_text(o, rules, target_name="@player"):
         "give": f"give away {rules.give_goal} rations over the game",
         "beat": f"finish with more rations than {target_name}",
         "robbed2_extract": f"get robbed at least {rules.robbed_goal}x and still extract",
-        "steal3_clean": "steal at least 3 times without ever being caught",
+        "steal3_clean": "steal 3 times before you're ever caught",
         "detective": "expose a thief red-handed with /investigate at least once",
         "grudge": (f"make sure {target_name} doesn't extract" if rules.grudge_goal == "deny"
                    else f"successfully rob {target_name} at least {rules.grudge_robs}x"),
@@ -21,11 +21,12 @@ def goal_progress(p, players, rules, quit_ids=frozenset(), target_band=None):
     P = {q.pid: q for q in players}
     if o in ("beat", "grudge") and p.obj_target in quit_ids:
         return "failed", "your target left the game, so this goal no longer counts"
-    if o == "steal3_clean":
+    if o == "steal3_clean":                      # owner, 17 Oct 2026: 3 clean steals before a catch locks it in
+        if p.clean_steals >= 3:
+            return "done", "3/3 clean steals before you were ever caught"
         if p.steals_caught:
-            return "failed", f"you were caught stealing, so this can't be met any more ({p.steals_ok}/3 clean)"
-        return ("open", "3/3 clean steals ✓. Now don't get caught: one catch before the end still fails it") \
-            if p.steals_ok >= 3 else ("open", f"{p.steals_ok}/3 clean steals, never caught so far")
+            return "failed", f"you were caught before your 3rd clean steal ({p.clean_steals}/3)"
+        return "open", f"{p.clean_steals}/3 clean steals, never caught so far"
     if o == "give":
         return ("done", f"{p.gifted_out}/{r.give_goal} given") if p.gifted_out >= r.give_goal \
             else ("open", f"{p.gifted_out}/{r.give_goal} given")
@@ -76,7 +77,7 @@ def finish(players, rules, rng, emit=lambda _type, **f: None, quit_ids=frozenset
         elif o == "robbed2_extract":
             done = p.times_robbed >= r.robbed_goal and p.extracted
         elif o == "steal3_clean":
-            done = p.steals_ok >= 3 and p.steals_caught == 0
+            done = p.clean_steals >= 3
         elif o == "give":
             done = p.gifted_out >= r.give_goal
         elif o == "detective":
