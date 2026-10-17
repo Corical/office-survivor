@@ -211,7 +211,7 @@ class GameService:
         log.info("move night=%d pid=%d kind=%s", night, pid, kind)
         what = {"scavenge": "🥫 scavenge", "guard": "🛡️ guard", "steal": f"🥷 steal from {target_alias}",
                 "investigate": f"🔍 investigate {target_alias}", "gift": f"🎁 give {target_alias} {amount}"}[kind]
-        return f"Tonight you'll {what}. You can change your mind until the deadline."
+        return f"Night {night}: you'll {what}. You can change your mind until the deadline."
 
     def radio(self, user_key, phrase, about=None):
         pid, _ = self._who(user_key)
@@ -398,7 +398,7 @@ def private_lines(events, p, before):
         if t == "scavenge" and e["player"] == me:
             out.append(f"🥫 You scavenged and found {e['found']}.")
         elif t == "guard_up" and e["player"] == me:
-            out.append(f"🛡️ You're guarding until the end of night {e['until_night']}.")
+            out.append(f"🛡️ You're on guard: protected tonight and through night {e['until_night']}.")
         elif t == "steal" and e["thief"] == me:
             if e["outcome"] == "success":
                 out.append(f"🥷 You stole {e['amount']} from {e['target']}.")

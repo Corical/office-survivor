@@ -66,6 +66,13 @@ Run tests: `python -m unittest discover -s engine/tests -t .` and `python -m uni
 4. Pi: `/opt/torch`, `/var/lib/torch`, `/etc/torch/torch.env`, systemd unit after time-sync.
 5. Rerun balance with the fair deal + Detective (`objective_stats.py`, `target_pileup.py`) and show the owner.
 
+### Backlog: wilderness events (owner idea, 17 Oct 2026)
+Random events (bananas +1, snake bite −1 never below 1, hidden idol = one-off theft shield, camp-wide storm/feast)
+as a catch-up mechanic (owner earlier: once someone leads, nobody catches up; sim: night-5 leader wins 77%).
+Rules: own ledger reasons so conservation still checks; seeded + logged for the reveal; rare (~1 per night
+camp-wide); a library in game.json; balance by simulation (leader-hold rate, comebacks, personality edge) before
+any goes live. Open choice: events biased toward trailing players vs purely random.
+
 ### Known gaps to close
 - Quitting zeroes rations without a `ration`/`quit_forfeit` ledger line (conservation books miss it).
 - A crash between `identity.put` and the `join` record leaves an identity with no player.
