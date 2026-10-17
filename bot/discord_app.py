@@ -434,7 +434,7 @@ def register(bot):
     @gm.command(name="start", description="Start the game")
     @app_commands.describe(events="Wilderness events: bananas, gorillas, hidden idols (about one a night)")
     @app_commands.choices(events=[app_commands.Choice(name="off", value="off"),
-                                  app_commands.Choice(name="gentle (about 1 a night)", value="gentle")])
+                                  app_commands.Choice(name="gentle", value="gentle")])
     @app_commands.describe(ranges="Post everyone's ration range in #news each morning (🟢 🟡 🔴 🏴‍☠️, never exact)")
     async def start(i: discord.Interaction, day_minutes: app_commands.Range[float, 1, 1440] = 5.0,
                     events: app_commands.Choice[str] = None, ranges: bool = False):
