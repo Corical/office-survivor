@@ -107,6 +107,24 @@ class FullGame(unittest.TestCase):
             first = used[:len(VARIANTS[eid])]
             self.assertEqual(len(first), len(set(first)), f"{eid} repeated a story before using its whole deck")
 
+    def test_every_event_including_the_idol_runs_inside_torch(self):
+        """The idol crashed Torch (PlayerState had no 'idol'): play events games until every event has fired."""
+        from engine.events import EVENTS
+        fired = set()
+        for seed in range(60):
+            g = GameService(Rules(), MemoryEventStore(), MemoryIdentityStore(), MemoryTextStore(), ALIASES,
+                            f"season-{seed}", clock=lambda: 0)   # own season name = own event dice
+            g.gm_add_sims(9, rng=random.Random(seed))
+            g.gm_start(day_seconds=300, now=0, events="gentle")
+            for night in range(1, 11):
+                g.tick(now=night * 300 + 10)                      # must not raise
+            self.assertTrue(g.finished)
+            fired |= {e["event"] for r in g.store.records if r["type"] == "night" for e in r["events"]
+                      if e["type"] == "event"}
+        on = {e["id"] for e in EVENTS if e["weight"] and e["id"] not in ("raid", "rats")}   # gentle: rats_top, no raids
+        self.assertTrue(on <= fired, f"never fired in 60 games: {on - fired}")
+        self.assertIn("idol", fired)
+
     def test_events_off_by_default_and_old_logs_without_the_key_load(self):
         store = MemoryEventStore()
         g = service(store)
