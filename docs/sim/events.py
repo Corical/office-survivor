@@ -63,6 +63,60 @@ EVENTS = [
 ]
 BY_ID = {e["id"]: e for e in EVENTS}
 
+# Same effect, different story (owner, 17 Oct 2026: "it's not always just snake bite, snake bite"). One is picked per
+# occurrence from its own dice (event, player, night), so variations never move the balance results.
+VARIANTS = {
+    "bananas": [
+        ("\U0001F34C", "{who} found a pile of bananas. +1 ration."),
+        ("\U0001FAD0", "{who} found a bush heavy with wild berries. +1 ration."),
+        ("\U0001F96D", "A ripe mango dropped right at {who}'s feet. +1 ration."),
+        ("\U0001F344", "{who} found mushrooms. The safe kind, apparently. +1 ration."),
+        ("\U0001F36F", "{who} raided a wild beehive and lived. +1 ration."),
+        ("\U0001F95A", "{who} found a nest of eggs nobody was guarding. +1 ration."),
+        ("\U0001F360", "{who} dug up a sweet potato. +1 ration."),
+    ],
+    "coconut": [
+        ("\U0001F965", "{who} cracked open a fallen coconut. +1 ration."),
+        ("\U0001F41F", "{who} caught a fish with their bare hands. +1 ration."),
+        ("\U0001F980", "{who} grabbed a crab before it got away. +1 ration."),
+        ("\U0001F95C", "{who} found a squirrel's hidden stash of nuts. +1 ration."),
+        ("\U0001F96B", "A tin of beans washed up on the beach. {who} got there first. +1 ration."),
+        ("\U0001F36B", "{who} found a chocolate bar in an old jacket pocket. +1 ration."),
+        ("\U0001F33D", "{who} found a patch of wild corn. +1 ration."),
+    ],
+    "cache": [
+        ("\U0001F392", "{who} stumbled on a buried supply cache. +2 rations."),
+        ("\U0001F6F6", "A crate washed ashore and {who} dragged it home. +2 rations."),
+        ("\U0001FA82", "A supply drop landed near {who}'s shelter. +2 rations."),
+    ],
+    "snake": [
+        ("\U0001F40D", "{who} was bitten by a snake and spent a ration recovering. -1 ration."),
+        ("\U0001F98D", "A gorilla raided {who}'s stash and ran off with a ration. -1 ration."),
+        ("\U0001F412", "A monkey snatched a ration from {who} and laughed about it. -1 ration."),
+        ("\U0001F99D", "Something with a striped tail got into {who}'s food overnight. -1 ration."),
+        ("\U0001F426", "A seagull swooped down and took {who}'s lunch. -1 ration."),
+        ("\U0001F417", "A wild boar trampled through {who}'s camp. -1 ration."),
+        ("\U0001F577️", "{who} was bitten by a spider and lost a ration's worth of energy. -1 ration."),
+    ],
+    "rain": [
+        ("\U0001F327️", "Rain soaked {who}'s stash. -1 ration."),
+        ("\U0001F30A", "The tide came in further than {who} expected. -1 ration."),
+        ("\U0001F41C", "Ants found {who}'s food before {who} did. -1 ration."),
+        ("\U0001F92E", "{who} ate something that disagreed with them. -1 ration."),
+        ("\U0001F525", "{who}'s cooking fire got out of hand. -1 ration."),
+        ("\U0001F573️", "{who} dropped a ration down a hole and it's not coming back. -1 ration."),
+        ("\U0001F9A0", "Mould got into {who}'s stash. -1 ration."),
+    ],
+}
+
+
+def flavour(ev, game_seed, occurrence):
+    """(emoji, text template) for the n-th occurrence (0-based) of `ev` in a game. Each event's variations are a
+    deck shuffled once per game: all of them come up before any repeats. Own dice: never touches any game rng."""
+    options = list(VARIANTS.get(ev["id"]) or [(ev["emoji"], ev["text"])])
+    random.Random(f"flavour:{ev['id']}:{game_seed}").shuffle(options)
+    return options[occurrence % len(options)]
+
 
 def rng_for(seed, night):
     """The events' own dice for one night of one game. A string seed is hashed, so it is stable across runs."""
@@ -132,9 +186,10 @@ def _apply(game, ev, rng, flags, news):
     elif op == "drop_guard":
         p.guard_until = game.night - 1
     game.L("event", event=ev["id"], scope="player", player=p.name, visibility="public" if ev["public"] else "private")
-    p.notes.append(f"Night {game.night}: {ev['text'].format(who='you')}")
+    emoji, text = flavour(ev, game.seed, tally[ev["id"]])
+    p.notes.append(f"Night {game.night}: {text.format(who=p.name)}")
     if ev["public"]:
-        news.append(f"{ev['emoji']} {ev['text'].format(who=p.name)}")
+        news.append(f"{emoji} {text.format(who=p.name)}")
         if op in ("find", "lose"):         # the camp can read the news, so their guess at this player's stash moves
             game.public_delta[p.pid] += eff["amount"] if op == "find" else -eff["amount"]
     tally[ev["id"]] += 1

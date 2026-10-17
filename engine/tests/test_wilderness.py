@@ -6,6 +6,32 @@ import os
 import random
 import sys
 import unittest
+
+
+class Variations(unittest.TestCase):
+    """Owner: flavour must not read 'snake bite, snake bite'. Every variation before any repeat, same effect."""
+
+    def test_no_variation_repeats_until_all_are_used(self):
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "docs", "sim"))
+        import events as E
+        for eid, options in E.VARIANTS.items():
+            ev = E.BY_ID[eid]
+            for seed in (1, 2, 99):
+                seen = [E.flavour(ev, seed, k) for k in range(len(options))]
+                self.assertEqual(len(set(seen)), len(options), f"{eid} repeated before using every variation")
+                self.assertEqual(E.flavour(ev, seed, len(options)), seen[0])     # then the deck starts over
+
+    def test_every_variation_states_the_same_effect_as_its_event(self):
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "docs", "sim"))
+        import events as E
+        for eid, options in E.VARIANTS.items():
+            eff = E.BY_ID[eid]["effect"]
+            tag = f"{'+' if eff['op'] == 'find' else '-'}{eff['amount']} ration"
+            for _, text in options:
+                self.assertIn(tag, text, f"{eid}: '{text}' doesn't say {tag}")
+                self.assertIn("{who}", text)
 from dataclasses import replace
 
 from engine import PlayerState, Rules, resolve_night
