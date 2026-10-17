@@ -16,7 +16,7 @@ from engine import ENGINE_VERSION, PlayerState, Rules, resolve_night
 from engine import events as wild
 from engine.visibility import band_label, morning_board
 from engine.deal import deal
-from engine.finish import finish, objective_text
+from engine.finish import finish, goal_progress, objective_text
 from engine.moves import can_guard, legal_moves, validate
 
 from . import sims
@@ -349,9 +349,13 @@ class GameService:
         move = self.moves.get(pid)
         tonight = ("not chosen yet (you'll scavenge if you forget)" if not move else
                    move[0] + (f" {self.players[move[1]].name}" if move[1] is not None else ""))
+        band = band_label(self.players[p.obj_target]) if self.ranges and p.obj_target >= 0 else None
+        state, how = goal_progress(p, list(self.players.values()), self.rules, frozenset(self.quit_ids), band)
+        mark = {"done": "✅ **Goal met:**", "failed": "❌ **Goal lost:**", "open": "🎯 **Progress:**",
+                "end": "⏳ **Progress:**"}[state]
         return (f"**{alias}**: 🥫 {p.rations} rations{' 🏴‍☠️ BANDIT' if p.bandit else ''}, 🛡️ {guards}"
                 f"{', guarded tonight' if p.guard_until > self.night else ''}.\n"
-                f"Secret goal: {objective_text(p.objective, self.rules, tgt)}.\nTonight: {tonight}."
+                f"Secret goal: {objective_text(p.objective, self.rules, tgt)}.\n{mark} {how}.\nTonight: {tonight}."
                 + (f"\nThe camp sees you as {band_label(p)}." if self.ranges else ""))
 
     def results(self, user_key):

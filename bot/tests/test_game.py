@@ -179,6 +179,58 @@ class FullGame(unittest.TestCase):
         self.assertIn("Game over", g.board()[1])
         self.assertNotIn("<t:", g.board()[1])                            # no countdown to a deadline that's gone
 
+    def test_goal_progress_never_promises_what_the_reveal_takes_away(self):
+        """Over many games: 'met' mid-game must score as met at the end, 'lost' must never score; and the
+        beat-someone goal must never show the target's exact rations."""
+        from engine.finish import goal_progress
+        checked = {"done": 0, "failed": 0}
+        for seed in range(40):
+            g = service()
+            g.join("h", rng=random.Random(seed))
+            g.gm_add_sims(9, rng=random.Random(seed + 100))
+            g.gm_start(day_seconds=300, now=0, events="gentle" if seed % 2 else "off", ranges=bool(seed % 3))
+            promised = {}
+            for night in range(1, 11):
+                g.tick(now=night * 300 + 10)
+                for pid, p in g.players.items():
+                    state, text = goal_progress(p, list(g.players.values()), g.rules, frozenset(g.quit_ids))
+                    if state in ("done", "failed"):
+                        promised.setdefault(pid, (state, night))
+                    if p.objective == "beat":
+                        tgt = g.players[p.obj_target]
+                        self.assertNotIn(f"{tgt.name} has", text)
+                        bare = text.replace(tgt.name, "").replace(f"you have {p.rations}", "")
+                        self.assertFalse(any(ch.isdigit() for ch in bare),
+                                         f"seed {seed}: beat-goal text shows a number beyond your own: {text!r}")
+            g.tick(now=5000)
+            self.assertTrue(g.finished)
+            for pid, (state, night) in promised.items():
+                p = g.players[pid]
+                checked[state] += 1
+                self.assertEqual(p.obj_done, state == "done",
+                                 f"seed {seed}: {p.name} ({p.objective}) shown {state} on night {night}, "
+                                 f"scored {p.obj_done} at the end")
+        self.assertGreater(checked["done"], 10)            # the test must actually see both kinds
+        self.assertGreater(checked["failed"], 3)
+
+    def test_status_shows_goal_progress_and_a_quit_target_voids_it(self):
+        g = service()
+        g.join("a", rng=random.Random(1))
+        g.join("b", rng=random.Random(2))
+        g.join("c", rng=random.Random(3))
+        g.gm_start(day_seconds=300, now=0)
+        p = g.players[g.identity.get("a")["pid"]]
+        p.objective, p.gifted_out = "give", 1
+        self.assertIn(f"🎯 **Progress:** 1/{g.rules.give_goal} given", g.status("a"))
+        p.gifted_out = g.rules.give_goal
+        self.assertIn("✅ **Goal met:**", g.status("a"))
+        p.objective, p.steals_ok, p.steals_caught = "steal3_clean", 3, 1
+        self.assertIn("❌ **Goal lost:**", g.status("a"))
+        p.objective = "grudge"
+        p.obj_target = g.identity.get("b")["pid"]
+        g.quit("b")
+        self.assertIn("❌ **Goal lost:** your target left the game", g.status("a"))
+
     def test_idol_stories_reach_news_thief_and_holder(self):
         from types import SimpleNamespace
         evs = [{"type": "event", "event": "idol", "scope": "player", "player": "Holder", "visibility": "private"},

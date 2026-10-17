@@ -13,6 +13,41 @@ def objective_text(o, rules, target_name="@player"):
     }[o]
 
 
+def goal_progress(p, players, rules, quit_ids=frozenset(), target_band=None):
+    """(state, text) for /status mid-game: state is 'done' (can no longer be lost), 'failed' (can no longer be met),
+    'open' or 'end' (only the reveal can tell). Uses the same counters `finish` scores with, and only facts the
+    player may know: never another player's exact rations (`target_band` is passed only when ranges are public)."""
+    r, o = rules, p.objective
+    P = {q.pid: q for q in players}
+    if o in ("beat", "grudge") and p.obj_target in quit_ids:
+        return "failed", "your target left the game, so this goal no longer counts"
+    if o == "steal3_clean":
+        if p.steals_caught:
+            return "failed", f"you were caught stealing, so this can't be met any more ({p.steals_ok}/3 clean)"
+        return ("open", "3/3 clean steals ✓. Now don't get caught: one catch before the end still fails it") \
+            if p.steals_ok >= 3 else ("open", f"{p.steals_ok}/3 clean steals, never caught so far")
+    if o == "give":
+        return ("done", f"{p.gifted_out}/{r.give_goal} given") if p.gifted_out >= r.give_goal \
+            else ("open", f"{p.gifted_out}/{r.give_goal} given")
+    if o == "detective":
+        n = getattr(p, "exposures", 0)
+        return ("done", "thief exposed") if n >= 1 else ("open", "0/1 thieves exposed")
+    if o == "robbed2_extract":
+        if p.times_robbed >= r.robbed_goal:
+            return "end", f"robbed {p.times_robbed}/{r.robbed_goal} ✓. Now hold a seat on the helicopter"
+        return "open", f"robbed {p.times_robbed}/{r.robbed_goal} so far, and you'll need a seat at the end"
+    if o == "beat":
+        tgt = P[p.obj_target].name
+        seen = f" They look {target_band} this morning." if target_band else ""
+        return "end", f"decided at the end: you have {p.rations}, {tgt}'s stash is secret.{seen}"
+    if r.grudge_goal == "deny":
+        return "end", f"decided at the end: who gets a seat is only known when the helicopter comes"
+    tgt = P[p.obj_target].name
+    if p.grudge_hits >= r.grudge_robs:
+        return "done", f"robbed {tgt} {p.grudge_hits}/{r.grudge_robs}"
+    return "open", f"robbed {tgt} {p.grudge_hits}/{r.grudge_robs}"
+
+
 def finish(players, rules, rng, emit=lambda _type, **f: None, quit_ids=frozenset()):
     """Seats, goals and scores. Sets extracted/survived/obj_done/score on each player; returns the summary."""
     r = rules
