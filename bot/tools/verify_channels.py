@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from check_discord import env, get  # noqa: E402
 
 VIEW, SEND = 1 << 10, 1 << 11
+THREADS = (1 << 35) | (1 << 36) | (1 << 38)
 READ_ONLY = {"news", "radio"}
 
 token, guild = env()
@@ -23,10 +24,11 @@ for c in [cat] + [c for c in chans if c.get("parent_id") == cat["id"]]:
     blocked = sum(1 for b in bots if b in o and int(o[b]["deny"]) & VIEW)
     ev = o.get(guild)
     people_post = not (ev and int(ev["deny"]) & SEND)
+    threads_shut = bool(ev and int(ev["deny"]) & THREADS == THREADS)
     torch = me in o and int(o[me]["allow"]) & (VIEW | SEND) == (VIEW | SEND)
     want_post = c["type"] == 4 or c["name"] not in READ_ONLY
-    good = blocked == len(bots) and torch and people_post == want_post
+    good = blocked == len(bots) and torch and people_post == want_post and (want_post or threads_shut)
     ok &= good
     print(f"{'OK ' if good else 'BAD'} {c['name']:12} other bots blocked {blocked}/{len(bots)} | "
-          f"people can post: {people_post} | Torch view+send: {torch}")
+          f"people can post: {people_post} | threads shut: {threads_shut} | Torch view+send: {torch}")
 sys.exit(0 if ok else 1)

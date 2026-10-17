@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from check_discord import API, env  # noqa: E402
 
 VIEW, SEND, HISTORY = 1 << 10, 1 << 11, 1 << 16
+THREADS = (1 << 35) | (1 << 36) | (1 << 38)   # create public/private threads, talk in threads: off in read-only channels
 PIN = 1 << 51            # PIN_MESSAGES: Torch pins its status board in #news (owner granted it there, 17 Oct 2026)
 CATEGORY, TEXT = 4, 0
 CHANNELS = [("town-square", "The open room: chat, bluff, ally and accuse as yourself. Play your moves here with "
@@ -69,7 +70,7 @@ def main(apply):
         if apply:
             call("PATCH", f"/channels/{cat['id']}", token, {"permission_overwrites": base})
     for name, topic, read_only in CHANNELS:
-        over = list(base) + ([{"id": everyone, "type": 0, "allow": "0", "deny": str(SEND)}] if read_only else [])
+        over = list(base) + ([{"id": everyone, "type": 0, "allow": "0", "deny": str(SEND | THREADS)}] if read_only else [])
         if name == "news":     # keep the pin right; leaving it out would quietly take it away again
             over[0] = {**over[0], "allow": str(VIEW | SEND | HISTORY | PIN)}
         existing = next((c for c in chans if c["type"] == TEXT and c["name"] == name and cat and c.get("parent_id") == cat.get("id")), None)
