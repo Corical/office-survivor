@@ -21,9 +21,12 @@ from check_discord import API, env  # noqa: E402
 
 VIEW, SEND, HISTORY = 1 << 10, 1 << 11, 1 << 16
 CATEGORY, TEXT = 4, 0
-CHANNELS = [("town-square", "Say hello. Trust no one.", False),
-            ("news", "Torch posts what happened overnight, every morning.", True),
-            ("radio", "Anonymous messages, posted by Torch.", True)]
+CHANNELS = [("town-square", "The open room: chat, bluff, ally and accuse as yourself. Play your moves here with "
+                            "/scavenge, /steal, /guard, /investigate, /gift; Torch answers only you. Trust no one.", False),
+            ("news", "The official record. Every morning Torch posts what happened overnight: robberies, catches, "
+                     "exposures, who ran out of food. Who did what stays secret until the final reveal.", True),
+            ("radio", "Anonymous whispers. Send one message a day with /radio and Torch posts it with the morning "
+                      "news, with no name attached. Tips, accusations, lies: believe at your own risk.", True)]
 
 
 def call(method, path, token, body=None):

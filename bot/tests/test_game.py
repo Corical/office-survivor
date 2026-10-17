@@ -79,6 +79,22 @@ class Rules_(unittest.TestCase):
         self.g.tick(now=330)
         self.assertEqual(len([i for i in self.g.pending_outbox() if i["to"] == "news"]), n)
 
+    def test_radio_is_fixed_phrases_and_one_a_day(self):
+        other = self.g.identity.get("b")["alias"]
+        self.g.radio("a", "trust", other)
+        self.assertEqual(self.g.texts.get(self.g.radio_pending[0]), f"Don't trust {other}.")
+        with self.assertRaises(GameError):
+            self.g.radio("a", "me")                       # one a day
+        with self.assertRaises(GameError):
+            self.g.radio("b", "trust")                    # needs a player
+        with self.assertRaises(GameError):
+            self.g.radio("b", "<script>")                 # only the fixed lines
+        self.g.radio("b", "me")
+        self.g.tick(now=310)
+        self.g.tick(now=320)
+        radio = [self.g.outbox_text(i) for i in self.g.pending_outbox() if i["to"] == "radio"]
+        self.assertEqual(sorted(radio), sorted([f"Don't trust {other}.", "I'm innocent. Leave me alone."]))
+
     def test_join_closed_after_start(self):
         with self.assertRaises(GameError):
             self.g.join("late")

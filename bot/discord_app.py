@@ -205,9 +205,13 @@ def register(bot):
     async def results(i: discord.Interaction):
         await call(i, bot.game.results, key(i))
 
-    @tree.command(description="Post an anonymous message (goes out with the morning news)")
-    async def radio(i: discord.Interaction, message: str):
-        await call(i, bot.game.radio, key(i), message)
+    @tree.command(description="Send an anonymous rumour (posted with the morning news)")
+    @app_commands.describe(line="What to say", about="Who it's about")
+    @app_commands.choices(line=[app_commands.Choice(name=t.replace("{a}", "…"), value=k)
+                                for k, t in __import__("bot.game", fromlist=["RADIO_PHRASES"]).RADIO_PHRASES.items()])
+    @app_commands.autocomplete(about=alias_complete)
+    async def radio(i: discord.Interaction, line: app_commands.Choice[str], about: str = None):
+        await call(i, bot.game.radio, key(i), line.value, about)
 
     @tree.command(name="quit", description="Leave the game (your food leaves with you)")
     async def quit_(i: discord.Interaction):

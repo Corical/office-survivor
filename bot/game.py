@@ -19,7 +19,16 @@ from engine.moves import can_guard, validate
 from . import sims
 
 log = logging.getLogger("torch.game")
-RADIO_MAX = 280
+# Radio is fixed phrases so nobody can be recognised by their writing style (owner, 17 Oct 2026).
+RADIO_PHRASES = {
+    "saw": "I saw {a} sneaking around last night.",
+    "trust": "Don't trust {a}.",
+    "lying": "{a} is lying about their rations.",
+    "guarding": "{a} is guarding. Don't waste your night on them.",
+    "easy": "{a} looks like an easy target.",
+    "innocent": "{a} is innocent. Leave them alone.",
+    "me": "I'm innocent. Leave me alone.",
+}
 
 
 @dataclass
@@ -202,13 +211,16 @@ class GameService:
                 "investigate": f"investigate {target_alias}", "gift": f"give {target_alias} {amount}"}[kind]
         return f"Tonight you'll {what}. You can change your mind until the deadline."
 
-    def radio(self, user_key, text):
+    def radio(self, user_key, phrase, about=None):
         pid, _ = self._who(user_key)
         if not self.started or self.finished:
             raise GameError("Radio opens when the game starts.")
-        text = " ".join((text or "").split())[:RADIO_MAX]
-        if not text:
-            raise GameError("Say something.")
+        if phrase not in RADIO_PHRASES:
+            raise GameError("Pick one of the radio lines.")
+        needs_player = "{a}" in RADIO_PHRASES[phrase]
+        if needs_player and not about:
+            raise GameError("Pick who it's about.")
+        text = RADIO_PHRASES[phrase].format(a=self.players[self._pid_by_alias(about)].name if needs_player else "")
         if any(r.startswith(f"r{self.night + 1}-{pid}-") for r in self.radio_pending):
             raise GameError("One radio message a day. Yours goes out with the morning news.")
         ref = f"r{self.night + 1}-{pid}-{len(self.radio_pending)}"
