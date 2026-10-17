@@ -181,6 +181,34 @@ class Validation(unittest.TestCase):
         self.assertIn("still in the game", self.check(0, ("steal", 1, 0, False), quit_ids={1}))
 
 
+class Deal(unittest.TestCase):
+    def test_fair_deal_across_roster_sizes(self):
+        from engine.deal import GOALS, TARGETED, deal
+        for n in range(3, 21):
+            for seed in range(60):
+                hand = deal(range(n), random.Random(seed))
+                targets = [t for g, t in hand.values() if g in TARGETED]
+                self.assertEqual(len(targets), len(set(targets)), f"n={n} seed={seed}: someone targeted twice")
+                for p, (g, t) in hand.items():
+                    self.assertEqual(g in TARGETED, t >= 0)
+                    self.assertNotEqual(p, t, "self-target")
+                    if t >= 0 and hand[t][0] in TARGETED:
+                        self.assertNotEqual(hand[t][1], p, f"n={n} seed={seed}: mutual pair {p}<->{t}")
+                counts = Counter(g for g, _ in hand.values())
+                full = [counts.get(g, 0) for g in GOALS]
+                self.assertLessEqual(max(full) - min(full), 1, f"n={n}: goal types uneven {counts}")
+
+    def test_detective_scores_after_one_exposure(self):
+        ps = players(3)
+        ps[1].objective = "detective"
+        for p in (ps[0], ps[2]):
+            p.objective = "give"
+        run_night(ps, {0: ("steal", 2, 0, False), 1: ("investigate", 0, 0, False), 2: ("scavenge", None, 0, False)})
+        self.assertEqual(ps[1].exposures, 1)
+        finish(ps, Rules(), random.Random(1))
+        self.assertTrue(ps[1].obj_done)
+
+
 class Finish(unittest.TestCase):
     def test_seats_come_from_the_roster_not_the_rules(self):
         ps = players(11)

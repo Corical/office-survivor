@@ -43,6 +43,34 @@ roll draws from the rng in the same order). Simulator: 261 lines out, 73 in.
 The engine has no clock: nights are numbers. Real dates, the midnight deadline, the 07:30 post or a
 5-minute compressed day are all scheduler config (owner, 17 Oct 2026: "every five minutes is a day").
 
+## Step 2 so far: the game service (17 Oct 2026)
+
+| Piece | File | State |
+| --- | --- | --- |
+| Move validation (owner decisions) | `engine/moves.py` | done, tested |
+| Scoring, seats from the roster, void goals on quitters | `engine/finish.py` | done; simulator uses it; golden 31/31 |
+| Fair goal deal + Detective goal | `engine/deal.py`, `engine/resolve.py` (`exposures`) | done, tested; the **simulator still deals the old way** (balance rerun pending) |
+| Stores: append-only JSONL (torn-line repair), identity, radio texts | `bot/store.py` | done |
+| Sim colleagues (office personalities, always-legal moves) | `bot/sims.py` | done |
+| Game service: join, moves, deadline, quit, radio, status, results, GM start/add-sims, compressed schedule, atomic night records, outbox inside the causing record, replay-verify on load | `bot/game.py` | done; 8 tests incl. full 10-night game with 8 sims + restart replay + tamper refusal |
+| Tests | `engine/tests` (20 + `mutants.py` 5/5), `bot/tests` (8) | green |
+
+Run tests: `python -m unittest discover -s engine/tests -t .` and `python -m unittest discover -s bot/tests -t .`
+
+### Next (in order)
+1. `bot/console.py`: play a compressed game from the terminal (fake/real clock, sims) to feel the flow.
+2. Discord adapter (`discord.py`): slash commands → `GameService`, one `reply_private()` for everything,
+   a loop calling `tick()` and delivering `pending_outbox()` (news → `#news`, radio → `#radio`, `dm:<pid>` →
+   DM with `/results` fallback), `mark_sent` after each send; GM role check; config with guild/channel ids.
+3. Run on F x D with 5-minute days + sims; owner plays.
+4. Pi: `/opt/torch`, `/var/lib/torch`, `/etc/torch/torch.env`, systemd unit after time-sync.
+5. Rerun balance with the fair deal + Detective (`objective_stats.py`, `target_pileup.py`) and show the owner.
+
+### Known gaps to close
+- Quitting zeroes rations without a `ration`/`quit_forfeit` ledger line (conservation books miss it).
+- A crash between `identity.put` and the `join` record leaves an identity with no player.
+- Outbox resend after a crash can double-post until the Discord adapter checks history for the intent id.
+
 ## Golden master for the engine extraction
 
 `docs/sim/tools/golden_master.py record|check bot/tests/golden`: 20 rules-player games and 10 adaptive games

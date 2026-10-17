@@ -27,4 +27,5 @@ class PlayerState:
     comebacks: int = 0
     died_unrobbed: int = 0
     missed: int = 0
+    exposures: int = 0                 # thieves this player exposed with investigate (the Detective goal)
     actions: Counter = field(default_factory=Counter)

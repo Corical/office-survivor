@@ -7,6 +7,7 @@ def objective_text(o, rules, target_name="@player"):
         "beat": f"finish with more rations than {target_name}",
         "robbed2_extract": f"get robbed at least {rules.robbed_goal}x and still extract",
         "steal3_clean": "steal at least 3 times without ever being caught",
+        "detective": "expose a thief red-handed with /investigate at least once",
         "grudge": (f"make sure {target_name} doesn't extract" if rules.grudge_goal == "deny"
                    else f"successfully rob {target_name} at least {rules.grudge_robs}x"),
     }[o]
@@ -43,6 +44,8 @@ def finish(players, rules, rng, emit=lambda _type, **f: None, quit_ids=frozenset
             done = p.steals_ok >= 3 and p.steals_caught == 0
         elif o == "give":
             done = p.gifted_out >= r.give_goal
+        elif o == "detective":
+            done = getattr(p, "exposures", 0) >= 1
         elif r.grudge_goal == "deny":
             done = p.obj_target not in ext_ids
         else:  # rob

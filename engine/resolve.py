@@ -218,6 +218,7 @@ def resolve_night(players, moves, r, rng, night, emit=lambda _type, **f: None, o
             ledger(tgt, -pay, "bounty_paid", tgt.rations, detail=inv.name)
             ledger(inv, pay, "bounty_received", inv.rations, detail=tgt.name)
             ev["exposed"] += 1
+            inv.exposures = getattr(inv, "exposures", 0) + 1
             news.append(f"EXPOSED: an investigator saw {tgt.name} rob {victim.name}. {tgt.name} pays them {pay}.")
             exposed_paid = pay
         obs.investigated(night, inv, tgt, seen, exposed_paid)
