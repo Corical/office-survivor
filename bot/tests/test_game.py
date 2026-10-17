@@ -5,7 +5,7 @@
 import random
 import unittest
 
-from bot.game import GameError, GameService
+from bot.game import GameError, GameService, news_lines, private_lines
 from bot.store import MemoryEventStore, MemoryIdentityStore, MemoryTextStore
 from engine import Rules
 
@@ -62,6 +62,67 @@ class FullGame(unittest.TestCase):
         got = {t: (who, top) for t, who, top in awards(rows)}
         self.assertEqual(got["Biggest thief"], ("A, B", 2))
         self.assertEqual(got["Most generous"], ("nobody", 0))
+
+    def test_events_game_books_every_ration_and_replays_identically(self):
+        store, ident, texts = MemoryEventStore(), MemoryIdentityStore(), MemoryTextStore()
+        g = service(store, ident, texts)
+        g.join("human", rng=random.Random(1))
+        g.gm_add_sims(9, rng=random.Random(3))
+        g.gm_start(day_seconds=300, now=0, events="gentle")
+        start = {pid: p.rations for pid, p in g.players.items()}
+        for night in range(1, 11):
+            g.tick(now=night * 300 + 10)
+        self.assertTrue(g.finished)
+        nights = [r for r in store.records if r["type"] == "night"]
+        evs = [e for r in nights for e in r["events"]]
+        self.assertGreater(sum(1 for e in evs if e["type"] == "event"), 3)          # events actually happened
+        lines = [l for r in nights for l in news_lines(r["events"])]
+        self.assertTrue(any(e.get("line") in lines for e in evs if e["type"] == "event" and e.get("line")))
+        # the books: every ration change, events included, is a ration line (quitters aside, none here)
+        for pid, p in g.players.items():
+            booked = sum(e["delta"] for e in evs if e["type"] == "ration" and e["player"] == p.name)
+            self.assertEqual(start[pid] + booked, p.rations, f"{p.name}: unbooked change")
+        again = service(store, ident, texts)                                       # restart: replay re-checks
+        self.assertEqual({p: s.rations for p, s in again.players.items()}, {p: s.rations for p, s in g.players.items()})
+        self.assertEqual(again.events_mode, "gentle")
+        # story decks run across the whole game: no event line repeats until its deck is used up
+        from engine.events import VARIANTS
+        seen = {}
+        for e in evs:
+            if e["type"] == "event" and e.get("line") and e["event"] in VARIANTS:
+                seen.setdefault(e["event"], []).append(e["line"].split(" ", 1)[1].replace(e.get("player", ""), "{who}"))
+        for eid, used in seen.items():
+            first = used[:len(VARIANTS[eid])]
+            self.assertEqual(len(first), len(set(first)), f"{eid} repeated a story before using its whole deck")
+
+    def test_events_off_by_default_and_old_logs_without_the_key_load(self):
+        store = MemoryEventStore()
+        g = service(store)
+        g.gm_add_sims(4, rng=random.Random(1))
+        g.gm_start(day_seconds=60, now=0)
+        g.tick(now=61)
+        self.assertFalse(any(e["type"] == "event" for r in store.records if r["type"] == "night" for e in r["events"]))
+        for r in store.records:
+            r.pop("events", None) if r["type"] == "start" else None
+        self.assertEqual(service(store).events_mode, "off")
+        with self.assertRaises(GameError):
+            service().gm_start(day_seconds=60, now=0, events="chaos")
+
+    def test_idol_stories_reach_news_thief_and_holder(self):
+        from types import SimpleNamespace
+        evs = [{"type": "event", "event": "idol", "scope": "player", "player": "Holder", "visibility": "private"},
+               {"type": "event", "event": "idol_used", "player": "Holder", "visibility": "public"},
+               {"type": "steal", "thief": "Thief", "target": "Holder", "outcome": "empty", "amount": 0, "split_with": 0}]
+        news = " ".join(news_lines(evs))
+        self.assertIn("hidden idol", news)
+        self.assertNotIn("found nothing", news)                  # the idol line replaces the empty-break-in line
+        self.assertNotIn("found a hidden idol", news)            # finding it stays secret
+        holder = " ".join(private_lines(evs, SimpleNamespace(name="Holder", rations=4), 4))
+        self.assertIn("found a hidden idol", holder)
+        self.assertIn("idol saved you", holder)
+        thief = " ".join(private_lines(evs, SimpleNamespace(name="Thief", rations=3), 3))
+        self.assertIn("had a hidden idol", thief)
+        self.assertNotIn("beat you to it", thief)
 
     def test_tampered_log_refuses_to_load(self):
         store = MemoryEventStore()

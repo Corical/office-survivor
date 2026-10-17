@@ -398,11 +398,18 @@ def register(bot):
             await call(i, lambda: (bot.game.gm_add_sims(count, rng=random.Random()), f"Added {count} sim colleagues.")[1])
 
     @gm.command(name="start", description="Start the game")
-    async def start(i: discord.Interaction, day_minutes: app_commands.Range[float, 1, 1440] = 5.0):
+    @app_commands.describe(events="Wilderness events: bananas, gorillas, hidden idols (about one a night)")
+    @app_commands.choices(events=[app_commands.Choice(name="off", value="off"),
+                                  app_commands.Choice(name="gentle (about 1 a night)", value="gentle")])
+    async def start(i: discord.Interaction, day_minutes: app_commands.Range[float, 1, 1440] = 5.0,
+                    events: app_commands.Choice[str] = None):
         if await gm_only(i):
+            mode = events.value if events else "off"
+
             def go():
-                bot.game.gm_start(day_seconds=day_minutes * 60, news_delay=10, now=time.time())
-                return f"Started: {len(bot.game.players)} players, a day every {day_minutes:g} minutes."
+                bot.game.gm_start(day_seconds=day_minutes * 60, news_delay=10, now=time.time(), events=mode)
+                return (f"Started: {len(bot.game.players)} players, a day every {day_minutes:g} minutes, "
+                        f"events {mode}.")
             await call(i, go)
 
     @gm.command(name="who-moved", description="Who has chosen tonight's move (never rations)")

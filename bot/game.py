@@ -9,9 +9,11 @@ import hashlib
 import logging
 import random
 import time
-from dataclasses import dataclass
+from collections import Counter
+from dataclasses import dataclass, replace
 
 from engine import ENGINE_VERSION, PlayerState, Rules, resolve_night
+from engine import events as wild
 from engine.deal import deal
 from engine.finish import finish, objective_text
 from engine.moves import can_guard, legal_moves, validate
@@ -46,6 +48,24 @@ class Schedule:
 
 
 SAST = __import__("datetime").timezone(__import__("datetime").timedelta(hours=2), "SAST")   # no daylight saving
+
+
+EVENT_MODES = {   # /gm start events:... ; "gentle" = events round 2's kindest design (docs/sim/results/events_sweep2.md)
+    "off": {},
+    "gentle": {"events_per_night": 1.0, "events_bias": "top", "events_rats_relative": True},
+}
+
+
+class _EventCtx:
+    """What engine/events.py needs from a game, for Torch: the active players, rules, night, a seed, and two writers
+    that turn every event and ration change into a record in the night's event list."""
+
+    def __init__(self, players, rules, night, seed, emit):
+        self.players, self.r, self.night, self.seed = players, rules, night, seed
+        self.event_tally = Counter()
+        self.L = emit
+        self.ledger = lambda p, delta, reason, balance, detail="": emit(
+            "ration", player=p.name, delta=delta, reason=reason, balance=balance, detail=detail)
 
 
 def night_label(schedule, night, closed=False):
@@ -84,6 +104,7 @@ class GameService:
         self.moves = {}            # pid -> move for night+1
         self.radio_pending = []    # text refs to post with the next news
         self.quit_ids = set()
+        self.event_counts = Counter()  # wilderness events so far this game, for the no-repeat story decks
         self.personality = {}      # pid -> personality for sims
         self.sims = set()
         self.news_posted = set()   # nights whose news intents exist
@@ -112,6 +133,8 @@ class GameService:
         elif t == "start":
             self.started = True
             self.schedule = Schedule(rec["start_ts"], rec["day_seconds"], rec["news_delay"])
+            self.events_mode = rec.get("events", "off")            # older logs have no key: events off
+            self.rules = replace(self.rules, **EVENT_MODES[self.events_mode])
             for c in rec["roster"]:
                 self.players[c["pid"]] = PlayerState(pid=c["pid"], name=c["alias"], rations=self.rules.start_rations,
                                                      objective=c["objective"], obj_target=c["target"])
@@ -131,6 +154,7 @@ class GameService:
             self.night = rec["night"]
             self.moves = {}
             self.last_private = {int(k): v for k, v in rec["private"].items()}
+            self.event_counts.update(e["event"] for e in rec["events"] if e["type"] == "event" and "scope" in e)
         elif t == "news":
             self.news_posted.add(rec["night"])
             self.radio_pending = []
@@ -151,8 +175,17 @@ class GameService:
 
     def _resolve(self, night, moves):
         events = []
+        emit = lambda _t, **f: events.append({"type": _t, **f})    # noqa: E731
+        flags = frozenset()
+        if self.rules.events_per_night > 0:      # wilderness events first, from their own dice (engine/events.py)
+            ctx = _EventCtx(self._active(), self.rules, night, self.season_id, emit)
+            ctx.event_tally.update(self.event_counts)          # earlier nights count, so story decks don't restart
+            flags, lines = wild.run_night_events(ctx, wild.rng_for(self.season_id, night))
+            public = [e for e in events if e["type"] == "event" and e["visibility"] == "public"]
+            for e, line in zip(public, lines):   # each public event wrote one #news line, in the same order
+                e["line"] = line
         resolve_night(self._active(), moves, self.rules, random.Random(night_seed(self.season_id, night)), night,
-                      emit=lambda _t, **f: events.append({"type": _t, **f}))
+                      emit=emit, flags=flags)
         return events
 
     def _run_finish(self, check=None):
@@ -309,7 +342,9 @@ class GameService:
         rng = rng or random.Random()
         return [self.join(f"sim:{len(self.joined)}", sim=True, rng=rng) for _ in range(n)]
 
-    def gm_start(self, day_seconds, news_delay=5.0, now=None):
+    def gm_start(self, day_seconds, news_delay=5.0, now=None, events="off"):
+        if events not in EVENT_MODES:
+            raise GameError(f"events must be one of: {', '.join(EVENT_MODES)}.")
         if self.started:
             raise GameError("Already started.")
         if len(self.joined) < 2:
@@ -322,7 +357,10 @@ class GameService:
                          f"Check /status for your secret goal. Choose a move before each deadline.", None)]
         msgs += [(f"dm:{c['pid']}", "🔥 The game has begun. Use /status any time to see your rations and your "
                                     "secret goal.", None) for c in roster if c["pid"] not in self.sims]
+        if events != "off":
+            msgs[0] = ("news", msgs[0][1] + " 🌴 Wilderness events are on: luck, good and bad, can strike anyone.", None)
         self._append({"type": "start", "start_ts": now, "day_seconds": day_seconds, "news_delay": news_delay,
+                      "events": events,
                       "roster": roster, "engine_version": ENGINE_VERSION, "season": self.season_id,
                       "rules": {**vars(self.rules), "players": len(roster)}, "outbox": self._intents(*msgs)})
         log.info("game started: %d players, day=%ss", len(roster), day_seconds)
@@ -426,10 +464,17 @@ class GameService:
 # ---------------- what players are told ----------------
 def news_lines(events):
     """The public #news lines for a night, in the engine's order, from its events."""
-    out = []
+    out, wild_lines = [], []
     robbed = {}
+    idol = {e["player"] for e in events if e["type"] == "event" and e.get("event") == "idol_used"}
     for e in events:
-        if e["type"] == "steal" and e["outcome"] == "caught":
+        if e["type"] == "event" and e.get("line"):          # a wilderness event (happens first, so listed first)
+            wild_lines.append(e["line"])
+        elif e["type"] == "event" and e.get("event") == "idol_used":
+            out.append(f"🗿 Someone tried to rob {e['player']} and left empty-handed: {e['player']} had a hidden idol.")
+        elif e["type"] == "steal" and e["target"] in idol and e["outcome"] in ("success", "empty"):
+            continue                                       # the idol line above says it all
+        elif e["type"] == "steal" and e["outcome"] == "caught":
             out.append(f"🚨 CAUGHT: {e['target']} was guarding and caught {e['thief']} red-handed. "
                        f"{e['thief']} paid {e['paid']}.")
         elif e["type"] == "steal" and e["outcome"] in ("success", "empty"):
@@ -445,15 +490,25 @@ def news_lines(events):
         who = "Someone" if len(amounts) == 1 else f"{len(amounts)} people"
         out.insert(0, f"🥷 {who} hit {victim} overnight. {victim} is down {total}." if total
                    else f"🥷 Someone broke into {victim}'s place and found nothing.")
-    return out
+    return wild_lines + out
 
 
 def private_lines(events, p, before):
     """What one player is told privately about their night."""
     me, out = p.name, []
+    idol = {e["player"] for e in events if e["type"] == "event" and e.get("event") == "idol_used"}
     for e in events:
         t = e["type"]
-        if t == "scavenge" and e["player"] == me:
+        if t == "event" and e.get("player") == me:
+            if e.get("event") == "idol":
+                out.append("🗿 You found a hidden idol. The next person to rob you gets nothing. Tell no one.")
+            elif e.get("event") == "idol_used":
+                out.append("🗿 Your idol saved you: a thief left with nothing. The idol is spent.")
+            elif e.get("line"):
+                out.append(e["line"])
+        elif t == "steal" and e["thief"] == me and e["target"] in idol:
+            out.append(f"🗿 {e['target']} had a hidden idol. You got nothing.")
+        elif t == "scavenge" and e["player"] == me:
             out.append(f"🥫 You scavenged and found {e['found']}.")
         elif t == "guard_up" and e["player"] == me:
             out.append(f"🛡️ You're on guard: protected tonight and through night {e['until_night']}.")
