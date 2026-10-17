@@ -253,6 +253,60 @@ class FullGame(unittest.TestCase):
         finish(ps, r, random.Random(0))
         self.assertFalse(ps[0].obj_done)
 
+    def test_owners_night_5_dm_explains_every_ration(self):
+        """Guard from the night before, no move chosen, a thief caught: the DM must say the guard was still up,
+        the scavenge was automatic, what the thief paid, and the meal, so the numbers add up."""
+        from engine import PlayerState, Rules, resolve_night
+        r = Rules()
+        ps = [PlayerState(pid=i, name=n, rations=5) for i, n in enumerate(("Me", "NightOwl", "C"))]
+        ps[0].guard_until = 5                                  # guarded on night 4, covers night 5
+        evs = []
+        moves = {0: ("scavenge", None, 0, True), 1: ("steal", 0, 0, False), 2: ("scavenge", None, 0, False)}
+        resolve_night(ps, moves, r, random.Random(3), 5, emit=lambda t, **f: evs.append({"type": t, **f}))
+        dm = "\n".join(private_lines(evs, ps[0], 5, night=5, guard_nights=2))
+        self.assertIn("Your guard (still up from night 4) caught NightOwl red-handed. They paid you", dm)
+        evs4 = [{"type": "guard_up", "player": "Me", "until_night": 5}]
+        self.assertIn("on guard for nights 4 and 5.", "\n".join(private_lines(evs4, ps[0], 5, night=4)))
+        self.assertIn("scavenged automatically", dm)
+        self.assertIn("You ate 1.", dm)
+        paid = sum(e["delta"] for e in evs if e["type"] == "ration" and e["player"] == "Me" and e["reason"] == "guard_reward")
+        found = next(e["found"] for e in evs if e["type"] == "scavenge" and e["player"] == "Me")
+        self.assertEqual(5 + paid + found - 1, ps[0].rations)  # the DM's numbers add up to the total it shows
+        self.assertIn(f"You now have {ps[0].rations} rations.", dm)
+
+    def test_every_ration_change_in_a_night_is_mentioned_in_the_dm(self):
+        reasons_to_words = {"guard_reward": "paid you", "eat": "You ate", "scavenge": "scavenged",
+                            "stole": "You stole", "robbed": "stole", "gift_in": "gave you", "gift_out": "You gave",
+                            "caught_penalty": "you were caught", "fine": "you were caught",
+                            "event_found": "+", "event_lost": "-", "bounty_received": "paid you",
+                            "bounty_paid": "EXPOSED", "gift_bonus": "gave you", "guard_income": "guard"}
+        seen = set()
+        for seed in range(25):
+            g = service()
+            g.join("h", rng=random.Random(seed))
+            g.gm_add_sims(9, rng=random.Random(seed + 50))
+            g.gm_start(day_seconds=300, now=0, events="gentle" if seed % 2 else "off")
+            pick = random.Random(seed)
+            for night in range(1, 11):
+                menu = g.play_menu("h")["moves"]                  # the human plays too, or the DM is all autopilot
+                kind = pick.choice([k for k in menu if k != "gift"] or ["scavenge"])
+                g.submit("h", kind, pick.choice(menu[kind]) if menu[kind] else None, at=night * 300 - 5)
+                g.tick(now=night * 300 + 10)
+            for rec in g.store.records:
+                if rec["type"] != "night":
+                    continue
+                for pid, lines in rec["private"].items():
+                    name = g.players[int(pid)].name
+                    dm = "\n".join(lines)
+                    for e in rec["events"]:
+                        if e["type"] == "ration" and e["player"] == name and e["delta"]:
+                            word = reasons_to_words.get(e["reason"])
+                            self.assertIsNotNone(word, f"unknown ration reason {e['reason']!r}: add it to the DM")
+                            seen.add(e["reason"])
+                            self.assertIn(word, dm, f"seed {seed} night {rec['night']}: {name}'s "
+                                                    f"{e['reason']} {e['delta']:+} isn't in their DM:\n{dm}")
+        self.assertTrue({"eat", "scavenge", "stole", "robbed"} <= seen, f"the games never produced: {seen}")
+
     def test_status_shows_goal_progress_and_a_quit_target_voids_it(self):
         g = service()
         g.join("a", rng=random.Random(1))
