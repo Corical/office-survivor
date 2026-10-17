@@ -1,2 +1,5 @@
 # Golden-master files are compared byte for byte: never convert their line endings.
 bot/tests/golden/** -text
+
+# Files that run on the Pi must keep Unix line endings.
+deploy/** text eol=lf
