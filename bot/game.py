@@ -280,6 +280,32 @@ class GameService:
         return {"header": f"**{night_label(self.schedule, night)}**: {alias}, {state}. What will you do tonight?",
                 "moves": moves, "gift_amounts": amounts, "radio": radio_free}
 
+    def board(self):
+        """(key, text) for the live status board in #news, or None before anyone has joined. Public facts only.
+        The key changes when the board's content does (start, each night, each news, the end); between those,
+        Discord's own <t:…:R> timestamps keep the countdown ticking in every player's app."""
+        if not self.joined:
+            return None
+        head = f"🔥 **Survivors** · {len(self.players) or len(self.joined)} players"
+        if not self.started:
+            return ("waiting", len(self.joined)), f"{head}\n⏳ Waiting for the Game Master to start. /join to play."
+        n, rounds = self.night, self.rules.rounds
+        posted = len(self.news_posted)
+        key = (self.season_id, n, posted, self.finished)
+        done = " ".join(str(i) for i in range(1, n + 1)) or "none"
+        modes = " · ".join(m for m in ("🌴 Events on" if self.events_mode != "off" else "",
+                                        "📊 Ranges on" if self.ranges else "") if m)
+        if self.finished:
+            return key, f"{head}\n🚁 **Game over.** The reveal is above. Thanks for playing."
+        nxt = n + 1
+        if nxt <= rounds:
+            dl = int(self.schedule.deadline(nxt))
+            now_line = f"🌙 **Night {nxt} of {rounds}** · moves close <t:{dl}:R> (<t:{dl}:t>) · use /play"
+        else:
+            now_line = "🚁 The last night is over. The helicopter is coming…"
+        return key, "\n".join(x for x in (head + (f" · {modes}" if modes else ""), now_line,
+                                           f"✅ Nights done: {done}") if x)
+
     def radio_menu(self, user_key):
         """What the radio picker offers: the fixed lines, the aliases (never your own), and whether today's message
         is still unused. {'lines': [(key, text with '…')], 'about': [aliases], 'available': bool}"""

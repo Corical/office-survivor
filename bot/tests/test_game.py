@@ -152,6 +152,33 @@ class FullGame(unittest.TestCase):
             self.assertIn(f"The camp sees you as {band_label(p)}.", h.status("a"))
         self.assertIn("🏴‍☠️ bandit", h.status("a"))                       # a bandit with food is still a bandit
 
+    def test_status_board_counts_down_to_the_right_deadline_and_changes_only_when_content_does(self):
+        g = service()
+        self.assertIsNone(g.board())                                     # nobody joined: no board
+        g.join("a", rng=random.Random(1))
+        self.assertIn("Waiting for the Game Master", g.board()[1])
+        g.gm_add_sims(3, rng=random.Random(2))
+        g.gm_start(day_seconds=300, now=1000, events="gentle", ranges=True)
+        k1, t1 = g.board()
+        self.assertIn("Night 1 of 10", t1)
+        self.assertIn("<t:1300:R>", t1)                                  # Discord renders the live countdown
+        self.assertIn("🌴 Events on", t1)
+        self.assertIn("📊 Ranges on", t1)
+        g.tick(now=1301)                                                 # night 1 resolved, news not out yet
+        self.assertNotEqual(g.board()[0], k1)
+        self.assertIn("<t:1600:R>", g.board()[1])                        # now counting down to night 2
+        k2 = g.board()[0]
+        g.tick(now=1302)                                                 # nothing new: same board, no repost
+        self.assertEqual(g.board()[0], k2)
+        g.tick(now=1320)                                                 # news posted: board moves under it
+        self.assertNotEqual(g.board()[0], k2)
+        for night in range(2, 11):
+            g.tick(now=1000 + night * 300 + 30)
+        g.tick(now=5000)
+        self.assertTrue(g.finished)
+        self.assertIn("Game over", g.board()[1])
+        self.assertNotIn("<t:", g.board()[1])                            # no countdown to a deadline that's gone
+
     def test_idol_stories_reach_news_thief_and_holder(self):
         from types import SimpleNamespace
         evs = [{"type": "event", "event": "idol", "scope": "player", "player": "Holder", "visibility": "private"},

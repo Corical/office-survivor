@@ -7,6 +7,7 @@ the length of a day when starting (5 minutes for pilots). News goes to #news, ra
 /results as the fallback when DMs are closed.
 """
 import asyncio
+import json
 import datetime
 import logging
 import os
@@ -91,14 +92,47 @@ class Torch(discord.Client):
 
     async def heartbeat(self):
         await self.wait_until_ready()
+        while not self.channels and not self.is_closed():     # on_ready finds #news/#radio; nothing sends before
+            await asyncio.sleep(1)
         while not self.is_closed():
             try:
                 async with self.lock:
                     self.game.tick(time.time())
                 await self.deliver()
+                await self.refresh_board()
             except Exception:
                 log.exception("heartbeat failed")
             await asyncio.sleep(5)
+
+    async def refresh_board(self):
+        """Keep one live status board at the bottom of #news: when its content changes (start, each night's news,
+        the end), delete the old one and post a fresh one, pinned when Torch may pin. Runs after the outbox, so the
+        board always sits under the latest news."""
+        async with self.lock:
+            b = self.game.board()
+        if b is None:
+            return
+        key, text = b
+        path = os.path.join(self.conf.data_dir, "board.json")
+        try:
+            state = json.load(open(path, encoding="utf-8"))
+        except (OSError, ValueError):
+            state = {}
+        if state.get("key") == list(key) or self.game.pending_outbox():
+            return                                    # unchanged, or news still going out: wait until it's above
+        ch = self.channels["news"]
+        if state.get("message_id"):
+            try:
+                old = await ch.fetch_message(int(state["message_id"]))
+                await old.delete()
+            except discord.HTTPException:
+                pass                                  # already gone
+        msg = await ch.send(text, allowed_mentions=NONE)
+        try:
+            await msg.pin(reason="Torch status board")
+        except discord.HTTPException:
+            pass                                      # no pin rights: the board still sits at the bottom of #news
+        json.dump({"key": list(key), "message_id": str(msg.id)}, open(path, "w", encoding="utf-8"))
 
     async def deliver(self):
         async with self.send_lock:
