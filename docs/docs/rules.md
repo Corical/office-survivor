@@ -13,6 +13,8 @@ Everyone plays under a secret alias the bot gives them when they join, like Rust
 - **#town-square is normal chat.** People talk as themselves and role-play about aliases: "RustyKettle got me last night." Nobody knows who RustyKettle is, so the mystery holds. Giving yourself away is your own call, and lying is fair game.
 - **Keep it light.** About two minutes a day: one move, the morning news, and banter if you feel like it. No extra messaging systems, nothing that pulls people away from work.
 - **The reveal shows aliases, never real names.** People will work plenty out from timing and style, but nothing official ever confirms it. Anyone can unmask themselves if they want to.
+- **After a season ends, the Game Master can see who played which alias**, and keeps totals per person for a Hall of Fame. The Hall of Fame shows only totals and praise (most wins, most seats, most rations stolen, most thieves exposed, most generous, most goals met): never who robbed whom.
+- **A new alias every season**, so no alias turns into a reputation.
 - **Across seasons (open):** keep your alias and build a legend, or get a new one each season with luck tied to you behind the scenes.
 
 ## The daily loop

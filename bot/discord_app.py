@@ -18,6 +18,7 @@ import discord
 from discord import app_commands
 
 from . import config as cfg
+from . import hall
 from .game import GameError, GameService
 from .store import IdentityStore, JsonlEventStore, TextStore
 
@@ -523,6 +524,46 @@ def register(bot):
                          f"minutes, events {mode}, ranges {'on' if ranges else 'off'}. Tap 🎮 Play on the board "
                          f"in #news.")
         await bot.deliver()
+
+    def who(i, key_):
+        m = i.guild.get_member(int(key_)) if i.guild and key_.isdigit() else None
+        return m.display_name if m else f"<left the server {key_[-4:]}>"
+
+    @gm.command(name="history", description="Who played which alias, in FINISHED seasons only (private to you)")
+    @app_commands.describe(member="Only this person's seasons")
+    async def history_cmd(i: discord.Interaction, member: discord.Member = None):
+        if not await gm_only(i):
+            return
+        rows = hall.history(hall.load_seasons(bot.conf.data_dir), str(member.id) if member else None)
+        if not rows:
+            return await private(i, "No finished seasons yet" + (f" for {member.display_name}." if member else "."))
+        lines = [f"`{datetime.datetime.fromtimestamp(r['started']).strftime('%d %b %H:%M')}` **{who(i, r['key'])}** "
+                 f"was {r['alias']} · {r['points']} pts{' · 🚁' if r['seat'] else ''}{' · 🏆' if r['won'] else ''}"
+                 for r in rows[:40]]
+        await private(i, "📜 **Finished seasons, newest first**\n" + "\n".join(lines))
+
+    @gm.command(name="hall-of-fame", description="Totals per person over finished seasons; post:True puts it in #news")
+    @app_commands.describe(since="Only seasons started on or after this date, e.g. 2026-10-01",
+                           post="Post it in #news for everyone (default: only you see it)")
+    async def hall_cmd(i: discord.Interaction, since: str = None, post: bool = False):
+        if not await gm_only(i):
+            return
+        try:
+            ts = datetime.datetime.strptime(since, "%Y-%m-%d").timestamp() if since else None
+        except ValueError:
+            return await private(i, "⚠️ since must look like 2026-10-01.")
+        tot = hall.totals(hall.load_seasons(bot.conf.data_dir), since=ts)
+        if not tot:
+            return await private(i, "No finished seasons in that period.")
+        lines = [f"{e} **{title}:** {', '.join(who(i, k) for k in keys)} ({v})"
+                 for e, title, keys, v in hall.hall_of_fame(tot)]
+        games = max(r["games"] for r in tot.values())
+        text = (f"🏛️ **Survivors Hall of Fame**{f' since {since}' if since else ''} · {len(tot)} players · "
+                f"up to {games} games each\n" + "\n".join(lines))
+        if post:
+            await bot.channels["news"].send(text[:1990], allowed_mentions=NONE)
+            return await private(i, "Posted in #news.")
+        await private(i, text + "\n\n*Only you see this. Run again with post: True to share it in #news.*")
 
     @gm.command(name="new-season", description="Archive this game and start an empty one")
     async def new_season(i: discord.Interaction, confirm: bool):
