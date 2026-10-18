@@ -116,7 +116,9 @@ func close() -> void:
 
 
 ## Send one intent. Returns "" when sent, else a reason: forbidden_key | not_connected | send_failed.
-func send(t: String, fields := {}) -> String:
+## `ack_ms`: how long to wait for the server's answer before the line is called dead. The default is ACK_TIMEOUT_MS; an intent the
+## server answers late on purpose (Continue waits for the others) says how long its answer may take.
+func send(t: String, fields := {}, ack_ms := -1) -> String:
 	for k in fields:
 		# the ONE exception: a kick carries the opaque handle of the seat to remove, in a field the server calls `seat`
 		# (the handle comes from the latest lobby; it is not a seat id or a player id and means nothing to anyone else)
@@ -133,7 +135,7 @@ func send(t: String, fields := {}) -> String:
 	if not _send_raw(msg):
 		return "send_failed"
 	if not t in NO_REPLY:
-		_acks[t] = clock.now_msec() + ACK_TIMEOUT_MS
+		_acks[t] = clock.now_msec() + (ack_ms if ack_ms > 0 else ACK_TIMEOUT_MS)
 	return ""
 
 

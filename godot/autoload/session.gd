@@ -23,6 +23,8 @@ var server_url := "wss://raspberrypi.tail87b476.ts.net:8470"      # the arena se
 ## Old defaults that earlier builds saved to disk as if the player had chosen them. A saved copy of one of these is not a
 ## choice, so it is dropped on load and the current default applies (an address the player typed is always kept).
 const RETIRED_DEFAULT_URLS: Array[String] = ["ws://127.0.0.1:8765"]
+const CONTINUE_ACK_MARGIN_MS := 10000          # after the reveal's own clock runs out, the next view should come within this
+const CONTINUE_ACK_MAX_MS := 120000            # chosen: no reveal waits longer than two minutes, whatever the server says
 ## The exact words the server uses when a kick targets a seat that is no longer in the room (docs/arena/GODOT_FOUNDATION.md).
 const KICK_SEAT_GONE_TEXT := "That seat is not in the room any more."
 ## What the server answers a join_room with when the camp cannot be joined (rooms listing and typed codes alike).
@@ -177,7 +179,7 @@ func act(t: String, fields := {}) -> String:
 	if _inflight.has(key):
 		Log.event("session", "intent_ignored", {"t": t, "why": "in_flight"})
 		return "in_flight"
-	var why: String = Net.send(t, fields)
+	var why: String = Net.send(t, fields, _ack_ms_for(t))
 	if why == "":
 		_inflight[key] = true
 		_last_type = t
@@ -203,6 +205,22 @@ func kick(handle: String) -> String:
 		Log.event("session", "kick_refused", {"why": "unknown_seat"})
 		return "unknown_seat"
 	return act("kick", {"seat": handle})
+
+
+## How long the server may take to answer `t` before the line is called dead. Almost everything is answered at once. Continue is
+## not: the server answers it when the reveal ends (or everyone has tapped), so a tap 6 s into a 20 s reveal is rightly silent
+## for 14 s. Waiting only 8 s dropped a healthy line and showed "Signal lost" (stranger pass 2, N3). The wait is the reveal's own
+## remaining time plus a margin, bounded so a hostile countdown cannot buy an endless wait; -1 = the normal deadline.
+func _ack_ms_for(t: String) -> int:
+	if t != "continue" or view.get("t") != "reveal":
+		return -1
+	var left_s: Variant = view.get("seconds_left", 0)
+	var left_ms := 0.0
+	if left_s is int or left_s is float:
+		left_ms = float(left_s) * 1000.0 - float(clock.now_msec() - view_msec)
+	if is_nan(left_ms) or left_ms < 0.0:
+		left_ms = 0.0
+	return int(clampf(maxf(left_ms + CONTINUE_ACK_MARGIN_MS, Net.ACK_TIMEOUT_MS), Net.ACK_TIMEOUT_MS, CONTINUE_ACK_MAX_MS))
 
 
 func pick(kind: String, target: Variant, amount := 0) -> String:
