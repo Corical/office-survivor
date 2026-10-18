@@ -18,6 +18,21 @@ msgstr "Unknown"
 msgid "band.well_fed"
 msgstr "Well fed"
 
+msgid "column.gave_away"
+msgstr "Gave away"
+
+msgid "column.rations"
+msgstr "Rations"
+
+msgid "column.score"
+msgstr "Points"
+
+msgid "column.stole"
+msgstr "Stole"
+
+msgid "column.times_robbed"
+msgstr "Robbed"
+
 msgid "goal.beat"
 msgstr "{text}"
 
@@ -32,6 +47,21 @@ msgstr "{text}"
 
 msgid "goal.robbed2_extract"
 msgstr "{text}"
+
+msgid "goal.state.done"
+msgstr "Done"
+
+msgid "goal.state.end"
+msgstr "Decided at the end"
+
+msgid "goal.state.failed"
+msgstr "Lost"
+
+msgid "goal.state.open"
+msgstr "In progress"
+
+msgid "goal.state.unknown"
+msgstr "Unknown"
 
 msgid "goal.steal3_clean"
 msgstr "{text}"
@@ -138,6 +168,9 @@ msgstr "Bandit {player} has scraped together enough to rejoin the survivors."
 msgid "line.now_have"
 msgstr "You now have {rations} rations."
 
+msgid "line.now_have.one"
+msgstr "You now have {rations} ration."
+
 msgid "line.rejoined_me"
 msgstr "You've scraped together enough to rejoin the survivors."
 
@@ -231,6 +264,39 @@ msgstr "something"
 msgid "move.unknown.help"
 msgstr "No description."
 
+msgid "notice.flapping"
+msgstr "The connection keeps dropping. Another device may have your seat."
+
+msgid "notice.generic"
+msgstr "{text}"
+
+msgid "notice.in_flight"
+msgstr "Already sent."
+
+msgid "notice.invalid"
+msgstr "The server sent something this app could not read."
+
+msgid "notice.locked"
+msgstr "Your move is locked in."
+
+msgid "notice.no_server_url"
+msgstr "Enter the server address first."
+
+msgid "notice.seat_gone"
+msgstr "That game is no longer available."
+
+msgid "notice.taken_over"
+msgstr "This seat was opened on another device."
+
+msgid "notice.too_big"
+msgstr "The server sent something too large."
+
+msgid "notice.unknown"
+msgstr "The server sent something this app doesn't know."
+
+msgid "notice.upgrade_required"
+msgstr "Please update the app to play."
+
 msgid "radio.easy"
 msgstr "{a} looks like an easy target."
 
@@ -266,4 +332,106 @@ msgstr "Bandit"
 
 msgid "status.shield"
 msgstr "On guard"
+
+msgid "ui.app_name"
+msgstr "Arena"
+
+msgid "ui.back_to_title"
+msgstr "Back to title"
+
+msgid "ui.continue"
+msgstr "Continue"
+
+msgid "ui.copy"
+msgstr "Copy"
+
+msgid "ui.create_room"
+msgstr "Create room"
+
+msgid "ui.enter_code"
+msgstr "Room code"
+
+msgid "ui.goal"
+msgstr "Your goal"
+
+msgid "ui.join_room"
+msgstr "Join room"
+
+msgid "ui.leave"
+msgstr "Leave game"
+
+msgid "ui.lock"
+msgstr "Lock in"
+
+msgid "ui.locked"
+msgstr "Locked in"
+
+msgid "ui.locked_count"
+msgstr "{locked} of {total} locked in"
+
+msgid "ui.locking"
+msgstr "Locking in..."
+
+msgid "ui.net.connecting"
+msgstr "Connecting..."
+
+msgid "ui.net.offline"
+msgstr "Offline"
+
+msgid "ui.net.online"
+msgstr "Connected"
+
+msgid "ui.net.reconnecting"
+msgstr "Reconnecting..."
+
+msgid "ui.net.stopped"
+msgstr "Disconnected"
+
+msgid "ui.net.unreachable"
+msgstr "Can't reach the server"
+
+msgid "ui.new_game"
+msgstr "New game"
+
+msgid "ui.radio"
+msgstr "Radio"
+
+msgid "ui.results"
+msgstr "Results"
+
+msgid "ui.resume"
+msgstr "Resume game"
+
+msgid "ui.room_code"
+msgstr "Room {code}"
+
+msgid "ui.round_of"
+msgstr "Round {round} of {rounds}"
+
+msgid "ui.seats"
+msgstr "{taken} of {total} seats taken"
+
+msgid "ui.server_address"
+msgstr "Server address"
+
+msgid "ui.settings"
+msgstr "Settings"
+
+msgid "ui.start"
+msgstr "Start game"
+
+msgid "ui.theme"
+msgstr "Theme"
+
+msgid "ui.timer_unknown"
+msgstr "Waiting for the server"
+
+msgid "ui.waiting_for_host"
+msgstr "Waiting for the host to start"
+
+msgid "ui.winners"
+msgstr "Winners"
+
+msgid "ui.you_are"
+msgstr "You are {alias}"
 

@@ -1,0 +1,46 @@
+class_name Ruleset
+extends RefCounted
+## What the client core needs to know about a game, and nothing more. Session validates frames and routes seat errors
+## through this; Feed asks it for neutral models. A new game is a new subclass in rulesets/<id>/ plus one line in
+## rulesets/registry.gd; core never names a game.
+
+## Message types that are screens' views (the rest are control frames).
+func view_types() -> Array:
+	return []
+
+
+## Error codes after which the stored seat is useless.
+func seat_gone_codes() -> Array:
+	return []
+
+
+## Server wordings that mean the same, for servers that do not send a distinct code yet.
+func seat_gone_texts() -> Array:
+	return []
+
+
+## "" when the frame is well-formed for its type (unknown types are accepted: Session reports them), else a reason.
+func validate(_msg: Dictionary) -> String:
+	return ""
+
+
+func lobby_model(_view: Dictionary) -> Dictionary:
+	return {}
+
+
+func round_model(_view: Dictionary) -> Dictionary:
+	return {}
+
+
+## `me` is my alias (may be ""); `before` is the last round view, or {} when unknown.
+func reveal_model(_view: Dictionary, _me: String, _before: Dictionary) -> Dictionary:
+	return {}
+
+
+func end_model(_view: Dictionary, _me: String) -> Dictionary:
+	return {}
+
+
+## Every translation key this ruleset can emit (a theme must cover them all).
+func all_keys() -> Array[String]:
+	return []

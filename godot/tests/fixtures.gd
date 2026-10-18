@@ -13,6 +13,7 @@ static func rows() -> Array:
 		for l in FileAccess.get_file_as_string(HARVEST).split("\n", false):
 			var r: Dictionary = SafeJson.parse(l)
 			r.msg = Net.normalize(r.msg)
+			r["before"] = Net.normalize(r.before) if r.has("before") else {}
 			_rows.append(r)
 	return _rows
 

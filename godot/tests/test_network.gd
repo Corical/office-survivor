@@ -4,6 +4,7 @@ extends BaseTest
 
 func test_reconnect_resumes_with_the_stored_token_and_the_fresh_view_wins() -> void:
 	in_round(2)
+	var creates_before := fake.count("create_room")        # the one the test helper sent to get a seat
 	fake.server_close(1006, "abnormal")
 	eq(Net.state, "reconnecting", "banner state")
 	check(not Session.picker_open(), "picker closed while reconnecting")
@@ -13,7 +14,7 @@ func test_reconnect_resumes_with_the_stored_token_and_the_fresh_view_wins() -> v
 	fake.server_open()
 	fake.server_send({"t": "hello_ok", "proto": 1})
 	eq(fake.last("resume").get("token"), "tok-secret-1", "resume carries the token")
-	eq(fake.count("create_room"), 0, "no other intent")
+	eq(fake.count("create_room"), creates_before, "no other intent after the reconnect")
 	fake.server_send({"t": "seat", "token": "tok-secret-1", "room_code": "ABCD", "alias": "Mango", "host": true})
 	fake.server_send(round_view(2, true, 100, 3))
 	eq(Session.view.locked_count, 3, "the fresh view replaced the old one")

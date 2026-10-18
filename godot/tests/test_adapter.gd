@@ -42,9 +42,15 @@ func test_codes_seen_in_real_play_all_map() -> void:
 
 
 func test_lines_table_is_the_servers() -> void:
-	var server := ProjectSettings.globalize_path("res://").path_join("../arena/lines_en.json")
+	# The server's folder is ../arena next to godot/, or ARENA_DIR. Missing is a FAILURE, not a skip (review N24):
+	# a silent skip lets the copy drift. Set ARENA_SIBLING=0 to opt out on a machine that has only godot/.
+	var dir := OS.get_environment("ARENA_DIR")
+	var base: String = dir if dir != "" else ProjectSettings.globalize_path("res://").path_join("../arena")
+	var server := base.path_join("lines_en.json")
 	if not FileAccess.file_exists(server):
-		return                                    # a checkout without the server next door: nothing to compare
+		if OS.get_environment("ARENA_SIBLING") != "0":
+			failures.append("cannot compare lines_en.json: %s not found (set ARENA_DIR, or ARENA_SIBLING=0 to skip)" % server)
+		return
 	eq(FileAccess.get_file_as_string(A.LINES_PATH).replace("\r\n", "\n"),
 		FileAccess.get_file_as_string(server).replace("\r\n", "\n"), "godot copy of lines_en.json drifted from arena/")
 

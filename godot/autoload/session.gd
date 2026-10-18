@@ -1,36 +1,22 @@
 extends Node
 ## What the client remembers and decides about the connection: the seat token (through a SessionStore), the latest
 ## validated view, the screen it implies, and which intents are in flight. Contract 5.3: draw only the latest view;
-## after a reconnect, resume and wait for a fresh view.
+## after a reconnect, resume and wait for a fresh view. Frame shapes and seat-gone codes come from the Ruleset.
 
 signal screen_changed(screen: String)
 signal view_changed(view: Dictionary)
 ## kind: error | unknown | terminal | invalid. `code` is machine-readable; `text` is the server's fallback wording.
 signal notice(kind: String, code: String, text: String)
+## The OS back button / gesture. Screens decide what it means; the app never quits on it by itself.
+signal back_requested
 
-const VIEW_TYPES := ["lobby", "round", "reveal", "end"]
-const NUM := -1                                   # "int or float" in SCHEMAS
-const SCHEMAS := {
-	"seat": {"token": TYPE_STRING, "room_code": TYPE_STRING, "alias": TYPE_STRING, "host": TYPE_BOOL},
-	"lobby": {"room_code": TYPE_STRING, "seats_taken": TYPE_INT, "seats_total": TYPE_INT, "host": TYPE_BOOL},
-	"round": {"round": TYPE_INT, "rounds": TYPE_INT, "seconds_left": NUM, "me": TYPE_DICTIONARY,
-		"legal": TYPE_DICTIONARY, "gift_amounts": TYPE_ARRAY, "my_locked": TYPE_BOOL, "locked_count": TYPE_INT,
-		"seats_total": TYPE_INT, "radio_available": TYPE_BOOL, "radio_phrases": TYPE_ARRAY, "aliases": TYPE_ARRAY},
-	"round.me": {"alias": TYPE_STRING, "rations": TYPE_INT, "bandit": TYPE_BOOL},
-	"reveal": {"round": TYPE_INT, "news": TYPE_ARRAY, "private": TYPE_ARRAY, "radio": TYPE_ARRAY,
-		"seconds_left": NUM},
-	"end": {"extracted": TYPE_ARRAY, "winners": TYPE_ARRAY, "results": TYPE_ARRAY},
-	"error": {"code": TYPE_STRING},
-	"upgrade_required": {},
-	"hello_ok": {},
-}
-## Error codes that mean the stored seat is useless (requested in the brief). Any error answering `resume` counts too.
-const SEAT_GONE_CODES := ["seat_gone", "room_gone", "bad_token"]
 const ROUND_GUARDED := ["lock", "continue"]        # once per room+round
+const SEAT_INTENTS := ["resume", "create_room", "join_room"]
 const INTENT_TTL_MS := 10000                       # chosen: a Create/Join tap older than this is not replayed
 
 var store: SessionStore
 var clock: Clock = Clock.new()
+var ruleset: Ruleset
 var server_url := "" if OS.has_feature("android") else "ws://127.0.0.1:8765"
 var token := ""
 var room_code := ""
@@ -44,17 +30,27 @@ var last_round_view := {}             # the before-state for the next reveal
 var locked_out := false               # true after upgrade_required: nothing the server says changes the screen
 var terminal_reason := ""
 var pending_intent := {}
+## True from a (re)connect until the next view: the held view is stale, so the picker stays shut and the timer is
+## unknown (contract 5.3, and the phone coming back from the background).
+var awaiting_view := false
 
 var _inflight := {}                   # guard key -> true
+var _last_type := ""                  # the intent most recently sent: the one an `error` is taken to answer
+var _last_key := ""
 
 
 func _ready() -> void:
 	if store == null:
 		store = SessionStore.new()
+	if ruleset == null:
+		ruleset = RulesetRegistry.make()
+	get_tree().quit_on_go_back = false           # Android: the back gesture must not close the game by itself
 	load_store()
 	Net.handshaken.connect(_on_handshaken)
 	Net.message_received.connect(apply)
 	Net.terminal.connect(_on_terminal)
+	Net.probe_due.connect(_on_probe)
+	Net.state_changed.connect(_on_net_state)
 
 
 ## Fresh state with the given store and clock (tests); nothing is read from or written to the player's files.
@@ -63,6 +59,7 @@ func reset(s: SessionStore = null, c: Clock = null) -> void:
 		store = s
 	if c:
 		clock = c
+	ruleset = RulesetRegistry.make()
 	token = ""
 	room_code = ""
 	alias = ""
@@ -74,17 +71,30 @@ func reset(s: SessionStore = null, c: Clock = null) -> void:
 	locked_out = false
 	terminal_reason = ""
 	pending_intent = {}
+	awaiting_view = false
 	_inflight = {}
+	_last_type = ""
+	_last_key = ""
 	load_store()
+
+
+static func valid_url(u: String) -> bool:
+	return (u.begins_with("ws://") or u.begins_with("wss://")) and u.length() > 8 and not (" " in u)
 
 
 # ---------------- intents ----------------
 
 ## Title screen: start fresh with Create or Join. The old seat is forgotten first, so the tap is never swallowed by a
-## silent resume (review B1-2); an open connection that carries the old seat is closed.
+## silent resume (review B1-2). Returns "" or a reason (no_server_url | <act reason>).
 func begin(t: String, fields := {}) -> String:
+	if not valid_url(server_url):
+		Log.event("session", "bad_server_url", {"url": server_url}, "WARN")
+		return "no_server_url"
 	var had_seat := token != ""
 	forget_seat()
+	view = {}
+	last_round_view = {}
+	awaiting_view = false
 	if had_seat and Net.state != "offline":
 		Net.close()
 	terminal_reason = ""
@@ -99,16 +109,31 @@ func begin(t: String, fields := {}) -> String:
 func resume_if_stored() -> bool:
 	if token == "":
 		return false
+	if not valid_url(server_url):
+		Log.event("session", "bad_server_url", {"url": server_url}, "WARN")
+		return false
 	terminal_reason = ""
+	awaiting_view = true
 	Log.event("session", "resume_start", {"room": room_code})
 	Net.connect_to(server_url)
 	return true
 
 
-## Send an intent once. Returns "" when sent, else why not: in_flight | locked | <Net reason>.
+## Send an intent once. Returns "" when sent, else why not: in_flight | locked | locked_round | radio_unavailable |
+## <Net reason>.
 func act(t: String, fields := {}) -> String:
 	if locked_out:
 		return "locked"
+	if awaiting_view and t != "resume":
+		# the held view is stale: after a reconnect the only first word is `resume` (found by the live two-human game,
+		# where pick and radio went out ahead of it)
+		Log.event("session", "intent_refused", {"t": t, "why": "awaiting_view"})
+		return "awaiting_view"
+	if t == "pick" and lock_state() != "open":
+		Log.event("session", "intent_refused", {"t": t, "why": "round_locked"})
+		return "locked_round"              # contract 5.3: after Lock the picker stays shut; never re-enabled locally
+	if t == "radio" and not bool(view.get("radio_available", false)):
+		return "radio_unavailable"
 	var key := _guard_key(t, fields)
 	if _inflight.has(key):
 		Log.event("session", "intent_ignored", {"t": t, "why": "in_flight"})
@@ -116,6 +141,8 @@ func act(t: String, fields := {}) -> String:
 	var why: String = Net.send(t, fields)
 	if why == "":
 		_inflight[key] = true
+		_last_type = t
+		_last_key = key
 	return why
 
 
@@ -132,6 +159,8 @@ func leave() -> void:
 	forget_seat()
 	Net.close()
 	view = {}
+	last_round_view = {}
+	awaiting_view = false
 	_inflight = {}
 	terminal_reason = ""
 	_go("title")
@@ -143,6 +172,7 @@ func back_to_title() -> void:
 	view = {}
 	_inflight = {}
 	pending_intent = {}
+	awaiting_view = false
 	if terminal_reason == "upgrade_required":
 		return                    # nothing else to do until the app is updated
 	_go("title")
@@ -162,8 +192,13 @@ func lock_state() -> String:
 
 
 func picker_open() -> bool:
-	return screen == "round" and not locked_out and Net.state == "online" and lock_state() == "open" \
-		and seconds_left_now() > 0
+	return screen == "round" and not locked_out and not awaiting_view and Net.state == "online" \
+		and lock_state() == "open" and seconds_left_now() > 0
+
+
+## False while the held view is stale (reconnecting, or back from the background): a ring should show "unknown".
+func timer_known() -> bool:
+	return not awaiting_view and Net.state == "online"
 
 
 func seconds_left_now() -> int:
@@ -177,6 +212,13 @@ func before_state_for(r: int) -> Dictionary:
 	return last_round_view if int(last_round_view.get("round", -1)) == r else {}
 
 
+func expecting_seat() -> bool:
+	for k in SEAT_INTENTS:
+		if _inflight.has(k):
+			return true
+	return false
+
+
 # ---------------- inbound ----------------
 
 func apply(msg: Dictionary) -> void:
@@ -184,12 +226,14 @@ func apply(msg: Dictionary) -> void:
 	if locked_out:
 		Log.event("session", "ignored_locked_out", {"t": t})
 		return
-	if SCHEMAS.has(t):
-		var bad := validate(msg)
-		if bad != "":
-			Log.event("session", "invalid_view", {"t": t, "problem": bad}, "WARN")
-			notice.emit("invalid", "invalid_" + t, "")
-			return
+	if Net.state == "offline":
+		Log.event("session", "ignored_offline", {"t": t})      # a frame that outlived a deliberate close (N05)
+		return
+	var bad := ruleset.validate(msg)
+	if bad != "":
+		Log.event("session", "invalid_frame", {"t": t, "problem": bad}, "WARN")
+		notice.emit("invalid", "invalid_" + t, "")
+		return
 	match t:
 		"hello_ok":
 			pass
@@ -201,49 +245,48 @@ func apply(msg: Dictionary) -> void:
 			_go("upgrade")
 			view_changed.emit(view)
 		"seat":
+			if not expecting_seat():
+				Log.event("session", "unexpected_seat", {}, "WARN")      # N06: a seat nobody asked for changes nothing
+				return
+			if str(msg.room_code) != room_code:
+				view = {}
+				last_round_view = {}
 			token = msg.token
 			room_code = msg.room_code
 			alias = msg.alias
 			host = msg.host
-			_clear_reply_guards()
+			for k in SEAT_INTENTS:
+				_inflight.erase(k)
+				Net.ack(k)
 			save_store()
 			Log.event("session", "seat", {"room": room_code, "host": host})
 		"error":
 			_on_error(msg)
 		_:
-			if t in VIEW_TYPES:
+			if t in ruleset.view_types():
 				_take_view(msg)
 			else:
 				Log.event("session", "unknown_type", {"t": t}, "WARN")
 				notice.emit("unknown", t, "")
 
 
-static func validate(msg: Dictionary) -> String:
-	var t: String = msg.t
-	var problem := _check(msg, SCHEMAS.get(t, {}))
-	if problem == "" and t == "round":
-		problem = _check(msg.me, SCHEMAS["round.me"])
-		if problem != "":
-			problem = "me." + problem
-	return problem
-
-
-static func _check(d: Dictionary, schema: Dictionary) -> String:
-	for k in schema:
-		if not d.has(k):
-			return "%s missing" % k
-		var want: int = schema[k]
-		var got := typeof(d[k])
-		if want == NUM:
-			if got != TYPE_INT and got != TYPE_FLOAT:
-				return "%s not a number" % k
-		elif got != want:
-			return "%s has the wrong type" % k
-	return ""
+## Rank of a round-ish view so an older one can be told from a newer one: round n < reveal n < round n+1.
+static func order_of(v: Dictionary) -> int:
+	match v.get("t"):
+		"round":
+			return int(v.get("round", 0)) * 2
+		"reveal":
+			return int(v.get("round", 0)) * 2 + 1
+	return -1
 
 
 func _take_view(msg: Dictionary) -> void:
 	var t: String = msg.t
+	var old := order_of(view)
+	var new := order_of(msg)
+	if old >= 0 and new >= 0 and new < old:
+		Log.event("session", "stale_view_ignored", {"got": t, "round": msg.get("round"), "have": view.get("round")}, "WARN")
+		return
 	if t == "lobby":
 		host = msg.host
 		room_code = msg.room_code
@@ -252,9 +295,16 @@ func _take_view(msg: Dictionary) -> void:
 		last_round_view = msg
 	view = msg
 	view_msec = clock.now_msec()
+	awaiting_view = false
 	_clear_reply_guards()
-	if new_round:
+	if new_round or t == "end":
 		_drop_round_guards()
+	# what this view answers (review N08): it ends the wait for every intent except a lock/continue it does not cover
+	Net.ack_except(ROUND_GUARDED)
+	if (t == "round" and bool(msg.my_locked)) or t == "reveal" or t == "end":
+		Net.ack("lock")
+	if new_round or t == "end":
+		Net.ack("continue")
 	if pending_intent and t != "lobby":
 		pending_intent = {}
 	Log.event("session", "view", {"t": t, "round": msg.get("round", "-")})
@@ -265,15 +315,24 @@ func _take_view(msg: Dictionary) -> void:
 func _on_error(msg: Dictionary) -> void:
 	var code: String = msg.code
 	var text := str(msg.get("message", ""))
-	var was_resume := _inflight.has(_guard_key("resume", {}))
+	var was_resume := _inflight.has("resume")
 	Log.event("session", "server_error", {"code": code, "resume": was_resume, "message": text}, "WARN")
-	_inflight = {}                    # a refusal re-opens whatever it refused (a rejected lock re-opens the picker)
-	if code in SEAT_GONE_CODES or was_resume:
+	if code in ruleset.seat_gone_codes() or (code == "refused" and text in ruleset.seat_gone_texts()):
+		_inflight = {}
 		_seat_gone(code, text)
-	elif code == "taken_over":
-		pass                          # Net also stops; _on_terminal handles the screen
-	else:
+		return
+	if code == "taken_over":
+		return                        # Net also stops; _on_terminal handles the screen
+	# an error answers the intent sent last; only that guard (and its wait) is released (review N07)
+	if _last_key != "":
+		_inflight.erase(_last_key)
+		Net.ack(_last_type)
+	if was_resume and not _inflight.has("resume"):
+		# a refused resume that is not "that seat is gone" (rate limit, server_error): keep the seat, try again later
 		notice.emit("error", code, text)
+		Net.reconnect_later()
+		return
+	notice.emit("error", code, text)
 
 
 func _on_terminal(reason: String) -> void:
@@ -292,12 +351,15 @@ func _on_terminal(reason: String) -> void:
 		_:
 			notice.emit("terminal", reason, "")   # taken_over, too_big, flapping: the seat is kept; Title offers resume
 			view = {}
+			awaiting_view = false
 			_go("title")
 
 
 func _seat_gone(code: String, text: String) -> void:
 	forget_seat()
 	view = {}
+	last_round_view = {}
+	awaiting_view = false
 	pending_intent = {}
 	notice.emit("terminal", "seat_gone", text if text != "" else code)
 	_go("title")
@@ -306,6 +368,7 @@ func _seat_gone(code: String, text: String) -> void:
 func _on_handshaken() -> void:
 	_inflight = {}                    # after a reconnect the fresh view decides; keep nothing else
 	if token != "":
+		awaiting_view = true
 		act("resume", {"token": token})
 	elif pending_intent:
 		var p := pending_intent
@@ -314,6 +377,37 @@ func _on_handshaken() -> void:
 			Log.event("session", "intent_expired", {"t": p.t})
 			return
 		act(p.t, p.fields)
+
+
+## The moment the connection leaves "online" with a seat held, the view we hold is stale. Net says "online" a hair
+## before it tells us the handshake finished; without this, a screen reacting to that state change could act on the
+## stale picker before the resume goes out.
+func _on_net_state(s: String) -> void:
+	if s != "online" and token != "":
+		awaiting_view = true
+
+
+## Nothing heard for a while. `resume` on the live connection is a harmless ping: the server answers with the seat
+## and the current view, and a dead path answers nothing, which the ack watchdog then catches.
+func _on_probe() -> void:
+	if token != "" and screen in ["lobby", "round", "reveal"] and not _inflight.has("resume"):
+		act("resume", {"token": token})
+
+
+# ---------------- app lifecycle (Android) ----------------
+
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_APPLICATION_PAUSED:
+			Log.event("session", "app_paused")
+		NOTIFICATION_APPLICATION_RESUMED:
+			Log.event("session", "app_resumed", {"screen": screen})
+			if token != "" and not locked_out and Net.state != "stopped":
+				# the socket may have died in the background and the monotonic clock may have stopped: trust neither
+				awaiting_view = true
+				Net.reconnect_now()
+		NOTIFICATION_WM_GO_BACK_REQUEST:
+			back_requested.emit()
 
 
 # ---------------- storage ----------------

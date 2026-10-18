@@ -61,6 +61,9 @@ static func _prepare(slots: Dictionary) -> Dictionary:
 	var out := {}
 	for k in slots:
 		var v: Variant = slots[k]
+		if v == null:
+			out[k] = ""                       # a missing value renders as nothing, never as "<null>"
+			continue
 		if v is Dictionary:
 			if v.has("key"):
 				out[k] = render(str(v.key))

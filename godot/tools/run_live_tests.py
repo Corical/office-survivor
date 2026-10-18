@@ -40,12 +40,54 @@ def godot(scene, args, log):
     return r.returncode, r.stdout
 
 
+def run_varied(tmp):
+    """Two humans: a Python host plays varied moves; the Godot client joins, varies its moves, drops once, resumes."""
+    port = free_port()
+    env = dict(os.environ, ARENA_TIMER="20")
+    srv = subprocess.Popen([sys.executable, "-m", "arena.server", "--data", os.path.join(tmp, "data2"),
+                            "--port", str(port)], cwd=ROOT, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    host = None
+    try:
+        if not wait_port(port):
+            print("LIVE2 FAIL: the arena server did not start")
+            return 1
+        url = "ws://127.0.0.1:%d" % port
+        host = subprocess.Popen([sys.executable, os.path.join(GODOT_DIR, "tools", "live_host.py"), "--server", url],
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+                                errors="replace")
+        room = ""
+        for line in host.stdout:                   # the first line the host prints is the room code
+            if line.startswith("ROOM "):
+                room = line.split()[1]
+                break
+        if not room:
+            print("LIVE2 FAIL: the host never created a room")
+            return 1
+        code, out = godot("res://tests/live/live_varied.tscn", ["--server=" + url, "--join=" + room, "--drop-at=4"],
+                          os.path.join(tmp, "varied.log"))
+        print("\n".join(l for l in out.splitlines() if l.startswith(("LIVE2", "  "))))
+        try:
+            rest, _ = host.communicate(timeout=60)
+        except subprocess.TimeoutExpired:
+            host.kill()
+            rest = "(host did not finish)"
+        host_line = [l for l in rest.splitlines() if l.startswith("HOST")]
+        print("\n".join(host_line) or "HOST: no summary line")
+        return 0 if code == 0 and host.returncode == 0 else 1
+    finally:
+        if host and host.poll() is None:
+            host.kill()
+        srv.terminate()
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["game", "faults"])
+    ap.add_argument("--only", choices=["game", "faults", "varied"])
     only = ap.parse_args().only
     tmp = tempfile.mkdtemp(prefix="live-")
     failed = 0
+    if only in (None, "varied"):
+        failed += run_varied(tmp)
     if only in (None, "game"):
         port = free_port()
         env = dict(os.environ, ARENA_TIMER="20")

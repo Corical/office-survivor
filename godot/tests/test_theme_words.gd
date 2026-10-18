@@ -17,9 +17,16 @@ func test_the_theme_loads() -> void:
 	check(Words.keys().size() > 80, "keys present: %d" % Words.keys().size())
 
 
-func test_completeness_every_key_the_adapter_can_emit_is_in_the_theme() -> void:
+func _needed() -> Array[String]:
+	var out: Array[String] = []
+	out.append_array(A.all_keys())
+	out.append_array(UiKeys.ALL)
+	return out
+
+
+func test_completeness_every_key_a_ruleset_or_screen_can_ask_for_is_in_the_theme() -> void:
 	var missing: Array[String] = []
-	for k in A.all_keys():
+	for k in _needed():
 		if not Words.has(k):
 			missing.append(k)
 	eq(missing, [], "theme is missing keys")
@@ -27,7 +34,7 @@ func test_completeness_every_key_the_adapter_can_emit_is_in_the_theme() -> void:
 
 func test_no_stale_keys_left_in_the_theme() -> void:
 	var allowed := {}
-	for k in A.all_keys():
+	for k in _needed():
 		allowed[k] = true
 	var stale: Array[String] = []
 	for k in Words.keys():
@@ -54,8 +61,10 @@ func test_placeholder_theme_has_no_emoji() -> void:
 	for k in Words.keys():
 		var t := str(Words.translation.get_message(k))
 		for i in t.length():
-			check(t.unicode_at(i) < 0x2000 or t.unicode_at(i) == 0x2019, "non-text character in %s: %s" % [k, t])
-			break
+			var c := t.unicode_at(i)
+			if not (c < 0x2000 or c == 0x2019):
+				failures.append("non-text character U+%04X at %d in %s: %s" % [c, i, k, t])
+				break
 
 
 func test_list_slots_join_the_english_way() -> void:
@@ -88,10 +97,10 @@ func test_slot_values_that_look_like_templates_do_not_inject() -> void:
 func test_swapping_the_translation_changes_the_words_without_touching_the_adapter() -> void:
 	var t := Translation.new()
 	t.locale = "en"
-	for k in A.all_keys():
+	for k in _needed():
 		t.add_message(k, "<%s>" % k)
 	Words.use(t)
 	var ln := A.line("stole", {"target": "Bo", "amount": 2})
 	eq(Words.render(ln.key, ln.slots), "<line.stole>", "a different theme owns the words")
-	var missing := A.all_keys().filter(func(k): return not Words.has(k))
+	var missing := _needed().filter(func(k): return not Words.has(k))
 	eq(missing, [], "a generated theme is complete too")

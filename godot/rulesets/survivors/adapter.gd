@@ -22,6 +22,11 @@ const END_COLUMNS := [
 	{"id": "times_robbed", "highlight": false},     # owner: praise only; shown, never ranked or highlighted
 ]
 const SYNTH_QUIET := "news_quiet"     # the server sends news: [] for a quiet night
+const GOAL_STATES := ["open", "done", "failed", "end"]
+const UNKNOWN_LOG_CAP := 64           # chosen: distinct unknown values logged per run, so a hostile server cannot flood
+## Every beat kind the adapter can emit; the Stage must handle each (a test checks both directions).
+const BEAT_KINDS := ["move_resource", "shield_on", "blocked", "empty", "learn", "marked", "status", "camp", "charm",
+	"total", "quiet", "event", "unknown"]
 
 static var _seen_unknown := {}
 static var _codes: Dictionary = {}
@@ -38,10 +43,15 @@ static func line_codes() -> Array:
 
 ## Every translation key this adapter can ever emit. The theme completeness test compares a theme against this.
 static func all_keys() -> Array[String]:
-	var out: Array[String] = ["line.unknown", "list.and", "resource.ration", "status.outcast", "status.shield",
-		"move.unknown", "move.unknown.choice", "move.unknown.help", "band.unknown", "goal.unknown", "radio.unknown"]
+	var out: Array[String] = ["line.unknown", "line.now_have.one", "list.and", "resource.ration", "status.outcast",
+		"status.shield", "move.unknown", "move.unknown.choice", "move.unknown.help", "band.unknown", "goal.unknown",
+		"radio.unknown", "goal.state.unknown"]
 	for c in line_codes():
 		out.append("line." + c)
+	for s in GOAL_STATES:
+		out.append("goal.state." + s)
+	for col in END_COLUMNS:
+		out.append("column." + col.id)
 	for m in MOVES:
 		out.append_array(["move." + m, "move.%s.choice" % m, "move.%s.help" % m])
 	for b in BANDS:
@@ -55,9 +65,15 @@ static func all_keys() -> Array[String]:
 
 static func _unknown(kind: String, value: String) -> void:
 	var k := kind + ":" + value
-	if not _seen_unknown.has(k):
-		_seen_unknown[k] = true
-		Log.event("adapter", "unknown_" + kind, {"value": value}, "WARN")
+	if _seen_unknown.has(k):
+		return
+	if _seen_unknown.size() >= UNKNOWN_LOG_CAP:
+		if _seen_unknown.size() == UNKNOWN_LOG_CAP:
+			_seen_unknown["@capped"] = true
+			Log.event("adapter", "unknown_log_capped", {"cap": UNKNOWN_LOG_CAP}, "WARN")
+		return
+	_seen_unknown[k] = true
+	Log.event("adapter", "unknown_" + kind, {"value": value}, "WARN")
 
 
 static func forget_unknowns() -> void:
@@ -207,7 +223,10 @@ static func line(code: String, args: Dictionary, source := "private") -> Diction
 				slots[k] = {"list": args[k] if args[k] is Array else [args[k]]}
 			_:
 				slots[k] = args[k]
-	return {"code": code, "key": ("line." + code) if known else "line.unknown", "slots": slots,
+	var key := ("line." + code) if known else "line.unknown"
+	if code == "now_have" and _n(args, "rations") == 1:
+		key = "line.now_have.one"          # "1 ration", not "1 rations"
+	return {"code": code, "key": key, "slots": slots,
 		"beats": beats_for(code, args) if known else [_beat("unknown")], "source": source, "covered": false}
 
 
@@ -245,6 +264,9 @@ static func reveal_lines(view: Dictionary, me: String) -> Array:
 			news_rest.append(l)
 	for l in priv:
 		lines.append(line(l.code, l.get("args", {}), "private"))
+	# The server resolves in seat order, so same-kind public lines arrive in seat order; showing them that way would let
+	# a viewer infer who joined before whom, i.e. who is a human (review N14). Order by content instead.
+	news_rest.sort_custom(func(x, y): return _line_key(x) < _line_key(y))
 	for l in news_rest:
 		var a: Dictionary = l.get("args", {})
 		var ln := line(l.code, a, "news")
@@ -255,16 +277,23 @@ static func reveal_lines(view: Dictionary, me: String) -> Array:
 	return lines
 
 
+static func _line_key(l: Dictionary) -> String:
+	return str(l.get("code", "")) + "|" + JSON.stringify(l.get("args", {}), "", true)
+
+
+## Does one of my private lines already show this news line's outcome? With no known `me` nothing is covered: a
+## missing argument ("") must never be mistaken for me (review N26).
 static func _covered(code: String, a: Dictionary, me: String, stole_from: Dictionary, exposed_by_me: Dictionary) -> bool:
+	var mine := me != ""
 	match code:
 		"news_hit_1", "news_hit_n":
-			return _s(a, "victim") == me or stole_from.has(_s(a, "victim"))
+			return (mine and _s(a, "victim") == me) or stole_from.has(_s(a, "victim"))
 		"news_caught":
-			return me in [_s(a, "target"), _s(a, "thief")]
+			return mine and me in [_s(a, "target"), _s(a, "thief")]
 		"news_exposed", "news_exposed_back":
-			return me in [_s(a, "thief"), _s(a, "victim")] or exposed_by_me.has(_s(a, "thief"))
+			return (mine and me in [_s(a, "thief"), _s(a, "victim")]) or exposed_by_me.has(_s(a, "thief"))
 		"news_bandit", "news_rejoined", "news_idol":
-			return _s(a, "player") == me
+			return mine and _s(a, "player") == me
 	return false
 
 
@@ -285,11 +314,16 @@ static func band_id(band: Variant) -> String:
 
 ## Everyone's home, sorted by alias (never by list order, which could reveal join order). Others' band comes from the
 ## board only; null when ranges are off.
-static func roster(me: String, others: Array, board: Variant) -> Array:
+## `board_before` (the previous morning's board) lets the Stage show a band change; "" when unknown.
+static func roster(me: String, others: Array, board: Variant, board_before: Variant = null) -> Array:
 	var bands := {}
 	if board is Array:
 		for e in board:
 			bands[str(e.get("alias"))] = band_id(e.get("band"))
+	var bands_before := {}
+	if board_before is Array:
+		for e in board_before:
+			bands_before[str(e.get("alias"))] = band_id(e.get("band"))
 	var names: Array = others.duplicate()
 	if me != "":
 		names.append(me)
@@ -297,7 +331,7 @@ static func roster(me: String, others: Array, board: Variant) -> Array:
 	names.sort()
 	var out: Array = []
 	for n in names:
-		out.append({"alias": n, "is_me": n == me, "band": bands.get(n, "")})
+		out.append({"alias": n, "is_me": n == me, "band": bands.get(n, ""), "band_before": bands_before.get(n, "")})
 	return out
 
 
@@ -312,14 +346,19 @@ static func round_model(view: Dictionary) -> Dictionary:
 			_unknown("move", str(kind))
 		var targets: Array = view.legal[kind].duplicate()
 		targets.sort()
-		pickers.append({"move_id": kind if known else "unknown", "server_id": kind, "targets": targets,
+		var mid: String = kind if known else "unknown"
+		pickers.append({"move_id": mid, "server_id": kind, "targets": targets,
+			"key": "move." + mid, "help_key": "move.%s.help" % mid, "choice_key": "move.%s.choice" % mid,
 			"amounts": view.gift_amounts.duplicate() if kind == "gift" else [],
 			"takes_target": (kind not in UNTARGETED) if known else not targets.is_empty()})
-	var goal: Dictionary = me.get("goal", {})
+	var goal: Dictionary = me.get("goal") if me.get("goal") is Dictionary else {}
 	var gcode := str(goal.get("code", ""))
 	if gcode not in GOALS:
 		_unknown("goal", gcode)
-	var progress: Dictionary = me.get("goal_progress", {})
+	var progress: Dictionary = me.get("goal_progress") if me.get("goal_progress") is Dictionary else {}
+	var gstate := str(progress.get("state", ""))
+	if gstate not in GOAL_STATES:
+		_unknown("goal_state", gstate)
 	var pick: Variant = null
 	if view.get("my_pick") is Dictionary:
 		var p: Dictionary = view.my_pick
@@ -335,11 +374,13 @@ static func round_model(view: Dictionary) -> Dictionary:
 		"timer": {"seconds_left": view.seconds_left},
 		"me": {"alias": me.alias,
 			"resources": [{"id": "resource.ration", "amount": me.rations}],
-			"statuses": [{"id": "status.outcast", "on": me.bandit}, {"id": "status.shield", "on": bool(me.get("guarded"))}],
+			"statuses": [{"id": "status.outcast", "on": me.bandit}, {"id": "status.shield", "on": me.get("guarded") == true}],
 			"shields_left": me.get("guards_left")},
 		"goal": {"key": ("goal." + gcode) if gcode in GOALS else "goal.unknown",
 			"slots": {"text": str(goal.get("text", "")), "target": str(goal.get("target") if goal.get("target") != null else "")},
-			"state": str(progress.get("state", "")), "progress_text": str(progress.get("text", ""))},
+			"state": gstate if gstate in GOAL_STATES else "unknown",
+			"state_key": ("goal.state." + gstate) if gstate in GOAL_STATES else "goal.state.unknown",
+			"progress_text": str(progress.get("text", ""))},
 		"pickers": pickers, "my_pick": pick,
 		"locked": view.my_locked, "locked_count": view.locked_count, "seats_total": view.seats_total,
 		"radio": {"available": view.radio_available, "phrases": phrases},
@@ -348,14 +389,39 @@ static func round_model(view: Dictionary) -> Dictionary:
 
 
 ## `before` is the last round view (the only source of who is in the game when ranges are off); {} if unknown.
-static func reveal_model(view: Dictionary, me: String, before: Dictionary) -> Dictionary:
+static func reveal_model(view: Dictionary, me_arg: String, before: Dictionary) -> Dictionary:
+	var before_me: Dictionary = before.get("me") if before.get("me") is Dictionary else {}
+	var me := me_arg if me_arg != "" else str(before_me.get("alias", ""))      # one source of "who am I" (N26)
 	var lines := reveal_lines(view, me)
 	var beats: Array = []
 	for i in lines.size():
 		for b in lines[i].beats:
 			var bb: Dictionary = b.duplicate()
 			bb["line_index"] = i
+			# A public line names me by alias; the Stage and the arithmetic know me as ME. One name for one person,
+			# or my food is counted twice and the conservation sum is wrong (found by mutation M04).
+			if me != "":
+				if bb.from == me:
+					bb.from = ME
+				if bb.to == me:
+					bb.to = ME
 			beats.append(bb)
+	# The lines do not always add up to the night's real change (wilderness events and guard income carry no amount),
+	# so the animation would end on the wrong number. Make up the difference with one explicit beat.
+	var total_before := int(before_me.rations) if before_me.has("rations") else -1
+	var total_after := -1
+	var total_at := -1
+	for i in beats.size():
+		if beats[i].kind == "total":
+			total_after = int(beats[i].amount_in)
+			total_at = i
+	var residual := 0
+	if total_before >= 0 and total_after >= 0:
+		residual = (total_after - total_before) - net_for_me(beats)
+		if residual != 0:
+			var rb := _mv(OFFSTAGE, ME, residual, -1, "other") if residual > 0 else _mv(ME, OFFSTAGE, -residual, -1, "other")
+			rb["line_index"] = beats[total_at].line_index
+			beats.insert(total_at, rb)
 	var radio: Array = []
 	for r in view.get("radio", []):
 		var ph = r.get("phrase")
@@ -365,21 +431,36 @@ static func reveal_model(view: Dictionary, me: String, before: Dictionary) -> Di
 			radio.append({"key": "radio.unknown", "slots": {}})
 		else:
 			radio.append({"key": "radio." + ph, "slots": {"a": str(r.get("about") if r.get("about") != null else "")}})
-	var others: Array = before.get("aliases", [])
+	var others: Array = before.get("aliases", []).duplicate()      # a copy: never write into the caller's view
 	if others.is_empty() and view.get("board") is Array:
 		for e in view.board:
 			if e.alias != me:
 				others.append(e.alias)
 	return {"round": view.round, "lines": lines, "beats": beats, "radio": radio,
 		"timer": {"seconds_left": view.seconds_left},
-		"roster": roster(me, others, view.get("board")),
+		"totals": {"before": total_before if total_before >= 0 else null, "after": total_after if total_after >= 0 else null,
+			"residual": residual},
+		"roster": roster(me, others, view.get("board"), before.get("board")),
 		"roster_known": not others.is_empty(), "has_before_state": not before.is_empty()}
+
+
+## What my beats add up to: everything arriving at me minus everything leaving me.
+static func net_for_me(beats: Array) -> int:
+	var n := 0
+	for b in beats:
+		if b.kind != "move_resource":
+			continue
+		if b.to == ME:
+			n += b.amount_in
+		if b.from == ME:
+			n -= b.amount_out
+	return n
 
 
 static func end_model(view: Dictionary, me: String) -> Dictionary:
 	var rows: Array = []
 	for r in view.results:
-		var g: Dictionary = r.get("goal", {})
+		var g: Dictionary = r.get("goal") if r.get("goal") is Dictionary else {}
 		var gcode := str(g.get("code", ""))
 		if gcode not in GOALS:
 			_unknown("goal", gcode)
@@ -390,5 +471,10 @@ static func end_model(view: Dictionary, me: String) -> Dictionary:
 			"goal": {"key": ("goal." + gcode) if gcode in GOALS else "goal.unknown",
 				"slots": {"text": str(g.get("text", "")), "target": str(g.get("target") if g.get("target") != null else "")},
 				"done": r.goal_done}})
+	var columns: Array = []
+	for c in END_COLUMNS:
+		var cc: Dictionary = c.duplicate()
+		cc["key"] = "column." + c.id
+		columns.append(cc)
 	return {"winners": view.winners.duplicate(), "extracted": view.extracted.duplicate(), "rows": rows,
-		"columns": END_COLUMNS.duplicate(true)}
+		"columns": columns}

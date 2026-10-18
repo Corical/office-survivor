@@ -4,11 +4,22 @@ extends RefCounted
 ## times (once per action), so the rule is: a round's timeline is created once and never restarted.
 
 var timeline: Timeline
+var room := ""
 
 
-## A reveal model arrived. Same round again -> keep the running timeline. New round -> a new one, snapped to its end
-## when there is no before-state to animate from.
-func offer(model: Dictionary) -> Timeline:
+## Forget the running timeline (a new game, or a new room).
+func reset() -> void:
+	timeline = null
+	room = ""
+
+
+## A reveal model arrived. Same room and round again -> keep the running timeline. A new round -> a new one, snapped to
+## its end when there is no before-state to animate from. A different room starts afresh (the second game of an
+## evening must play from round 1 again).
+func offer(model: Dictionary, room_code := "") -> Timeline:
+	if room_code != room:
+		timeline = null
+		room = room_code
 	if timeline != null and int(model.round) <= timeline.round:
 		if int(model.round) < timeline.round:
 			Log.event("stage", "stale_reveal_ignored", {"got": model.round, "have": timeline.round}, "WARN")

@@ -17,6 +17,9 @@ config/icon="res://icon.svg"
 Log="*res://autoload/log.gd"
 Net="*res://autoload/net.gd"
 Session="*res://autoload/session.gd"
+Themes="*res://autoload/themes.gd"
+Feed="*res://autoload/model_feed.gd"
+Intents="*res://autoload/intents.gd"
 
 [display]
 

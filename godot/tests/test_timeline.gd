@@ -79,6 +79,17 @@ func test_the_same_reveal_pushed_again_never_restarts() -> void:
 	eq(p.timeline.index, 2, "still at beat 2 after 30 pushes")
 
 
+func test_a_new_room_starts_from_round_one_even_without_a_reset() -> void:
+	var p := TimelinePlayer.new()
+	var last := p.offer(_model(10, 3), "ROOMA")
+	last.advance(Timeline.DEFAULT_MS * 5)
+	var first := p.offer(_model(1, 3), "ROOMB")
+	check(first != last, "a different object")
+	eq(first.round, 1, "round 1 of the second game plays")
+	eq(first.index, 0, "from its first beat")
+	check(not first.finished, "not left over from the last game")
+
+
 func test_a_new_round_starts_a_new_timeline() -> void:
 	var p := TimelinePlayer.new()
 	var t1 := p.offer(_model(3, 4))

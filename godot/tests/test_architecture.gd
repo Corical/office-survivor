@@ -11,7 +11,12 @@ const CONTRACT_FIELDS := ["gift_amounts", "times_robbed", "gave_away", "guards_l
 const GAME_WORDS := ["ration", "bandit", "helicopter", "scavenge", "steal", "investigate", "gift", "guard", "idol",
 	"survivor"]
 ## Literals that make a screen own its look.
-const LOOK_LITERALS := ["Color(", "Color.", "res://themes/", "res://assets", ".ttf", ".png", ".svg"]
+const LOOK_LITERALS := ["Color(", "Color8(", "Color.", "res://themes/", "res://assets", ".ttf", ".png", ".svg", ".tres",
+	"Theme.new", "StyleBoxFlat", "add_theme_color", "add_theme_font"]
+## Screens talk to the world through Feed (models), Intents (taps), Words (text) and Themes (icons). These are the
+## doors they must not use: Session / Net hold the raw view, the rulesets and the registries know the game.
+const FORBIDDEN_DOORS := ["Session.", "Net.", "SurvivorsAdapter", "SurvivorsRuleset", "RulesetRegistry",
+	"ThemeRegistry", "rulesets/", "res://core/", "SessionStore", "Transport"]
 
 
 func _scripts(dir: String) -> Array[String]:
@@ -69,11 +74,11 @@ func test_no_screen_or_stage_script_owns_a_colour_font_or_asset_path() -> void:
 			check(not (lit in code), "%s contains '%s': looks belong to the theme" % [path, lit])
 
 
-func test_no_screen_or_stage_script_reaches_for_the_adapter_or_raw_views() -> void:
+func test_no_screen_or_stage_script_uses_a_door_it_must_not() -> void:
 	for path in _guarded():
 		var code := _code(path)
-		check(not ("SurvivorsAdapter" in code or "rulesets/" in code), "%s imports a ruleset" % path)
-		check(not ("Session.view" in code), "%s reads the raw server view" % path)
+		for d in FORBIDDEN_DOORS:
+			check(not (d in code), "%s uses '%s': go through Feed / Intents / Words / Themes" % [path, d])
 
 
 func test_ruleset_code_does_not_depend_on_screens_or_theme_files() -> void:

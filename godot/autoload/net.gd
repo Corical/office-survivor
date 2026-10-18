@@ -5,13 +5,17 @@ extends Node
 signal handshaken
 signal message_received(msg: Dictionary)
 signal state_changed(state: String)
-## The connection ended for a reason reconnecting cannot fix: seat_gone | upgrade_required | taken_over | too_big
+## The connection ended for a reason reconnecting cannot fix: seat_gone | upgrade_required | taken_over | too_big | flapping
 signal terminal(reason: String)
+## Nothing has arrived for a while on an idle connection: the owner of the seat should probe it (an idle half-open
+## socket otherwise looks alive for ever, because the server only speaks when something changes).
+signal probe_due
 
 const PROTO := 1
 const BACKOFF := [1.0, 2.0, 4.0, 8.0]   # seconds; chosen
 const HELLO_TIMEOUT_MS := 5000           # chosen: open but no hello_ok -> try again
-const ACK_TIMEOUT_MS := 8000             # chosen: the server answers every accepted intent with a view; silence = dead
+const ACK_TIMEOUT_MS := 8000             # chosen: the server answers every accepted intent; silence = dead
+const PROBE_MS := 30000                  # chosen: idle this long -> probe (a round is 180 s of silence otherwise)
 const TOO_BIG_TRIES := 2                 # chosen: oversize frames before we give up
 const MAX_TEXT := 64 * 1024              # chosen: bytes; the engine's own buffer limit proved looser than its name
 const STABLE_MS := 10000                 # chosen: a connection that lived this long was healthy; backoff restarts
@@ -21,7 +25,7 @@ const UNREACHABLE_AFTER := 4             # attempts before the banner says "can'
 const CLOSE_CODES := {4001: "seat_gone", 4002: "upgrade_required", 4003: "taken_over", 1009: "too_big"}
 ## The server knows who we are from the connection. An intent that names a seat is a bug, never sent.
 const FORBIDDEN_KEYS := ["seat", "pid", "player", "player_id", "seat_id"]
-## Intents that get no view back (the server answers leave by dropping us).
+## Intents that get no reply (the server answers leave by dropping us).
 const NO_REPLY := ["hello", "leave"]
 
 var transport: Transport
@@ -31,15 +35,17 @@ var url := ""
 var state := "offline"
 var handshake_done := false
 var attempt := 0
+var probe_ms := PROBE_MS
 var log_payloads := OS.is_debug_build()
 
 var _want := false
 var _retry_at := -1
 var _hello_deadline := -1
-var _ack_deadline := -1
+var _acks := {}                # intent type -> deadline (ms); one per kind of intent in flight (review N08)
 var _too_big := 0
 var _up_since := -1            # when the current connection got hello_ok
 var _short_lives := 0          # connections in a row that ended within STABLE_MS of hello_ok
+var _last_rx := 0
 
 
 func _ready() -> void:
@@ -64,13 +70,14 @@ func reset() -> void:
 	_want = false
 	_retry_at = -1
 	_hello_deadline = -1
-	_ack_deadline = -1
+	_acks.clear()
 	_too_big = 0
 	_up_since = -1
 	_short_lives = 0
 	attempt = 0
 	handshake_done = false
 	url = ""
+	probe_ms = PROBE_MS
 	if transport:
 		transport.close()
 	_set_state("offline")
@@ -95,7 +102,7 @@ func close() -> void:
 	_want = false
 	_retry_at = -1
 	_hello_deadline = -1
-	_ack_deadline = -1
+	_acks.clear()
 	handshake_done = false
 	transport.close()
 	_set_state("offline")
@@ -115,8 +122,38 @@ func send(t: String, fields := {}) -> String:
 	if not _send_raw(msg):
 		return "send_failed"
 	if not t in NO_REPLY:
-		_ack_deadline = clock.now_msec() + ACK_TIMEOUT_MS
+		_acks[t] = clock.now_msec() + ACK_TIMEOUT_MS
 	return ""
+
+
+## The reply to intent `t` arrived: stop waiting for it.
+func ack(t: String) -> void:
+	_acks.erase(t)
+
+
+## Stop waiting for every intent except those named.
+func ack_except(keep: Array) -> void:
+	for k in _acks.keys():
+		if not k in keep:
+			_acks.erase(k)
+
+
+## Drop this connection and open a new one after the next backoff step (a rate-limited resume, say).
+func reconnect_later() -> void:
+	if _want:
+		_drop_and_retry()
+
+
+## Drop this connection and open a new one now (the app came back from the background).
+func reconnect_now() -> void:
+	if not _want:
+		return
+	transport.close()
+	handshake_done = false
+	_hello_deadline = -1
+	_acks.clear()
+	_retry_at = clock.now_msec()
+	_set_state("reconnecting")
 
 
 func _process(_delta: float) -> void:
@@ -135,10 +172,16 @@ func tick() -> void:
 		_hello_deadline = -1
 		Log.event("net", "hello_timeout", {"url": url}, "WARN")
 		_drop_and_retry()
-	if _ack_deadline >= 0 and now >= _ack_deadline:
-		_ack_deadline = -1
-		Log.event("net", "ack_timeout", {"url": url}, "WARN")
-		_drop_and_retry()
+		return
+	for k in _acks.keys():
+		if now >= _acks[k]:
+			Log.event("net", "ack_timeout", {"intent": k, "url": url}, "WARN")
+			_drop_and_retry()
+			return
+	if handshake_done and probe_ms > 0 and now - _last_rx >= probe_ms and _acks.is_empty():
+		_last_rx = now
+		Log.event("net", "probe_due", {"idle_ms": probe_ms})
+		probe_due.emit()
 
 
 func _open() -> void:
@@ -155,6 +198,7 @@ func _open() -> void:
 func _drop_and_retry() -> void:
 	handshake_done = false
 	_hello_deadline = -1
+	_acks.clear()
 	transport.close()
 	_schedule_retry()
 
@@ -173,7 +217,7 @@ func _stop(reason: String) -> void:
 	_want = false
 	_retry_at = -1
 	_hello_deadline = -1
-	_ack_deadline = -1
+	_acks.clear()
 	handshake_done = false
 	transport.close()
 	_set_state("stopped")
@@ -183,6 +227,7 @@ func _stop(reason: String) -> void:
 
 func _on_opened() -> void:
 	Log.event("net", "open", {"url": url})
+	_last_rx = clock.now_msec()
 	_send_raw({"t": "hello", "proto": PROTO, "client_build": str(ProjectSettings.get_setting(
 		"application/config/version"))})
 
@@ -194,7 +239,7 @@ func _on_closed(code: int, reason: String) -> void:
 	_up_since = -1
 	handshake_done = false
 	_hello_deadline = -1
-	_ack_deadline = -1
+	_acks.clear()
 	if lived >= STABLE_MS:
 		attempt = 0
 		_short_lives = 0
@@ -227,8 +272,9 @@ func _on_binary(size: int) -> void:
 
 
 func _on_text(text: String) -> void:
-	if state == "stopped":
-		Log.event("net", "dropped_after_stop", {"bytes": text.length()})
+	if state == "stopped" or not _want:
+		# a frame that was already on its way when we closed on purpose must not move the game (review N05)
+		Log.event("net", "dropped_unwanted", {"bytes": text.length(), "state": state})
 		return
 	if text.length() > MAX_TEXT / 4 and text.to_utf8_buffer().size() > MAX_TEXT:
 		_too_big += 1
@@ -243,7 +289,7 @@ func _on_text(text: String) -> void:
 		Log.event("net", "dropped_not_a_message", {"bytes": text.length(), "head": text.left(60)}, "WARN")
 		return
 	var msg: Dictionary = normalize(data)
-	_ack_deadline = -1
+	_last_rx = clock.now_msec()
 	if msg.t != "hello_ok":
 		_too_big = 0              # a real message got through, so the size problem was one-off
 	Log.event("net", "rx", {"t": msg.t, "bytes": text.length()})
@@ -251,6 +297,9 @@ func _on_text(text: String) -> void:
 		Log.event("net", "rx_payload", {"json": JSON.stringify(redact(msg))})
 	match msg.t:
 		"hello_ok":
+			if handshake_done:
+				Log.event("net", "duplicate_hello_ok", {}, "WARN")      # review N06: never re-fire the handshake
+				return
 			handshake_done = true
 			_hello_deadline = -1
 			_up_since = clock.now_msec()      # attempt is NOT reset here: only a connection that stays up earns that

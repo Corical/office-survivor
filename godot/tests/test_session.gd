@@ -15,11 +15,12 @@ func test_create_with_a_stored_seat_sends_create_not_resume() -> void:
 
 func test_create_while_online_in_a_room_starts_over() -> void:
 	in_round()
+	var creates_before := fake.count("create_room")        # the one the test helper sent to get the first seat
 	Session.begin("create_room")
 	eq(Net.state, "connecting", "old connection closed, new one opening")
 	fake.server_open()
 	fake.server_send({"t": "hello_ok", "proto": 1})
-	eq(fake.count("create_room"), 1, "create sent")
+	eq(fake.count("create_room"), creates_before + 1, "exactly one new create sent")
 	eq(fake.count("resume"), 0, "no resume with the old seat")
 
 

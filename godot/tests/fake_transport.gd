@@ -16,7 +16,7 @@ func open(url: String) -> Error:
 func send_text(text: String) -> Error:
 	if not _open:
 		return ERR_UNAVAILABLE
-	sent.append(SafeJson.parse(text))
+	sent.append(Net.normalize(SafeJson.parse(text)))      # as the server would read it: whole numbers are ints
 	return OK
 
 

@@ -32,10 +32,10 @@ class _Sink extends Logger:
 
 
 func _init() -> void:
-	for a in OS.get_cmdline_user_args():
-		if a.begins_with("--log="):
-			path = a.substr(6)
-	_file = FileAccess.open(path, FileAccess.WRITE)     # one log per run
+	path = path_from(OS.get_cmdline_user_args(), OS.is_debug_build(), DEFAULT_PATH)
+	if not is_tooling(OS.get_cmdline_args()):            # an import or export must not touch the player's log
+		rotate_file(path)
+		_file = FileAccess.open(path, FileAccess.WRITE)  # one log per run; the run before it is kept as <path>.1
 	_sink = _Sink.new()
 	_sink.log_node = self
 	OS.add_logger(_sink)
@@ -47,12 +47,41 @@ func _exit_tree() -> void:
 	OS.remove_logger(_sink)
 
 
-## Structured line: `name key=value key=value`. Values are written with str(); strings with spaces are quoted.
+## Which file this run logs to: `--log=<path>` after `--`, but only in a debug build (a release build never lets a
+## command line choose where it writes).
+static func path_from(user_args: PackedStringArray, debug: bool, default_path: String) -> String:
+	if debug:
+		for a in user_args:
+			if a.begins_with("--log="):
+				return a.substr(6)
+	return default_path
+
+
+## Is this an import / export / editor run, which must not open (and truncate) the player's log?
+static func is_tooling(args: PackedStringArray) -> bool:
+	for a in args:
+		if a in ["--import", "--editor", "-e", "--export-debug", "--export-release", "--export-pack", "--export-patch"]:
+			return true
+	return false
+
+
+## Keep the previous run's log as <path>.1 before this run truncates it.
+static func rotate_file(p: String) -> void:
+	if FileAccess.file_exists(p):
+		DirAccess.copy_absolute(ProjectSettings.globalize_path(p), ProjectSettings.globalize_path(p) + ".1")
+
+
+## Structured line: `name key=value key=value`. Values are single-line: newlines are escaped and quotes backslashed, so
+## a server-controlled value can never forge a second log line; long values are cut.
 func event(tag: String, name: String, fields := {}, level := "INFO") -> void:
 	var parts := [name]
 	for k in fields:
-		var v := str(fields[k])
-		parts.append("%s=%s" % [k, ('"%s"' % v) if " " in v else v])
+		var v := str(fields[k]).replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r")
+		if v.length() > 300:
+			v = v.left(300) + "..."
+		if " " in v or "=" in v or '"' in v:
+			v = '"%s"' % v.replace('"', '\\"')
+		parts.append("%s=%s" % [k, v])
 	write_line(level, tag, " ".join(parts))
 
 
@@ -69,8 +98,10 @@ func error(tag: String, msg: String) -> void:
 
 
 func write_line(level: String, tag: String, msg: String, echo := true) -> void:
-	var t := Time.get_datetime_string_from_system()
-	var text := "%s.%03d %s [%s] %s" % [t, Time.get_ticks_msec() % 1000, level, tag, msg]
+	var unix := Time.get_unix_time_from_system()
+	var local := int(unix) + int(Time.get_time_zone_from_system().get("bias", 0)) * 60     # local time, like before
+	var text := "%s.%03d %s [%s] %s" % [Time.get_datetime_string_from_unix_time(local), int(fmod(unix, 1.0) * 1000.0),
+		level, tag, msg]
 	_mutex.lock()
 	lines.append(text)
 	if lines.size() > KEEP:

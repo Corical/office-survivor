@@ -44,9 +44,11 @@ def play(seed, sink0):
         g.connect(i)                  # a real client is connected; early advance only waits for connected humans
     g.start()
 
-    def sink(seed_, pid, msg):
-        """Record a view together with whose it is: `me` and the other aliases, straight from the room's state."""
-        sink0(seed_, pid, msg, g.players[pid].name, sorted(q.name for q in g._active() if q.pid != pid))
+    last_round = {}                       # pid -> the round view that opened the night: a reveal's before-state
+
+    def sink(seed_, pid, msg, before=None):
+        """Record a view with whose it is (`me`, the other aliases) and, for a reveal, the round view it followed."""
+        sink0(seed_, pid, msg, g.players[pid].name, sorted(q.name for q in g._active() if q.pid != pid), before)
 
     sink(seed, 0, views.lobby(g, 0, "HARV", True))
     steps = 0
@@ -54,7 +56,8 @@ def play(seed, sink0):
         steps += 1
         if g.phase == "round":
             for pid in range(humans):
-                sink(seed, pid, views.round_view(g, pid))
+                last_round[pid] = views.round_view(g, pid)
+                sink(seed, pid, last_round[pid])
                 legal, amounts = g.legal_for(pid)
                 kinds = [k for k in legal if k != "gift" or amounts]
                 if not kinds:
@@ -73,7 +76,7 @@ def play(seed, sink0):
                 sched.advance(sched.now() + 200)        # past the 180 s timer and every bot's lock moment
         elif g.phase == "reveal":
             for pid in range(humans):
-                sink(seed, pid, views.reveal_view(g, pid))
+                sink(seed, pid, views.reveal_view(g, pid), last_round.get(pid))
             for pid in range(humans):
                 try:
                     g.continue_(pid)
@@ -95,12 +98,15 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     seen, rows, codes = set(), [], {}
 
-    def sink(seed, pid, msg, me, others):
-        key = json.dumps(msg, sort_keys=True, ensure_ascii=False)
+    def sink(seed, pid, msg, me, others, before=None):
+        key = json.dumps([msg, before], sort_keys=True, ensure_ascii=False)
         if key in seen:
             return
         seen.add(key)
-        rows.append({"game": seed, "pid": pid, "me": me, "others": others, "msg": msg})
+        row = {"game": seed, "pid": pid, "me": me, "others": others, "msg": msg}
+        if before is not None:
+            row["before"] = before
+        rows.append(row)
         if msg["t"] == "reveal":
             for part in ("news", "private"):
                 for ln in msg[part]:

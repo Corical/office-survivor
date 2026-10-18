@@ -49,6 +49,34 @@ UI = {
 }
 for k, v in RADIO.items():
     UI["radio." + k] = v
+UI.update({
+    "line.now_have.one": "You now have {rations} ration.",
+    "goal.state.open": "In progress", "goal.state.done": "Done", "goal.state.failed": "Lost",
+    "goal.state.end": "Decided at the end", "goal.state.unknown": "Unknown",
+    "column.score": "Points", "column.rations": "Rations", "column.stole": "Stole",
+    "column.gave_away": "Gave away", "column.times_robbed": "Robbed",
+    # ruleset-neutral words (core/ui_keys.gd)
+    "ui.app_name": "Arena", "ui.create_room": "Create room", "ui.join_room": "Join room", "ui.enter_code": "Room code",
+    "ui.server_address": "Server address", "ui.resume": "Resume game", "ui.start": "Start game", "ui.lock": "Lock in",
+    "ui.locked": "Locked in", "ui.locking": "Locking in...", "ui.continue": "Continue", "ui.leave": "Leave game",
+    "ui.back_to_title": "Back to title", "ui.new_game": "New game", "ui.settings": "Settings",
+    "ui.room_code": "Room {code}", "ui.seats": "{taken} of {total} seats taken", "ui.you_are": "You are {alias}",
+    "ui.locked_count": "{locked} of {total} locked in", "ui.round_of": "Round {round} of {rounds}", "ui.radio": "Radio",
+    "ui.goal": "Your goal", "ui.winners": "Winners", "ui.results": "Results", "ui.theme": "Theme",
+    "ui.timer_unknown": "Waiting for the server", "ui.waiting_for_host": "Waiting for the host to start",
+    "ui.copy": "Copy",
+    "ui.net.connecting": "Connecting...", "ui.net.online": "Connected", "ui.net.reconnecting": "Reconnecting...",
+    "ui.net.unreachable": "Can't reach the server", "ui.net.offline": "Offline", "ui.net.stopped": "Disconnected",
+    "notice.seat_gone": "That game is no longer available.",
+    "notice.taken_over": "This seat was opened on another device.",
+    "notice.too_big": "The server sent something too large.",
+    "notice.flapping": "The connection keeps dropping. Another device may have your seat.",
+    "notice.upgrade_required": "Please update the app to play.",
+    "notice.invalid": "The server sent something this app could not read.",
+    "notice.unknown": "The server sent something this app doesn't know.",
+    "notice.generic": "{text}", "notice.no_server_url": "Enter the server address first.",
+    "notice.locked": "Your move is locked in.", "notice.in_flight": "Already sent.",
+})
 
 
 def strip_emoji(text):

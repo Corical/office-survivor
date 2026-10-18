@@ -21,6 +21,7 @@ func setup() -> void:
 	Net.log_payloads = false
 	Session.reset(store, clock)
 	Session.server_url = "ws://test"
+	Feed.reset()
 	notices.clear()
 	if not Session.notice.is_connected(_on_notice):
 		Session.notice.connect(_on_notice)
@@ -62,7 +63,10 @@ func go_online() -> void:
 	fake.server_send({"t": "hello_ok", "proto": 1})
 
 
+## The server's `seat` reply. A seat nobody asked for is ignored (review N06), so ask for one first, as a client would.
 func give_seat(tok := "tok-secret-1", room := "ABCD", is_host := true) -> void:
+	if not Session.expecting_seat():
+		Session.act("create_room")
 	fake.server_send({"t": "seat", "token": tok, "room_code": room, "alias": "Mango", "host": is_host})
 
 

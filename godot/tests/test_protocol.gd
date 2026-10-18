@@ -104,6 +104,19 @@ func test_net_itself_drops_frames_after_a_terminal_stop() -> void:
 	eq(seen, [], "nothing emitted after the stop")
 
 
+func test_net_itself_drops_frames_after_a_deliberate_close() -> void:
+	# independent of Session's own offline guard: Net must not even emit a message once we closed on purpose
+	in_round()
+	Net.close()
+	var seen := []
+	var cb := func(m): seen.append(m.t)
+	Net.message_received.connect(cb)
+	fake.server_send(round_view(2))
+	fake.server_send({"t": "seat", "token": "ghost", "room_code": "GHOS", "alias": "X", "host": false})
+	Net.message_received.disconnect(cb)
+	eq(seen, [], "nothing emitted after a deliberate close")
+
+
 func test_upgrade_required_by_close_code_alone() -> void:
 	go_online()
 	fake.server_close(4002, "upgrade_required")      # the message may have been lost to the engine

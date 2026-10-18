@@ -3,7 +3,7 @@
   "args": [
    "amount"
   ],
-  "count": 1011,
+  "count": 1014,
   "in": [
    "private"
   ]
@@ -59,7 +59,7 @@
   "args": [
    "line"
   ],
-  "count": 1258,
+  "count": 1261,
   "in": [
    "news",
    "private"
@@ -136,7 +136,7 @@
    "amount",
    "receiver"
   ],
-  "count": 179,
+  "count": 180,
   "in": [
    "private"
   ]
@@ -252,7 +252,7 @@
    "total",
    "victim"
   ],
-  "count": 93,
+  "count": 94,
   "in": [
    "news"
   ]
@@ -279,7 +279,7 @@
   "args": [
    "rations"
   ],
-  "count": 1187,
+  "count": 1190,
   "in": [
    "private"
   ]
@@ -304,7 +304,7 @@
   "args": [
    "found"
   ],
-  "count": 161,
+  "count": 162,
   "in": [
    "private"
   ]
@@ -342,7 +342,7 @@
    "amount",
    "target"
   ],
-  "count": 265,
+  "count": 266,
   "in": [
    "private"
   ]
