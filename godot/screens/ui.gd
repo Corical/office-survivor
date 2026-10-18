@@ -135,9 +135,7 @@ static func picture(tex: Texture2D, min_size: Vector2, id := "") -> TextureRect:
 static func page(owner_control: Control) -> VBoxContainer:
 	owner_control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var margin := _margin(owner_control)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
+	var scroll := _scroller(margin)
 	var col := vbox(12)
 	scroll.add_child(col)
 	return col
@@ -156,9 +154,7 @@ static func page_docked(owner_control: Control) -> Dictionary:
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 16 if side != "bottom" else 4)
 	root.add_child(margin)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
+	var scroll := _scroller(margin)
 	var col := vbox(12)
 	scroll.add_child(col)
 	var dock := card("Dock")
@@ -167,6 +163,19 @@ static func page_docked(owner_control: Control) -> Dictionary:
 	var dock_col := vbox(8)
 	dock.add_child(dock_col)
 	return {"col": col, "dock": dock_col}
+
+
+## A page's scroller: vertical only, with no visible scrollbar (a bar that appears takes width and moves the whole page), and a
+## ScrollHint over it that says when there is more below.
+static func _scroller(margin: Control) -> ScrollContainer:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	margin.add_child(scroll)
+	var hint := ScrollHint.new()
+	margin.add_child(hint)
+	hint.setup(scroll)
+	return scroll
 
 
 static func _margin(owner_control: Control) -> MarginContainer:

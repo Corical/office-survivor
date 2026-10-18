@@ -71,7 +71,11 @@ func _signature(m: Dictionary) -> String:
 func _refresh_live() -> void:
 	var lc := Ui.find(self, "locked_count") as Label
 	if lc != null:
-		lc.text = Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total})
+		var words := Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total})
+		if lc is FitLabel:
+			(lc as FitLabel).set_fit_text(words)
+		else:
+			lc.text = words
 	if _lanterns != null:
 		Ui.set_lit(_lanterns, int(_m.locked_count))
 	_tick()
@@ -375,14 +379,20 @@ func _target_button(alias: String, chosen: bool, open: bool) -> Button:
 func _dock(dock: VBoxContainer, open: bool) -> void:
 	var top := Ui.hbox(12)
 	top.alignment = BoxContainer.ALIGNMENT_CENTER
+	if _m.radio.available:
+		var radio := Ui.button(Words.render("ui.radio"), "radio_toggle", func():
+			_radio_open = not _radio_open
+			_radio_phrase = {}
+			_build(), not open, "", "radio")
+		radio.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		radio.custom_minimum_size = Vector2(0, 48)
+		top.add_child(radio)
 	_lanterns = Ui.lanterns(int(_m.seats_total), int(_m.locked_count), "lanterns")
 	if _lanterns != null:
 		_lanterns.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		top.add_child(_lanterns)
-	var count := Ui.label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}), "locked_count",
-		"MutedLabel")
-	count.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	count.autowrap_mode = TextServer.AUTOWRAP_OFF            # a shrunk, wrapping label collapses to one letter per line
+	var count := Ui.name_label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}),
+		"locked_count", "MutedLabel")
 	top.add_child(count)
 	dock.add_child(top)
 	var state: String = _m.lock.state
@@ -452,11 +462,7 @@ func _radio(open: bool) -> VBoxContainer:
 	var s := Ui.vbox(8)
 	if not _m.radio.available:
 		return s
-	s.add_child(Ui.button(Words.render("ui.radio"), "radio_toggle", func():
-		_radio_open = not _radio_open
-		_radio_phrase = {}
-		_build(), not open, "", "radio"))
-	if _radio_open:
+	if _radio_open:                                    # (the Radio button itself lives in the dock, where it cannot be hidden)
 		var phrases := Ui.flow()
 		for ph in _m.radio.phrases:
 			phrases.add_child(Ui.button(Words.render(ph.key, {"a": "..."}), "phrase_" + ph.server_id,
