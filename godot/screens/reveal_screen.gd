@@ -119,14 +119,19 @@ func _build() -> void:
 
 
 func _head() -> Control:
+	var plate := Ui.card("Scrim")
 	var row := Ui.hbox(10)
-	row.add_child(Ui.label(Words.render("ui.reveal_title"), "reveal_title", "HeaderLabel"))
-	_timer_label = Ui.label("", "timer_label", "MutedLabel")
+	plate.add_child(row)
+	var title := Ui.label(Words.render("ui.reveal_title"), "reveal_title", "HeaderLabel")
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	row.add_child(title)
+	_timer_label = Ui.label("", "timer_label", "HeaderLabel")
 	_timer_label.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_timer_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(_timer_label)
-	return row
+	return plate
 
 
 ## The Stage, with the Skip pill laid over its top right corner.

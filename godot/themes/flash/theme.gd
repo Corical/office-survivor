@@ -424,12 +424,13 @@ static func _cards(th: Theme, t: ThemeDef, _bold: Font) -> void:
 	# LogLine / LogLineHot: one line of the night's written log: a card, the newest one lit
 	th.set_type_variation("LogLine", "PanelContainer")
 	th.set_type_variation("LogLineHot", "PanelContainer")
-	if frame != null:
-		th.set_stylebox("panel", "LogLine", _tint(frame, Color(1, 1, 1), 18, 9))
-		th.set_stylebox("panel", "LogLineHot", _tint(frame, Color(1.75, 1.35, 0.9), 18, 9))
-	else:
-		th.set_stylebox("panel", "LogLine", _pad(_flat(SURFACE, 12, Color("33477a"), 2, 4, 2), 14, 8))
-		th.set_stylebox("panel", "LogLineHot", _pad(_flat(Color("33281a"), 12, EMBER, 3, 6, 2), 14, 8))
+	# a flat dark panel with a brass rim: roomy padding so the words never touch the rim, and the lit line (ember rim, warm
+	# fill, same padding so nothing jumps) stays as readable as the rest
+	th.set_stylebox("panel", "LogLine", _pad(_flat(Color(0.06, 0.09, 0.17, 0.88), 14, Color("a8803a"), 2, 4, 2), 18, 12))
+	th.set_stylebox("panel", "LogLineHot", _pad(_flat(Color(0.2, 0.15, 0.09, 0.94), 14, EMBER, 3, 8, 2), 18, 12))
+	# Scrim: a dark plate behind loose text that sits over the scene (a screen title, a clock)
+	th.set_type_variation("Scrim", "PanelContainer")
+	th.set_stylebox("panel", "Scrim", _pad(_flat(Color(0.03, 0.05, 0.1, 0.8), 14, Color(0.66, 0.5, 0.23, 0.6), 1, 0, 0), 14, 7))
 	# Plate: a name plate: the same frame with tighter margins
 	th.set_type_variation("Plate", "PanelContainer")
 	if frame != null:
