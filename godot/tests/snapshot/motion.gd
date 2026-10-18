@@ -81,6 +81,29 @@ func _ready() -> void:
 		_audit("reveal waiting %dx%d" % [s.x, s.y])
 	await _size(PHONE)
 
+	# ---- 4a. the animation has finished: is the stage still alive over 10 s of waiting?
+	Feed.player.timeline.snap_to_end()
+	await _wait(0.5)
+	await _idle("waiting_idle_phone", 10.0, Rect2i(0, 120, 540, 440))
+
+	# ---- 4a2. a caught steal and an exposure, frame by frame (the beat is parked at its start and played at 30 fps)
+	for spec in [["caught_steal", "blocked", "guard"], ["exposed", "marked", "exposed"]]:
+		var beats: Array = Feed.models.reveal.beats
+		var at := -1
+		for i in beats.size():
+			if beats[i].kind == spec[1] and beats[i].style == spec[2]:
+				at = i
+				break
+		if at < 0:
+			print("no beat ", spec)
+			continue
+		var tl: Timeline = Feed.player.timeline
+		await _record(spec[0], func():
+			tl.finished = false
+			tl.index = at
+			tl.elapsed_ms = 0.0, 36)
+		await _shot("%s_%s_end" % [tag, spec[0]])
+
 	# ---- 4b. reveal -> round (the next night starts), then the same reveal again
 	var next_round: Dictionary = round_msg.duplicate(true)
 	next_round["round"] = int(round_msg.round) + 1
@@ -139,6 +162,31 @@ func _ready() -> void:
 	print("CLEARANCE TOTAL: %d violations in %d audits, %d distinct offenders" % [violations, audits, violation_paths.size()])
 	print("MOTION DONE ", out_dir)
 	get_tree().quit(0)
+
+
+## The stage region of the reveal at rest for `secs` seconds at 30 fps: the mean difference between frames one second apart
+## (a still picture scores 0) and a strip of the first, middle and last frames.
+func _idle(label: String, secs: float, region: Rect2i) -> void:
+	var imgs: Array[Image] = []
+	for i in int(secs * 30.0):
+		var g := await _grab()
+		imgs.append(g.get_region(region))
+	var per_second: Array[float] = []
+	for i in range(30, imgs.size(), 30):
+		per_second.append(_diff(imgs[i - 30], imgs[i]))
+	var consecutive := 0.0
+	for i in range(1, imgs.size()):
+		consecutive += _diff(imgs[i - 1], imgs[i])
+	consecutive /= float(imgs.size() - 1)
+	var line := "%s,%s,mean_consecutive=%.2f,between_seconds=%s" % [tag, label, consecutive, ";".join(per_second.map(func(d): return "%.2f" % d))]
+	_csv.append(line)
+	print("IDLE ", line)
+	var strip := Image.create(region.size.x * 3, region.size.y, false, Image.FORMAT_RGB8)
+	for k in 3:
+		var p := imgs[mini(k * (imgs.size() - 1) / 2, imgs.size() - 1)].duplicate() as Image
+		p.convert(Image.FORMAT_RGB8)
+		strip.blit_rect(p, Rect2i(Vector2i.ZERO, region.size), Vector2i(k * region.size.x, 0))
+	strip.save_png(out_dir.path_join("%s_%s_strip.png" % [tag, label]))
 
 
 func _frames(n: int) -> void:

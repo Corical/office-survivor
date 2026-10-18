@@ -170,6 +170,9 @@ static func _fx() -> Dictionary:
 		"stage.burst": {"sparks": 12, "speed": 190.0, "motion": true},
 		"stage.pop": {"time": 0.55},
 		# the huts breathe all the time (a fraction of the hut's height, and the seconds one breath takes)
+		# a caught or exposed thief's hut flashes (the effect is on while this entry is present)
+		"stage.alert": {"motion": true},
+		"beat.blocked.caught.guard": {"motion": true},        # a thief stopped by a guard (not by an idol) is flagged
 		"stage.idle": {"breathe": 0.035, "period": 3.4, "motion": true},
 		# which colour a kind of movement is tinted by (the ruleset's style ids -> colour names; the rest is untinted)
 		"stage.style": {"steal": "loss", "robbed": "loss", "hit": "loss", "fine": "mark", "bounty": "mark", "return": "gold",

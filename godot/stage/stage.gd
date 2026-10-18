@@ -59,6 +59,8 @@ var _flash := 0.0
 var _hit_pause := 0.0
 var _bubble := {}                       # alias -> 0..1, how far its shield bubble has grown
 var _dark := {}                         # alias -> 0..1, how far its hut has gone dark
+var _hurt := {}                         # alias (or ME) -> 1..0, a caught thief's hut flashing red
+var _exposed := {}                      # alias (or ME) -> 1..0, an exposed thief's hut tinted violet
 var _food_shown := 0.0
 var _food_pop := 0.0
 var _shown_int := 0
@@ -124,6 +126,8 @@ func _load() -> void:
 		_pool.clear()
 		_bubble = {}
 		_dark = {}
+		_hurt = {}
+		_exposed = {}
 		_hit_pause = 0.0
 		_shake = 0.0
 		_flash = 0.0
@@ -348,6 +352,11 @@ func _animate(dt: float, real: float) -> void:
 		var a: String = e.alias
 		if not e.is_me and _band_shown.get(a, "") != _band_of(e):
 			_build_plate(e)                               # its band label is now explained by what has played
+		for k in [a, ME]:
+			if _hurt.has(k):
+				_hurt[k] = move_toward(float(_hurt[k]), 0.0, dt * 1.4)
+			if _exposed.has(k):
+				_exposed[k] = move_toward(float(_exposed[k]), 0.0, dt * 0.45)
 		_bubble[a] = move_toward(float(_bubble.get(a, 0.0)), 1.0 if _shield_goal(e) else 0.0, dt * 2.6)
 		_dark[a] = move_toward(float(_dark.get(a, 0.0)), 1.0 if _outcast_goal(e) else 0.0, dt * 2.0)
 	var goal := float(_food_mine)
@@ -416,6 +425,8 @@ func _on_beat(b: Dictionary) -> void:
 			_ring(at, "shield", _hut_px * 0.5, _hut_px * 1.7, 0.5)
 			_burst(at, "gold")
 			_impact(b)
+			if b.from != OFFSTAGE:
+				_caught_thief(b.from, from_pos, str(b.style))
 		"empty":
 			_puffs(at)
 		"learn":
@@ -424,6 +435,8 @@ func _on_beat(b: Dictionary) -> void:
 			_ring(at, "mark", _hut_px * 0.4, _hut_px * 1.5, 0.6)
 			_ring(at, "mark", _hut_px * 0.3, _hut_px * 1.1, 0.6, 0.18)
 			_burst(at, "mark")
+			if b.to != OFFSTAGE and not Themes.fx("stage.alert").is_empty():
+				_exposed[b.to] = 1.0                        # the exposed thief's hut stays violet for a couple of seconds
 		"status":
 			_ring(at, "loss", _hut_px * 0.4, _hut_px * 1.4, 0.6)
 			_burst(at, "loss")
@@ -444,6 +457,17 @@ func _on_beat(b: Dictionary) -> void:
 		_:                               # a happening in the world, or a beat this Stage has no special effect for
 			_burst(c, "gold")
 			_ring(c, "glow", _hut_px * 0.6, _hut_px * 1.8, 0.7)
+
+
+## A thief who walked into a block that catches thieves (the theme says which styles do): their own hut flashes red and sparks
+## fly off it, so the eye goes to who was caught, not only to the guard's bubble. (The fine then flies from the thief as the
+## move beat that follows.)
+func _caught_thief(who: String, at: Vector2, style: String) -> void:
+	if Themes.fx("beat.blocked.caught." + style).is_empty():
+		return
+	_hurt[who] = 1.0
+	_ring(at, "hit", _hut_px * 0.4, _hut_px * 1.5, 0.6)
+	_burst(at, "loss")
 
 
 ## Food leaving one place for another: crumbs in arcs with trails, "+N" where it lands and "-N" where it came from.
@@ -686,6 +710,13 @@ func _draw_home(e: Dictionary, font: Font, ink: Color) -> void:
 	var tex: Texture2D = _tex.hut_me if (e.is_me and _tex.hut_me != null) else _tex.hut
 	var dark := float(_dark.get(e.alias, 0.0))
 	var tint := Themes.color("white").lerp(Themes.color("cold").darkened(0.6), dark * 0.75)
+	var who: String = ME if e.is_me else e.alias
+	var hurt := float(_hurt.get(who, 0.0))
+	var exposed := float(_exposed.get(who, 0.0))
+	if hurt > 0.0:
+		tint = tint.lerp(Themes.color("hit"), hurt * (0.55 + 0.25 * sin(_t * 26.0)))       # a quick red flicker
+	if exposed > 0.0:
+		tint = tint.lerp(Themes.color("mark"), exposed * 0.6)
 	draw_set_transform(_shake_off + at + Vector2(0, hs * 0.43), 0.0, Vector2(1.0, 0.26))
 	draw_circle(Vector2.ZERO, hs * 0.55, Themes.color("shade"))
 	draw_set_transform(_shake_off, 0.0, Vector2.ONE)
@@ -795,6 +826,8 @@ func _draw_beat(cur: Dictionary, p: float, c: Vector2) -> void:
 	var kind: String = cur.kind
 	if kind == "learn":
 		draw_line(from_pos, to_pos, Themes.color_a("white", 0.5 * sin(p * PI)), 2.0, true)
+	if kind == "marked" and cur.from != OFFSTAGE:                  # the exposer points at the thief
+		draw_line(from_pos, to_pos, Themes.color_a("mark", 0.85 * sin(p * PI)), 4.0, true)
 	if kind == "move_resource":
 		if Themes.fx("stage.crumbs").is_empty():
 			_draw_travelling_food(cur, from_pos, to_pos, p)
