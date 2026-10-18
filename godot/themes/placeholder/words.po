@@ -339,6 +339,9 @@ msgstr "Already sent."
 msgid "notice.invalid"
 msgstr "The server sent something this app could not read."
 
+msgid "notice.kicked"
+msgstr "The host removed you from this game. You can join again with a code."
+
 msgid "notice.locked"
 msgstr "Your move is locked in."
 
@@ -480,6 +483,15 @@ msgstr "Hide settings"
 msgid "ui.join_room"
 msgstr "Join room"
 
+msgid "ui.kick"
+msgstr "Remove"
+
+msgid "ui.kick_confirm"
+msgstr "Remove this player?"
+
+msgid "ui.kick_help"
+msgstr "A seat that dropped off stays taken. Remove it to free the seat."
+
 msgid "ui.leave"
 msgstr "Leave game"
 
@@ -597,8 +609,17 @@ msgstr "Everyone"
 msgid "ui.round_of"
 msgstr "Round {round} of {rounds}"
 
+msgid "ui.seat_dropped"
+msgstr "Not connected"
+
+msgid "ui.seat_here"
+msgstr "Here"
+
 msgid "ui.seat_mark"
 msgstr "seat"
+
+msgid "ui.seat_n"
+msgstr "Seat {n}"
 
 msgid "ui.seats"
 msgstr "{taken} of {total} seats taken"

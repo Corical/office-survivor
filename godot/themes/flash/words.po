@@ -339,6 +339,9 @@ msgstr "Already sent."
 msgid "notice.invalid"
 msgstr "The server sent something this app could not read."
 
+msgid "notice.kicked"
+msgstr "The host sent you away from the camp. You can find your way back with a code."
+
 msgid "notice.locked"
 msgstr "Your move is locked in."
 
@@ -480,6 +483,15 @@ msgstr "Hide settings"
 msgid "ui.join_room"
 msgstr "Join camp"
 
+msgid "ui.kick"
+msgstr "Send away"
+
+msgid "ui.kick_confirm"
+msgstr "Send this player away?"
+
+msgid "ui.kick_help"
+msgstr "A seat that dropped off stays taken. Send them away to free the seat."
+
 msgid "ui.leave"
 msgstr "Leave camp"
 
@@ -597,8 +609,17 @@ msgstr "AROUND THE FIRE"
 msgid "ui.round_of"
 msgstr "Night {round} of {rounds}"
 
+msgid "ui.seat_dropped"
+msgstr "Out in the dark"
+
+msgid "ui.seat_here"
+msgstr "At the fire"
+
 msgid "ui.seat_mark"
 msgstr "seat"
+
+msgid "ui.seat_n"
+msgstr "Seat {n}"
 
 msgid "ui.seats"
 msgstr "{taken} of {total} places by the fire"

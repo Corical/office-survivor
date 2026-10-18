@@ -27,7 +27,9 @@ const SCHEMAS := {
 	# the open-camps list: the frame itself only has to be an object; every entry is checked and cleaned one by one by
 	# RoomsWatch.sanitize, so one bad entry (or a hostile list) never costs the whole frame or raises a "bad frame" notice
 	"rooms": {"dict": {"?rooms": ANY}},
-	"lobby": {"dict": {"room_code": S, "seats_taken": I, "seats_total": I, "host": B}},
+	# `seats` (host only): [{id, connected}] one per OTHER seat; every entry is checked and cleaned by the adapter, so a hostile
+	# list never costs the whole lobby frame
+	"lobby": {"dict": {"room_code": S, "seats_taken": I, "seats_total": I, "host": B, "?seats": ANY}},
 	"round": {"dict": {
 		"round": I, "rounds": I, "seconds_left": NUM,
 		"me": {"dict": {"alias": S, "rations": I, "bandit": B, "?guards_left": ANY, "?guarded": ANY,

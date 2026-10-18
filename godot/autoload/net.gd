@@ -25,12 +25,12 @@ const STABLE_MS := 10000                 # chosen: a connection that lived this 
 const FLAP_LIMIT := 4                    # chosen: short-lived connections in a row before we stop and say so
 const UNREACHABLE_AFTER := 4             # attempts before the banner says "can't reach the server"
 ## Close codes the server sends after a terminal message (requested in the brief); the message itself may be lost.
-const CLOSE_CODES := {4001: "seat_gone", 4002: "upgrade_required", 4003: "taken_over", 1009: "too_big"}
+const CLOSE_CODES := {4001: "seat_gone", 4002: "upgrade_required", 4003: "taken_over", 4004: "kicked", 1009: "too_big"}
 ## The server knows who we are from the connection. An intent that names a seat is a bug, never sent.
 const FORBIDDEN_KEYS := ["seat", "pid", "player", "player_id", "seat_id"]
 ## Intents that get no reply (the server answers leave by dropping us). `list_rooms` is here because an old server may
 ## never answer it, and a missing answer must not look like a dead socket: the open-camps list has its own 3 s rule.
-const NO_REPLY := ["hello", "leave", "list_rooms"]
+const NO_REPLY := ["hello", "leave", "list_rooms", "kick"]       # kick: the server answers it only with a fresh lobby (or a refusal)
 
 var transport: Transport
 var clock: Clock = Clock.new()
@@ -118,6 +118,10 @@ func close() -> void:
 ## Send one intent. Returns "" when sent, else a reason: forbidden_key | not_connected | send_failed.
 func send(t: String, fields := {}) -> String:
 	for k in fields:
+		# the ONE exception: a kick carries the opaque handle of the seat to remove, in a field the server calls `seat`
+		# (the handle comes from the latest lobby; it is not a seat id or a player id and means nothing to anyone else)
+		if t == "kick" and str(k) == "seat" and fields[k] is String:
+			continue
 		if str(k).to_lower() in FORBIDDEN_KEYS:
 			Log.event("net", "refused_seat_field", {"t": t, "key": k}, "ERROR")
 			return "forbidden_key"
@@ -326,6 +330,10 @@ func _on_text(text: String) -> void:
 			if msg.get("code") == "taken_over":
 				message_received.emit(msg)
 				_stop("taken_over")      # reconnecting would take the seat back from the other device
+				return
+			if msg.get("code") == "kicked":
+				message_received.emit(msg)
+				_stop("kicked")          # the host removed this seat: reconnecting would only be refused (seat_gone)
 				return
 	message_received.emit(msg)
 

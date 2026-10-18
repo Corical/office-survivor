@@ -26,6 +26,11 @@ func list_rooms() -> String:
 	return Session.rooms_refresh()
 
 
+## The host removes a seat that dropped off (`handle` is a seat's `id` from the lobby model; see Feed.models.lobby.seats).
+func kick(handle: String) -> String:
+	return _done(Session.kick(handle))
+
+
 ## Full screen on a desktop window (a phone is always full screen: then there is nothing to offer).
 func can_fullscreen() -> bool:
 	return WindowModes.available()

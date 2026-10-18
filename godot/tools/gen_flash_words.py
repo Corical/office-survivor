@@ -102,6 +102,11 @@ OVERRIDES = {
     "ui.results": "RESULTS",
     "ui.resume": "Rejoin camp",
     "ui.resume_code": "Rejoin camp {code}",
+    # --- kick ---
+    "notice.kicked": "The host sent you away from the camp. You can find your way back with a code.",
+    "ui.kick": "Send away", "ui.kick_confirm": "Send this player away?",
+    "ui.seat_here": "At the fire", "ui.seat_dropped": "Out in the dark",
+    "ui.kick_help": "A seat that dropped off stays taken. Send them away to free the seat.",
     "notice.taken_over": "Your camp was opened on another device. Rejoin here to take it back.",
     "ui.reveal_title": "What happened in the night",
     "ui.room_code": "Camp {code}",

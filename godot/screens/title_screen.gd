@@ -5,7 +5,7 @@ extends Control
 ## menu pops in the first time it appears (all of it from the theme's art and effect settings, none of it required).
 
 ## Reasons a connection can end while the seat is kept: the title explains them (an upgrade has its own screen).
-const TERMINAL_ON_TITLE := ["taken_over", "too_big", "flapping"]
+const TERMINAL_ON_TITLE := ["taken_over", "too_big", "flapping", "kicked"]
 const MAX_CODE_SHOWN := 12          # real codes are 4 letters; a button must never grow with a hostile one
 
 var _notice := ""

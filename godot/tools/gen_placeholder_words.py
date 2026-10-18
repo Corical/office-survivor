@@ -88,6 +88,11 @@ UI.update({
     "notice.room_full": "That camp is full.", "notice.room_started": "That camp has already started.",
     "notice.room_gone": "No camp with that code. Check it and try again.",
     "ui.resume_code": "Resume game {code}",
+    # --- kick (host removes a seat that dropped off) ---
+    "notice.kicked": "The host removed you from this game. You can join again with a code.",
+    "ui.kick": "Remove", "ui.kick_confirm": "Remove this player?",
+    "ui.seat_n": "Seat {n}", "ui.seat_here": "Here", "ui.seat_dropped": "Not connected",
+    "ui.kick_help": "A seat that dropped off stays taken. Remove it to free the seat.",
     "ui.net.connecting": "Connecting...", "ui.net.online": "Connected", "ui.net.reconnecting": "Reconnecting...",
     "ui.net.unreachable": "Can't reach the server", "ui.net.offline": "Offline", "ui.net.stopped": "Disconnected",
     "notice.seat_gone": "That game is no longer available.",

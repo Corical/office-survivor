@@ -23,6 +23,8 @@ var server_url := "wss://raspberrypi.tail87b476.ts.net:8470"      # the arena se
 ## Old defaults that earlier builds saved to disk as if the player had chosen them. A saved copy of one of these is not a
 ## choice, so it is dropped on load and the current default applies (an address the player typed is always kept).
 const RETIRED_DEFAULT_URLS: Array[String] = ["ws://127.0.0.1:8765"]
+## The exact words the server uses when a kick targets a seat that is no longer in the room (docs/arena/GODOT_FOUNDATION.md).
+const KICK_SEAT_GONE_TEXT := "That seat is not in the room any more."
 ## What the server answers a join_room with when the camp cannot be joined (rooms listing and typed codes alike).
 const JOIN_REFUSAL_CODES: Array[String] = ["room_full", "room_started", "room_gone"]
 var token := ""
@@ -179,6 +181,24 @@ func act(t: String, fields := {}) -> String:
 		_wire += 1
 		_intent_wire = _wire
 	return why
+
+
+## The host removes a seat that dropped off. `handle` must be one of the seats in the LATEST lobby (a handle changes when a seat
+## changes hands, so an older one is refused by the server and could never hit the next person; we refuse it here first).
+## Returns "" when sent, else not_host | not_in_lobby | unknown_seat | in_flight | <a connection reason>.
+func kick(handle: String) -> String:
+	if view.get("t") != "lobby":
+		return "not_in_lobby"
+	if not host:
+		return "not_host"
+	var known := false
+	for s in ruleset.lobby_model(view).get("seats", []):                # the cleaned list the host's screen shows, not the raw frame
+		if str(s.get("id", "")) == handle and handle != "":
+			known = true
+	if not known:
+		Log.event("session", "kick_refused", {"why": "unknown_seat"})
+		return "unknown_seat"
+	return act("kick", {"seat": handle})
 
 
 func pick(kind: String, target: Variant, amount := 0) -> String:
@@ -395,8 +415,14 @@ func _on_error(msg: Dictionary) -> void:
 		_inflight = {}
 		_seat_gone(code, text)
 		return
-	if code == "taken_over":
+	if code == "taken_over" or code == "kicked":
 		return                        # Net also stops; _on_terminal handles the screen
+	# A kick the server refused because that seat left first: the list changed under the host and a fresh lobby is on its way.
+	# Nothing to tell them; just release the guard so the next kick can go.
+	if _last_key == "kick" and text == KICK_SEAT_GONE_TEXT:
+		_inflight.erase("kick")
+		Log.event("session", "kick_target_already_gone", {})
+		return
 	# an error answers the intent sent last; only that guard (and its wait) is released (review N07)
 	if _last_key != "":
 		_inflight.erase(_last_key)
@@ -416,6 +442,16 @@ func _on_terminal(reason: String) -> void:
 	match reason:
 		"seat_gone":
 			_seat_gone("seat_gone", "")
+		"kicked":
+			# The host removed this seat (error `kicked` and/or close 4004: either one alone is enough). The seat is dead on the
+			# server, so forget it, say who did it, and go to the title. The player can join again by code (there is no ban).
+			forget_seat()
+			view = {}
+			last_round_view = {}
+			awaiting_view = false
+			_locked_seen = {}
+			notice.emit("terminal", "kicked", "")
+			_go("title")
 		"upgrade_required":
 			if not locked_out:
 				locked_out = true

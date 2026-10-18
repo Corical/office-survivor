@@ -367,7 +367,33 @@ static func _covered(code: String, a: Dictionary, me: String, stole_from: Dictio
 
 static func lobby_model(view: Dictionary) -> Dictionary:
 	return {"room_code": view.room_code, "seats_taken": view.seats_taken, "seats_total": view.seats_total,
-		"is_host": view.host}
+		"is_host": view.host, "seats": clean_seats(view.get("seats"), view.host == true)}
+
+
+const MAX_KICK_SEATS := 12            # chosen: no camp this client draws is bigger
+const MAX_KICK_HANDLE := 64           # chosen: real handles are a few characters; anything longer is not one
+
+
+## The host's seat list, cleaned: [{id: String, connected: bool}]. Guests never have one. Anything that is not a clean entry
+## is dropped (not a dict, no usable id, a repeated id: the first wins). An unclear `connected` counts as true: a wrong
+## "dropped off" would invite the host to remove someone who is there.
+static func clean_seats(raw: Variant, is_host: bool) -> Array:
+	var out: Array = []
+	if not is_host or not (raw is Array):
+		return out
+	var seen := {}
+	for e in raw:
+		if out.size() >= MAX_KICK_SEATS:
+			break
+		if not (e is Dictionary):
+			continue
+		var id: Variant = e.get("id")
+		if not (id is String) or id == "" or id.length() > MAX_KICK_HANDLE or seen.has(id):
+			continue
+		seen[id] = true
+		var c: Variant = e.get("connected")
+		out.append({"id": id, "connected": not (typeof(c) == TYPE_BOOL and not c)})        # only an explicit false is "dropped off"
+	return out
 
 
 static func band_id(band: Variant) -> String:

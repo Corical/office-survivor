@@ -19,6 +19,7 @@ const ALL: Array[String] = [
 	"notice.seat_gone", "notice.taken_over", "notice.too_big", "notice.flapping", "notice.upgrade_required",
 	"notice.invalid", "notice.unknown", "notice.generic", "notice.no_server_url", "notice.locked", "notice.in_flight",
 	"notice.camp_unavailable", "notice.room_full", "notice.room_started", "notice.room_gone", "ui.resume_code",
+	"notice.kicked", "ui.kick", "ui.kick_confirm", "ui.seat_n", "ui.seat_here", "ui.seat_dropped", "ui.kick_help",
 	# --- reveal/stage ---
 	"ui.reveal_waiting",
 ]
@@ -26,7 +27,7 @@ const ALL: Array[String] = [
 ## Notice codes the client itself raises that have a word of their own; everything else uses `notice.generic` with the
 ## server's own text as a fallback.
 const NOTICE_CODES := ["seat_gone", "taken_over", "too_big", "flapping", "upgrade_required", "no_server_url", "locked",
-	"in_flight", "camp_unavailable", "room_full", "room_started", "room_gone"]
+	"in_flight", "camp_unavailable", "room_full", "room_started", "room_gone", "kicked"]
 
 
 ## The translation key for a notice (kind, code): a specific one when we have it.

@@ -169,4 +169,5 @@ func test_the_lobby_model() -> void:
 	go_online()
 	give_seat("t", "ABCD", true)
 	fake.server_send({"t": "lobby", "room_code": "ABCD", "seats_taken": 2, "seats_total": 4, "host": true})
-	eq(Feed.models.lobby, {"room_code": "ABCD", "seats_taken": 2, "seats_total": 4, "is_host": true}, "lobby model")
+	eq(Feed.models.lobby, {"room_code": "ABCD", "seats_taken": 2, "seats_total": 4, "is_host": true, "seats": []},
+		"lobby model (a lobby frame without a seat list gives an empty one)")
