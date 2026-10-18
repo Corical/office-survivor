@@ -176,6 +176,24 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(rd["me"]["alias"], dseat["alias"])
         self.assertNotIn(seat["alias"], rc["aliases"])
 
+    async def test_leaving_the_lobby_does_not_hold_up_the_first_round(self):
+        """Found while writing the handoff: `leave` before the start dropped the connection but left the seat
+        marked present, so the others waited for a ghost until the full timer."""
+        a, seat = await self._new_room()
+        b = await Client.open(self.port)
+        await b.send({"t": "join_room", "code": seat["room_code"]})
+        await b.until("seat")
+        await b.send({"t": "leave"})
+        await asyncio.sleep(FAST.grace + 0.3)             # the ghost's grace has run out
+        await a.send({"t": "start"})
+        r = await a.until("round")
+        await a.send({"t": "pick", "kind": "scavenge"})
+        await a.send({"t": "lock"})
+        rv = await a.until("reveal", lambda m: m["round"] == 1)     # well inside the 4 s timer
+        self.assertEqual(rv["round"], 1)
+        room = next(iter(self.server.rooms.values()))
+        self.assertEqual(room.game.close_reason, "all_locked")
+
     # ---------------- reconnects ----------------
     async def test_resume_after_a_drop_gives_the_current_view_and_keeps_the_lock(self):
         c, seat = await self._new_room()

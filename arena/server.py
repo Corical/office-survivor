@@ -271,6 +271,7 @@ class Server:
             if g.started:
                 g.leave_seat(room.identity.key_for(pid))
             room.conns.pop(pid, None)
+            g.disconnect(pid)               # not here any more: after the grace, the round stops waiting for this seat
             await room.push_all()
             return None
         else:

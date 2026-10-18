@@ -154,6 +154,7 @@ they are listed in MECHANICS.md section 9.
 | Goal wording and goal progress travel as English text (with the goal code) | The engine writes them; a second theme needs codes |
 | Wilderness event stories travel as English text (code `event`) | Same: `engine/events.py` writes them |
 | Log writes fsync on the event loop | Rooms are capped (20 by default) and records are tiny |
+| Leaving the lobby does not free the seat (the join is in the log); the seat stays counted as taken and, once started, is a human who never answers | After the `grace` the round stops waiting for it. Freeing the seat needs a "left before the start" record: not built |
 | One server process per data folder | Two processes on one folder would both write the same rounds; the service manager (systemd) runs one |
 | `websockets` is not in the project venv or on the Pi yet | Installing it is a download: asked before deploy |
 
