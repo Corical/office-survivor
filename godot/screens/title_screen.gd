@@ -21,11 +21,13 @@ var _vis := "public"
 var _camp_name := ""
 var _vis_buttons := {}
 var _vis_help: Label
+var _game := ""                               # the game picked on the picker (only drawn with more than one game)
 
 
 func _ready() -> void:
 	Feed.status_changed.connect(_on_status)
 	Feed.notice_raised.connect(_on_notice)
+	Feed.model_changed.connect(func(kind, _m): if kind == "games": _build())          # a new hello_ok may offer other games
 	_build()
 	Intents.rooms_watch(true)                 # the open-camps list runs for as long as this screen does (menu rebuilds do not touch it)
 
@@ -83,6 +85,11 @@ func _build() -> void:
 		var resume := Ui.button(resume_label, "resume", func(): _show(Intents.resume()), false, "PrimaryButton")
 		menu.add_child(resume)
 		entries.append(resume)
+	var games := Feed.games_model()
+	if games.pick:
+		var picker := _picker(games.games)
+		menu.add_child(picker)
+		entries.append(picker)
 	var create := Ui.button(Words.render("ui.create_room"), "create", func(): _on_create(), false, "PrimaryButton")
 	menu.add_child(create)
 	entries.append(create)
@@ -127,6 +134,40 @@ func _build() -> void:
 		Ui.intro_all(entries)
 
 
+## The game the player picked: their choice if the server still offers it, else the first game offered ("" with no list).
+func _game_choice() -> String:
+	var games: Array = Feed.games_model().games
+	for g in games:
+		if g.id == _game:
+			return _game
+	return str(games[0].id) if not games.is_empty() else ""
+
+
+## "Choose a game": one row per game the server offers (its name and its seat range), the chosen one in the pick style.
+## Drawn only when there is more than one game; the ids, names and seat counts are the server's, never words of this screen.
+func _picker(games: Array) -> Control:
+	var col := Ui.vbox(8)
+	col.set_meta("id", "game_picker")
+	col.add_child(Ui.label(Words.render("ui.choose_game"), "game_picker_title", "MutedLabel"))
+	var chosen := _game_choice()
+	for g in games:
+		var id: String = g.id
+		var pick := func():
+			_game = id
+			_build()
+		var b := Ui.button("%s\n%s" % [g.name, players_text(g)], "game_" + id, pick, false, "ChosenButton" if id == chosen else "")
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.add_child(b)
+	return col
+
+
+## "3 to 8 players", or "4 players" when the game has one size.
+static func players_text(g: Dictionary) -> String:
+	if int(g.seats_min) == int(g.seats_max):
+		return Words.render("ui.game_players_exact", {"n": g.seats_min})
+	return Words.render("ui.game_players", {"min": g.seats_min, "max": g.seats_max})
+
+
 ## Create: with a server that can list camps there is something to choose (public or private, a name), so a small sheet
 ## opens first; with any other server there is nothing to ask and the camp is created straight away, as it always was.
 func _on_create() -> void:
@@ -135,7 +176,7 @@ func _on_create() -> void:
 		_sheet_fresh = true
 		_build()
 		return
-	_reason(Intents.create_room())
+	_reason(Intents.create_room("", "", _game_choice()))
 
 
 ## The new-camp form: a veil over the screen and a card with an optional name and a Public / Private choice.
@@ -207,7 +248,7 @@ func _show_visibility() -> void:
 
 func _confirm_create() -> void:
 	_sheet_open = false
-	var why := Intents.create_room(_vis, _camp_name)
+	var why := Intents.create_room(_vis, _camp_name, _game_choice())
 	if why != "":
 		_reason(why)
 	else:

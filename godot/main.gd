@@ -11,8 +11,9 @@ const SCREENS := {
 	"upgrade": preload("res://screens/upgrade_screen.gd"),
 	"bang_table": preload("res://games/bang/table_screen.gd"),
 	"bang_end": preload("res://games/bang/end_screen.gd"),
+	"neutral": preload("res://screens/neutral_screen.gd"),
 }
-const SHARED_SCREENS := ["title", "upgrade"]        # the rest are a game's, shown only through its ruleset's phases
+const SHARED_SCREENS := ["title", "upgrade", "neutral"]        # the rest are a game's, shown only through its ruleset's phases
 ## The order the backdrop pans through as a game moves along (a screen not listed pans like the title).
 const DEFAULT_FADE := {"fade": 0.4, "slide": 0.0}          # chosen: the same length as the flash theme's, without the drift
 const MAX_STEP := 1.0 / 30.0                # chosen: a fade moves at most this much per frame, however long the frame was
@@ -82,6 +83,10 @@ func _routable(screen: String) -> bool:
 
 func _route(st: Dictionary) -> void:
 	var want: String = st.screen if _routable(st.screen) else "title"
+	if st.get("unsupported_game", "") != "" and st.has_seat:
+		want = "upgrade"                          # a room of a game this app does not have: say so, and offer the way out
+	elif want == "title" and st.screen != "title" and st.has_seat:
+		want = "neutral"                          # a phase of the room's game that nothing here draws
 	if want == current_name:
 		return
 	var old := current

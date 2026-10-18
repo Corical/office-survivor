@@ -122,6 +122,13 @@ OVERRIDES = {
     "ui.bots_fill": "Empty places by the fire are taken by bots when you start.",
     # --- lobby away count ---
     "ui.seats_away": "{here} at the fire, {away} out in the dark",
+    "ui.choose_game": "Choose a game", "ui.game_players": "{min} to {max} players", "ui.game_players_exact": "{n} players",
+    "ui.game_unknown": "Another game", "ui.seat_range": "Needs {min} to {max} to start", "ui.seat_range_exact": "{n} seats",
+    "ui.neutral_title": "Waiting for this part of the game",
+    "ui.neutral_body": "This app has no picture for it yet. The game goes on; you will see it again when the next part starts.",
+    "ui.leave_game": "Leave game",
+    "ui.update_body": "This server needs a newer version of the app than the one you have.",
+    "ui.update_game_body": "This game needs a newer version of the app than the one you have.",
 }
 
 SLOT = re.compile(r"\{(\w+)\}")

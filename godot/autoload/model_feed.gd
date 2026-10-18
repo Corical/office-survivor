@@ -20,6 +20,8 @@ func _ready() -> void:
 	Session.notice.connect(_on_notice)
 	Net.state_changed.connect(func(_s): refresh())
 	Session.rooms_changed.connect(_on_rooms)
+	Session.games_changed.connect(_on_games)
+	Session.room_game_decided.connect(_emit_status)
 
 
 func reset() -> void:
@@ -36,6 +38,32 @@ func _on_rooms(m: Dictionary) -> void:
 	model_changed.emit("rooms", m)
 
 
+## The games the server offers, as a neutral model: {games: [{id, name, seats_min, seats_max}], pick: bool}. `pick` is true only
+## with more than one game: a lone game (or an old server that names none) has nothing to choose, and nothing new is drawn.
+func games_model() -> Dictionary:
+	return {"games": Session.games.duplicate(true), "pick": Session.games.size() > 1}
+
+
+func _on_games() -> void:
+	var m := games_model()
+	models["games"] = m
+	model_changed.emit("games", m)
+
+
+## The name to show for a game id on a camp card: the server's name for it, "" for a lone-game server (no label at all), and the
+## neutral "another game" key's text is the screen's to choose when the server did not list the id.
+func game_label(id: Variant) -> Dictionary:
+	if Session.games.size() < 2:
+		return {}
+	var e := Session.game_entry(id if id != null else RulesetRegistry.DEFAULT_ID)
+	return {"name": e.name} if not e.is_empty() else {"unknown": true}
+
+
+## The server's entry for the game of the room I am in ({} when none or not listed).
+func room_game() -> Dictionary:
+	return Session.room_game_entry()
+
+
 func rooms_model() -> Dictionary:
 	return models.get("rooms", {"supported": false, "rooms": [], "stale": false, "loading": false})
 
@@ -47,6 +75,8 @@ func _on_view(v: Dictionary) -> void:
 	match kind:
 		"lobby":
 			m = rs.lobby_model(v)
+			if Session.games.size() > 1:
+				m["game"] = Session.room_game_entry()      # the room's game, for the seat range; a lone-game server adds nothing
 		"round":
 			m = rs.round_model(v)
 			var key := "%s|%s" % [Session.room_code, v.round]
@@ -109,7 +139,8 @@ func status() -> Dictionary:
 	return {"net": Net.state, "net_key": UiKeys.net_key(Net.state), "attempt": Net.attempt,
 		"terminal": Session.terminal_reason, "awaiting_view": Session.awaiting_view, "screen": Session.screen,
 		"has_seat": Session.token != "", "room_code": Session.room_code, "alias": Session.alias,
-		"is_host": Session.host, "server_url": Session.server_url, "entering": Session.entering_camp()}
+		"is_host": Session.host, "server_url": Session.server_url, "entering": Session.entering_camp(),
+		"unsupported_game": Session.unsupported_game}
 
 
 func _emit_status() -> void:

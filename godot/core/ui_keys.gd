@@ -25,6 +25,9 @@ const ALL: Array[String] = [
 	"ui.advanced_hint",
 	# --- lobby away count ---
 	"ui.seats_away",
+	# --- platform screens: picker, game label, seat range, neutral phase, update ---
+	"ui.choose_game", "ui.game_players", "ui.game_players_exact", "ui.game_unknown", "ui.seat_range", "ui.seat_range_exact",
+	"ui.neutral_title", "ui.neutral_body", "ui.leave_game", "ui.update_body", "ui.update_game_body",
 	# --- reveal/stage ---
 	"ui.reveal_waiting",
 ]
