@@ -17,7 +17,7 @@ const INTENT_TTL_MS := 10000                       # chosen: a Create/Join tap o
 var store: SessionStore
 var clock: Clock = Clock.new()
 var ruleset: Ruleset
-var server_url := "" if OS.has_feature("android") else "ws://127.0.0.1:8765"
+var server_url := "wss://raspberrypi.tail87b476.ts.net:8470"      # the arena server on the Pi (tailnet only); Settings can change it
 var token := ""
 var room_code := ""
 var alias := ""

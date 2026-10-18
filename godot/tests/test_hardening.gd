@@ -189,6 +189,16 @@ func test_n16_a_bad_server_address_is_refused_before_anything_happens() -> void:
 	check(Session.valid_url("wss://pi.example.ts.net:8470"), "wss is fine")
 
 
+## A fresh install must point at the real arena server on every platform: the old default was localhost (nothing there on a
+## player's PC, so the first tap on Create showed "can't reach the server") and empty on Android.
+func test_the_default_address_is_the_real_server_and_valid() -> void:
+	var fresh: Node = load("res://autoload/session.gd").new()
+	check(Session.valid_url(fresh.server_url), "valid: '%s'" % fresh.server_url)
+	check(fresh.server_url.begins_with("wss://"), "TLS, not plain ws: '%s'" % fresh.server_url)
+	check(not ("127.0.0.1" in fresh.server_url or "localhost" in fresh.server_url), "not a loopback address")
+	fresh.free()
+
+
 # ---- N17: the stale view after a reconnect ----
 
 func test_n17_the_picker_stays_shut_until_the_fresh_view_arrives() -> void:
