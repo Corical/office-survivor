@@ -81,19 +81,68 @@ func _ready() -> void:
 		_audit("reveal waiting %dx%d" % [s.x, s.y])
 	await _size(PHONE)
 
+	# ---- 4a. the animation has finished: is the stage still alive over 10 s of waiting?
+	Feed.player.timeline.snap_to_end()
+	await _wait(0.5)
+	await _idle("waiting_idle_phone", 10.0, Rect2i(0, 120, 540, 440))
+
+	# ---- 4a2. a caught steal and an exposure, frame by frame (the beat is parked at its start and played at 30 fps)
+	for spec in [["caught_steal", "blocked", "guard"], ["exposed", "marked", "exposed"]]:
+		var beats: Array = Feed.models.reveal.beats
+		var at := -1
+		for i in beats.size():
+			if beats[i].kind == spec[1] and beats[i].style == spec[2]:
+				at = i
+				break
+		if at < 0:
+			print("no beat ", spec)
+			continue
+		var tl: Timeline = Feed.player.timeline
+		await _record(spec[0], func():
+			tl.finished = false
+			tl.index = at
+			tl.elapsed_ms = 0.0, 36)
+		await _shot("%s_%s_end" % [tag, spec[0]])
+
+	# ---- 4b. reveal -> round (the next night starts), then the same reveal again
+	var next_round: Dictionary = round_msg.duplicate(true)
+	next_round["round"] = int(round_msg.round) + 1
+	await _record("reveal_to_round", func(): fake.server_send(next_round), 40)
+	await _wait(0.5)
+	fake.server_send(_night(next_round, me))
+	await _wait(0.8)
+
 	# ---- 5. reveal -> end
 	var end_row: Dictionary = Fixtures.of_type("end")[0]
 	await _record("reveal_to_end", func(): fake.server_send(_rename(end_row.msg)), 40)
 	await _wait(0.6)
 
-	# ---- 6. wide round (the backdrop): fresh round view at three window sizes
-	fake.server_send(round_msg)
+	# ---- 5b. end -> title, then title -> round (a seat and a round view arriving together)
+	await _record("end_to_title", func(): Intents.leave(), 40)
+	await _wait(0.6)
+	await _record("title_to_round", func():
+		Session.act("create_room")
+		fake.server_send({"t": "seat", "token": "snap-token2", "room_code": "KXQM", "alias": me, "host": true})
+		fake.server_send(round_msg), 40)
 	await _wait(0.8)
+
+	# ---- 6. wide round (the backdrop): fresh round view at three window sizes
 	for s in [Vector2i(540, 960), Vector2i(700, 800), Vector2i(1280, 720), Vector2i(1904, 1001), Vector2i(2560, 1440)]:
 		await _size(s)
 		await _wait(0.5)
 		await _shot("%s_round_%dx%d" % [tag, s.x, s.y])
 		_audit("round %dx%d" % [s.x, s.y])
+	# the wide background alone, layer by layer, at the full-screen size that showed a seam (1920x1082)
+	await _size(Vector2i(1920, 1082))
+	await _wait(0.5)
+	router._slot.visible = false
+	await _wait(0.2)
+	await _shot("%s_bg_all_1920x1082" % tag)
+	router.backdrop._front.visible = false
+	await _wait(0.2)
+	await _shot("%s_bg_far_only_1920x1082" % tag)
+	router.backdrop._front.visible = true
+	router._slot.visible = true
 	await _size(Vector2i(1904, 1001))
 	await _wait(0.3)
 	fake.server_send(_night(round_msg, me))
@@ -103,12 +152,41 @@ func _ready() -> void:
 	await _wait(0.5)
 	await _shot("%s_reveal_end_1904x1001" % tag)
 
+	await _size(PHONE)
+	await _wait(0.4)
+	await _record("round_to_title", func(): Intents.leave(), 40)
+
 	var f := FileAccess.open(out_dir.path_join("%s_frame_diffs.csv" % tag), FileAccess.WRITE)
 	f.store_string("\n".join(_csv))
 	f.close()
 	print("CLEARANCE TOTAL: %d violations in %d audits, %d distinct offenders" % [violations, audits, violation_paths.size()])
 	print("MOTION DONE ", out_dir)
 	get_tree().quit(0)
+
+
+## The stage region of the reveal at rest for `secs` seconds at 30 fps: the mean difference between frames one second apart
+## (a still picture scores 0) and a strip of the first, middle and last frames.
+func _idle(label: String, secs: float, region: Rect2i) -> void:
+	var imgs: Array[Image] = []
+	for i in int(secs * 30.0):
+		var g := await _grab()
+		imgs.append(g.get_region(region))
+	var per_second: Array[float] = []
+	for i in range(30, imgs.size(), 30):
+		per_second.append(_diff(imgs[i - 30], imgs[i]))
+	var consecutive := 0.0
+	for i in range(1, imgs.size()):
+		consecutive += _diff(imgs[i - 1], imgs[i])
+	consecutive /= float(imgs.size() - 1)
+	var line := "%s,%s,mean_consecutive=%.2f,between_seconds=%s" % [tag, label, consecutive, ";".join(per_second.map(func(d): return "%.2f" % d))]
+	_csv.append(line)
+	print("IDLE ", line)
+	var strip := Image.create(region.size.x * 3, region.size.y, false, Image.FORMAT_RGB8)
+	for k in 3:
+		var p := imgs[mini(k * (imgs.size() - 1) / 2, imgs.size() - 1)].duplicate() as Image
+		p.convert(Image.FORMAT_RGB8)
+		strip.blit_rect(p, Rect2i(Vector2i.ZERO, region.size), Vector2i(k * region.size.x, 0))
+	strip.save_png(out_dir.path_join("%s_%s_strip.png" % [tag, label]))
 
 
 func _frames(n: int) -> void:

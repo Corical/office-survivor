@@ -22,9 +22,10 @@ const PAN_PER_SCREEN := 1.0                 # parallax steps per screen index (s
 const MAX_UPSCALE := 1.25                   # chosen: the most an art pixel is stretched on screen before the picture looks soft
 const HORIZON_AT := 0.38                    # chosen: in a wide window the horizon sits this far down
 const HORIZON_IN_ART := 0.635               # where the horizon is in the far art (row 1220 of 1920)
-const NEAR_EDGE_L := 270.0                  # the near art's dark arch ends here on the left (art pixels from the left edge)
-const NEAR_EDGE_R := 810.0                  # and here on the right
-const NEAR_SOFT_PX := 150.0                 # chosen: width of the soft strip beside each edge (logical px)
+## Wide windows only: the near art carries a faint dark haze (alpha 3 to 25 percent) that ends in a straight vertical edge, which
+## showed as a seam. This drops every pixel that faint and keeps the solid art (palms, rocks, leaves), so no edge is left.
+## It also feathers the cut down the middle of the art (where the two halves stop), over the 8 percent either side of it.
+const HAZE_CUT := "shader_type canvas_item;\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV);\n\tc.a *= smoothstep(0.08, 0.3, c.a);\n\tc.a *= smoothstep(0.0, 0.08, abs(UV.x - 0.5));\n\tCOLOR = c;\n}\n"
 
 var _ambient: Dictionary = {}
 var _flicker: Dictionary = {}
@@ -46,7 +47,9 @@ var _tex_cloud: Texture2D
 var _tex_star: Texture2D
 var _tex_glow: Texture2D
 var _add: CanvasItemMaterial
-var _soft: Texture2D
+var _haze_cut: ShaderMaterial
+## For tests (a headless window has no real scale): when above zero, the on-screen size of one logical unit.
+var screen_scale_override := 0.0
 
 
 func _ready() -> void:
@@ -69,6 +72,7 @@ func _ready() -> void:
 		_star_rate.append(rng.randf_range(0.8, 2.6))
 		_star_size.append(rng.randf_range(7.0, 17.0))
 	resized.connect(_on_resized)
+	get_viewport().size_changed.connect(_on_resized)          # the window's scale can change after this control's size did
 	Themes.theme_changed.connect(func(_id): _setup())
 	Themes.motion_changed.connect(func(_r): _setup())
 	_setup()
@@ -92,8 +96,8 @@ func _setup() -> void:
 	_tex_cloud = Themes.texture("cloud")
 	_tex_star = Themes.texture("fx_spark")
 	_tex_glow = Themes.texture("campfire_glow")
-	_soft = null
 	_setup_embers()
+	_update_near_mode()
 	set_process(not _ambient.is_empty() or not _flicker.is_empty() or _embers.emitting)
 	for l in [_back, _front, _glow]:
 		l.queue_redraw()
@@ -141,6 +145,7 @@ func _place_embers() -> void:
 
 func _on_resized() -> void:
 	_place_embers()
+	_update_near_mode()
 	for l in [_back, _front, _glow]:
 		if l != null:
 			l.queue_redraw()
@@ -190,6 +195,8 @@ func _cover(c: CanvasItem, tex: Texture2D, shift_x: float, extra: float) -> void
 
 ## How many screen pixels one logical unit is (the window stretch), so an art pixel's real on-screen size can be known.
 func _screen_scale() -> float:
+	if screen_scale_override > 0.0:
+		return screen_scale_override
 	return maxf(0.01, get_viewport().get_final_transform().get_scale().x) if is_inside_tree() else 1.0
 
 
@@ -229,19 +236,21 @@ func _far_wide(c: CanvasItem, tex: Texture2D, shift_x: float) -> void:
 		_draw_flipped(c, tex, Rect2(x, top, w, h), k % 2 != 0)
 
 
-## A strip that is the night's shade at its left edge and clear at its right (flipped for the right-hand side).
-func _soft_edge() -> Texture2D:
-	if _soft == null:
-		var g := Gradient.new()
-		g.colors = PackedColorArray([Themes.color_a("ink", 0.62), Themes.color_a("ink", 0.0)])
-		var t := GradientTexture2D.new()
-		t.gradient = g
-		t.fill_from = Vector2(0, 0)
-		t.fill_to = Vector2(1, 0)
-		t.width = 64
-		t.height = 4
-		_soft = t
-	return _soft
+## The near layer wears the haze-cutting shader exactly when the window is wide enough to draw it as two edge pieces.
+func _update_near_mode() -> void:
+	if _front == null:
+		return
+	var margin := float(_ambient.get("parallax_px", 0.0)) * 3.0 + float(_ambient.get("drift_px", 0.0)) * 2.0 + 4.0
+	var wide := _tex_near != null and _cover_scale(_tex_near, margin) > _max_scale()
+	if not wide:
+		_front.material = null
+		return
+	if _haze_cut == null:
+		var sh := Shader.new()
+		sh.code = HAZE_CUT
+		_haze_cut = ShaderMaterial.new()
+		_haze_cut.shader = sh
+	_front.material = _haze_cut
 
 
 func _paint_back(c: Layer) -> void:
@@ -292,11 +301,6 @@ func _paint_front(c: Layer) -> void:
 	c.draw_texture_rect_region(_tex_near, Rect2(-margin + sh, size.y - h, half * s, h), Rect2(0, 0, half, _tex_near.get_height()))
 	var right_x := size.x + margin + sh - half * s
 	c.draw_texture_rect_region(_tex_near, Rect2(right_x, size.y - h, half * s, h), Rect2(half, 0, half, _tex_near.get_height()))
-	# the art's dark arch ends in a straight edge: a soft strip beside it so the edge reads as shade, not as a wall
-	var soft := _soft_edge()
-	var strip := NEAR_SOFT_PX
-	_draw_flipped(c, soft, Rect2(-margin + sh + NEAR_EDGE_L * s, size.y - h, strip, h), false)
-	_draw_flipped(c, soft, Rect2(right_x + (NEAR_EDGE_R - half) * s - strip, size.y - h, strip, h), true)
 
 
 func _paint_glow(c: Layer) -> void:

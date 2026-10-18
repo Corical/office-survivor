@@ -24,6 +24,60 @@ func _stage_with(beats: Array, finished := false, index := 0) -> Stage:
 	return s
 
 
+func _rich_stage() -> Stage:
+	Themes.use("flash")
+	var s := Stage.new()
+	add_child(s)
+	_mounted.append(s)
+	s._load_art()
+	s._pos = {"@me": Vector2(100, 200), "Fig": Vector2(200, 100), "Plum": Vector2(50, 100)}
+	return s
+
+
+func _beat_of(kind: String, from_: String, to: String, style: String) -> Dictionary:
+	return {"kind": kind, "from": from_, "to": to, "amount_out": 0, "amount_in": 0, "style": style, "detail": ""}
+
+
+func test_a_caught_thief_and_an_exposed_thief_are_flagged_on_their_own_huts() -> void:
+	var s := _rich_stage()
+	check(s._rich, "the flash theme draws huts")
+	s._on_beat(_beat_of("blocked", "@me", "Fig", "guard"))
+	check(float(s._hurt.get("@me", 0.0)) > 0.9, "I walked into a guard: my own hut flashes")
+	check(not s._hurt.has("Fig"), "the guard's hut is not flagged as the thief")
+	s._on_beat(_beat_of("blocked", "Plum", "@me", "guard"))
+	check(float(s._hurt.get("Plum", 0.0)) > 0.9, "Plum was caught by me: Plum's hut flashes")
+	s._on_beat(_beat_of("marked", "@me", "Fig", "exposed"))
+	check(float(s._exposed.get("Fig", 0.0)) > 0.9, "Fig was exposed: Fig's hut is tinted")
+
+
+func test_nothing_is_flagged_when_nobody_nameable_was_caught() -> void:
+	var s := _rich_stage()
+	s._on_beat(_beat_of("blocked", "@offstage", "@me", "guard"))   # an unnamed thief: no hut to point at
+	s._on_beat(_beat_of("blocked", "@offstage", "@me", "idol"))    # an idol saved me: nobody was caught
+	s._on_beat(_beat_of("blocked", "Fig", "@me", "idol"))          # an idol, not a guard: no thief to flag
+	s._on_beat(_beat_of("marked", "@me", "@offstage", "exposed"))  # an exposure with no named thief
+	eq(s._hurt.size(), 0, "no hut flashed: %s" % [s._hurt])
+	eq(s._exposed.size(), 0, "no hut tinted: %s" % [s._exposed])
+
+
+func test_the_flags_fade_out_and_calm_mode_has_none() -> void:
+	var s := _rich_stage()
+	s._on_beat(_beat_of("blocked", "@me", "Fig", "guard"))
+	s._on_beat(_beat_of("marked", "@me", "Fig", "exposed"))
+	s._roster = [{"alias": "Fig", "is_me": false, "band": "", "band_before": ""}]
+	s._timeline = Timeline.new(1, [_beat_of("quiet", "@offstage", "@offstage", "")])
+	s._beats = s._timeline.beats
+	for i in 200:
+		s._animate(0.05, 0.05)
+	check(float(s._hurt.get("@me", 1.0)) == 0.0, "the red flash ends")
+	check(float(s._exposed.get("Fig", 1.0)) == 0.0, "the violet tint ends (slower, but ends)")
+	Themes.reduced_motion = true
+	var calm := _rich_stage()
+	calm._on_beat(_beat_of("blocked", "@me", "Fig", "guard"))
+	eq(calm._hurt.size(), 0, "calm mode: no flashing")
+	Themes.reduced_motion = false
+
+
 func _beat(from_: String, to: String) -> Dictionary:
 	return {"kind": "move_resource", "from": from_, "to": to, "amount_out": 1, "amount_in": 1, "style": "", "detail": ""}
 

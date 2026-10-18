@@ -11,8 +11,13 @@ const SCREENS := {
 	"upgrade": preload("res://screens/upgrade_screen.gd"),
 }
 ## The order the backdrop pans through as a game moves along (a screen not listed pans like the title).
+const DEFAULT_FADE := {"fade": 0.4, "slide": 0.0}          # chosen: the same length as the flash theme's, without the drift
+const MAX_STEP := 1.0 / 30.0                # chosen: a fade moves at most this much per frame, however long the frame was
 const PAN_ORDER := ["title", "lobby", "round", "reveal", "end"]
 
+var _fades: Array = []                      # the changes of screen still fading: {old, now, t, dur, lead, out, slide}
+## For tests: builds the screen called `name` instead of the real one (so a swap can be checked without a whole game's state).
+var screen_factory: Callable
 var current_name := ""
 var current: Control
 var backdrop: Backdrop
@@ -72,16 +77,13 @@ func _route(st: Dictionary) -> void:
 	if want == current_name:
 		return
 	var old := current
-	current = SCREENS[want].new()
+	current = screen_factory.call(want) if screen_factory.is_valid() else SCREENS[want].new()
 	current_name = want
 	_slot.add_child(current)
 	backdrop.pan_to(maxi(0, PAN_ORDER.find(want)))
 	var fade := Themes.fx("transition")
 	if fade.is_empty():
-		if old != null:
-			_slot.remove_child(old)
-			old.queue_free()
-		return
+		fade = DEFAULT_FADE                       # a theme with no setting of its own still never swaps a screen in one frame
 	_cross_fade(old, current, fade)
 
 
@@ -93,24 +95,51 @@ func _cross_fade(old: Control, now: Control, fade: Dictionary) -> void:
 	now.modulate.a = 0.0
 	now.offset_top = slide
 	now.offset_bottom = slide
-	var tw := create_tween().set_parallel(true)
+	# A screen that is the new one of an earlier, unfinished change stops being animated as "new": it now fades out as the old one.
+	for f in _fades:
+		if f.now == old:
+			f.now = null
+	if old != null:
+		old.process_mode = Node.PROCESS_MODE_DISABLED
+		Ui.inert(old)                                    # takes no tap while it fades out
+		Ui.freeze(old, [Feed, Themes, Intents])          # no relayout while it fades out
 	# Only the content fades; the backdrop never does. The two screens overlap: the old one is gone in the first 45% of the
 	# time and the new one rises from 15% to the end, so the change is spread over many frames and never a single cut.
 	var lead := t * 0.15 if old != null else 0.0
-	var rise := t - lead
-	tw.tween_property(now, "modulate:a", 1.0, rise).set_delay(lead).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tw.tween_property(now, "offset_top", 0.0, rise).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(now, "offset_bottom", 0.0, rise).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_fades.append({"old": old, "now": now, "t": 0.0, "dur": t, "lead": lead, "out": t * 0.45, "slide": slide})
+
+
+## The fade is stepped here, not by a Tween: building the new screen can make the next frame very long, and a Tween (real time)
+## would spend the whole fade in that one frame, which is a hard cut. Each frame advances the fade by at most MAX_STEP.
+func _process(delta: float) -> void:
+	if _fades.is_empty():
+		return
+	var step := minf(delta, MAX_STEP)
+	for f in _fades.duplicate():
+		f.t += step
+		_apply_fade(f)
+		if f.t >= f.dur:
+			_fades.erase(f)
+
+
+func _apply_fade(f: Dictionary) -> void:
+	var done: bool = f.t >= f.dur
+	var now: Control = f.now if is_instance_valid(f.now) else null
+	if now != null:
+		var p := 1.0 if done else clampf((f.t - f.lead) / (f.dur - f.lead), 0.0, 1.0)
+		now.modulate.a = sin(p * PI * 0.5)                                    # ease out
+		var rest: float = f.slide * pow(1.0 - p, 3.0)                         # drifts up into place, slowing
+		now.offset_top = rest
+		now.offset_bottom = rest
+	var old: Control = f.old if is_instance_valid(f.old) else null
 	if old == null:
 		return
-	old.process_mode = Node.PROCESS_MODE_DISABLED
-	old.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Ui.freeze(old, [Feed, Themes, Intents])          # no relayout while it fades out
-	var out_t := t * 0.45
-	tw.tween_property(old, "modulate:a", 0.0, out_t).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tw.tween_property(old, "offset_top", -slide * 0.5, out_t)
-	tw.tween_property(old, "offset_bottom", -slide * 0.5, out_t)
-	tw.chain().tween_callback(func():
-		if is_instance_valid(old):
-			_slot.remove_child(old)
-			old.queue_free())
+	if done or f.t >= f.out:
+		_slot.remove_child(old)
+		old.queue_free()
+		f.old = null
+		return
+	var q := clampf(f.t / f.out, 0.0, 1.0)
+	old.modulate.a = cos(q * PI * 0.5)                                        # ease in
+	old.offset_top = -f.slide * 0.5 * q
+	old.offset_bottom = -f.slide * 0.5 * q
