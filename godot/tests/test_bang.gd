@@ -312,6 +312,15 @@ func test_frames_that_are_not_a_bang_view_are_refused_not_drawn() -> void:
 	check(notices.any(func(n): return n.kind == "invalid"), "reported")
 
 
+func test_the_hello_lists_every_game_this_client_can_play_or_the_server_refuses_a_bang_camp() -> void:
+	go_online()
+	var hellos := fake.sent.filter(func(m): return m.t == "hello")
+	eq(hellos.size(), 1, "one hello")
+	var games: Array = hellos[0].get("games", [])
+	check("bang" in games and "survivors" in games, "hello.games is %s" % [games])
+	eq(games.size(), RulesetRegistry.RULESETS.size(), "exactly the registered games")
+
+
 func test_the_lobby_of_a_bang_room_is_the_shared_lobby() -> void:
 	_room()
 	fake.server_send({"t": "lobby", "game": "bang", "room_code": "BANG", "seats_taken": 1, "seats_total": 5, "host": true,

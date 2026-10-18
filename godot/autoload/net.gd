@@ -250,8 +250,10 @@ func _stop(reason: String) -> void:
 func _on_opened() -> void:
 	Log.event("net", "open", {"url": url})
 	_last_rx = clock.now_msec()
+	# `games`: the game ids this client can play (docs/ARENA.md section 6). Without it the server treats the client as Survivors-only
+	# and refuses a Bang! create_room with unsupported_game.
 	_send_raw({"t": "hello", "proto": PROTO, "client_build": str(ProjectSettings.get_setting(
-		"application/config/version"))})
+		"application/config/version")), "games": RulesetRegistry.RULESETS.keys()})
 
 
 func _on_closed(code: int, reason: String) -> void:
