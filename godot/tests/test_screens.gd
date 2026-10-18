@@ -259,6 +259,49 @@ func test_other_players_show_only_a_band_never_a_number() -> void:
 			check(not ch.is_valid_int(), "a digit in another player's line: " + text_of(s, id))
 
 
+func test_a_push_that_only_moves_the_locked_count_keeps_the_same_buttons() -> void:
+	# found by driving: bots lock all the time, and a rebuild between a press and its release lost the tap
+	var s := _round_screen()
+	var steal := btn(s, "move_steal")
+	fake.server_send(round_view(1, false, 150, 2))
+	check(btn(s, "move_steal") == steal, "the very same button node survives a locked-count push")
+	eq(text_of(s, "locked_count"), "2 of 4 locked in", "the count still updates")
+	fake.server_send(round_view(1, false, 140, 3))
+	check(btn(s, "move_steal") == steal, "and a second push")
+	eq(text_of(s, "locked_count"), "3 of 4 locked in", "count updated again")
+
+
+func test_a_push_that_changes_what_is_shown_does_rebuild() -> void:
+	var s := _round_screen()
+	var before := btn(s, "move_steal")
+	fake.server_send(_view_with_pick())
+	check(btn(s, "move_steal") != before, "a pick echo rebuilds the screen")
+	check(Ui.find(s, "my_pick") != null, "and shows it")
+
+
+func test_the_same_reveal_pushed_again_keeps_the_continue_button() -> void:
+	in_round(1)
+	fake.server_send(_reveal_view())
+	var s := mount(RevealScreen)
+	var cont := btn(s, "continue")
+	for i in 5:
+		fake.server_send(_reveal_view())
+	check(btn(s, "continue") == cont, "five identical pushes, the same Continue button")
+	fake.server_send(_reveal_view(1).merged({"private": []}, true))
+	check(btn(s, "continue") != cont, "a changed reveal does rebuild")
+
+
+func test_the_goal_status_line_does_not_say_decided_at_the_end_twice() -> void:
+	in_round()
+	var v := round_view(1)
+	v.me.goal_progress = {"state": "end", "text": "x", "line": {"code": "progress_beat",
+		"args": {"rations": 8, "target": "Fig"}}}
+	fake.server_send(v)
+	var s := mount(RoundScreen)
+	var text: String = (Ui.find(s, "goal_status") as Label).text
+	eq(text.to_lower().count("decided at the end"), 1, "once, not twice: " + text)
+
+
 func test_the_timer_shows_the_clock_and_says_unknown_when_stale() -> void:
 	var s := _round_screen()
 	s._tick()

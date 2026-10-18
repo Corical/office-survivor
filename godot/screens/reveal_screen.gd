@@ -7,7 +7,7 @@ var _timer_label: Label
 
 
 func _ready() -> void:
-	Feed.model_changed.connect(func(kind, _m): if kind == "reveal": _build())
+	Feed.model_changed.connect(_on_model)
 	_build()
 
 
@@ -16,7 +16,23 @@ func _process(_delta: float) -> void:
 		_timer_label.text = Words.render("ui.seconds", {"n": Feed.seconds_left()})
 
 
+var _sig := ""
+
+
+## An identical push (the server re-sends the same view on every action) must not rebuild the screen under a finger.
+func _on_model(kind: String, m: Dictionary) -> void:
+	if kind != "reveal":
+		return
+	if _sig_of(m) != _sig:
+		_build()
+
+
+func _sig_of(m: Dictionary) -> String:
+	return JSON.stringify(m.get("lines", m)) + JSON.stringify(m.get("radio", [])) + str(m.get("is_host", "")) + str(m.get("seats_taken", ""))
+
+
 func _build() -> void:
+	_sig = _sig_of(Feed.models.get("reveal", {}))
 	for c in get_children():
 		remove_child(c)
 		c.queue_free()

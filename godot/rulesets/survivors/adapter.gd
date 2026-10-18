@@ -267,8 +267,8 @@ static func plain_sentence(s: String) -> String:
 static func slots_for(args: Dictionary) -> Dictionary:
 	var slots := {}
 	for k in args:
-		if k == "line" and args[k] is String:
-			slots[k] = plain_sentence(args[k])
+		if (k == "line" or k == "band") and args[k] is String:
+			slots[k] = plain_sentence(args[k])           # server English: no emoji (a band arrives as "<dot> well fed")
 			continue
 		match SLOT_TYPES.get(k, ""):
 			"move":

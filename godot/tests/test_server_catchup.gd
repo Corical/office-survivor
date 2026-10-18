@@ -159,6 +159,16 @@ func test_the_events_fallback_sentence_carries_no_emoji() -> void:
 					break
 
 
+func test_a_band_inside_a_progress_line_carries_no_emoji() -> void:
+	eq(A.slots_for({"band": "\U01F7E2 well fed"}).band, "well fed", "the dot is stripped")
+	var v := _round_with({"code": "beat", "text": "x", "line": {"code": "goal_beat", "args": {"target": "Fig"}}},
+		{"state": "end", "text": "x", "line": {"code": "progress_beat_band",
+			"args": {"rations": 8, "target": "Fig", "band": "\U01F7E2 well fed"}}})
+	var g: Dictionary = A.round_model(v).goal
+	eq(Words.render(g.progress.key, g.progress.slots),
+		"decided at the end: you have 8, Fig's stash is secret. They look well fed this morning.", "no dot")
+
+
 func test_my_own_find_event_is_normalised_to_me() -> void:
 	var m := A.reveal_model(_reveal([_ev("bananas", "player", "Me")], [_ev("bananas", "player", "Me"),
 		{"code": "now_have", "args": {"rations": 8}}]), "Me", {"me": {"alias": "Me", "rations": 7}, "aliases": ["Bo"]})

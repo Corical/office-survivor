@@ -15,6 +15,7 @@ var _radio_phrase: Dictionary = {}
 var _timer_label: Label
 var _timer_bar: ProgressBar
 var _wide := false
+var _sig := ""                      # what the screen currently shows, so an unchanged push does not rebuild it
 var _building := false
 
 
@@ -41,7 +42,24 @@ func _on_model(kind: String, m: Dictionary) -> void:
 		_radio_open = false
 		_radio_phrase = {}
 	_m = m
-	_build()
+	if _signature(m) != _sig:
+		_build()
+	else:
+		_refresh_live()       # only the clock and the locked count moved: update them in place, keep the buttons
+
+
+## Everything the screen draws except the clock and the locked count. A server push that changes only those (a bot
+## locking, say) must not rebuild the buttons: a tap whose press and release straddle a rebuild is lost.
+func _signature(m: Dictionary) -> String:
+	return JSON.stringify([m.round, m.rounds, m.me, m.goal, m.pickers, m.my_pick, m.lock, m.radio, m.roster,
+		m.seats_total, m.timer.known])
+
+
+func _refresh_live() -> void:
+	var lc := Ui.find(self, "locked_count") as Label
+	if lc != null:
+		lc.text = Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total})
+	_tick()
 
 
 func _process(_delta: float) -> void:
@@ -67,6 +85,7 @@ func _build() -> void:
 		return
 	_building = true
 	_wide = size.x >= WIDE_PX
+	_sig = _signature(_m) if not _m.is_empty() else ""
 	for c in get_children():
 		remove_child(c)
 		c.queue_free()
@@ -100,6 +119,19 @@ func _build() -> void:
 		for s in [head, act, roster, goal, radio]:
 			page.add_child(s)
 	_building = false
+	if _radio_open:
+		call_deferred("_show_radio")
+
+
+## The radio opens at the bottom of the page: scroll it into view so nobody has to hunt for it.
+func _show_radio() -> void:
+	var last: Control = null
+	for c in Ui.find_all(self, "phrase_") + Ui.find_all(self, "about_"):
+		last = c
+	if last == null:
+		return
+	for n in find_children("*", "ScrollContainer", true, false):
+		(n as ScrollContainer).ensure_control_visible(last)
 
 
 ## Who I am, the clock, what I have.
@@ -159,8 +191,10 @@ func _goal() -> VBoxContainer:
 	var s := Ui.vbox(4)
 	s.add_child(Ui.label(Words.render("ui.goal"), "", "MutedLabel"))
 	s.add_child(Ui.label(Words.render(_m.goal.key, _m.goal.slots), "goal"))
-	s.add_child(Ui.label("%s: %s" % [Words.render(_m.goal.state_key), Words.render(_m.goal.progress.key,
-		_m.goal.progress.slots)], "goal_status", "MutedLabel"))
+	var progress: String = Words.render(_m.goal.progress.key, _m.goal.progress.slots)
+	# worded from a code, the progress already says how it stands; otherwise lead with the state word
+	var status: String = progress if _m.goal.progress.from_code else "%s: %s" % [Words.render(_m.goal.state_key), progress]
+	s.add_child(Ui.label(status, "goal_status", "MutedLabel"))
 	return s
 
 
