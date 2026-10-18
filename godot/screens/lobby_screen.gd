@@ -5,12 +5,15 @@ extends Control
 ## sees a clear "waiting for the host" card and no Start.
 
 const LANTERN := Vector2(40, 60)          # chosen: the lantern art has a clear margin, so this shows about 24 x 36 of lantern
-var copied_seconds := 1.6                 # how long the Copy button says it worked (a test shortens it)
+const KICK_WIDTH := 170.0                 # chosen: "Send away" with its studs and a margin, in the widest word the themes use
+var copied_seconds := 1.6                # how long the Copy button says it worked (a test shortens it)
 
 var _sig := ""
 var _intro_played := false
 var _copy_button: Button
-var _copy_gen := 0                        # a later press must not be undone by an earlier press's timer
+var _kicking := ""                        # the handle of the seat just sent away, until the next lobby shows it gone
+var _confirming := ""                     # the handle of a seat that is here and is being asked about
+var _copy_gen := 0                       # a later press must not be undone by an earlier press's timer
 
 
 func _ready() -> void:
@@ -22,12 +25,16 @@ func _ready() -> void:
 func _on_model(kind: String, m: Dictionary) -> void:
 	if kind != "lobby":
 		return
-	if _sig_of(m) != _sig:
+	if _sig_of(m) != _sig or _kicking != "":
+		# a push while a kick is out is the server's answer (the seat is gone) or a refusal (it is still there: the button
+		# comes back, and a second tap meets the "in flight" guard if the first is still travelling)
+		if _sig_of(m) == _sig:
+			_kicking = ""
 		_build()
 
 
 func _sig_of(m: Dictionary) -> String:
-	return JSON.stringify(m.get("lines", m)) + JSON.stringify(m.get("radio", [])) + str(m.get("is_host", "")) + str(m.get("seats_taken", ""))
+	return JSON.stringify(m.get("lines", m)) + JSON.stringify(m.get("radio", [])) + str(m.get("is_host", "")) + str(m.get("seats_taken", "")) + JSON.stringify(m.get("seats", []))
 
 
 func _build() -> void:
@@ -60,6 +67,9 @@ func _build() -> void:
 	menu.add_child(sign_card)
 	entries.append(sign_card)
 	if m.is_host:
+		var seat_rows := _seat_list(m.get("seats", []))
+		if seat_rows != null:
+			menu.add_child(seat_rows)
 		if int(m.seats_taken) < int(m.seats_total):
 			var bots := Ui.label(Words.render("ui.bots_fill"), "bots_note", "MutedLabel")
 			bots.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -81,6 +91,90 @@ func _build() -> void:
 	if not _intro_played:
 		_intro_played = true
 		Ui.intro_all(entries)
+
+
+## The host's list of the OTHER seats, one row per entry of the latest lobby model, named by position ("Seat 1".."Seat n":
+## the server gives no names and neither does this). Each row says whether that seat is here (lit lantern) or dropped off (dim
+## lantern) and has a Send away button. A dropped seat is sent away with one tap. A seat that is here needs a second, explicit
+## tap (the confirm row), so one stray tap can never remove a player who is there. Null when there is nobody to list.
+## Nothing is decided locally after a kick: the server sends a fresh lobby and the row is gone. The pressed row's button is
+## off until then (a second tap would only come back "in flight").
+func _seat_list(seats: Array) -> Control:
+	var handles: Array = seats.map(func(s): return s.id)
+	if _kicking != "" and not handles.has(_kicking):
+		_kicking = ""                                      # that seat is gone: the kick worked
+	if _confirming != "" and not handles.has(_confirming):
+		_confirming = ""
+	if seats.is_empty():
+		return null
+	var col := Ui.vbox(8)
+	col.set_meta("id", "seat_list")
+	var any_dropped := false
+	for i in seats.size():
+		var seat: Dictionary = seats[i]
+		any_dropped = any_dropped or not seat.connected
+		col.add_child(_seat_row(i + 1, seat))
+	if any_dropped:
+		var help := Ui.label(Words.render("ui.kick_help"), "kick_help", "MutedLabel")
+		help.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(help)
+	return col
+
+
+func _seat_row(n: int, seat: Dictionary) -> Control:
+	var id: String = seat.id
+	var card := Ui.card("Plate")
+	card.set_meta("id", "seat_row_%d" % n)
+	var row := Ui.hbox(10)
+	card.add_child(row)
+	var tex := Themes.texture("lantern_on" if seat.connected else "lantern_off")
+	if tex != null:
+		row.add_child(Ui.picture(tex, Vector2(40, 60)))
+	var text := Ui.vbox(0)
+	text.add_child(Ui.name_label(Words.render("ui.seat_n", {"n": n}), "seat_name_%d" % n, "NameLabel"))
+	var state := Ui.name_label(Words.render("ui.seat_here" if seat.connected else "ui.seat_dropped"), "seat_state_%d" % n, "MutedLabel")
+	text.add_child(state)
+	row.add_child(text)
+	var busy := _kicking == id
+	if _confirming == id and not busy:
+		var ask := Ui.label(Words.render("ui.kick_confirm"), "seat_confirm_%d" % n, "MutedLabel")
+		ask.size_flags_horizontal = Control.SIZE_SHRINK_END
+		var yes := Ui.button(Words.render("ui.kick"), "kick_yes_%d" % n, func(): _send_kick(id))
+		var no := Ui.button(Words.render("ui.cancel"), "kick_no_%d" % n, func():
+			_confirming = ""
+			_build())
+		card.remove_child(row)
+		var stack := Ui.vbox(8)
+		stack.add_child(row)
+		stack.add_child(ask)
+		var choice := Ui.hbox(8)
+		yes.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		no.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		choice.add_child(yes)
+		choice.add_child(no)
+		stack.add_child(choice)
+		card.add_child(stack)
+		return card
+	var kick := Ui.button(Words.render("ui.kick"), "kick_%d" % n, func(): _on_kick_tap(id, seat.connected), busy)
+	kick.size_flags_horizontal = Control.SIZE_SHRINK_END
+	kick.custom_minimum_size = Vector2(KICK_WIDTH, Ui.MIN_ART_BUTTON_HEIGHT)          # room for the word between the two studs
+	row.add_child(kick)
+	return card
+
+
+func _on_kick_tap(id: String, connected: bool) -> void:
+	if connected:
+		_confirming = id                                    # a seat that is here: ask first
+		_build()
+		return
+	_send_kick(id)
+
+
+func _send_kick(id: String) -> void:
+	_confirming = ""
+	if Intents.kick(id) == "":
+		_kicking = id
+	_build()
 
 
 ## A small Copy button under the code; it says "Copied" for a moment after it worked.
