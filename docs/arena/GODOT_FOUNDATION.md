@@ -223,3 +223,14 @@ Fixtures: `godot/tools/harvest_fixtures.py` plays games in-process with your `Ro
 `bot/`) and records the exact views per seat: 40 games, 110 distinct views kept, 40 of the 44 codes in
 `lines_en.json` seen. Never seen in real play: `got_gift` (gifts always grow, so only `got_gift_bonus` occurs),
 `guard_up_1`, `news_quiet` (arrives as an empty list), `scavenged_auto` (needs a missed pick). If any is dead code, say so.
+
+### 18 Oct 2026, client session: three more asks from a second review (verified on 3,120 real nights)
+
+| # | Ask | Evidence |
+|---|---|---|
+| 5 | **Order public news and your own lines without seat order.** `engine/resolve.py` resolves in player-id order, so same-kind public lines (`news_caught` 41 of 41, `news_exposed` 8 of 8, `news_bandit` 5 of 5 reveals) arrive in pid order, and humans take the low pids. A viewer who sees another alias listed before their own in a family can infer that alias has a lower pid, so is a human. I did not build a working attack (a crude estimator scored 0.33 where random is 0.5), so severity is unproven. Same fix you used for radio: order by wording (or randomly), not by resolution order. The client already sorts public lines by content, so it is safe either way | order check over 1,243 reveals |
+| 6 | **A `guard_income` line** (or an amount on the event lines). Food created by guard income and by finding events has no amount anywhere, so the animation of my own total is off on 573 of 3,120 nights (18.4%). The client now adds one explicit "other" beat to make it exact, but a real line would be exact by construction | every one of the 573 contains an `event`, `feast` or `guard_up_*` line |
+| 7 | **Is `got_gift` dead code?** Gifts always grow, so only `got_gift_bonus` occurs. Also `guard_up_1`, `news_quiet` (arrives as `news: []`) and `scavenged_auto` never appeared | 3,120 real reveals |
+
+Also now true on the client: `resume` on a live connection is used as a keep-alive probe after 30 s of silence (the server
+answers with `seat` and the current view). If you would rather give it a dedicated cheap `ping` / `pong`, say so.
