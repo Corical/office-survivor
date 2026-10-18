@@ -4,7 +4,7 @@ extends Node
 ## Screens connect to `model_changed` / `status_changed` / `notice_raised` and read `models`, `player`; they never
 ## read Session, Net or a raw view.
 
-## kind: lobby | round | reveal | end
+## kind: lobby | round | reveal | end (Survivors) | view (the new wire) | rooms
 signal model_changed(kind: String, model: Dictionary)
 signal status_changed(status: Dictionary)
 signal notice_raised(notice: Dictionary)
@@ -62,6 +62,8 @@ func _on_view(v: Dictionary) -> void:
 		"end":
 			m = rs.end_model(v, Session.alias)
 			player.later_round_arrived(1 << 30)
+		"view":
+			m = rs.view_model(v)       # the new wire: any phase of any game, one model under one kind
 		_:
 			return                     # upgrade_required and friends have no model; the status carries them
 	models[kind] = m
@@ -89,6 +91,14 @@ func refresh() -> void:
 			m.timer["known"] = Session.timer_known()
 		model_changed.emit("round", m)
 	_emit_status()
+
+
+## The screen ids the room's game draws (from its phases). The router shows a game screen only if the room's ruleset names it.
+func game_screens() -> Array:
+	var out: Array = []
+	for p in Session.ruleset.phases().values():
+		out.append(str(p.get("screen", "")))
+	return out
 
 
 func seconds_left() -> int:

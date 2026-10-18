@@ -10,6 +10,7 @@ const SCREENS := {
 	"end": preload("res://screens/end_screen.gd"),
 	"upgrade": preload("res://screens/upgrade_screen.gd"),
 }
+const SHARED_SCREENS := ["title", "upgrade"]        # the rest are a game's, shown only through its ruleset's phases
 ## The order the backdrop pans through as a game moves along (a screen not listed pans like the title).
 const DEFAULT_FADE := {"fade": 0.4, "slide": 0.0}          # chosen: the same length as the flash theme's, without the drift
 const MAX_STEP := 1.0 / 30.0                # chosen: a fade moves at most this much per frame, however long the frame was
@@ -72,8 +73,13 @@ func _on_theme(_id: String) -> void:
 	_route(Feed.status())
 
 
+## A shared screen always; a game's screen only when the room's ruleset names it and a screen is drawn for it.
+func _routable(screen: String) -> bool:
+	return SCREENS.has(screen) and (screen in SHARED_SCREENS or screen in Feed.game_screens())
+
+
 func _route(st: Dictionary) -> void:
-	var want: String = st.screen if SCREENS.has(st.screen) else "title"
+	var want: String = st.screen if _routable(st.screen) else "title"
 	if want == current_name:
 		return
 	var old := current
