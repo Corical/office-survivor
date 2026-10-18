@@ -5,6 +5,7 @@ Hidden from a seat during play: the others' picks, goals, private lines and exac
 when ranges are on), which of them have locked (only the count is public), and which seats are bots.
 """
 import copy
+from dataclasses import replace
 import json
 import random
 import unittest
@@ -116,6 +117,69 @@ class NonInterference(unittest.TestCase):
         leaky = lambda g, me: {**views.round_view(g, me), "x": sorted(g.sims)}     # noqa: E731
         diffs = sum(dump(leaky(scramble(g, 0, random.Random(k)), 0)) != dump(leaky(g, 0)) for k in range(5))
         self.assertGreater(diffs, 0)
+
+
+class GoalLines(unittest.TestCase):
+    def test_a_goal_and_its_progress_travel_as_lines_that_render_to_their_english(self):
+        """Client request 4: `line` (code + values) and `text` are the same words, for every seat in every game."""
+        from arena.lines import ALL_EN, render
+        seen = set()
+        for seed in range(40):
+            rng = random.Random(seed)
+            g, sched = new_room(seed, humans=1 + seed % 4, ranges=seed % 2 == 0)
+            humans = list(range(1 + seed % 4))
+            while not g.finished:
+                if g.phase == "round":
+                    for me in humans:
+                        v = views.round_view(g, me)["me"]
+                        for part in (v["goal"], v["goal_progress"]):
+                            self.assertIn(part["line"]["code"], ALL_EN)
+                            self.assertEqual(render(part["line"]), part["text"], f"seed {seed} seat {me}")
+                            seen.add(part["line"]["code"])
+                        moves, amounts = g.legal_for(me)
+                        if rng.random() < 0.7:
+                            kind = rng.choice(sorted(moves))
+                            tgt = rng.choice(moves[kind]) if moves[kind] else None
+                            g.pick(me, kind, tgt, amounts[0] if kind == "gift" and amounts else 0)
+                    sched.advance(g.deadline)
+                else:
+                    sched.advance(g.reveal_until)
+            for res in views.end_view(g, 0)["results"]:
+                self.assertEqual(render(res["goal"]["line"]), res["goal"]["text"])
+        goals = {c for c in seen if c.startswith("goal_")}
+        # The goal deck is dealt in order, one card per seat: with 4 seats only the first four goal types exist.
+        # (grudge and detective need 5+ seats: a design fact the owner has been told, pinned here.)
+        self.assertEqual(goals, {"goal_beat", "goal_robbed2_extract", "goal_steal3_clean", "goal_give"})
+
+    def test_all_six_goals_render_when_forced_even_the_two_a_four_seat_room_never_deals(self):
+        from arena.lines import render
+        from engine.deal import GOALS as ALL_GOALS
+        g, sched = new_room(5, humans=1, ranges=True)
+        p = g.players[0]
+        for goal in ALL_GOALS:
+            for grudge_goal in ("rob", "deny"):
+                g.rules = replace(g.rules, grudge_goal=grudge_goal)
+                p.objective, p.obj_target = goal, (1 if goal in ("beat", "grudge") else -1)
+                v = views.round_view(g, 0)["me"]
+                self.assertEqual(render(v["goal"]["line"]), v["goal"]["text"], goal)
+                self.assertEqual(render(v["goal_progress"]["line"]), v["goal_progress"]["text"], goal)
+                p.obj_target = 1 if goal in ("beat", "grudge") else -1
+        g.quit_ids.add(1)                                   # a hunter whose target left
+        p.objective, p.obj_target = "beat", 1
+        v = views.round_view(g, 0)["me"]
+        self.assertEqual(v["goal_progress"]["line"]["code"], "progress_target_left")
+        self.assertEqual(v["goal_progress"]["state"], "failed")
+
+    def test_goal_lines_use_the_players_own_numbers_and_the_targets_alias_not_its_rations(self):
+        g, sched = new_room(3, humans=1, ranges=True)
+        v = views.round_view(g, 0)["me"]
+        text = json.dumps(v)
+        target = g.players[g.players[0].obj_target].name if g.players[0].obj_target >= 0 else None
+        for q in g.players.values():
+            if q.pid != 0:
+                self.assertNotIn(f"{q.name} has {q.rations}", text)
+        if target:
+            self.assertIn(target, text)
 
 
 class NewsOrder(unittest.TestCase):

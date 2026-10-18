@@ -80,7 +80,11 @@ news is ordered the same way (wilderness stories first, then by wording), never 
 the low seats, so that order would show which seats are people. (Torch's #news still lists lines in engine order; its
 players have random aliases and no way to see seat numbers, so it is a much weaker hint there.)
 
-Lines are codes plus values (`arena/lines.py`); `arena/lines_en.json` turns them into Torch's exact English.
+Lines are codes plus values (`arena/lines.py`); `arena/lines_en.json` turns them into Torch's exact English. A seat's goal
+(`me.goal`, and each result's `goal` at the end) and its progress (`me.goal_progress`) carry a `line` = `{code, args}`
+(codes `goal_*` and `progress_*`, in the same JSON) plus the same words as English `text`, as a fallback. The wording
+lives in one table in `engine/finish.py`, shared with Torch's `/status`; `engine/tests/test_goal_codes.py` holds it to a
+frozen copy of what those lines said before they became templates, over every goal, state and rule variant.
 
 ## 6. Protocol
 
@@ -172,7 +176,8 @@ they are listed in MECHANICS.md section 9.
 | Limit | Why it is acceptable for now |
 |---|---|
 | When the last human locks before the bots, the remaining bots lock in the same instant | A small timing hint; the count still includes bots |
-| Goal wording and goal progress travel as English text (with the goal code) | The engine writes them; a second theme needs codes |
+| `band` in the `progress_beat_band` line is the English band label ("🟡 getting by"), not a band key | It is the same text Torch shows; the board next to it carries the band keys |
+| In a 4-seat room only four goal types are ever dealt (beat, robbed twice and extract, clean thief, give): the goal deck is dealt in order, one card per seat, so **grudge and detective need 5 or more seats** | A rules fact (MECHANICS.md section 7), not a bug; it means the Detective goal never appears in a 4-seat room |
 | Wilderness event stories travel as English text (code `event`, arg `line`), with `event` (the id), `scope` (`camp` or `player`) and, for a player event, `who` beside it | `engine/events.py` writes the sentence. The story **variant** is not sent: the engine picks it from the seed each time and does not record it, and recording it would add a field to every stored event, which makes every existing log fail to replay |
 | Log writes fsync on the event loop | Rooms are capped (20 by default) and records are tiny |
 | Leaving the lobby does not free the seat (the join is in the log); the seat stays counted as taken and, once started, is a human who never answers | After the `grace` the round stops waiting for it. Freeing the seat needs a "left before the start" record: not built |

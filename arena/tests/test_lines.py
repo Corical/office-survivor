@@ -7,7 +7,7 @@ import json
 import random
 import unittest
 
-from arena.lines import JSON_PATH, LINES_EN, news_codes, private_codes, render
+from arena.lines import ALL_EN, JSON_PATH, LINES_EN, news_codes, private_codes, render
 from bot.game import GameError, GameService, news_lines, private_lines
 from bot.store import MemoryEventStore, MemoryIdentityStore, MemoryTextStore
 from bot.tests.test_core_fixtures import _official
@@ -162,12 +162,12 @@ class LinesMatchTorch(unittest.TestCase):
 
     def test_json_for_the_client_equals_the_table(self):
         with open(JSON_PATH, encoding="utf-8") as f:
-            self.assertEqual(json.load(f), LINES_EN, "run: python -m arena.lines  (rewrites arena/lines_en.json)")
+            self.assertEqual(json.load(f), ALL_EN, "run: python -m arena.lines  (rewrites arena/lines_en.json)")
 
     def test_every_template_names_only_args_its_code_gets(self):
         """A template with a {name} no code ever fills would crash a client at render time."""
         import string
-        for code, text in LINES_EN.items():
+        for code, text in ALL_EN.items():
             names = {f for _, f, _, _ in string.Formatter().parse(text) if f}
             with self.subTest(code=code):
                 self.assertTrue(all(n.isidentifier() for n in names))

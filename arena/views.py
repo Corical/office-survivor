@@ -4,13 +4,14 @@ Every function takes the room and ONE pid and returns a plain dict (the protocol
 section 5.2). Nothing here may read another player's pick, goal, private lines or exact rations, or whether a seat is
 a bot; arena/tests/test_views.py changes all of those and requires the view to stay byte-identical.
 
-Two fields still carry English from the engine (a theme will need them as codes): a goal's wording (`text`, from
-engine/finish.py objective_text) and goal progress (`text`, from goal_progress).
+A goal and its progress each travel twice: as a line (`line` = code + values, worded by the client's theme from
+arena/lines_en.json) and as English `text` (the same words, kept as a fallback). Both come from the one template table
+in engine/finish.py, which Torch's /status uses too. Still English only: wilderness event sentences (see lines.py).
 """
 import re
 
 from bot.core import RADIO_PHRASES
-from engine.finish import goal_progress, objective_text
+from engine.finish import goal_line, goal_progress_line, objective_text, render_line
 from engine.visibility import band_index
 
 from .lines import news_codes as _news_codes, render
@@ -31,8 +32,11 @@ def _band(p):
 
 
 def _goal(g, p):
+    """The goal: its id, its target, and its wording as a line (code + values) with the English kept as a fallback."""
     tgt = g.players[p.obj_target].name if p.obj_target >= 0 else None
-    return {"code": p.objective, "target": tgt, "text": objective_text(p.objective, g.rules, tgt or "")}
+    code, args = goal_line(p.objective, g.rules, tgt or "")
+    return {"code": p.objective, "target": tgt, "text": objective_text(p.objective, g.rules, tgt or ""),
+            "line": {"code": code, "args": args}}
 
 
 def _board(g):
@@ -51,8 +55,8 @@ def round_view(g, pid):
     move = g.moves.get(pid)
     tgt_band = band_index(g.players[p.obj_target]) if g.ranges and p.obj_target >= 0 else None
     from engine.visibility import band_label
-    state, how = goal_progress(p, list(g.players.values()), g.rules, frozenset(g.quit_ids),
-                               band_label(g.players[p.obj_target]) if tgt_band is not None else None)
+    state, pcode, pargs = goal_progress_line(p, list(g.players.values()), g.rules, frozenset(g.quit_ids),
+                                             band_label(g.players[p.obj_target]) if tgt_band is not None else None)
     legal, amounts = g.legal_for(pid) if pid not in g.quit_ids else ({}, [])
     return {
         "t": "round", "round": g.round, "rounds": g.rules.rounds,
@@ -60,7 +64,9 @@ def round_view(g, pid):
         "me": {"alias": p.name, "rations": p.rations, "bandit": p.bandit,
                "guards_left": (g.rules.guard_limit - p.guards_used) if g.rules.guard_limit else None,
                "guarded": p.guard_until >= g.round,
-               "goal": _goal(g, p), "goal_progress": {"state": state, "text": how}},
+               "goal": _goal(g, p),
+               "goal_progress": {"state": state, "text": render_line(pcode, pargs),
+                                 "line": {"code": pcode, "args": pargs}}},
         "legal": legal, "gift_amounts": amounts,
         "my_pick": None if not move else {"kind": move[0], "target": g.players[move[1]].name if move[1] is not None
                                           else None, "amount": move[2]},

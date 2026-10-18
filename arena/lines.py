@@ -11,6 +11,8 @@ Wilderness events are the one exception: engine/events.py writes their story lin
 import json
 import os
 
+from engine.finish import GOAL_LINES, PROGRESS_LINES
+
 LINES_EN = {
     # ---- private: what one player is told
     "idol_found": "🗿 You found a hidden idol. The next person to rob you gets nothing. Tell no one.",
@@ -64,6 +66,11 @@ LINES_EN = {
 }
 
 
+# The one table the client loads (arena/lines_en.json): the night's lines above, plus the goal and goal-progress
+# wording, which lives in engine/finish.py so Torch's /status and the live rooms say exactly the same.
+ALL_EN = {**LINES_EN, **GOAL_LINES, **PROGRESS_LINES}
+
+
 def _l(code, **args):
     return {"code": code, "args": args}
 
@@ -84,10 +91,10 @@ def _and(nums):
     return nums[0] if len(nums) == 1 else ", ".join(nums[:-1]) + " and " + nums[-1]
 
 
-def render(line, table=LINES_EN):
+def render(line, table=None):
     """One line in words. A list arg is joined the English way ('3, 4 and 5')."""
     args = {k: _and(v) if isinstance(v, list) else v for k, v in line["args"].items()}
-    return table[line["code"]].format(**args)
+    return (table or ALL_EN)[line["code"]].format(**args)
 
 
 def news_codes(events):
@@ -208,7 +215,7 @@ JSON_PATH = os.path.join(os.path.dirname(__file__), "lines_en.json")
 def write_json(path=JSON_PATH):
     """Write the template table for the Godot client (a test keeps the file equal to LINES_EN)."""
     with open(path, "w", encoding="utf-8", newline="\n") as f:
-        json.dump(LINES_EN, f, ensure_ascii=False, indent=1, sort_keys=True)
+        json.dump(ALL_EN, f, ensure_ascii=False, indent=1, sort_keys=True)
         f.write("\n")
 
 
