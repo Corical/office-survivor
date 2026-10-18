@@ -426,9 +426,9 @@ func _crumbs(b: Dictionary, from_pos: Vector2, to_pos: Vector2) -> void:
 	if f.is_empty() or crumb == null:
 		# reduced motion or no crumb art: the numbers still show, the crumbs do not fly
 		if b.to != OFFSTAGE and amount_in > 0 and not fl.is_empty():
-			_pool.spawn_text("+%d" % amount_in, to_pos + Vector2(0, -_hut_px * 0.55), rise, 0.35, life, Themes.color("gain"))
+			_pool.spawn_text("+%d" % amount_in, to_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, 0.35, life, Themes.color("gain"))
 		if b.from != OFFSTAGE and amount_out > 0 and not fl.is_empty():
-			_pool.spawn_text("-%d" % amount_out, from_pos + Vector2(0, -_hut_px * 0.55), rise, 0.0, life, Themes.color("loss"))
+			_pool.spawn_text("-%d" % amount_out, from_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, 0.0, life, Themes.color("loss"))
 		return
 	var n := mini(maxi(amount_in, amount_out), int(f.get("max", 8)))
 	var flight := float(f.get("flight", 0.6))
@@ -443,9 +443,9 @@ func _crumbs(b: Dictionary, from_pos: Vector2, to_pos: Vector2) -> void:
 			2.0 * side, true)
 	var landed := flight + float(maxi(n - 1, 0)) * stagger
 	if b.to != OFFSTAGE and amount_in > 0:
-		_pool.spawn_text("+%d" % amount_in, to_pos + Vector2(0, -_hut_px * 0.55), rise, landed * 0.9, life, Themes.color("gain"))
+		_pool.spawn_text("+%d" % amount_in, to_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, landed * 0.9, life, Themes.color("gain"))
 	if b.from != OFFSTAGE and amount_out > 0:
-		_pool.spawn_text("-%d" % amount_out, from_pos + Vector2(0, -_hut_px * 0.55), rise, 0.0, life, Themes.color("loss"))
+		_pool.spawn_text("-%d" % amount_out, from_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, 0.0, life, Themes.color("loss"))
 
 
 ## The colour a style of movement is tinted by (the theme maps style -> colour name; unknown styles are untinted).
