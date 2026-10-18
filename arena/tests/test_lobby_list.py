@@ -15,6 +15,7 @@ class OpenCamps(unittest.IsolatedAsyncioTestCase):
     # the server fixtures of ServerTests, borrowed rather than copied so a change there reaches here
     S = base.ServerTests
     asyncSetUp, _start, _stop, asyncTearDown = S.asyncSetUp, S._start, S._stop, S.asyncTearDown
+    _play_round = S._play_round
     del S
 
     # ---------------- helpers ----------------
@@ -118,15 +119,205 @@ class OpenCamps(unittest.IsolatedAsyncioTestCase):
         await back.until("seat")
         await self._until_listed(code, True)
 
-    async def test_a_seat_that_left_the_lobby_still_counts_as_taken(self):
-        """Known and documented (ARENA.md): leaving the lobby does not free the seat. The list tells the truth about it."""
+    async def test_closing_the_app_without_leave_keeps_the_seat_in_case_they_come_back(self):
+        """Documented (ARENA.md section 7): only the leave message frees a lobby seat; a dropped phone may resume."""
         c, seat = await self._camp()
         j = await self._join(seat["room_code"])
-        await j.until("seat")
+        joined = await j.until("seat")
         await j.close()
         for _ in range(20):                                    # let the server notice the drop
             await asyncio.sleep(0.05)
         self.assertEqual((await self._list())[0]["seats_taken"], 2)
+        back = await Client.open(self.port)
+        await back.send({"t": "resume", "token": joined["token"]})
+        self.assertEqual((await back.until("seat"))["alias"], joined["alias"])
+
+    # ---------------- leaving the lobby gives the seat back ----------------
+    async def _lobby_count(self, client, n):
+        return await client.until("lobby", lambda m: m["seats_taken"] == n)
+
+    async def test_the_owners_exact_scenario_the_creator_sees_the_count_drop_when_the_joiner_leaves(self):
+        creator, seat = await self._camp()
+        joiner = await self._join(seat["room_code"])
+        await joiner.until("seat")
+        await self._lobby_count(creator, 2)
+        await joiner.send({"t": "leave"})
+        lobby = await self._lobby_count(creator, 1)             # the creator is told: 1 of 4, not a stuck 2
+        self.assertTrue(lobby["host"])
+        self.assertEqual((await self._list())[0]["seats_taken"], 1)
+
+    async def test_the_leaver_hears_nothing_more_and_their_token_is_dead(self):
+        creator, seat = await self._camp()
+        joiner = await self._join(seat["room_code"])
+        joined = await joiner.until("seat")
+        await self._lobby_count(creator, 2)
+        mark = len(joiner.seen)
+        await joiner.send({"t": "leave"})
+        await self._lobby_count(creator, 1)
+        await asyncio.sleep(0.2)
+        self.assertEqual([m["t"] for m in joiner.seen[mark:]], [], "a player who left gets no more lobby pushes")
+        again = await Client.open(self.port)
+        await again.send({"t": "resume", "token": joined["token"]})
+        self.assertEqual((await again.until("error"))["code"], "seat_gone")
+
+    async def test_the_freed_seat_is_taken_by_the_next_person_and_the_whole_game_plays_to_the_end(self):
+        """Three humans, the middle one leaves, a fourth takes the place, then 10 rounds: pids have been reused."""
+        host, seat = await self._camp()
+        code = seat["room_code"]
+        b = await self._join(code)
+        await b.until("seat")
+        c = await self._join(code)
+        await c.until("seat")
+        await self._lobby_count(host, 3)
+        await b.send({"t": "leave"})
+        await self._lobby_count(host, 2)
+        d = await self._join(code)
+        await d.until("seat")
+        await self._lobby_count(host, 3)
+        await host.send({"t": "start"})
+        humans = [host, c, d]
+
+        async def play(cl):
+            for n in range(1, 11):
+                await self._play_round(cl)
+                await cl.send({"t": "continue"})
+            return await cl.until("end")
+
+        ends = await asyncio.gather(*(play(cl) for cl in humans))
+        self.assertTrue(all(len(e["results"]) == 4 for e in ends))
+        self.assertEqual(len({r["alias"] for r in ends[0]["results"]}), 4)
+
+    async def test_a_full_room_reopens_when_someone_leaves_and_shows_up_in_the_list_again(self):
+        creator, seat = await self._camp()
+        code = seat["room_code"]
+        others = []
+        for _ in range(3):
+            o = await self._join(code)
+            await o.until("seat")
+            others.append(o)
+        self.assertEqual(await self._list(), [])
+        await others[0].send({"t": "leave"})
+        await self._until_listed(code, True)
+        self.assertEqual((await self._list())[0]["seats_taken"], 3)
+        late = await self._join(code)
+        await late.until("seat")
+        self.assertEqual(await self._list(), [])
+
+    async def test_the_host_leaving_passes_the_camp_to_the_next_person(self):
+        creator, seat = await self._camp()
+        other = await self._join(seat["room_code"])
+        await other.until("seat")
+        await creator.send({"t": "leave"})
+        lobby = await self._lobby_count(other, 1)
+        self.assertTrue(lobby["host"], "the one left behind runs the lobby now")
+        await other.send({"t": "start"})                        # and can start it
+        await other.until("round")
+
+    async def test_the_last_person_out_deletes_the_camp_and_frees_its_room_slot(self):
+        self.server.max_rooms = 1
+        c, seat = await self._camp()
+        code = seat["room_code"]
+        folder = os.path.join(self.data, "rooms", code)
+        self.assertTrue(os.path.isdir(folder))
+        await c.send({"t": "leave"})
+        for _ in range(40):
+            if not os.path.isdir(folder):
+                break
+            await asyncio.sleep(0.05)
+        self.assertFalse(os.path.isdir(folder), "an emptied lobby is deleted from disk")
+        self.assertEqual(await self._list(), [])
+        late = await self._join(code)
+        self.assertEqual((await late.until("error"))["code"], "room_gone")
+        again, _ = await self._camp()                           # the one slot is free again: no "server is full"
+        await again.close()
+
+    async def test_leave_then_join_again_on_the_same_connection_is_a_fresh_seat(self):
+        creator, seat = await self._camp()
+        j = await self._join(seat["room_code"])
+        first = await j.until("seat")
+        await j.send({"t": "leave"})
+        await self._lobby_count(creator, 1)
+        await j.send({"t": "join_room", "code": seat["room_code"]})
+        second = await j.until("seat", lambda m: m["token"] != first["token"])
+        self.assertNotEqual(second["token"], first["token"])
+        await self._lobby_count(creator, 2)
+
+    async def test_leaving_twice_or_without_a_seat_is_a_calm_error_not_a_crash(self):
+        creator, seat = await self._camp()
+        j = await self._join(seat["room_code"])
+        await j.until("seat")
+        await j.send({"t": "leave"})
+        await j.send({"t": "leave"})
+        self.assertIn("Join or create", (await j.until("error"))["message"])
+        stranger = await Client.open(self.port)
+        await stranger.send({"t": "leave"})
+        self.assertIn("Join or create", (await stranger.until("error"))["message"])
+        await creator.send({"t": "start"})                      # the room is unharmed
+        await creator.until("round")
+
+    async def test_a_second_device_holding_the_leavers_token_is_dead_too(self):
+        creator, seat = await self._camp()
+        j = await self._join(seat["room_code"])
+        joined = await j.until("seat")
+        phone2 = await Client.open(self.port)
+        await phone2.send({"t": "resume", "token": joined["token"]})        # takes the seat over: j is told and closed
+        await phone2.until("seat")
+        await phone2.send({"t": "leave"})
+        await self._lobby_count(creator, 1)
+        again = await Client.open(self.port)
+        await again.send({"t": "resume", "token": joined["token"]})
+        self.assertEqual((await again.until("error"))["code"], "seat_gone")
+
+    async def test_a_restart_after_a_leave_keeps_the_free_seat_and_the_dead_token_dead(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        seat_b = await b.until("seat")
+        c = await self._join(seat_a["room_code"])
+        seat_c = await c.until("seat")
+        await self._lobby_count(a, 3)
+        await b.send({"t": "leave"})
+        await self._lobby_count(a, 2)
+        for cl in (a, b, c):
+            await cl.close()
+        await self._stop()
+        await self._start()
+        ra = await Client.open(self.port)
+        await ra.send({"t": "resume", "token": seat_a["token"]})
+        await ra.until("seat")
+        rc = await Client.open(self.port)
+        await rc.send({"t": "resume", "token": seat_c["token"]})
+        self.assertEqual((await rc.until("seat"))["alias"], seat_c["alias"])
+        dead = await Client.open(self.port)
+        await dead.send({"t": "resume", "token": seat_b["token"]})
+        self.assertEqual((await dead.until("error"))["code"], "seat_gone")
+        d = await self._join(seat_a["room_code"])               # the free place is still there after the restart
+        await d.until("seat")
+        await self._lobby_count(ra, 3)
+        await ra.send({"t": "start"})
+        await ra.until("round")
+
+    async def test_identity_left_behind_by_a_crash_does_not_revive_the_leaver_after_a_restart(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        seat_b = await b.until("seat")
+        await self._lobby_count(a, 2)
+        ident_path = os.path.join(self.data, "rooms", seat_a["room_code"], "identity.json")
+        with open(ident_path, encoding="utf-8") as f:
+            before_leave = f.read()
+        await b.send({"t": "leave"})
+        await self._lobby_count(a, 1)
+        await a.close()
+        await b.close()
+        await self._stop()
+        with open(ident_path, "w", encoding="utf-8") as f:       # the identity write that never happened
+            f.write(before_leave)
+        await self._start()
+        dead = await Client.open(self.port)
+        await dead.send({"t": "resume", "token": seat_b["token"]})
+        self.assertEqual((await dead.until("error"))["code"], "seat_gone")
+        live = await Client.open(self.port)
+        await live.send({"t": "resume", "token": seat_a["token"]})
+        await live.until("seat")
 
     # ---------------- the races the list creates ----------------
     async def test_room_fills_between_the_list_and_the_tap(self):
