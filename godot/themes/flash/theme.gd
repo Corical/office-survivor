@@ -113,10 +113,14 @@ static func build() -> ThemeDef:
 		# the 96 px (1x) texture, so its centre is 5 px ABOVE the texture's middle (the lip is underneath). A label centred
 		# in the content rect lands at h/2 + (top - bottom)/2, so top - bottom = -10 puts it on the face; -12 was the value the
 		# render probe (tests/perf/button_centre.gd) found centres the capitals best (text 2 px low before, <= 1 px now).
-		t.nine_patches["button_wood"] = _nine(wood, 36, 30, 36, 30, 26, 5, 26, 17)
+		# Art redrawn 72 px tall (1x): texture margins 36 top (the whole stud sits inside it, so it is never stretched) and 26
+		# bottom, so only plain wood is stretched and the minimum height is 62. Lit face spans rows 4..56, centre 30 = h/2 - 6 for
+		# any h (the face's top is fixed, its bottom is 16 px above the texture's bottom), so top - bottom = -12 centres the label.
+		t.nine_patches["button_wood"] = _nine(wood, 36, 36, 36, 26, 26, 5, 26, 17)
 	if wood_down != null:
 		# the pressed face spans rows 11..86: centre 0.5 px below the middle, so top - bottom = +1 (5.5 px lower than normal)
-		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 36, 30, 36, 30, 26, 12, 26, 11)
+		# pressed: face rows 9..63 of 72, so its top is fixed and its bottom is 9 px above the bottom: centre = h/2, top = bottom
+		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 36, 36, 36, 26, 26, 12, 26, 12)
 
 	_labels(th, bold, spaced)
 	_buttons(th, bold, t)

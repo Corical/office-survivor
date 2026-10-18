@@ -81,7 +81,7 @@ func _build() -> void:
 	code.placeholder_text = Words.render("ui.enter_code")
 	code.text = _code_text
 	code.max_length = 8
-	code.custom_minimum_size = Vector2(160, 56)
+	code.custom_minimum_size = Vector2(160, Ui.MIN_ART_BUTTON_HEIGHT)          # as tall as the Join button beside it
 	code.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	code.text_changed.connect(func(t: String):
 		var caps := t.to_upper()                       # codes are capitals: show what will be sent, caret where it was

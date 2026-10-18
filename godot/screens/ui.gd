@@ -4,6 +4,7 @@ extends RefCounted
 ## Theme through type variations, art ids (Themes.texture) and effect settings (Themes.fx), never from here.
 
 const AVATARS := 8                    # chosen: the art set has avatar_0 .. avatar_7
+const MIN_ART_BUTTON_HEIGHT := 64     # the wood art's top+bottom margins are 60 px: any wood button must be at least this tall
 
 
 static func clear(n: Node) -> void:
@@ -43,7 +44,9 @@ static func button(text: String, id: String, cb: Callable, disabled := false, va
 	b.text = text
 	b.disabled = disabled
 	b.set_meta("id", id)
-	b.custom_minimum_size = Vector2(0, 72 if variation == "PrimaryButton" else 56)       # a thumb-sized target
+	# A thumb-sized target, and never shorter than the wood art's top+bottom margins (60 px): a nine-patch drawn lower than its
+	# own edges overlaps them and squashes the lip (the Settings and Join buttons were 56 and looked broken).
+	b.custom_minimum_size = Vector2(0, 72 if variation == "PrimaryButton" else MIN_ART_BUTTON_HEIGHT)
 	if variation != "":
 		b.theme_type_variation = variation
 	if icon_id != "":

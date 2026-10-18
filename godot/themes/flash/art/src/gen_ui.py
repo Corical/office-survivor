@@ -63,8 +63,10 @@ def card_frame():
 
 def button(pressed):
     name = "button_wood_pressed" if pressed else "button_wood"
-    s = Svg(256, 96, name)
-    W, H = 256, 96
+    # 72 px tall (it was 96). The studs sit inside the TOP margin (36 px) so they are never stretched; the stretched middle band
+    # is plain wood only. A button must be at least top+bottom margin = 62 px tall (the UI uses 64 and 72).
+    s = Svg(256, 72, name)
+    W, H = 256, 72
     lip = 3 if pressed else 10
     top = 9 if pressed else 4  # the face sinks when pressed
     fx, fy, fw = 6, top, W - 12
