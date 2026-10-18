@@ -29,6 +29,8 @@ No file has moved. Moving the `survivors` rows into `games/survivors/` is step 3
 | `stage/timeline.gd` | survivors | The beat timeline of a Survivors reveal |
 | `stage/timeline_player.gd` | survivors | Plays that timeline; `Feed` still owns one (known coupling, goes with the round-state move into the ruleset) |
 | `stage/fx_pool.gd` | survivors | The effects the Stage's beats use |
+| `games/bang/table_screen.gd` | bang | The table while dice are rolled and resolved: seats, dice, targets |
+| `games/bang/end_screen.gd` | bang | Bang!'s winners and everyone's role |
 
 ## Allowed exceptions (a shared script that still contains a game word)
 

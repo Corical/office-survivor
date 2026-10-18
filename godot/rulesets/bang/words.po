@@ -1,0 +1,196 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "bang.role.sheriff"
+msgstr "Sheriff"
+
+msgid "bang.role.deputy"
+msgstr "Deputy"
+
+msgid "bang.role.outlaw"
+msgstr "Outlaw"
+
+msgid "bang.role.renegade"
+msgstr "Renegade"
+
+msgid "bang.role.unknown"
+msgstr "Unknown"
+
+msgid "bang.role_line"
+msgstr "You are the {role}"
+
+msgid "bang.role_hint.sheriff"
+msgstr "Stay alive. Take out every Outlaw and the Renegade."
+
+msgid "bang.role_hint.deputy"
+msgstr "Protect the Sheriff and help take out the Outlaws and the Renegade."
+
+msgid "bang.role_hint.outlaw"
+msgstr "Take out the Sheriff."
+
+msgid "bang.role_hint.renegade"
+msgstr "Be the last one standing with the Sheriff, or take out everyone else first."
+
+msgid "bang.face.arrow"
+msgstr "Arrow"
+
+msgid "bang.face.dynamite"
+msgstr "Dynamite"
+
+msgid "bang.face.shoot1"
+msgstr "Shoot 1"
+
+msgid "bang.face.shoot2"
+msgstr "Shoot 2"
+
+msgid "bang.face.beer"
+msgstr "Beer"
+
+msgid "bang.face.gatling"
+msgstr "Gatling"
+
+msgid "bang.face.unknown"
+msgstr "?"
+
+msgid "bang.die_kept"
+msgstr "Kept"
+
+msgid "bang.die_locked"
+msgstr "Locked"
+
+msgid "bang.die_to"
+msgstr "to {name}"
+
+msgid "bang.turn_yours"
+msgstr "Your turn"
+
+msgid "bang.turn_of"
+msgstr "{name}'s turn"
+
+msgid "bang.turn_out"
+msgstr "You are out. You can watch the rest."
+
+msgid "bang.rolls"
+msgstr "Roll {n} of {max}"
+
+msgid "bang.pile"
+msgstr "Arrows left: {n}"
+
+msgid "bang.seat_life"
+msgstr "Life {life} of {max}"
+
+msgid "bang.seat_arrows"
+msgstr "Arrows {n}"
+
+msgid "bang.seat_out"
+msgstr "Out"
+
+msgid "bang.seat_away"
+msgstr "Away"
+
+msgid "bang.seat_you"
+msgstr "You"
+
+msgid "bang.seat_turn"
+msgstr "Turn"
+
+msgid "bang.seat_sheriff"
+msgstr "Sheriff"
+
+msgid "bang.seat_unknown"
+msgstr "Role hidden"
+
+msgid "bang.act.roll"
+msgstr "Roll the dice"
+
+msgid "bang.act.reroll"
+msgstr "Roll again"
+
+msgid "bang.act.stop"
+msgstr "Stop rolling"
+
+msgid "bang.wait"
+msgstr "Waiting for {name}"
+
+msgid "bang.rolling_hint"
+msgstr "Tap the dice you want to keep, then roll again or stop. Dynamite stays."
+
+msgid "bang.target_prompt"
+msgstr "Choose who gets the {face}"
+
+msgid "bang.target_wait"
+msgstr "{name} is choosing targets"
+
+msgid "bang.nothing"
+msgstr "Nothing to show yet."
+
+msgid "bang.log_title"
+msgstr "What happened"
+
+msgid "bang.log_empty"
+msgstr "Nothing yet."
+
+msgid "bang.log.rolled"
+msgstr "{by} rolled ({roll}): {d1}, {d2}, {d3}, {d4}, {d5}"
+
+msgid "bang.log.arrow"
+msgstr "{by} took an arrow"
+
+msgid "bang.log.indians"
+msgstr "The Indians attack! {hits}"
+
+msgid "bang.log.dynamite"
+msgstr "{by} rolled three dynamite and loses a life"
+
+msgid "bang.log.shot"
+msgstr "{by} shot {at}"
+
+msgid "bang.log.beer"
+msgstr "{by} served a beer to {at}"
+
+msgid "bang.log.gatling"
+msgstr "{by} fired the Gatling"
+
+msgid "bang.log.out"
+msgstr "{at} is out. They were the {role}"
+
+msgid "bang.log.turn"
+msgstr "It is {at}'s turn"
+
+msgid "bang.log.over"
+msgstr "The game is over"
+
+msgid "bang.end.win"
+msgstr "Your side won"
+
+msgid "bang.end.lose"
+msgstr "Your side lost"
+
+msgid "bang.end.roles"
+msgstr "Everyone's role"
+
+msgid "bang.end.winners"
+msgstr "Winners"
+
+msgid "bang.team.sheriff"
+msgstr "The Sheriff's side wins"
+
+msgid "bang.team.outlaws"
+msgstr "The Outlaws win"
+
+msgid "bang.team.renegade"
+msgstr "The Renegade wins"
+
+msgid "bang.team.deputy"
+msgstr "The Deputy wins"
+
+msgid "bang.team.outlaw"
+msgstr "The Outlaw wins"
+
+msgid "bang.team.abandoned"
+msgstr "Everyone left the table"
+
+msgid "bang.team.unknown"
+msgstr "The game is over"
