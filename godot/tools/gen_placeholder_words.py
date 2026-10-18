@@ -81,6 +81,11 @@ UI.update({
     "ui.private_help": "Not listed. Only people you give the code to can join.",
     "ui.create_go": "Create", "ui.cancel": "Cancel", "ui.you_are_prefix": "You are", "ui.pick_prompt": "Pick a move!",
     # --- round screen ---
+    # --- round pick hints ---
+    "ui.hint_pick_move": "Pick a move first", "ui.hint_pick_target": "Pick a target first",
+    "ui.hint_pick_amount": "Pick an amount first", "ui.hint_sending": "Sending your pick...",
+    "ui.hint_closed": "Waiting for the next night", "ui.move_off": "Closed",
+    # --- end round pick hints ---
     "ui.goal_tap_more": "Tap for details", "ui.goal_tap_less": "Tap to hide",
     "ui.move_unavailable": "{move} is not available tonight.",
     "ui.goal_seat_note": "A seat is a place on the helicopter. Only a few are free; the players with the most rations at the end get them.",
@@ -95,7 +100,7 @@ UI.update({
     "ui.kick_help": "A seat that dropped off stays taken. Remove it to free the seat.",
     "ui.net.connecting": "Connecting...", "ui.net.online": "Connected", "ui.net.reconnecting": "Reconnecting...",
     "ui.net.unreachable": "Can't reach the server", "ui.net.offline": "Offline", "ui.net.stopped": "Disconnected",
-    "notice.seat_gone": "That game is no longer available.",
+    "notice.seat_gone": "Your seat is gone: the game ended or the host removed you. You can join again with a code.",
     "notice.taken_over": "This game was opened on another device. Resume here to take it back.",
     "notice.too_big": "The server sent something too large.",
     "notice.flapping": "The connection keeps dropping. Another device may have your seat.",
@@ -111,6 +116,8 @@ UI.update({
     "ui.bots_fill": "Empty seats are filled by bots when you start.",
     "ui.advanced": "Advanced", "ui.hide_advanced": "Hide advanced",
     "ui.advanced_hint": "Only change this if you were given an address.",
+    # --- lobby away count ---
+    "ui.seats_away": "{here} here, {away} away",
     # --- reveal/stage ---
     "ui.reveal_waiting": "Waiting for the others, {n} s",
 })

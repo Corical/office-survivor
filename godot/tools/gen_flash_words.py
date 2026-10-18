@@ -120,6 +120,8 @@ OVERRIDES = {
     "ui.best_legend": "[ ] = the most around the fire",
     "ui.code_caption": "Camp code",
     "ui.bots_fill": "Empty places by the fire are taken by bots when you start.",
+    # --- lobby away count ---
+    "ui.seats_away": "{here} at the fire, {away} out in the dark",
 }
 
 SLOT = re.compile(r"\{(\w+)\}")

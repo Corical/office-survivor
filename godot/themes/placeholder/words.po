@@ -358,7 +358,7 @@ msgid "notice.room_started"
 msgstr "That camp has already started."
 
 msgid "notice.seat_gone"
-msgstr "That game is no longer available."
+msgstr "Your seat is gone: the game ended or the host removed you. You can join again with a code."
 
 msgid "notice.taken_over"
 msgstr "This game was opened on another device. Resume here to take it back."
@@ -501,6 +501,21 @@ msgstr "Hide advanced"
 msgid "ui.hide_settings"
 msgstr "Hide settings"
 
+msgid "ui.hint_closed"
+msgstr "Waiting for the next night"
+
+msgid "ui.hint_pick_amount"
+msgstr "Pick an amount first"
+
+msgid "ui.hint_pick_move"
+msgstr "Pick a move first"
+
+msgid "ui.hint_pick_target"
+msgstr "Pick a target first"
+
+msgid "ui.hint_sending"
+msgstr "Sending your pick..."
+
 msgid "ui.join_room"
 msgstr "Join room"
 
@@ -527,6 +542,9 @@ msgstr "{locked} of {total} locked in"
 
 msgid "ui.locking"
 msgstr "Locking in..."
+
+msgid "ui.move_off"
+msgstr "Closed"
 
 msgid "ui.move_unavailable"
 msgstr "{move} is not available tonight."
@@ -644,6 +662,9 @@ msgstr "Seat {n}"
 
 msgid "ui.seats"
 msgstr "{taken} of {total} seats taken"
+
+msgid "ui.seats_away"
+msgstr "{here} here, {away} away"
 
 msgid "ui.seconds"
 msgstr "{n} s"

@@ -323,3 +323,13 @@ free it at once. The lobby never shows aliases, so the host points at a seat wit
 | Refusals (`error refused`) | `Only the host can kick.`, `That seat is not in the room any more.`, `You can't kick yourself; use leave.`, `Kicking is only possible in the lobby.` On "not in the room any more", just wait for the next `lobby`: the list changed under you |
 | Handles | A hash that changes when a seat changes hands, so a stale handle is refused and can never hit the next person in that seat. Do not cache handles across `lobby` messages: always send one from the latest message |
 | Not built | Ban (a kicked player can join again by code); kick after the start; auto-freeing idle lobby seats |
+
+### 18 Oct 2026 17:55, client session: what a second reviewer saw on the wire (four real clients on the Pi, about 40 minutes, 10 nights)
+
+Evidence: `godot/docs/stranger-pass-2-2026-10-18/console_A.log` to `console_D.log`. Client side is fixed or in hand; these are for the server.
+
+| # | What the logs show | Why it matters | Ask |
+|---|---|---|---|
+| 1 | Every `reveal` (and `round`) frame reaches a client about three times within ~70 ms (`console_A.log` lines 2543-2551, same size, same round) | Clients already ignore a repeat, but it triples the traffic and the redraw work per night | Is the same view really sent to a connection more than once? If it is a broadcast to every seat per event, send it once per change |
+| 2 | One idle probe (`resume` on a live socket, every 30 s) makes the server re-send the view to EVERY player in the room: with 4 clients probing, each client receives 4 round views per half minute, plus its own `seat` frame AFTER the view | Cost grows with the square of the players, which matters for Bang (3-8 players) | Answer a probe to that connection only. If the view must be re-sent, also send the `seat` frame first (the client expects the seat before the view) |
+| 3 | After a client sends `continue`, the server sends nothing until the reveal ends (or everyone has tapped), then the next view | Fixed on the client (the wait for `continue` is now the reveal's remaining time plus 10 s). Stated so the server keeps that behaviour documented | Confirm that is intended, and that `seconds_left` on a reveal is the real remaining time |
