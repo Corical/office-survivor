@@ -290,7 +290,7 @@ func _on_terminal(reason: String) -> void:
 				_go("upgrade")
 				view_changed.emit(view)
 		_:
-			notice.emit("terminal", reason, "")   # taken_over, too_big: the seat is kept; Title offers resume
+			notice.emit("terminal", reason, "")   # taken_over, too_big, flapping: the seat is kept; Title offers resume
 			view = {}
 			_go("title")
 

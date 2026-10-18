@@ -87,6 +87,67 @@ func test_unreachable_server_is_bounded_and_visible() -> void:
 	check(fake.open_urls.size() <= opens + 1, "still retrying slowly, not spinning")
 
 
+func test_oversize_text_frame_is_dropped_and_bounded() -> void:
+	in_round()
+	fake.server_raw("{\"t\":\"lobby\",\"pad\":\"" + "x".repeat(70000) + "\"}")
+	eq(Session.screen, "round", "the oversize frame changed nothing")
+	eq(Net.state, "reconnecting", "first time: reconnect to fetch a fresh view")
+	clock.advance(1100)
+	Net.tick()
+	fake.server_open()
+	fake.server_send({"t": "hello_ok", "proto": 1})
+	fake.server_raw("{\"t\":\"lobby\",\"pad\":\"" + "x".repeat(70000) + "\"}")
+	eq(Net.state, "stopped", "second time: stop, visibly")
+	eq(Session.terminal_reason, "too_big", "reason")
+
+
+func test_flapping_connection_stops_with_a_reason_and_keeps_the_seat() -> void:
+	in_round()
+	for i in 8:
+		if Net.state == "stopped":
+			break
+		fake.server_close(1000)                      # up, then dropped by the server at once (a seat fight)
+		clock.advance(9000)
+		Net.tick()
+		if Net.state != "stopped":
+			fake.server_open()
+			fake.server_send({"t": "hello_ok", "proto": 1})
+	eq(Net.state, "stopped", "gave up")
+	eq(Session.terminal_reason, "flapping", "reason")
+	eq(Session.token, "tok-secret-1", "seat kept")
+	check(fake.open_urls.size() <= 5, "bounded: %d connections" % fake.open_urls.size())
+
+
+func test_a_connection_that_stays_up_resets_the_backoff() -> void:
+	in_round()
+	fake.server_close(1006)
+	clock.advance(1100)
+	Net.tick()
+	fake.server_open()
+	fake.server_send({"t": "hello_ok", "proto": 1})
+	clock.advance(Net.STABLE_MS + 1000)              # healthy for a while
+	fake.server_close(1006)
+	clock.advance(1100)                              # back to the first backoff step, not the second
+	Net.tick()
+	eq(fake.open_urls.size(), 3, "reopened after 1 s again")
+
+
+func test_a_quick_drop_does_not_reset_the_backoff() -> void:
+	in_round()
+	fake.server_close(1006)
+	clock.advance(1100)
+	Net.tick()
+	fake.server_open()
+	fake.server_send({"t": "hello_ok", "proto": 1})
+	fake.server_close(1006)                          # dropped at once
+	clock.advance(1100)
+	Net.tick()
+	eq(fake.open_urls.size(), 2, "not yet: the wait grew to 2 s")
+	clock.advance(1000)
+	Net.tick()
+	eq(fake.open_urls.size(), 3, "after 2 s")
+
+
 func test_connect_to_the_same_url_twice_is_a_no_op() -> void:
 	Net.connect_to("ws://test")
 	Net.connect_to("ws://test")

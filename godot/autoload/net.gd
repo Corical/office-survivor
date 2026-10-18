@@ -12,7 +12,10 @@ const PROTO := 1
 const BACKOFF := [1.0, 2.0, 4.0, 8.0]   # seconds; chosen
 const HELLO_TIMEOUT_MS := 5000           # chosen: open but no hello_ok -> try again
 const ACK_TIMEOUT_MS := 8000             # chosen: the server answers every accepted intent with a view; silence = dead
-const TOO_BIG_TRIES := 2                 # chosen: 1009 closes before we give up
+const TOO_BIG_TRIES := 2                 # chosen: oversize frames before we give up
+const MAX_TEXT := 64 * 1024              # chosen: bytes; the engine's own buffer limit proved looser than its name
+const STABLE_MS := 10000                 # chosen: a connection that lived this long was healthy; backoff restarts
+const FLAP_LIMIT := 4                    # chosen: short-lived connections in a row before we stop and say so
 const UNREACHABLE_AFTER := 4             # attempts before the banner says "can't reach the server"
 ## Close codes the server sends after a terminal message (requested in the brief); the message itself may be lost.
 const CLOSE_CODES := {4001: "seat_gone", 4002: "upgrade_required", 4003: "taken_over", 1009: "too_big"}
@@ -35,6 +38,8 @@ var _retry_at := -1
 var _hello_deadline := -1
 var _ack_deadline := -1
 var _too_big := 0
+var _up_since := -1            # when the current connection got hello_ok
+var _short_lives := 0          # connections in a row that ended within STABLE_MS of hello_ok
 
 
 func _ready() -> void:
@@ -61,6 +66,8 @@ func reset() -> void:
 	_hello_deadline = -1
 	_ack_deadline = -1
 	_too_big = 0
+	_up_since = -1
+	_short_lives = 0
 	attempt = 0
 	handshake_done = false
 	url = ""
@@ -79,6 +86,8 @@ func connect_to(server_url: String) -> void:
 	_want = true
 	attempt = 0
 	_too_big = 0
+	_short_lives = 0
+	_up_since = -1
 	_open()
 
 
@@ -181,9 +190,20 @@ func _on_opened() -> void:
 func _on_closed(code: int, reason: String) -> void:
 	if state == "stopped":
 		return
+	var lived := clock.now_msec() - _up_since if _up_since >= 0 else -1
+	_up_since = -1
 	handshake_done = false
 	_hello_deadline = -1
 	_ack_deadline = -1
+	if lived >= STABLE_MS:
+		attempt = 0
+		_short_lives = 0
+	elif lived >= 0:
+		_short_lives += 1              # up, then dropped quickly: the signature of two devices fighting for a seat
+		if _short_lives >= FLAP_LIMIT:
+			Log.event("net", "flapping", {"short_lives": _short_lives, "code": code}, "WARN")
+			_stop("flapping")
+			return
 	var why: String = CLOSE_CODES.get(code, "")
 	if why == "too_big":
 		_too_big += 1
@@ -210,6 +230,14 @@ func _on_text(text: String) -> void:
 	if state == "stopped":
 		Log.event("net", "dropped_after_stop", {"bytes": text.length()})
 		return
+	if text.length() > MAX_TEXT / 4 and text.to_utf8_buffer().size() > MAX_TEXT:
+		_too_big += 1
+		Log.event("net", "frame_too_big", {"bytes": text.to_utf8_buffer().size(), "tries": _too_big}, "WARN")
+		if _too_big >= TOO_BIG_TRIES:
+			_stop("too_big")
+		else:
+			_drop_and_retry()
+		return
 	var data: Variant = SafeJson.parse(text)
 	if not (data is Dictionary) or typeof(data.get("t")) != TYPE_STRING:
 		Log.event("net", "dropped_not_a_message", {"bytes": text.length(), "head": text.left(60)}, "WARN")
@@ -225,7 +253,7 @@ func _on_text(text: String) -> void:
 		"hello_ok":
 			handshake_done = true
 			_hello_deadline = -1
-			attempt = 0
+			_up_since = clock.now_msec()      # attempt is NOT reset here: only a connection that stays up earns that
 			_set_state("online")
 			handshaken.emit()
 		"upgrade_required":
