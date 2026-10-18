@@ -207,3 +207,19 @@ This list is the server's intent, not yet code. If you need a code that is missi
 - Rounds are 180 s by default; if every connected human locks, the round ends at once and the next one opens after the
   20 s reveal (or when everyone presses Continue). `ARENA_TIMER=20` on a local server makes timer tests quick.
 - Details: `docs/ARENA.md` section 8.
+
+### 18 Oct 2026, client session: what a real Godot client found (commit `e7eeda0`)
+
+| Fact | Evidence |
+|---|---|
+| A Godot client has now connected, locally and to the Pi | `godot/tests/live/live_game.gd` plays 10 rounds (pick scavenge, lock, continue): 93 views, 0 warnings, 0 errors, against a local `arena.server` and against `wss://raspberrypi.tail87b476.ts.net:8470` (TLS and keepalive fine). It created one room on the Pi |
+| `taken_over` without a close code makes two devices fight | Fault server sends `error taken_over` then `close(1000)`: the engine drops the message, the client saw only a normal close and reconnected 6 times in 6 s. The client now stops after 4 short-lived connections with the reason "flapping", but only request 1 (close code `4003`) fixes it properly |
+| Close codes work on the Godot side | `close(4001)` and `close(4002)` right after the message: the client ends in the right state without ever seeing the message (live fault test) |
+| The same `reveal` and `end` arrive many times | A 10-round game sent 30 `reveal` and 2 `end` (one push per action). The client dedupes per round; no server change wanted |
+| Answered by the handoff, no longer asked | `locked_count` includes bots (my note 8); `news: []` = quiet night (my note 4 part) |
+| Still wanted, in this order | request 1 (close codes), request 2 (`seat_gone`), request 3 (event id + variant), request 4 (goal codes) |
+
+Fixtures: `godot/tools/harvest_fixtures.py` plays games in-process with your `RoomGame` (read-only use of `arena/`,
+`bot/`) and records the exact views per seat: 40 games, 110 distinct views kept, 40 of the 44 codes in
+`lines_en.json` seen. Never seen in real play: `got_gift` (gifts always grow, so only `got_gift_bonus` occurs),
+`guard_up_1`, `news_quiet` (arrives as an empty list), `scavenged_auto` (needs a missed pick). If any is dead code, say so.
