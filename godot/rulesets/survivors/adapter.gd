@@ -132,7 +132,7 @@ static func _event_beat(a: Dictionary) -> Dictionary:
 		b = _beat("camp", OFFSTAGE, OFFSTAGE, ev)
 	else:
 		b = _beat("event", OFFSTAGE, OFFSTAGE, ev)
-	b.detail = _s(a, "line")
+	b.detail = plain_sentence(_s(a, "line"))
 	return b
 
 
@@ -254,10 +254,22 @@ static func is_text_only(code: String) -> bool:
 	return code.begins_with("goal_") or code.begins_with("progress_")
 
 
+## The server's own sentences (wilderness events) start with an emoji. Fonts differ and icons belong to the theme, so
+## the fallback sentence is shown without it (a real window drew it as an empty box).
+static func plain_sentence(s: String) -> String:
+	var i := 0
+	while i < s.length() and s.unicode_at(i) > 127:
+		i += 1
+	return s.substr(i).strip_edges()
+
+
 ## Typed slots for a line's args (a move becomes a translated word, a list is joined the theme's way).
 static func slots_for(args: Dictionary) -> Dictionary:
 	var slots := {}
 	for k in args:
+		if k == "line" and args[k] is String:
+			slots[k] = plain_sentence(args[k])
+			continue
 		match SLOT_TYPES.get(k, ""):
 			"move":
 				var mv := str(args[k])

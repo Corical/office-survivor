@@ -142,6 +142,23 @@ func test_an_unknown_or_unnamed_event_stays_a_generic_event_beat_with_its_senten
 	eq([old.kind, old.detail], ["event", "Old style."], "an old-contract event line still works")
 
 
+func test_the_events_fallback_sentence_carries_no_emoji() -> void:
+	var ln := A.line("event", {"line": "\U01F32A️ A whirlwind tore through the island.", "event": "storm",
+		"scope": "camp"}, "news")
+	eq(Words.render(ln.key, ln.slots), "A whirlwind tore through the island.", "emoji and its selector stripped")
+	eq(ln.beats[0].detail, "A whirlwind tore through the island.", "the beat's text too")
+	eq(A.plain_sentence("Already plain."), "Already plain.", "plain text untouched")
+	eq(A.plain_sentence(""), "", "empty is fine")
+	for r in Fixtures.of_type("reveal"):
+		for part in ["news", "private"]:
+			for l in r.msg[part]:
+				var made := A.line(l.code, l.args, part)
+				var text := Words.render(made.key, made.slots)
+				for i in text.length():
+					check(text.unicode_at(i) < 0x2000, "non-text character in a rendered real line: " + text)
+					break
+
+
 func test_my_own_find_event_is_normalised_to_me() -> void:
 	var m := A.reveal_model(_reveal([_ev("bananas", "player", "Me")], [_ev("bananas", "player", "Me"),
 		{"code": "now_have", "args": {"rations": 8}}]), "Me", {"me": {"alias": "Me", "rations": 7}, "aliases": ["Bo"]})

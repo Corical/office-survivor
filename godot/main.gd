@@ -16,11 +16,11 @@ var _slot: Control
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if Themes.current:
 		theme = Themes.current.godot_theme
 	_slot = Control.new()
-	_slot.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_slot.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_slot)
 	add_child(Overlay.new())
 	Feed.status_changed.connect(_route)

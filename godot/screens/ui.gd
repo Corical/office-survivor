@@ -49,9 +49,9 @@ static func flow() -> HFlowContainer:
 
 ## The page every screen builds into: a scrolling column with a side margin.
 static func page(owner_control: Control) -> VBoxContainer:
-	owner_control.set_anchors_preset(Control.PRESET_FULL_RECT)
+	owner_control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 16)
 	owner_control.add_child(margin)

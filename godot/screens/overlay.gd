@@ -8,7 +8,7 @@ var _notice: Label
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE            # never blocks a tap on the screen below
-	set_anchors_preset(Control.PRESET_TOP_WIDE)
+	set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_banner = Ui.label("", "net_banner", "MutedLabel")
 	_notice = Ui.label("", "notice_toast")
 	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
