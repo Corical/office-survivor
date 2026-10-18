@@ -6,6 +6,8 @@ Last checked against the code: 17 October 2026, at commit 4ecdb0f. It describes 
 
 **The rule:** every change to game behaviour (rules, numbers, goals, events, ranges, messages, commands, phase order, scoring) updates this file in the same commit. `engine/tests/test_mechanics_doc.py` fails when this file and the game disagree.
 
+**Live rooms (the Godot client)** play these same rules; what a room adds (4 seats, timed rounds, lock-in, early advance, reconnects, the protocol) is in `docs/ARENA.md`, kept true by `arena/tests/test_arena_doc.py`.
+
 ## How this file is checked
 
 Tables that follow a line like `<!-- check:rules -->` are read by the test. The first column or the backticked cells must match the code exactly. If you add a Rules field, a goal, an event, a radio phrase, a ledger reason, a command or a player-facing line, the test names the table and the row to add. Prose is not checked, so keep it short and keep it true.
