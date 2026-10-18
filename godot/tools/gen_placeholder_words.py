@@ -95,6 +95,8 @@ UI.update({
     "notice.unknown": "The server sent something this app doesn't know.",
     "notice.generic": "{text}", "notice.no_server_url": "Enter the server address first.",
     "notice.locked": "Your move is locked in.", "notice.in_flight": "Already sent.",
+    # --- reveal/stage ---
+    "ui.reveal_waiting": "Waiting for the others, {n} s",
 })
 
 

@@ -8,10 +8,13 @@ extends Control
 const WIDE_PX := 900
 const LOG_MIN_H := 150.0              # chosen: room for about two log lines on a phone; the Stage gets the rest
 const STAGE_MIN_H := 360.0
+const FADE_PX := 30.0                 # chosen: the soft edge of the log
 
 var _timer_label: Label
 var _skip_pill: Button
 var _log: ScrollContainer
+var _fade_top: TextureRect
+var _fade_foot: TextureRect
 var _cards: Array = []                # one panel per log line, in order
 var _hot := -2                        # the log line lit right now
 var _sig := ""
@@ -43,6 +46,7 @@ func _process(_delta: float) -> void:
 	if _skip_pill != null and tl != null:
 		_skip_pill.visible = not tl.finished
 	_light_log()
+	_update_fades()
 
 
 ## An identical push (the server re-sends the same view on every action) must not rebuild the screen under a finger.
@@ -69,6 +73,8 @@ func _build() -> void:
 	_timer_label = null
 	_skip_pill = null
 	_log = null
+	_fade_top = null
+	_fade_foot = null
 	_cards = []
 	_hot = -2
 	var m: Dictionary = Feed.models.get("reveal", {})
@@ -86,6 +92,7 @@ func _build() -> void:
 	var stage_box := _stage_box()
 	var head := _head()
 	_log = _log_panel(m)
+	var log_box := _log_box(_log)
 	var dock := _dock()
 	if _wide:
 		var cols := HBoxContainer.new()
@@ -97,8 +104,8 @@ func _build() -> void:
 		right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		right.size_flags_stretch_ratio = 2.0
 		right.add_child(head)
-		_log.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		right.add_child(_log)
+		log_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		right.add_child(log_box)
 		right.add_child(dock)
 		cols.add_child(right)
 		margin.add_child(cols)
@@ -108,10 +115,10 @@ func _build() -> void:
 		col.add_child(head)
 		stage_box.size_flags_stretch_ratio = 4.0
 		col.add_child(stage_box)
-		_log.custom_minimum_size = Vector2(0, LOG_MIN_H)
-		_log.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		_log.size_flags_stretch_ratio = 2.0
-		col.add_child(_log)
+		log_box.custom_minimum_size = Vector2(0, LOG_MIN_H)
+		log_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		log_box.size_flags_stretch_ratio = 2.0
+		col.add_child(log_box)
 		col.add_child(dock)
 		margin.add_child(col)
 	_building = false
@@ -146,16 +153,69 @@ func _stage_box() -> Control:
 	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	holder.add_child(stage)
 	_skip_pill = Ui.button(Words.render("ui.skip"), "skip", func(): _skip(), false, "SkipPill")
-	_skip_pill.custom_minimum_size = Vector2(0, 0)
+	_skip_pill.custom_minimum_size = Vector2(96, 44)
 	holder.add_child(_skip_pill)
-	_skip_pill.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 10)
+	# pinned to the top right corner and growing leftwards, so the pill's own text width can never push it off the edge
+	_skip_pill.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_skip_pill.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_skip_pill.offset_right = -10.0
+	_skip_pill.offset_top = 10.0
 	return holder
+
+
+## The log with a soft edge at the top and at the foot that shows while there is more to scroll to, so a line cut by the edge
+## fades out instead of being sliced.
+func _log_box(scroll: ScrollContainer) -> Control:
+	var box := Control.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.clip_contents = true
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(scroll)
+	_fade_top = _edge_fade(true)
+	_fade_foot = _edge_fade(false)
+	box.add_child(_fade_top)
+	box.add_child(_fade_foot)
+	return box
+
+
+func _edge_fade(top: bool) -> TextureRect:
+	var g := Gradient.new()
+	var solid := Themes.color_a("ink", 0.95)
+	var clear := Themes.color_a("ink", 0.0)
+	g.colors = PackedColorArray([solid, clear] if top else [clear, solid])
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill_from = Vector2(0, 0)
+	tex.fill_to = Vector2(0, 1)
+	tex.width = 4
+	tex.height = 64
+	var r := TextureRect.new()
+	r.texture = tex
+	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r.stretch_mode = TextureRect.STRETCH_SCALE
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE if top else Control.PRESET_BOTTOM_WIDE)
+	if top:
+		r.offset_bottom = FADE_PX
+	else:
+		r.offset_top = -FADE_PX
+	r.visible = false
+	return r
+
+
+func _update_fades() -> void:
+	if _log == null or _fade_top == null:
+		return
+	var bar := _log.get_v_scroll_bar()
+	_fade_top.visible = bar.value > 4.0
+	_fade_foot.visible = bar.value + bar.page < bar.max_value - 4.0
 
 
 ## The written night: one panel per line, then the radio.
 func _log_panel(m: Dictionary) -> ScrollContainer:
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var col := Ui.vbox(8)
 	scroll.add_child(col)
 	for i in m.lines.size():

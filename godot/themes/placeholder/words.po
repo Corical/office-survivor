@@ -570,6 +570,9 @@ msgstr "Resume game {code}"
 msgid "ui.reveal_title"
 msgstr "What happened"
 
+msgid "ui.reveal_waiting"
+msgstr "Waiting for the others, {n} s"
+
 msgid "ui.room_code"
 msgstr "Room {code}"
 

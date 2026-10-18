@@ -19,6 +19,8 @@ const ALL: Array[String] = [
 	"notice.seat_gone", "notice.taken_over", "notice.too_big", "notice.flapping", "notice.upgrade_required",
 	"notice.invalid", "notice.unknown", "notice.generic", "notice.no_server_url", "notice.locked", "notice.in_flight",
 	"notice.camp_unavailable", "notice.room_full", "notice.room_started", "notice.room_gone", "ui.resume_code",
+	# --- reveal/stage ---
+	"ui.reveal_waiting",
 ]
 
 ## Notice codes the client itself raises that have a word of their own; everything else uses `notice.generic` with the

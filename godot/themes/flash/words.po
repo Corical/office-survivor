@@ -570,6 +570,9 @@ msgstr "Rejoin camp {code}"
 msgid "ui.reveal_title"
 msgstr "What happened in the night"
 
+msgid "ui.reveal_waiting"
+msgstr "Waiting for the others, {n} s"
+
 msgid "ui.room_code"
 msgstr "Camp {code}"
 
