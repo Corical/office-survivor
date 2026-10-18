@@ -19,7 +19,32 @@ var reduced_motion := false:
 		if v != reduced_motion:
 			reduced_motion = v
 			motion_changed.emit(v)
+			_save_settings()
+## Where the player's settings are kept between launches. Null (the default) means they are not kept: tests and tools never
+## touch the player's file. The app turns it on once at launch with `enable_settings`.
+var settings_store: SessionStore = null
+var _settings := {}                   # everything the file held, so a setting a newer build wrote is not lost by an older one
+var _loading := false
 var _textures := {}
+
+
+## Keep settings from now on, in `store`, and apply what it holds. Only an explicit `true` counts for a flag: a file that was
+## hand-edited, damaged or written by something else can never switch a setting on by accident.
+func enable_settings(store: SessionStore) -> void:
+	settings_store = store
+	_settings = store.load_data() if store else {}
+	_settings.erase("v")
+	_loading = true
+	var raw: Variant = _settings.get("reduced_motion", false)
+	reduced_motion = typeof(raw) == TYPE_BOOL and raw           # (a text or number is not a bool: comparing it to true would throw)
+	_loading = false
+
+
+func _save_settings() -> void:
+	if settings_store == null or _loading:
+		return
+	_settings["reduced_motion"] = reduced_motion
+	settings_store.save_data(_settings)
 
 
 func _ready() -> void:

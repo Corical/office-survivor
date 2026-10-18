@@ -21,6 +21,8 @@ var _vignette: TextureRect
 
 
 func _ready() -> void:
+	if Themes.settings_store == null and DisplayServer.get_name() != "headless":
+		Themes.enable_settings(SessionStore.new("user://settings.json"))      # calm mode survives a restart
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if Themes.current:
 		theme = Themes.current.godot_theme
