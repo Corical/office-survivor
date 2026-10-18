@@ -61,25 +61,23 @@ func test_a_new_game_forgets_the_old_rows() -> void:
 	eq(_moves(s).size(), 4, "round 1 starts from what is offered")
 
 
-func test_the_pick_panel_takes_room_before_and_after_a_pick() -> void:
+func test_the_pick_shows_in_the_prompt_row_without_changing_its_height() -> void:
 	go_online()
 	give_seat()
 	var s1 := _mount(1)
 	s1.size = Vector2(540, 960)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	var none := Ui.find(s1, "my_pick") as Label
-	check(none != null, "the panel exists with no pick")
-	var h_none: float = none.get_parent().size.y
-	eq(none.get_parent().modulate.a, 0.0, "invisible with no pick")
+	var none := Ui.find(s1, "pick_prompt") as Label
+	check(none != null, "no pick: the quiet prompt")
+	var h_none: float = none.size.y
 	var s2 := _mount(1, "", false, 120.0, true)
 	s2.size = Vector2(540, 960)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var some := Ui.find(s2, "my_pick") as Label
-	check(some != null, "and with one")
-	eq(some.get_parent().modulate.a, 1.0, "visible with one")
-	eq(h_none, some.get_parent().size.y, "same height both ways")
+	check(some != null and some.text.begins_with("Your pick"), "a pick: the same row says what it is")
+	eq(h_none, some.size.y, "same height both ways: nothing moves when a move is chosen")
 
 
 func test_a_greyed_out_lock_has_no_light_moving_across_it() -> void:

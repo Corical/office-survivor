@@ -501,6 +501,21 @@ msgstr "Hide advanced"
 msgid "ui.hide_settings"
 msgstr "Hide settings"
 
+msgid "ui.hint_closed"
+msgstr "Waiting for the next night"
+
+msgid "ui.hint_pick_amount"
+msgstr "Pick an amount first"
+
+msgid "ui.hint_pick_move"
+msgstr "Pick a move first"
+
+msgid "ui.hint_pick_target"
+msgstr "Pick a target first"
+
+msgid "ui.hint_sending"
+msgstr "Sending your pick..."
+
 msgid "ui.join_room"
 msgstr "Join camp"
 
@@ -527,6 +542,9 @@ msgstr "{locked} of {total} locked in"
 
 msgid "ui.locking"
 msgstr "Locking in..."
+
+msgid "ui.move_off"
+msgstr "Closed"
 
 msgid "ui.move_unavailable"
 msgstr "{move} is not available tonight."

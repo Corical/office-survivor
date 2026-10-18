@@ -69,8 +69,8 @@ func test_an_unpicked_player_under_twenty_seconds_is_told_to_pick() -> void:
 
 
 func test_a_player_who_has_picked_or_locked_is_not_nagged() -> void:
-	eq(_label(_screen(15.0, false, true), "pick_prompt").text, "Pick a move", "picked: quiet")
-	eq(_label(_screen(15.0, true, true), "pick_prompt").text, "Pick a move", "locked: quiet")
+	check(_label(_screen(15.0, false, true), "my_pick").text.begins_with("Your pick"), "picked: the row shows the pick, not a nag")
+	check(_label(_screen(15.0, true, true), "my_pick").text.begins_with("Your pick"), "locked: the same")
 
 
 func test_the_prompt_never_changes_the_height_of_its_row() -> void:
