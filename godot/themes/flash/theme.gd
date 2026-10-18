@@ -193,6 +193,19 @@ static func _labels(th: Theme, bold: Font, spaced: Font) -> void:
 	th.set_constant("shadow_offset_y", "BigLabel", 3)
 	th.set_constant("outline_size", "BigLabel", 6)
 	th.set_color("font_outline_color", "BigLabel", Color("1c0f08"))
+	# CodeLabel: the camp code on the lobby sign, the biggest thing on that screen; letters spaced so it reads at arm's length
+	var code_font := FontVariation.new()
+	code_font.base_font = ThemeDB.fallback_font
+	code_font.variation_embolden = 0.75
+	code_font.spacing_glyph = 10
+	th.set_type_variation("CodeLabel", "Label")
+	th.set_font("font", "CodeLabel", code_font)
+	th.set_font_size("font_size", "CodeLabel", 84)
+	th.set_color("font_color", "CodeLabel", EMBER_HI)
+	th.set_color("font_shadow_color", "CodeLabel", Color(0, 0, 0, 0.6))
+	th.set_constant("shadow_offset_y", "CodeLabel", 4)
+	th.set_constant("outline_size", "CodeLabel", 8)
+	th.set_color("font_outline_color", "CodeLabel", Color("1c0f08"))
 	# YouLabel: who you are, in the heads-up card: ember, big enough to find first, smaller than the app name
 	th.set_type_variation("YouLabel", "Label")
 	th.set_font("font", "YouLabel", bold)

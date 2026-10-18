@@ -127,7 +127,7 @@ func _to_lobby(is_host: bool) -> void:
 func test_lobby_shows_the_room_code_and_seats_and_lets_the_host_start() -> void:
 	_to_lobby(true)
 	var s := mount(LobbyScreen)
-	eq(text_of(s, "room_code"), "Room ABCD", "code")
+	eq(text_of(s, "room_code"), "ABCD", "the code alone, big")
 	eq(text_of(s, "seats"), "2 of 4 seats taken", "seats")
 	press(s, "start")
 	eq(fake.count("start"), 1, "start sent")

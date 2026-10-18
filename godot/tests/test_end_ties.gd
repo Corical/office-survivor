@@ -6,11 +6,13 @@ extends BaseTest
 const NAMES := ["Fig", "Figaro", "SoggyBiscuit", "LuckyLantern", "IronSpatula", "QuietOtter"]
 
 var _mounted: Array = []
+var _in_room := false
 
 
 func setup() -> void:
 	super.setup()
 	Themes.use("placeholder")
+	_in_room = false
 
 
 func teardown() -> void:
@@ -22,7 +24,9 @@ func teardown() -> void:
 
 
 func _send(scores: Array, winners: Array, names := NAMES) -> void:
-	in_round(10)
+	if not _in_room:                       # building the room costs ~0.3 s: once per test, not once per pattern
+		in_round(10)
+		_in_room = true
 	var rows := []
 	for i in scores.size():
 		rows.append({"alias": names[i], "score": scores[i], "rations": 1, "seat": i == 0, "goal_done": false, "stole": 0,
