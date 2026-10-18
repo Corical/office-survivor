@@ -14,6 +14,7 @@ var problems: Array[String] = []
 var taps := 0
 var rounds_played := 0
 var reveals_seen := 0
+var _last_reveal := 0                 # the round of the reveal whose Continue was last tapped
 var moves_used := {}
 var radios := 0
 var retries := 0                      # title and lobby taps repeated (the round screen has none: see _play_round)
@@ -172,15 +173,26 @@ func _play_round(r: int) -> bool:
 
 func _handle_reveal() -> bool:
 	var r: int = Feed.models.get("reveal", {}).get("round", 0)
-	if not await _until(func(): return Ui.find(router.current, "continue") != null, 6.0):
+	if r == _last_reveal:
+		# Continue for this reveal is already tapped; the server's next frame (the next round, or the end) has not been drawn yet.
+		# Handling it again counted the reveal twice and judged the NEXT screen's lines (the end screen has none): a race in
+		# the driver, not a fault in the app.
+		await _frames(2)
+		return true
+	_last_reveal = r
+	if not await _until(func(): return router.current_name != "reveal" or Ui.find(router.current, "continue") != null, 6.0):
 		_fail("reveal %d: no Continue button" % r)
 		return false
+	if router.current_name != "reveal":
+		return true                                    # the next screen arrived first: nothing left to tap
 	await _frames(3)
-	if (Ui.find_all(router.current, "line_").size() == 0):
+	if router.current_name == "reveal" and Ui.find_all(router.current, "line_").size() == 0:
 		_fail("reveal %d shows no lines at all" % r)
 	if r in SHOT_ROUNDS:
 		await _shot("reveal_%02d" % r)
 	reveals_seen += 1
+	if router.current_name != "reveal":
+		return true
 	return await _tap("continue")
 
 
