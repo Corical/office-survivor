@@ -33,8 +33,8 @@ class Bust:
         sil = " ".join(self.sil)
         # ground shadow so the bust sits on the page
         s.add(ellipse(64, 124, 50, 5, "#000", f'fill-opacity="0.35" filter="{s.blur(3)}"'))
-        s.add(f'<g transform="translate(-1.8 -1.8)"><path d="{sil}" fill="#a9c8ff" fill-opacity="0.9"/></g>')
-        s.add(f'<g transform="translate(1.8 1.2)"><path d="{sil}" fill="#ff9a3c" fill-opacity="0.75"/></g>')
+        # (the cool and warm rim copies that were drawn offset OUTSIDE the outline are gone: they read as a pale halo
+        #  around every avatar on a dark scene; the rim light is still applied inside the figure by the clip below)
         for l in self.layers:
             s.add(l)
         # overall light: cool from the top-left, warm bounce from the bottom-right, clipped to the figure
