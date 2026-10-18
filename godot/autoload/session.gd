@@ -18,7 +18,13 @@ const INTENT_TTL_MS := 10000                       # chosen: a Create/Join tap o
 
 var store: SessionStore
 var clock: Clock = Clock.new()
+## The ruleset of the room I hold a seat in (the default game's while I hold none). One per room, kept in _rulesets.
 var ruleset: Ruleset
+## Makes the ruleset for a game id, or returns null for a game this client does not have. Tests swap it to play a toy game.
+var ruleset_factory: Callable = RulesetRegistry.try_make
+## The game id of the room I am in when this client does not have it ("" when it does): the room runs under an inert ruleset
+## so its frames are never misread as another game's.
+var unsupported_game := ""
 var server_url := "wss://raspberrypi.tail87b476.ts.net:8470"      # the arena server on the Pi (tailnet only); Settings can change it
 ## Old defaults that earlier builds saved to disk as if the player had chosen them. A saved copy of one of these is not a
 ## choice, so it is dropped on load and the current default applies (an address the player typed is always kept).
@@ -61,6 +67,14 @@ var _list_wire := 0
 var _intent_wire := 0
 var _join_from_list := false          # the join in flight was a tap on a listed camp: a refusal gets the neutral wording
 
+static var _GAME_ID_RX := RegEx.create_from_string("^[a-z][a-z0-9_]*$")
+const GAME_ID_MAX := 24              # the server's manifest ids: a lowercase letter, then up to 23 of a-z 0-9 _
+var _rulesets := {}                   # room code -> its Ruleset
+var _games := {}                      # room code -> the game id the room's frames last named ("" when that was not a usable id)
+var _last_seq := 0                    # the newest `view` seq taken on this connection (the server counts from 1 on each seat)
+var _act_nonce := ""                  # makes act ids differ between runs of the app; the counter makes them differ within one
+var _act_count := 0
+
 var _inflight := {}                   # guard key -> true
 var _locked_seen := {}                # "room|round|lock" -> true once a view said my_locked for that round
 var _last_type := ""                  # the intent most recently sent: the one an `error` is taken to answer
@@ -72,6 +86,7 @@ func _ready() -> void:
 		store = SessionStore.new()
 	if ruleset == null:
 		ruleset = RulesetRegistry.make()
+	_act_nonce = "%x" % (randi() ^ Time.get_ticks_usec())
 	get_tree().quit_on_go_back = false           # Android: the back gesture must not close the game by itself
 	load_store()
 	Net.handshaken.connect(_on_handshaken)
@@ -89,6 +104,12 @@ func reset(s: SessionStore = null, c: Clock = null) -> void:
 	if c:
 		clock = c
 	ruleset = RulesetRegistry.make()
+	ruleset_factory = RulesetRegistry.try_make
+	unsupported_game = ""
+	_rulesets = {}
+	_games = {}
+	_last_seq = 0
+	_act_count = 0
 	seat_pending_view = false
 	token = ""
 	room_code = ""
@@ -176,8 +197,7 @@ func act(t: String, fields := {}) -> String:
 	if t == "pick" and lock_state() != "open":
 		Log.event("session", "intent_refused", {"t": t, "why": "round_locked"})
 		return "locked_round"              # contract 5.3: after Lock the picker stays shut; never re-enabled locally
-	if t == "radio" and not bool(view.get("radio_available", false)):
-		return "radio_unavailable"
+	if t == "radio" and not bool(view.get("radio_available", false)):		return "radio_unavailable"
 	var key := _guard_key(t, fields)
 	if _inflight.has(key):
 		Log.event("session", "intent_ignored", {"t": t, "why": "in_flight"})
@@ -231,6 +251,23 @@ func pick(kind: String, target: Variant, amount := 0) -> String:
 	if amount > 0:
 		fields["amount"] = amount
 	return act("pick", fields)
+
+
+## One verb of the room's game on the generic wire: `{t: "act", verb, args, phase_id, act_id}` (docs/ARENA.md section 6). Refused here,
+## before anything is sent, when the room's game has no such verb (unknown_verb), the args are not the verb's (bad_args), an arg
+## is named like a seat or secret (forbidden_arg), or the view I hold names no phase (no_phase: a legacy Survivors view).
+## Otherwise "" when sent, else the reasons act() gives.
+func act_verb(verb: Variant, args: Variant = {}) -> String:
+	var bad := VerbCheck.check(ruleset.verbs(), verb, args)
+	if bad != "":
+		Log.event("session", "act_refused", {"why": bad}, "WARN")          # never the verb or args: they are caller data
+		return bad
+	var phase_id: Variant = view.get("phase_id")
+	if not (phase_id is String) or phase_id == "":
+		Log.event("session", "act_refused", {"why": "no_phase"}, "WARN")
+		return "no_phase"
+	_act_count += 1
+	return act("act", {"verb": verb, "args": args, "phase_id": phase_id, "act_id": "%s-%d" % [_act_nonce, _act_count]})
 
 
 func leave() -> void:
@@ -322,6 +359,8 @@ func apply(msg: Dictionary) -> void:
 	if Net.state == "offline":
 		Log.event("session", "ignored_offline", {"t": t})      # a frame that outlived a deliberate close (N05)
 		return
+	if t == "lobby" or t == "view":
+		_note_game(room_code, msg.get("game"))          # first: the frame is checked by the ruleset of the game it names
 	var bad := ruleset.validate(msg)
 	if bad != "":
 		Log.event("session", "invalid_frame", {"t": t, "problem": bad}, "WARN")
@@ -354,6 +393,9 @@ func apply(msg: Dictionary) -> void:
 			room_code = msg.room_code
 			alias = msg.alias
 			host = msg.host
+			_last_seq = 0                       # the server counts views from 1 on every seat
+			_select_room(room_code)
+			_note_game(room_code, msg.get("game"))
 			seat_pending_view = _inflight.has("create_room") or _inflight.has("join_room")
 			for k in SEAT_INTENTS:
 				_inflight.erase(k)
@@ -382,8 +424,68 @@ static func order_of(v: Dictionary) -> int:
 	return -1
 
 
+## The room's game, from a frame that names it: switch to that game's ruleset when it differs from what the room had. A frame
+## that names no game leaves the room as it was (a new room starts as the default game). A game this client does not have, or an
+## id that is not a plausible one, gets an inert ruleset: it plays nothing, and no other game's rules are applied to its frames.
+func _note_game(code: String, raw: Variant) -> void:
+	if code == "":
+		return
+	if raw == null:
+		if not _rulesets.has(code):
+			_bind_game(code, RulesetRegistry.DEFAULT_ID, false)
+		return
+	var id := ""
+	if raw is String and raw.length() <= GAME_ID_MAX and _GAME_ID_RX.search(raw) != null:
+		id = raw
+	if _games.has(code) and _games[code] == id:
+		return                              # the same game again (or the same unusable id: already inert, already logged)
+	_bind_game(code, id)
+
+
+## `id` is "" for an id that is not a plausible one; it is never logged raw (it came off the network).
+func _bind_game(code: String, id: String, named := true) -> void:
+	var rs: Ruleset = ruleset_factory.call(id) if id != "" else null
+	var known := rs != null
+	if not known:
+		rs = Ruleset.new()
+		Log.event("session", "unsupported_game", {"game": id}, "WARN")
+	if _games.has(code):
+		Log.event("session", "room_game_changed", {"to": id}, "WARN")
+		_last_seq = 0
+		last_round_view = {}
+	if named:
+		_games[code] = id
+	_rulesets[code] = rs
+	if code == room_code:
+		ruleset = rs
+		unsupported_game = "" if known else (id if id != "" else "?")
+
+
+## The seat is in `code`: use that room's ruleset (the default game's until a frame names another). Other rooms are forgotten:
+## a seat is held in one room at a time, and a code that is reused later must not inherit the old game.
+func _select_room(code: String) -> void:
+	for k in _rulesets.keys():
+		if k != code:
+			_rulesets.erase(k)
+			_games.erase(k)
+	if not _rulesets.has(code):
+		_bind_game(code, RulesetRegistry.DEFAULT_ID, false)
+	ruleset = _rulesets[code]
+	unsupported_game = ""
+
+
 func _take_view(msg: Dictionary) -> void:
 	var t: String = msg.t
+	if t == "view":
+		var s: Variant = msg.get("seq")
+		if typeof(s) != TYPE_INT or s < 1:
+			Log.event("session", "invalid_frame", {"t": t, "problem": "seq"}, "WARN")
+			notice.emit("invalid", "invalid_view", "")
+			return
+		if s <= _last_seq:
+			Log.event("session", "stale_view_ignored", {"got": "view", "seq": s, "have": _last_seq}, "WARN")
+			return
+		_last_seq = s
 	var old := order_of(view)
 	var new := order_of(msg)
 	if old >= 0 and new >= 0 and new < old:
@@ -530,6 +632,7 @@ func _seat_gone(code: String, text: String) -> void:
 
 func _on_handshaken() -> void:
 	_inflight = {}                    # after a reconnect the fresh view decides; keep nothing else
+	_last_seq = 0                     # a new connection: the server counts views from 1 again
 	games = RoomsWatch.sanitize_games(Net.server_games)
 	rooms.on_features(Net.server_features)          # before the first list_rooms: a server that said no is never asked
 	rooms.on_connected(clock.now_msec())
@@ -586,6 +689,11 @@ func _notification(what: int) -> void:
 # ---------------- storage ----------------
 
 func forget_seat() -> void:
+	_rulesets = {}
+	_games = {}
+	_last_seq = 0
+	ruleset = RulesetRegistry.make()
+	unsupported_game = ""
 	token = ""
 	room_code = ""
 	alias = ""
@@ -617,6 +725,8 @@ func _guard_key(t: String, fields: Dictionary) -> String:
 		return _round_key(t)
 	if t == "pick":
 		return "pick|%s" % JSON.stringify(fields)
+	if t == "act":          # the same verb, args and phase twice is one tap (the act id differs on purpose and is not part of it)
+		return "act|%s|%s|%s" % [fields.get("verb"), JSON.stringify(fields.get("args")), fields.get("phase_id")]
 	return t
 
 
