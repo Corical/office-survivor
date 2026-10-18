@@ -358,7 +358,7 @@ msgid "notice.seat_gone"
 msgstr "That game is no longer available."
 
 msgid "notice.taken_over"
-msgstr "This seat was opened on another device."
+msgstr "This game was opened on another device. Resume here to take it back."
 
 msgid "notice.too_big"
 msgstr "The server sent something too large."
@@ -560,6 +560,9 @@ msgstr "Results"
 
 msgid "ui.resume"
 msgstr "Resume game"
+
+msgid "ui.resume_code"
+msgstr "Resume game {code}"
 
 msgid "ui.reveal_title"
 msgstr "What happened"

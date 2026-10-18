@@ -4,6 +4,10 @@ extends Control
 ## and talks only through Intents. The logo bobs and glows, the buttons are chunky and bounce when pressed, and the whole
 ## menu pops in the first time it appears (all of it from the theme's art and effect settings, none of it required).
 
+## Reasons a connection can end while the seat is kept: the title explains them (an upgrade has its own screen).
+const TERMINAL_ON_TITLE := ["taken_over", "too_big", "flapping"]
+const MAX_CODE_SHOWN := 12          # real codes are 4 letters; a button must never grow with a hostile one
+
 var _notice := ""
 var _code_text := ""
 var _show_settings := false
@@ -53,12 +57,19 @@ func _build() -> void:
 	menu.add_child(title)
 	if title.visible:
 		entries.append(title)
-	if _notice != "":
-		var note := Ui.label(_notice, "notice")
+	var said := _notice
+	if said == "" and st.terminal in TERMINAL_ON_TITLE:
+		# The notice for this was emitted when the connection ended, before this screen existed. The reason is state, so
+		# read it from there: the player must be able to see why they were disconnected, not just that they were.
+		said = Words.render("notice." + st.terminal)
+	if said != "":
+		var note := Ui.label(said, "notice")
 		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		menu.add_child(note)
 	if st.has_seat:
-		var resume := Ui.button(Words.render("ui.resume"), "resume", func(): _show(Intents.resume()), false, "PrimaryButton")
+		var code_tag := str(st.room_code).left(MAX_CODE_SHOWN)
+		var resume_label := Words.render("ui.resume_code", {"code": code_tag}) if code_tag != "" else Words.render("ui.resume")
+		var resume := Ui.button(resume_label, "resume", func(): _show(Intents.resume()), false, "PrimaryButton")
 		menu.add_child(resume)
 		entries.append(resume)
 	var create := Ui.button(Words.render("ui.create_room"), "create", func(): _on_create(), false, "PrimaryButton")

@@ -517,3 +517,73 @@ func test_the_overlay_never_blocks_a_tap() -> void:
 			o = c
 	eq(o.mouse_filter, Control.MOUSE_FILTER_IGNORE, "overlay container ignores the mouse")
 	eq((Ui.find(r, "net_banner") as Label).mouse_filter, Control.MOUSE_FILTER_IGNORE, "banner ignores the mouse")
+
+
+# ---------------- why the connection ended is still there when the title appears (stranger pass #7) ----------------
+
+func _title_text(s: Control) -> String:
+	return " | ".join(Ui.texts(s))
+
+
+## The notice is emitted when the connection ends, a moment BEFORE the title exists; the reason must be read from state.
+func test_a_title_that_appears_after_being_kicked_still_says_why() -> void:
+	go_online()
+	give_seat("tok", "ABCD", true)
+	fake.server_send({"t": "error", "code": "taken_over", "message": "This seat was opened on another device."})
+	eq(Session.terminal_reason, "taken_over", "the connection ended for that reason")
+	var s := mount(TitleScreen)                            # built AFTER the notice went out
+	check("another device" in _title_text(s), "the title tells the player why: %s" % _title_text(s))
+	var n := Ui.find(s, "notice")
+	check(n != null, "there is a notice label")
+	if n != null:
+		check((n as Label).text.count("another device") == 1, "once, not twice")
+
+
+func test_every_terminal_reason_that_keeps_the_seat_is_explained_on_the_title() -> void:
+	for pair in [["too_big", 0], ["flapping", 0]]:
+		setup()
+		go_online()
+		give_seat("tok", "ABCD", true)
+		Session._on_terminal(pair[0])                      # how Net reports a connection that cannot be fixed by retrying
+		eq(Session.terminal_reason, pair[0], "%s: the reason is held as state" % pair[0])
+		var s := mount(TitleScreen)
+		var n := Ui.find(s, "notice")
+		check(n != null, "%s: something is said" % pair[0])
+		if n != null:
+			check((n as Label).text != "" and not ("notice." in (n as Label).text), "%s: in words, not a key: %s" % [pair[0], (n as Label).text])
+
+
+func test_the_reason_goes_away_when_the_player_acts_again() -> void:
+	go_online()
+	give_seat("tok", "ABCD", true)
+	fake.server_send({"t": "error", "code": "taken_over", "message": "x"})
+	var s := mount(TitleScreen)
+	check(Ui.find(s, "notice") != null, "shown after the kick")
+	Session.begin("create_room")                           # the player taps Create: a fresh start
+	eq(Session.terminal_reason, "", "the reason is cleared")
+	var t2 := mount(TitleScreen)
+	check(Ui.find(t2, "notice") == null, "and a title built after that does not repeat it")
+
+
+func test_the_upgrade_reason_is_not_dumped_on_the_title() -> void:
+	go_online()
+	Session.terminal_reason = "upgrade_required"
+	var s := mount(TitleScreen)
+	check(Ui.find(s, "notice") == null, "the upgrade screen owns that message")
+
+
+func test_the_resume_button_names_the_camp_and_survives_a_hostile_code() -> void:
+	go_online()
+	give_seat("tok", "KXQM", true)
+	Session.back_to_title()
+	var s := mount(TitleScreen)
+	var b := Ui.find(s, "resume") as Button
+	check(b != null and "KXQM" in b.text, "names the camp: %s" % (b.text if b else "no button"))
+	Session.room_code = "X".repeat(10000)
+	var t2 := mount(TitleScreen)
+	var b2 := Ui.find(t2, "resume") as Button
+	check(b2 != null and b2.text.length() < 80, "a huge code cannot blow up the button: %d chars" % (b2.text.length() if b2 else -1))
+	Session.room_code = ""
+	var t3 := mount(TitleScreen)
+	var b3 := Ui.find(t3, "resume") as Button
+	check(b3 != null and b3.text != "" and not ("{" in b3.text), "no code: the plain label, no stray slot: %s" % (b3.text if b3 else ""))
