@@ -9,6 +9,8 @@ const SCREENS := {
 	"reveal": preload("res://screens/reveal_screen.gd"),
 	"end": preload("res://screens/end_screen.gd"),
 	"upgrade": preload("res://screens/upgrade_screen.gd"),
+	"bang_table": preload("res://games/bang/table_screen.gd"),
+	"bang_end": preload("res://games/bang/end_screen.gd"),
 }
 const SHARED_SCREENS := ["title", "upgrade"]        # the rest are a game's, shown only through its ruleset's phases
 ## The order the backdrop pans through as a game moves along (a screen not listed pans like the title).

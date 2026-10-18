@@ -16,7 +16,33 @@ static func use(t: Translation) -> void:
 
 
 static func has(key: String) -> bool:
-	return translation != null and str(translation.get_message(key)) != ""
+	return _message(key) != ""
+
+
+static var _extras: Array = []
+static var _extras_loaded := false
+
+
+## The words a game ships in its own file (Ruleset.words_path), asked after the theme's. Loaded once; a game with no file adds none.
+static func _game_words() -> Array:
+	if not _extras_loaded:
+		_extras_loaded = true
+		for p in RulesetRegistry.words_paths():
+			var t: Variant = load(p)
+			if t is Translation:
+				_extras.append(t)
+	return _extras
+
+
+static func _message(key: String) -> String:
+	var msg := str(translation.get_message(key)) if translation else ""
+	if msg != "":
+		return msg
+	for t in _game_words():
+		msg = str((t as Translation).get_message(key))
+		if msg != "":
+			return msg
+	return ""
 
 
 static func keys() -> Array[String]:
@@ -30,7 +56,7 @@ static func keys() -> Array[String]:
 ## The words for `key` with `slots` filled in. A missing key renders as "[key]" (visible, never silent) and is logged
 ## once, so a theme gap shows up in testing instead of as an empty label.
 static func render(key: String, slots := {}) -> String:
-	var msg := str(translation.get_message(key)) if translation else ""
+	var msg := _message(key)
 	if msg == "":
 		if not missing_seen.has(key):
 			missing_seen[key] = true

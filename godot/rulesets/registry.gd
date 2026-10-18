@@ -5,7 +5,18 @@ extends RefCounted
 const DEFAULT_ID := "survivors"
 const RULESETS := {
 	"survivors": preload("res://rulesets/survivors/ruleset.gd"),
+	"bang": preload("res://rulesets/bang/ruleset.gd"),
 }
+
+
+## The words files the games ship themselves (a game with none adds nothing).
+static func words_paths() -> Array:
+	var out: Array = []
+	for id in RULESETS:
+		var p: String = RULESETS[id].new().words_path()
+		if p != "":
+			out.append(p)
+	return out
 
 
 static func has(id: Variant) -> bool:

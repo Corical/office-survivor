@@ -57,6 +57,11 @@ func view_model(_view: Dictionary) -> Dictionary:
 	return {}
 
 
+## A .po file of this game's own words ("" when the theme's file carries them). Asked after the theme's, so a theme can still override.
+func words_path() -> String:
+	return ""
+
+
 ## Every translation key this ruleset can emit (a theme must cover them all).
 func all_keys() -> Array[String]:
 	return []
