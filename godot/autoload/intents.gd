@@ -4,12 +4,26 @@ extends Node
 ## reason (in_flight | locked | locked_round | radio_unavailable | no_server_url | not_connected | ...) the screen can show.
 
 
-func create_room() -> String:
-	return _done(Session.begin("create_room"))
+## Create a camp. `visibility` ("public" | "private") and `name` (at most 24 characters) are optional and are sent only
+## when the server has shown it understands them; with neither, this is the plain create_room it always was.
+func create_room(visibility := "", camp_name := "") -> String:
+	return _done(Session.create_camp(visibility, camp_name))
 
 
-func join_room(code: String) -> String:
-	return _done(Session.begin("join_room", {"code": code.strip_edges().to_upper()}))
+## Join by code. `from_list`: the player tapped a camp in the open-camps list (a refusal then gets the neutral wording).
+func join_room(code: String, from_list := false) -> String:
+	return _done(Session.join_camp(code, from_list))
+
+
+## The open-camps list is showing (true) or no longer is (false). While it is, the client keeps a line open and asks
+## about every 3 s; when it stops, so does the asking. Calls must be paired (one true, one false per screen).
+func rooms_watch(on: bool) -> void:
+	Session.rooms_watch(on)
+
+
+## Ask for the list right now ("" when asked).
+func list_rooms() -> String:
+	return Session.rooms_refresh()
 
 
 ## Resume a stored seat on launch. False when there is none (or no usable server address).
@@ -53,6 +67,7 @@ func back_to_title() -> void:
 func set_server_url(url: String) -> void:
 	Session.server_url = url.strip_edges()
 	Session.save_store()
+	Session.url_changed()
 	Feed.refresh()
 
 

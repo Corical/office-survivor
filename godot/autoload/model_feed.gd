@@ -19,12 +19,25 @@ func _ready() -> void:
 	Session.screen_changed.connect(func(_s): _emit_status())
 	Session.notice.connect(_on_notice)
 	Net.state_changed.connect(func(_s): refresh())
+	Session.rooms_changed.connect(_on_rooms)
 
 
 func reset() -> void:
 	models = {}
 	player.reset()
 	_first_seconds = {}
+
+
+## The open-camps list, as a neutral model: {supported, rooms: [{code, seats_taken, seats_total, age_s, name}], stale, loading}.
+## `supported` is false until the server has answered a list request (and again when it stops answering), so a screen shows
+## the list only when it is true, a quiet header while `loading`, and nothing otherwise.
+func _on_rooms(m: Dictionary) -> void:
+	models["rooms"] = m
+	model_changed.emit("rooms", m)
+
+
+func rooms_model() -> Dictionary:
+	return models.get("rooms", {"supported": false, "rooms": [], "stale": false, "loading": false})
 
 
 func _on_view(v: Dictionary) -> void:

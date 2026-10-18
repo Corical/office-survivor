@@ -9,6 +9,8 @@ signal view_changed(view: Dictionary)
 signal notice(kind: String, code: String, text: String)
 ## The OS back button / gesture. Screens decide what it means; the app never quits on it by itself.
 signal back_requested
+## The open-camps list changed (or was hidden): the model Feed publishes as "rooms".
+signal rooms_changed(model: Dictionary)
 
 const ROUND_GUARDED := ["lock", "continue"]        # once per room+round
 const SEAT_INTENTS := ["resume", "create_room", "join_room"]
@@ -37,6 +39,17 @@ var pending_intent := {}
 ## unknown (contract 5.3, and the phone coming back from the background).
 var awaiting_view := false
 
+## The open-camps list (see core/rooms_watch.gd). It runs only while a screen has asked for it (rooms_watch) and only on the
+## title screen, never while an intent is waiting for its answer, and it stops when a game starts.
+var rooms := RoomsWatch.new()
+const URL_SETTLE_MS := 1000           # chosen: after the server address is edited, wait this long before reconnecting for the list
+var _watchers := 0                    # screens that asked for the list; a count, so a rebuilt screen cannot switch it off by leaving late
+var _watch_reconnect_at := -1
+var _wire := 0                        # counts what was sent, to tell which request an `error` is answering
+var _list_wire := 0
+var _intent_wire := 0
+var _join_from_list := false          # the join in flight was a tap on a listed camp: a refusal gets the neutral wording
+
 var _inflight := {}                   # guard key -> true
 var _locked_seen := {}                # "room|round|lock" -> true once a view said my_locked for that round
 var _last_type := ""                  # the intent most recently sent: the one an `error` is taken to answer
@@ -55,6 +68,7 @@ func _ready() -> void:
 	Net.terminal.connect(_on_terminal)
 	Net.probe_due.connect(_on_probe)
 	Net.state_changed.connect(_on_net_state)
+	Net.ticked.connect(_rooms_tick)
 
 
 ## Fresh state with the given store and clock (tests); nothing is read from or written to the player's files.
@@ -80,6 +94,13 @@ func reset(s: SessionStore = null, c: Clock = null) -> void:
 	_locked_seen = {}
 	_last_type = ""
 	_last_key = ""
+	rooms = RoomsWatch.new()
+	_watchers = 0
+	_watch_reconnect_at = -1
+	_wire = 0
+	_list_wire = 0
+	_intent_wire = 0
+	_join_from_list = false
 	load_store()
 
 
@@ -120,6 +141,9 @@ func resume_if_stored() -> bool:
 	terminal_reason = ""
 	awaiting_view = true
 	Log.event("session", "resume_start", {"room": room_code})
+	if Net.handshake_done and Net.state == "online":
+		act("resume", {"token": token})          # the line is already up (the open-camps list opened it): just resume on it
+		return true
 	Net.connect_to(server_url)
 	return true
 
@@ -150,6 +174,8 @@ func act(t: String, fields := {}) -> String:
 		_inflight[key] = true
 		_last_type = t
 		_last_key = key
+		_wire += 1
+		_intent_wire = _wire
 	return why
 
 
@@ -272,6 +298,8 @@ func apply(msg: Dictionary) -> void:
 			Log.event("session", "seat", {"room": room_code, "host": host})
 		"error":
 			_on_error(msg)
+		"rooms":
+			_on_rooms(msg)
 		_:
 			if t in ruleset.view_types():
 				_take_view(msg)
@@ -327,6 +355,23 @@ func _take_view(msg: Dictionary) -> void:
 func _on_error(msg: Dictionary) -> void:
 	var code: String = msg.code
 	var text := str(msg.get("message", ""))
+	# An error answers the request sent last. If that was the list request, it says "no lists here" (or "slow down"),
+	# and it is not something to tell the player about.
+	if rooms.awaiting() and _list_wire > _intent_wire:
+		if rooms.on_error(code):
+			rooms_changed.emit(rooms.model())
+		Log.event("session", "list_rooms_error", {"code": code})
+		return
+	# A tap on a listed camp that was refused: the camp filled, started or vanished first, or anything else. One neutral
+	# wording for all of it, and the list is refreshed at once.
+	if _join_from_list and _last_key == "join_room" and _inflight.has("join_room"):
+		_join_from_list = false
+		_inflight.erase("join_room")
+		Net.ack("join_room")
+		Log.event("session", "listed_camp_refused", {"code": code, "message": text}, "WARN")
+		notice.emit("error", "camp_unavailable", text)
+		rooms.refresh_now(clock.now_msec())
+		return
 	var was_resume := _inflight.has("resume")
 	Log.event("session", "server_error", {"code": code, "resume": was_resume, "message": text}, "WARN")
 	if code in ruleset.seat_gone_codes() or (code == "refused" and text in ruleset.seat_gone_texts()):
@@ -379,9 +424,14 @@ func _seat_gone(code: String, text: String) -> void:
 
 func _on_handshaken() -> void:
 	_inflight = {}                    # after a reconnect the fresh view decides; keep nothing else
-	if token != "":
+	rooms.on_connected(clock.now_msec())
+	rooms_changed.emit(rooms.model())
+	_rooms_tick()                     # (re)connected with the list showing: ask for it now, do not wait for the next beat
+	if token != "" and not _watch_only():
 		awaiting_view = true
 		act("resume", {"token": token})
+	elif token != "":
+		pass                          # on the title screen with a stored seat and the camps list open: Resume is the player's choice
 	elif pending_intent:
 		var p := pending_intent
 		pending_intent = {}
@@ -397,6 +447,9 @@ func _on_handshaken() -> void:
 func _on_net_state(s: String) -> void:
 	if s != "online" and token != "":
 		awaiting_view = true
+	if s != "online" and rooms.connected:
+		rooms.on_disconnected()                  # the list we hold is the last one we had; polling resumes with the handshake
+		rooms_changed.emit(rooms.model())
 
 
 ## Nothing heard for a while. `resume` on the live connection is a harmless ping: the server answers with the seat
@@ -478,4 +531,123 @@ func _go(s: String) -> void:
 	if s != screen:
 		Log.event("session", "screen", {"from": screen, "to": s})
 		screen = s
+		if s != "title":
+			_join_from_list = false
+			if rooms.watching:                   # a game started (or the app locked): the list is over, whatever the screen says
+				_watchers = 0
+				rooms.stop()
+				rooms_changed.emit(rooms.model())
 		screen_changed.emit(s)
+
+
+# ---------------- the open-camps list ----------------
+
+## A screen wants the list (true) or no longer does (false). Counted, so a screen that is rebuilt (its replacement asks
+## before the old one has left) never switches the list off by leaving late. Only the title screen shows it.
+func rooms_watch(on: bool) -> void:
+	if on:
+		if screen != "title" or locked_out:
+			return
+		_watchers += 1
+		if _watchers == 1:
+			rooms.start(clock.now_msec())
+			rooms_changed.emit(rooms.model())
+		_watch_connect()
+		return
+	if _watchers == 0:
+		return
+	_watchers -= 1
+	if _watchers > 0:
+		return
+	rooms.stop()
+	rooms_changed.emit(rooms.model())
+	# nothing else is using the line (no seat, nothing waiting for a reply): do not keep it open just for a closed list
+	if token == "" and pending_intent.is_empty() and _inflight.is_empty() and screen == "title" and Net.state != "offline":
+		Net.close()
+
+
+## Ask for the list now (a camp filled first; the player pressed refresh). "" when asked, else why not.
+func rooms_refresh() -> String:
+	if not rooms.watching:
+		return "not_watching"
+	rooms.refresh_now(clock.now_msec())
+	_rooms_tick()
+	return "" if rooms.awaiting() or Net.handshake_done else "not_connected"
+
+
+## The server address was edited while the list is open: the line to the old address is dropped and a new one is made once
+## the typing has settled (so every keystroke of a half-typed address is not a connection attempt).
+func url_changed() -> void:
+	if _watchers == 0 or token != "" or Net.url == server_url:
+		return
+	Net.close()
+	rooms.on_disconnected()
+	rooms_changed.emit(rooms.model())
+	_watch_reconnect_at = clock.now_msec() + URL_SETTLE_MS
+
+
+func _watch_only() -> bool:
+	return rooms.watching and screen == "title" and pending_intent.is_empty()
+
+
+func _watch_connect() -> void:
+	if not valid_url(server_url) or locked_out:
+		return
+	if Net.handshake_done and Net.state == "online":
+		rooms.refresh_now(clock.now_msec())
+		_rooms_tick()
+		return
+	if Net.state in ["connecting", "reconnecting", "unreachable"]:
+		return                                   # already trying
+	Net.connect_to(server_url)
+
+
+## Driven by Net's tick (every frame, or by tests with a fake clock): the settle timer, the 3 s silence rule, the poll.
+func _rooms_tick() -> void:
+	var now := clock.now_msec()
+	if _watch_reconnect_at >= 0 and now >= _watch_reconnect_at:
+		_watch_reconnect_at = -1
+		_watch_connect()
+	if rooms.tick(now):
+		Log.event("session", "rooms_hidden_silence", {})
+		rooms_changed.emit(rooms.model())
+	if not rooms.poll_due(now):
+		return
+	# never while something waits for its answer (an error would be taken for the wrong request), nor off the title screen
+	if screen != "title" or locked_out or not _inflight.is_empty() or not pending_intent.is_empty() or not Net.handshake_done:
+		return
+	if Net.send("list_rooms") == "":
+		_wire += 1
+		_list_wire = _wire
+		rooms.sent(now)
+		rooms_changed.emit(rooms.model())
+
+
+func _on_rooms(msg: Dictionary) -> void:
+	if rooms.on_reply(msg.get("rooms")):
+		rooms_changed.emit(rooms.model())
+
+
+# ---------------- create and join with the list ----------------
+
+## Create a camp. `visibility` ("public" | "private") and `name` go out ONLY once a valid `rooms` reply has shown that this
+## server knows them: an old server might reject unknown fields. Returns "" or a reason, like begin().
+func create_camp(visibility := "", camp_name := "") -> String:
+	var fields := {}
+	if rooms.supported:
+		var vis := RoomsWatch.clean_visibility(visibility)
+		if vis != "":
+			fields["visibility"] = vis
+		var nm := RoomsWatch.clean_name(camp_name)
+		if nm != "":
+			fields["name"] = nm
+	return begin("create_room", fields)
+
+
+## Join a camp by code. `from_list`: the player tapped a card, so a refusal is worded neutrally (it filled or closed first).
+func join_camp(code: String, from_list := false) -> String:
+	_join_from_list = from_list
+	var why := begin("join_room", {"code": code.strip_edges().to_upper()})
+	if why != "":
+		_join_from_list = false
+	return why
