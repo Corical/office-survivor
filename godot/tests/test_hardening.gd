@@ -189,6 +189,27 @@ func test_n16_a_bad_server_address_is_refused_before_anything_happens() -> void:
 	check(Session.valid_url("wss://pi.example.ts.net:8470"), "wss is fine")
 
 
+## The owner's PC kept showing the retired localhost default because earlier builds SAVED it to disk and a saved address
+## beats the default. A saved copy of the retired default is not a choice and must give way; a typed address must not.
+func test_a_saved_retired_default_gives_way_but_a_typed_address_survives() -> void:
+	var fresh_default: String = Session.server_url
+	for kept in ["wss://my-own-box.example.net:9000", "ws://127.0.0.1:9999", "ws://localhost:8765", "ws://127.0.0.1:8765/x"]:
+		store.data = {"token": "t", "room_code": "ABCD", "alias": "Mango", "server_url": kept}
+		Session.server_url = fresh_default
+		Session.load_store()
+		eq(Session.server_url, kept, "an address the player chose is kept: %s" % kept)
+	for retired in ["ws://127.0.0.1:8765", "  ws://127.0.0.1:8765  "]:
+		store.data = {"token": "t", "room_code": "ABCD", "alias": "Mango", "server_url": retired}
+		Session.server_url = fresh_default
+		Session.load_store()
+		eq(Session.server_url, fresh_default, "the retired default is replaced: '%s'" % retired)
+		eq(Session.token, "t", "and the seat is untouched")
+	store.data = {"server_url": ""}
+	Session.server_url = fresh_default
+	Session.load_store()
+	eq(Session.server_url, fresh_default, "an empty saved address keeps the default")
+
+
 ## A fresh install must point at the real arena server on every platform: the old default was localhost (nothing there on a
 ## player's PC, so the first tap on Create showed "can't reach the server") and empty on Android.
 func test_the_default_address_is_the_real_server_and_valid() -> void:

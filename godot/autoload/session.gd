@@ -18,6 +18,9 @@ var store: SessionStore
 var clock: Clock = Clock.new()
 var ruleset: Ruleset
 var server_url := "wss://raspberrypi.tail87b476.ts.net:8470"      # the arena server on the Pi (tailnet only); Settings can change it
+## Old defaults that earlier builds saved to disk as if the player had chosen them. A saved copy of one of these is not a
+## choice, so it is dropped on load and the current default applies (an address the player typed is always kept).
+const RETIRED_DEFAULT_URLS: Array[String] = ["ws://127.0.0.1:8765"]
 var token := ""
 var room_code := ""
 var alias := ""
@@ -435,8 +438,9 @@ func load_store() -> void:
 	token = str(d.get("token", ""))
 	room_code = str(d.get("room_code", ""))
 	alias = str(d.get("alias", ""))
-	if str(d.get("server_url", "")) != "":
-		server_url = str(d.server_url)
+	var saved := str(d.get("server_url", "")).strip_edges()
+	if saved != "" and not RETIRED_DEFAULT_URLS.has(saved):
+		server_url = saved
 
 
 func save_store() -> void:
