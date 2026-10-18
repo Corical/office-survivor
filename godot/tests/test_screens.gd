@@ -10,7 +10,7 @@ func setup() -> void:
 	Themes.use("placeholder")
 	for c in _mounted:
 		if is_instance_valid(c):
-			c.queue_free()
+			c.free()
 	_mounted.clear()
 
 
@@ -18,7 +18,7 @@ func teardown() -> void:
 	super.teardown()
 	for c in _mounted:
 		if is_instance_valid(c):
-			c.queue_free()
+			c.free()
 	_mounted.clear()
 
 

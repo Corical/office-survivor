@@ -64,10 +64,10 @@ func go_online() -> void:
 
 
 ## The server's `seat` reply. A seat nobody asked for is ignored (review N06), so ask for one first, as a client would.
-func give_seat(tok := "tok-secret-1", room := "ABCD", is_host := true) -> void:
+func give_seat(tok := "tok-secret-1", room := "ABCD", is_host := true, alias := "Mango") -> void:
 	if not Session.expecting_seat():
 		Session.act("create_room")
-	fake.server_send({"t": "seat", "token": tok, "room_code": room, "alias": "Mango", "host": is_host})
+	fake.server_send({"t": "seat", "token": tok, "room_code": room, "alias": alias, "host": is_host})
 
 
 func round_view(n := 1, locked := false, secs := 180, locked_count := 0) -> Dictionary:

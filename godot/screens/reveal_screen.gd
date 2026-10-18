@@ -11,6 +11,12 @@ func _ready() -> void:
 	_build()
 
 
+## Skip the animation: the log below is always complete, so nothing is lost.
+func _skip() -> void:
+	if Feed.player.timeline != null:
+		Feed.player.timeline.snap_to_end()
+
+
 func _process(_delta: float) -> void:
 	if _timer_label != null:
 		_timer_label.text = Words.render("ui.seconds", {"n": Feed.seconds_left()})
@@ -45,6 +51,11 @@ func _build() -> void:
 	col.add_child(Ui.label(Words.render("ui.reveal_title"), "reveal_title", "HeaderLabel"))
 	_timer_label = Ui.label("", "timer_label", "MutedLabel")
 	col.add_child(_timer_label)
+	var stage := Stage.new()
+	stage.set_meta("id", "stage")
+	stage.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_child(stage)
+	col.add_child(Ui.button(Words.render("ui.skip"), "skip", func(): _skip()))
 	for i in m.lines.size():
 		var ln: Dictionary = m.lines[i]
 		col.add_child(Ui.label(Words.render(ln.key, ln.slots), "line_%d" % i))

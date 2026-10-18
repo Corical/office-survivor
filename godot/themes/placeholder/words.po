@@ -519,6 +519,9 @@ msgstr "Server address"
 msgid "ui.settings"
 msgstr "Settings"
 
+msgid "ui.skip"
+msgstr "Skip"
+
 msgid "ui.start"
 msgstr "Start game"
 
