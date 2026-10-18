@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 - Build 32.0.101.7092 - Compatibility - Using Device: Intel - Intel(R) Iris(R) Xe Graphics
+
+2026-10-18T13:39:31.663 INFO [log] start build=0.1.0-foundation debug=true os=Windows path=user://client.log
+2026-10-18T13:39:32.036 INFO [themes] use id=flash
+2026-10-18T13:39:32.065 INFO [themes] use id=flash
+PERF full title: 0.88 ms  19 draws  111 objects
+PERF backdrop hidden: 0.54 ms  13 draws  57 objects
+PERF embers off: 0.82 ms  18 draws  110 objects
+PERF backdrop not redrawn per frame: 0.80 ms  19 draws  111 objects
+PERF vignette off: 0.91 ms  18 draws  110 objects
+PERF logo hidden (glow and bob gone): 0.74 ms  16 draws  108 objects
+PERF DONE
