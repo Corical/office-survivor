@@ -545,7 +545,7 @@ func _draw_home(e: Dictionary, font: Font, ink: Color) -> void:
 ## The name plate under a home: the name, and below it my food (a number) or another player's band (an icon and a word).
 func _draw_plate(e: Dictionary, at: Vector2, font: Font, ink: Color) -> void:
 	var pw := _plate_w()
-	var rect := Rect2(at.x - pw * 0.5, at.y + _hut_px * 0.5 + 2.0, pw, PLATE_H)
+	var rect := Rect2(clampf(at.x - pw * 0.5, 4.0, maxf(4.0, size.x - pw - 4.0)), at.y + _hut_px * 0.5 + 2.0, pw, PLATE_H)
 	var sb := get_theme_stylebox("plate_me" if e.is_me else "plate", "Stage")
 	draw_style_box(sb, rect)
 	var ps := _plate_size()

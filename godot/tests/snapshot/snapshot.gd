@@ -5,7 +5,9 @@ extends Control
 ##   godot --path godot res://tests/snapshot/snapshot.tscn -- --out=<dir> --log=<file> [--theme=flash|placeholder]
 ## Aliases from the fixtures are renamed to realistic ones (one long, one short) so ellipsis and layout are judged fairly.
 
-const NAMES := ["Mango", "SaltyPretzel", "Fig", "WobblyTable", "Kiwi", "Plum", "Juniper", "Marlowe"]
+var NAMES := ["Mango", "SaltyPretzel", "Fig", "WobblyTable", "Kiwi", "Plum", "Juniper", "Marlowe"]
+const LONG_NAMES := ["Bartholomew_Jr_III", "SaltyPretzelSupreme", "Wolfgang Amadeus", "WobblyTableLegsXL", "Kiwi", "Plum",
+	"Juniper", "Marlowe"]
 const PHONE := Vector2i(540, 960)
 const DESKTOP := Vector2i(1280, 720)
 
@@ -24,6 +26,8 @@ func _ready() -> void:
 			out_dir = a.substr(6)
 		elif a.begins_with("--theme="):
 			theme_id = a.substr(8)
+		elif a == "--long":
+			NAMES = LONG_NAMES                        # the longest names a player can have: layout must hold
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	await get_tree().process_frame
 	Net.reset()

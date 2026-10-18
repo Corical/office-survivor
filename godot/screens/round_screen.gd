@@ -218,6 +218,9 @@ func _head() -> Control:
 		row.add_child(Ui.picture(face, Vector2(AVATAR_PX, AVATAR_PX), "me_avatar"))
 	var s := Ui.vbox(4)
 	var you := Ui.label(Words.render("ui.you_are", {"alias": _m.me.alias}), "you_are", "YouLabel")
+	you.autowrap_mode = TextServer.AUTOWRAP_OFF              # a name is one line: trimmed with an ellipsis, never broken mid-word
+	you.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	you.clip_text = true
 	s.add_child(you)
 	s.add_child(Ui.label(Words.render("ui.round_of", {"round": _m.round, "rounds": _m.rounds}), "round_of", "MutedLabel"))
 	for r in _m.me.resources:
