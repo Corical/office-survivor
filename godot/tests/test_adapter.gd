@@ -32,6 +32,9 @@ func test_every_server_code_has_a_known_line_and_beats() -> void:
 	for code in A.line_codes():
 		var ln := A.line(code, {}, "private")
 		eq(ln.key, "line." + code, code + " key")
+		if A.is_text_only(code):
+			eq(ln.beats, [], code + " is card text: no beats")       # goal_* and progress_*
+			continue
 		check(not ln.beats.is_empty(), code + " has beats")
 		check(ln.beats[0].kind != "unknown", code + " is not mapped to the unknown beat")
 

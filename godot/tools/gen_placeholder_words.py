@@ -95,7 +95,7 @@ def main():
     shutil.copyfile(SRC, DST_LINES)
     entries = {}
     for code, tpl in lines.items():
-        text = strip_emoji(tpl)
+        text = strip_emoji(tpl).replace("✓", "(done)")      # the placeholder theme carries no symbols at all
         entries["line." + code] = text
     entries.update(UI)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

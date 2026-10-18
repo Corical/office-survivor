@@ -25,8 +25,13 @@ const SYNTH_QUIET := "news_quiet"     # the server sends news: [] for a quiet ni
 const GOAL_STATES := ["open", "done", "failed", "end"]
 const UNKNOWN_LOG_CAP := 64           # chosen: distinct unknown values logged per run, so a hostile server cannot flood
 ## Every beat kind the adapter can emit; the Stage must handle each (a test checks both directions).
-const BEAT_KINDS := ["move_resource", "shield_on", "blocked", "empty", "learn", "marked", "status", "camp", "charm",
-	"total", "quiet", "event", "unknown"]
+const BEAT_KINDS := ["move_resource", "shield_on", "shield_off", "blocked", "empty", "learn", "marked", "status", "camp",
+	"charm", "total", "quiet", "event", "unknown"]
+## Wilderness events (MECHANICS section 5; the server sends the id, the scope and who it hit beside the sentence).
+const EVENT_FIND := {"bananas": 1, "coconut": 1, "cache": 2}        # one player finds food (created)
+const EVENT_LOSE := {"snake": 1, "rain": 1, "raid": 2}              # one player loses food (destroyed)
+const EVENT_CAMP := ["storm", "feast", "rats", "rats_top"]          # happens to the whole camp
+const EVENT_CAMP_TAKES := {"rats": 1, "rats_top": 1}                # what a camp event takes from each player it hits
 
 static var _seen_unknown := {}
 static var _codes: Dictionary = {}
@@ -111,6 +116,26 @@ static func _s(a: Dictionary, k: String) -> String:
 	return "" if v == null else str(v)
 
 
+## A wilderness event as one beat. The sentence travels along as `detail` so a theme with no words of its own for the
+## event can still show it. An event the client does not know, or one with no `who`, is the generic event beat.
+static func _event_beat(a: Dictionary) -> Dictionary:
+	var ev := _s(a, "event")
+	var who := _s(a, "who")
+	var b: Dictionary
+	if ev in EVENT_FIND and who != "":
+		b = _mv(OFFSTAGE, who, EVENT_FIND[ev], -1, ev)
+	elif ev in EVENT_LOSE and who != "":
+		b = _mv(who, OFFSTAGE, EVENT_LOSE[ev], -1, ev)
+	elif ev == "shelter" and who != "":
+		b = _beat("shield_off", who, who, ev)
+	elif ev in EVENT_CAMP:
+		b = _beat("camp", OFFSTAGE, OFFSTAGE, ev)
+	else:
+		b = _beat("event", OFFSTAGE, OFFSTAGE, ev)
+	b.detail = _s(a, "line")
+	return b
+
+
 ## One server line becomes one or more atomic beats. `a` is the line's args.
 static func beats_for(code: String, a: Dictionary) -> Array:
 	match code:
@@ -177,9 +202,7 @@ static func beats_for(code: String, a: Dictionary) -> Array:
 		"idol_blocked":
 			return [_beat("blocked", ME, _s(a, "target"), "idol")]
 		"event":
-			var e := _beat("event")
-			e.detail = _s(a, "line")          # a finished sentence from the engine until the server sends an event id
-			return [e]
+			return [_event_beat(a)]
 		"news_hit_1", "news_hit_n":
 			return [_mv(_s(a, "victim"), OFFSTAGE, _n(a, "total"), -1, "hit")]
 		"news_break_in_empty":
@@ -210,6 +233,29 @@ static func line(code: String, args: Dictionary, source := "private") -> Diction
 	var known := code in line_codes()
 	if not known:
 		_unknown("line_code", code)
+	var slots := slots_for(args)
+	var key := ("line." + code) if known else "line.unknown"
+	if code == "now_have" and _n(args, "rations") == 1:
+		key = "line.now_have.one"          # "1 ration", not "1 rations"
+	var beats: Array = beats_for(code, args) if known else [_beat("unknown")]
+	if known and is_text_only(code):
+		beats = []                          # goal and progress wording is text for a card, never something that happens
+	# a camp event that took food from EVERY holder reaches me in my private lines only when it took from me
+	if known and code == "event" and source == "private" and _s(args, "scope") == "camp":
+		var takes: int = EVENT_CAMP_TAKES.get(_s(args, "event"), 0)
+		if takes > 0:
+			beats.append(_mv(ME, OFFSTAGE, takes, -1, _s(args, "event")))
+	return {"code": code, "key": key, "slots": slots, "beats": beats, "source": source, "covered": false}
+
+
+## The server's table also holds the wording of goals and goal progress (`goal_*`, `progress_*`). They are worded onto
+## a card, not played in a reveal, so they have no beats.
+static func is_text_only(code: String) -> bool:
+	return code.begins_with("goal_") or code.begins_with("progress_")
+
+
+## Typed slots for a line's args (a move becomes a translated word, a list is joined the theme's way).
+static func slots_for(args: Dictionary) -> Dictionary:
 	var slots := {}
 	for k in args:
 		match SLOT_TYPES.get(k, ""):
@@ -223,11 +269,19 @@ static func line(code: String, args: Dictionary, source := "private") -> Diction
 				slots[k] = {"list": args[k] if args[k] is Array else [args[k]]}
 			_:
 				slots[k] = args[k]
-	var key := ("line." + code) if known else "line.unknown"
-	if code == "now_have" and _n(args, "rations") == 1:
-		key = "line.now_have.one"          # "1 ration", not "1 rations"
-	return {"code": code, "key": key, "slots": slots,
-		"beats": beats_for(code, args) if known else [_beat("unknown")], "source": source, "covered": false}
+	return slots
+
+
+## A goal or progress shown from the server's code + values when it sent them and we have words for the code;
+## otherwise from the older contract-id key with the server's English as the slot.
+static func _goal_text(line_ref: Variant, fallback_key: String, fallback_slots: Dictionary) -> Dictionary:
+	if line_ref is Dictionary:
+		var code := str(line_ref.get("code", ""))
+		if code in line_codes():
+			var args: Dictionary = line_ref.get("args") if line_ref.get("args") is Dictionary else {}
+			return {"key": "line." + code, "slots": slots_for(args), "from_code": true}
+		_unknown("goal_line", code)
+	return {"key": fallback_key, "slots": fallback_slots, "from_code": false}
 
 
 # ---------------- reveal: merge, dedupe, order ----------------
@@ -335,6 +389,23 @@ static func roster(me: String, others: Array, board: Variant, board_before: Vari
 	return out
 
 
+static func _goal_slots(goal: Dictionary) -> Dictionary:
+	return {"text": str(goal.get("text", "")), "target": str(goal.get("target") if goal.get("target") != null else "")}
+
+
+## The goal card: worded from the server's code + values when it sent them (`goal.line`), else from the goal id with
+## the server's English as the slot. `progress` is the same for how it is going; `state` says open/done/failed/end.
+static func goal_card(goal: Dictionary, gcode: String, progress: Dictionary, gstate: String) -> Dictionary:
+	var fallback_key := ("goal." + gcode) if gcode in GOALS else "goal.unknown"
+	var text := _goal_text(goal.get("line"), fallback_key, _goal_slots(goal))
+	var state_key := ("goal.state." + gstate) if gstate in GOAL_STATES else "goal.state.unknown"
+	var prog := _goal_text(progress.get("line"), state_key, {"text": str(progress.get("text", ""))})
+	return {"key": text.key, "slots": text.slots, "from_code": text.from_code,
+		"state": gstate if gstate in GOAL_STATES else "unknown", "state_key": state_key,
+		"progress": {"key": prog.key, "slots": prog.slots, "from_code": prog.from_code},
+		"progress_text": str(progress.get("text", ""))}
+
+
 static func round_model(view: Dictionary) -> Dictionary:
 	var me: Dictionary = view.me
 	var pickers: Array = []
@@ -376,11 +447,7 @@ static func round_model(view: Dictionary) -> Dictionary:
 			"resources": [{"id": "resource.ration", "amount": me.rations}],
 			"statuses": [{"id": "status.outcast", "on": me.bandit}, {"id": "status.shield", "on": me.get("guarded") == true}],
 			"shields_left": me.get("guards_left")},
-		"goal": {"key": ("goal." + gcode) if gcode in GOALS else "goal.unknown",
-			"slots": {"text": str(goal.get("text", "")), "target": str(goal.get("target") if goal.get("target") != null else "")},
-			"state": gstate if gstate in GOAL_STATES else "unknown",
-			"state_key": ("goal.state." + gstate) if gstate in GOAL_STATES else "goal.state.unknown",
-			"progress_text": str(progress.get("text", ""))},
+		"goal": goal_card(goal, gcode, progress, gstate),
 		"pickers": pickers, "my_pick": pick,
 		"locked": view.my_locked, "locked_count": view.locked_count, "seats_total": view.seats_total,
 		"radio": {"available": view.radio_available, "phrases": phrases},
@@ -464,13 +531,12 @@ static func end_model(view: Dictionary, me: String) -> Dictionary:
 		var gcode := str(g.get("code", ""))
 		if gcode not in GOALS:
 			_unknown("goal", gcode)
+		var gt := _goal_text(g.get("line"), ("goal." + gcode) if gcode in GOALS else "goal.unknown", _goal_slots(g))
 		rows.append({"alias": r.alias, "is_me": r.alias == me, "is_winner": r.alias in view.winners,
 			"has_seat": r.seat,
 			"cells": {"score": r.score, "rations": r.rations, "stole": r.stole, "gave_away": r.gave_away,
 				"times_robbed": r.times_robbed},
-			"goal": {"key": ("goal." + gcode) if gcode in GOALS else "goal.unknown",
-				"slots": {"text": str(g.get("text", "")), "target": str(g.get("target") if g.get("target") != null else "")},
-				"done": r.goal_done}})
+			"goal": {"key": gt.key, "slots": gt.slots, "done": r.goal_done}})
 	var columns: Array = []
 	for c in END_COLUMNS:
 		var cc: Dictionary = c.duplicate()

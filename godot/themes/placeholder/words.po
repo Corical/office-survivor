@@ -114,6 +114,27 @@ msgstr "While watching, you found {found} rations."
 msgid "line.gave"
 msgstr "You gave {receiver} {amount}."
 
+msgid "line.goal_beat"
+msgstr "finish with more rations than {target}"
+
+msgid "line.goal_detective"
+msgstr "expose a thief red-handed with /investigate at least once"
+
+msgid "line.goal_give"
+msgstr "give away {n} rations over the game"
+
+msgid "line.goal_grudge_deny"
+msgstr "make sure {target} doesn't extract"
+
+msgid "line.goal_grudge_rob"
+msgstr "successfully rob {target} at least {n}x"
+
+msgid "line.goal_robbed2_extract"
+msgstr "get robbed at least {n}x and still extract"
+
+msgid "line.goal_steal3_clean"
+msgstr "steal 3 times before you're ever caught"
+
 msgid "line.got_gift"
 msgstr "{giver} secretly gave you {amount}."
 
@@ -170,6 +191,45 @@ msgstr "You now have {rations} rations."
 
 msgid "line.now_have.one"
 msgstr "You now have {rations} ration."
+
+msgid "line.progress_beat"
+msgstr "decided at the end: you have {rations}, {target}'s stash is secret."
+
+msgid "line.progress_beat_band"
+msgstr "decided at the end: you have {rations}, {target}'s stash is secret. They look {band} this morning."
+
+msgid "line.progress_clean_done"
+msgstr "3/3 clean steals before you were ever caught"
+
+msgid "line.progress_clean_failed"
+msgstr "you were caught before your 3rd clean steal ({have}/3)"
+
+msgid "line.progress_clean_open"
+msgstr "{have}/3 clean steals, never caught so far"
+
+msgid "line.progress_detective_done"
+msgstr "thief exposed"
+
+msgid "line.progress_detective_open"
+msgstr "0/1 thieves exposed"
+
+msgid "line.progress_give"
+msgstr "{have}/{need} given"
+
+msgid "line.progress_grudge_deny"
+msgstr "decided at the end: who gets a seat is only known when the helicopter comes"
+
+msgid "line.progress_grudge_rob"
+msgstr "robbed {target} {have}/{need}"
+
+msgid "line.progress_robbed_end"
+msgstr "robbed {have}/{need} (done). Now hold a seat on the helicopter"
+
+msgid "line.progress_robbed_open"
+msgstr "robbed {have}/{need} so far, and you'll need a seat at the end"
+
+msgid "line.progress_target_left"
+msgstr "your target left the game, so this goal no longer counts"
 
 msgid "line.rejoined_me"
 msgstr "You've scraped together enough to rejoin the survivors."

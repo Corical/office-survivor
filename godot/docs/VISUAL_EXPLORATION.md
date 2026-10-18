@@ -4,6 +4,13 @@
 **Live step tracker:** https://claude.ai/artifact/VKRpFqztv8KqqmLudfb7aK (updated as the build moves)
 **Rules of the game:** `docs/MECHANICS.md` (exact), `docs/ARENA.md` (the live-room rules). This file never overrides them.
 
+**Nothing waits on this document.** The build does not need a choice from it: screens are built first in neutral
+placeholder layouts, and a look only changes the theme and the arrangement later. You do not have to pick one of the
+three; they are there to react to ("this part", "not that"), whenever you want to. Section 7 is optional.
+
+**Drawn frames:** `godot/docs/visual/STORYBOARDS.md` and `storyboards.html` (15 frames: the three treatments on the five
+moments below), also at https://claude.ai/artifact/72JE4MgPTHYfdnuNmAhAGn.
+
 | Part | What it is | Who writes it |
 |---|---|---|
 | 1. Where this fits | Which tracker steps produce the pictures you will look at | fixed |
@@ -12,7 +19,7 @@
 | 4. Constraints | What any look must obey | fixed |
 | 5. The exploration process | How to go from brief to a chosen look | fixed |
 | 6. Pass 1: three treatments | Three different ways to illustrate all of it | the agent (first pass, 18 Oct 2026) |
-| 7. Owner reactions and decision log | Blank tables to fill in | the owner |
+| 7. Owner reactions and decision log | Optional blank tables, for whenever you have a reaction | the owner |
 
 ---
 
@@ -106,7 +113,7 @@ Ten nights on an island (the Discord version says "office"; the words belong to 
 | rats | whole camp | everyone holding 7+ loses 1 | yes (never drawn in Torch's gentle mode) | 1 |
 | raid | one rich player | -2 | yes (never drawn in Torch's gentle mode) | 6 |
 
-Today an event arrives from the server as one finished English sentence; an event id and variant are an open request to the server session (see the tracker, "Waiting on the server session").
+An event arrives from the server as a finished English sentence **plus** its id, its scope (one player or the whole camp) and who it hit (since 11:02 on 18 Oct 2026). The story **variant** (which of the tellings) is not available: the engine does not record it, so a theme words an event by its id, not by variant.
 
 ### 3.5 The six secret goals
 
@@ -119,7 +126,7 @@ Today an event arrives from the server as one finished English sentence; an even
 | grudge | rob a named player once |
 | detective | expose a thief at least once |
 
-Progress states a goal card can show: open, done, failed, "decided at the end".
+Progress states a goal card can show: open, done, failed, "decided at the end". The server now sends a goal and its progress as a code plus values, so a theme words them itself. A 4-seat room deals only 4 of the 6 goal types (no grudge, no detective).
 
 ### 3.6 The radio
 

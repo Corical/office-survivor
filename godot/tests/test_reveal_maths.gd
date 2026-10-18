@@ -39,7 +39,9 @@ func test_every_real_night_ends_on_the_true_total() -> void:
 		if m.totals.residual != 0:
 			with_residual += 1
 	check(n > 25, "enough real nights checked: %d" % n)
-	check(with_residual > 0, "the residual path was exercised by real data (events / guard income)")
+	# Since the server sends event ids, the lines explain every real night; the residual is a safety net for a
+	# server that adds an unexplained change, and is exercised by the hand-built tests below.
+	eq(with_residual, 0, "no real night needs an invented beat any more")
 
 
 func test_a_missing_amount_is_made_up_by_a_residual_beat() -> void:

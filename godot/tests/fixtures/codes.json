@@ -57,7 +57,10 @@
  },
  "event": {
   "args": [
-   "line"
+   "event",
+   "line",
+   "scope",
+   "who"
   ],
   "count": 1261,
   "in": [

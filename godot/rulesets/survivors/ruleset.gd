@@ -16,7 +16,8 @@ const SEAT_GONE_TEXTS := ["That seat no longer exists."]       # today's wording
 
 const LINE := {"dict": {"code": S, "?args": TYPE_DICTIONARY}}
 const BOARD := {"null": {"list": {"dict": {"alias": S, "?band": ANY}}}}
-const GOAL := {"null": {"dict": {"?code": ANY, "?target": ANY, "?text": ANY}}}
+const LINE_REF := {"null": {"dict": {"code": S, "?args": TYPE_DICTIONARY}}}      # a goal / progress line: code + values
+const GOAL := {"null": {"dict": {"?code": ANY, "?target": ANY, "?text": ANY, "?line": LINE_REF}}}
 
 const SCHEMAS := {
 	"hello_ok": {"dict": {}},
