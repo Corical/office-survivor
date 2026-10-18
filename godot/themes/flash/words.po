@@ -453,6 +453,9 @@ msgstr "Light a new fire"
 msgid "ui.enter_code"
 msgstr "Camp code"
 
+msgid "ui.fullscreen"
+msgstr "Full screen (F11)"
+
 msgid "ui.goal"
 msgstr "YOUR SECRET GOAL"
 

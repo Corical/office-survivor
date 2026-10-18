@@ -453,6 +453,9 @@ msgstr "New camp"
 msgid "ui.enter_code"
 msgstr "Room code"
 
+msgid "ui.fullscreen"
+msgstr "Full screen (F11)"
+
 msgid "ui.goal"
 msgstr "Your goal"
 

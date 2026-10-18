@@ -194,6 +194,8 @@ func _settings(menu: VBoxContainer, st: Dictionary) -> void:
 		Themes.reduced_motion = not Themes.reduced_motion
 		_drop_hero()
 		_build()))
+	if Intents.can_fullscreen():
+		menu.add_child(Ui.button(Words.render("ui.fullscreen"), "fullscreen_toggle", func(): Intents.toggle_fullscreen()))
 
 
 ## The logo, bobbing, over a glow that pulses. Null when the theme has no logo (the title is then plain text).

@@ -72,6 +72,7 @@ UI.update({
     "ui.radio_heard": "On the radio", "ui.nothing_to_show": "Nothing yet.", "ui.close": "Close",
     "ui.hide_settings": "Hide settings", "ui.skip": "Skip",
     "ui.reduced_motion": "Reduced motion", "ui.on": "On", "ui.off": "Off", "ui.rank": "#{n}",
+    "ui.fullscreen": "Full screen (F11)",
     "ui.open_camps": "Open camps", "ui.no_open_camps": "No open camps. Create one.", "ui.camp_just_now": "just now",
     "ui.camp_min_ago": "{n} min ago", "ui.camp_hours_ago": "{n} h ago", "ui.camp_days_ago": "{n} d ago",
     "ui.camp_seats": "{taken} of {total}", "ui.create_sheet_title": "New camp", "ui.camp_name_hint": "Camp name (optional)",

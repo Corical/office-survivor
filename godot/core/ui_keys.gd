@@ -11,7 +11,7 @@ const ALL: Array[String] = [
 	"ui.pick_a_move", "ui.pick_a_target", "ui.pick_an_amount", "ui.your_pick", "ui.radio_pick_player", "ui.seconds",
 	"ui.roster", "ui.you_mark", "ui.winner_mark", "ui.seat_mark", "ui.goal_met", "ui.goal_missed", "ui.reveal_title",
 	"ui.radio_heard", "ui.nothing_to_show", "ui.close", "ui.hide_settings", "ui.skip",
-	"ui.reduced_motion", "ui.on", "ui.off", "ui.rank",
+	"ui.reduced_motion", "ui.on", "ui.off", "ui.rank", "ui.fullscreen",
 	"ui.open_camps", "ui.no_open_camps", "ui.camp_just_now", "ui.camp_min_ago", "ui.camp_hours_ago", "ui.camp_days_ago",
 	"ui.camp_seats", "ui.create_sheet_title", "ui.camp_name_hint", "ui.public", "ui.private", "ui.public_help",
 	"ui.private_help", "ui.create_go", "ui.cancel",
