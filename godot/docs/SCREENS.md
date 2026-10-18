@@ -15,6 +15,7 @@ No file has moved. Moving the `survivors` rows into `games/survivors/` is step 3
 | `screens/overlay.gd` | shared | The connection banner and notices; the connection belongs to the platform |
 | `screens/open_camps.gd` | shared | The list of open rooms, one card each; the game label goes on the card in step 3.5 |
 | `screens/lobby_screen.gd` | shared | Room code, seats, host and kick are the platform's; no game is chosen yet when it is drawn |
+| `screens/neutral_screen.gd` | shared | Shown when the room's game sends a phase nothing here draws; names the game from the server's list and offers Leave |
 | `screens/ui.gd` | shared | Builders for labels, buttons and lanterns; no rules |
 | `screens/fit_label.gd` | shared | A label that shrinks to fit; no rules |
 | `screens/ring_timer.gd` | shared | A countdown ring; any timed phase can use it |

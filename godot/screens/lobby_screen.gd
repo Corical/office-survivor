@@ -52,6 +52,11 @@ func _build() -> void:
 	var sign_card := Ui.card()
 	var inner := Ui.vbox(10)
 	sign_card.add_child(inner)
+	var game: Dictionary = m.get("game", {})                  # only on a server that offers more than one game
+	if not game.is_empty():
+		var game_name := Ui.name_label(str(game.name), "game_name", "MutedLabel")
+		game_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		inner.add_child(game_name)
 	var caption := Ui.label(Words.render("ui.code_caption"), "code_caption", "MutedLabel")
 	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	inner.add_child(caption)
@@ -72,6 +77,10 @@ func _build() -> void:
 	var seats := Ui.label(count_text, "seats")
 	seats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	inner.add_child(seats)
+	if not game.is_empty():
+		var range_label := Ui.label(range_text(game), "seat_range", "MutedLabel")
+		range_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		inner.add_child(range_label)
 	menu.add_child(sign_card)
 	entries.append(sign_card)
 	if m.is_host:
@@ -99,6 +108,13 @@ func _build() -> void:
 	if not _intro_played:
 		_intro_played = true
 		Ui.intro_all(entries)
+
+
+## "Needs 3 to 8 to start", from the game's own seat counts; "4 seats" when the game has one size.
+static func range_text(game: Dictionary) -> String:
+	if int(game.seats_min) == int(game.seats_max):
+		return Words.render("ui.seat_range_exact", {"n": game.seats_min})
+	return Words.render("ui.seat_range", {"min": game.seats_min, "max": game.seats_max})
 
 
 ## The host's list of the OTHER seats, one row per entry of the latest lobby model, named by position ("Seat 1".."Seat n":

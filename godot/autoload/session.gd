@@ -11,6 +11,10 @@ signal notice(kind: String, code: String, text: String)
 signal back_requested
 ## The open-camps list changed (or was hidden): the model Feed publishes as "rooms".
 signal rooms_changed(model: Dictionary)
+## The games the server offers were (re)read from a new hello_ok: the model Feed publishes as "games".
+signal games_changed
+## The game of the room I am in was (re)decided, or found unsupported: the status Feed publishes carries it.
+signal room_game_decided
 
 const ROUND_GUARDED := ["lock", "continue"]        # once per room+round
 const SEAT_INTENTS := ["resume", "create_room", "join_room"]
@@ -459,6 +463,7 @@ func _bind_game(code: String, id: String, named := true) -> void:
 	if code == room_code:
 		ruleset = rs
 		unsupported_game = "" if known else (id if id != "" else "?")
+		room_game_decided.emit()
 
 
 ## The seat is in `code`: use that room's ruleset (the default game's until a frame names another). Other rooms are forgotten:
@@ -641,7 +646,10 @@ func _seat_gone(code: String, text: String) -> void:
 func _on_handshaken() -> void:
 	_inflight = {}                    # after a reconnect the fresh view decides; keep nothing else
 	_last_seq = 0                     # a new connection: the server counts views from 1 again
-	games = RoomsWatch.sanitize_games(Net.server_games)
+	var offered := RoomsWatch.sanitize_games(Net.server_games)
+	if offered != games:                # a lone-game or old server says nothing new on every connect: nothing is redrawn for it
+		games = offered
+		games_changed.emit()
 	rooms.on_features(Net.server_features)          # before the first list_rooms: a server that said no is never asked
 	rooms.on_connected(clock.now_msec())
 	rooms_changed.emit(rooms.model())
@@ -860,8 +868,12 @@ func _on_rooms(msg: Dictionary) -> void:
 
 ## Create a camp. `visibility` ("public" | "private") and `name` go out ONLY once a valid `rooms` reply has shown that this
 ## server knows them: an old server might reject unknown fields. Returns "" or a reason, like begin().
-func create_camp(visibility := "", camp_name := "") -> String:
+## `game`: the id the player picked. It goes out only when the server offered more than one game, the id is one of them, and it is
+## not the default (a Survivors create is the plain create_room it always was).
+func create_camp(visibility := "", camp_name := "", game := "") -> String:
 	var fields := {}
+	if games.size() > 1 and game != RulesetRegistry.DEFAULT_ID and game_entry(game).size() > 0:
+		fields["game"] = game
 	if rooms.create_fields_ok():
 		var vis := RoomsWatch.clean_visibility(visibility)
 		if vis != "":
@@ -870,6 +882,21 @@ func create_camp(visibility := "", camp_name := "") -> String:
 		if nm != "":
 			fields["name"] = nm
 	return begin("create_room", fields)
+
+
+## The server's entry for a game id ({id, name, seats_min, seats_max}), or {} when it did not list that game.
+func game_entry(id: Variant) -> Dictionary:
+	for g in games:
+		if g.id == id:
+			return g
+	return {}
+
+
+## The entry of the game of the room I am in; {} when there is no room or the server did not list its game.
+func room_game_entry() -> Dictionary:
+	if room_code == "":
+		return {}
+	return game_entry(_games.get(room_code, RulesetRegistry.DEFAULT_ID))
 
 
 ## Join a camp by code. `from_list`: the player tapped a card, so a refusal is worded neutrally (it filled or closed first).

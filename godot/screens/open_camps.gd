@@ -11,6 +11,7 @@ extends VBoxContainer
 ## Who asks the server for the list is the title screen (Intents.rooms_watch); this only shows what arrives.
 
 const CARD_MIN_H := 76.0
+const GAME_TAG_H := 24.0                   # chosen: one more line of the muted size, when the card names its game
 const LANTERN_ROOM := 150.0
 
 var _header: HBoxContainer
@@ -43,7 +44,9 @@ func _ready() -> void:
 
 
 func _on_model(kind: String, m: Dictionary) -> void:
-	if kind == "rooms":
+	if kind == "games":
+		_apply(Feed.rooms_model())          # the labels follow the games the server offers
+	elif kind == "rooms":
 		_apply(m)
 
 
@@ -114,8 +117,11 @@ func _make_row(r: Dictionary) -> Dictionary:
 	var sub := Ui.name_label("", "", "MutedLabel")
 	words.add_child(title)
 	words.add_child(sub)
+	var tag := Ui.name_label("", "game_tag", "MutedLabel")          # which game this card is for; shown only when the server offers more than one
+	tag.visible = false
+	words.add_child(tag)
 	row.add_child(words)
-	return {"button": b, "title": title, "sub": sub, "row": row, "lanterns": null, "total": -1, "taken": -1, "count": null}
+	return {"button": b, "title": title, "sub": sub, "tag": tag, "row": row, "lanterns": null, "total": -1, "taken": -1, "count": null}
 
 
 func _update_row(row: Dictionary, r: Dictionary) -> void:
@@ -123,6 +129,7 @@ func _update_row(row: Dictionary, r: Dictionary) -> void:
 	(row.title as Label).text = title
 	var seats := Words.render("ui.camp_seats", {"taken": r.seats_taken, "total": r.seats_total})
 	(row.sub as Label).text = "%s - %s" % [seats, age_text(int(r.age_s))]
+	_set_game_tag(row, Feed.game_label(r.get("game")))
 	if int(row.total) != int(r.seats_total):                    # a different size of camp: its lanterns are made again
 		if row.lanterns != null:
 			(row.lanterns as Node).queue_free()
@@ -137,6 +144,18 @@ func _update_row(row: Dictionary, r: Dictionary) -> void:
 	elif row.lanterns != null and int(row.taken) != int(r.seats_taken):
 		Ui.set_lit(row.lanterns, int(r.seats_taken))
 	row.taken = int(r.seats_taken)
+
+
+## The game's name on a card: the server's name for the card's game; the neutral "another game" when the server did not list that
+## id; nothing at all on a lone-game server (the label is `{}` then).
+func _set_game_tag(row: Dictionary, label: Dictionary) -> void:
+	var tag: Label = row.tag
+	tag.visible = not label.is_empty()
+	# the card's content is laid over it, so a third line needs a taller card, or it sits on the border
+	(row.button as Button).custom_minimum_size = Vector2(0, CARD_MIN_H + (GAME_TAG_H if tag.visible else 0.0))
+	if label.is_empty():
+		return
+	tag.text =Words.render("ui.game_unknown") if label.get("unknown", false) else str(label.name)
 
 
 ## "just now", "3 min ago", "2 h ago", "1 d ago": plain words from the theme.

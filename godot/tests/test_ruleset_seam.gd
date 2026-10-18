@@ -521,7 +521,7 @@ func test_a_toy_game_runs_hello_view_act_view_end_to_end() -> void:
 	eq(Feed.models.view.pot, 3, "carrying the toy's own field")
 	eq(Session.screen, "play", "Session asks for the screen the phase names")
 	eq(seen.filter(func(e): return e[0] == "view").size(), 2, "one model per view, announced")
-	eq(r.current_name, "title", "no screen is drawn for a toy phase yet, and no Survivors screen stands in for it")
+	eq(r.current_name, "neutral", "no screen is drawn for a toy phase: the neutral screen stands in, never a Survivors one")
 	no_errors()
 
 
@@ -555,7 +555,7 @@ func test_a_view_for_an_unknown_game_never_reaches_feed() -> void:
 	fake.server_send(round_view(1))
 	eq(seen.filter(func(e): return e[0] != "rooms").size(), 0, "no model was built")
 	eq(Feed.models.keys().filter(func(k): return k != "rooms").size(), 0, "none is held")
-	eq(r.current_name, "title", "and the router stayed put")
+	eq(r.current_name, "upgrade", "and the router says the app cannot play it")
 	no_errors()
 
 
@@ -574,7 +574,7 @@ func test_a_survivors_frame_in_a_toy_room_never_reaches_feed() -> void:
 	eq(Feed.models.get("view", {}).get("mark"), "dealt", "the toy's model is untouched")
 	eq(Session.view.get("mark"), "dealt", "and so is the view")
 	check(notices.any(func(n): return n.kind == "unknown"), "the frames were reported, not swallowed")
-	eq(r.current_name, "title", "the router did not show a Survivors screen")
+	eq(r.current_name, "neutral", "the router did not show a Survivors screen")
 	no_errors()
 
 
@@ -593,7 +593,7 @@ func test_a_room_whose_game_changes_between_frames_is_judged_by_each_frame_game(
 	eq(seen.size(), 0, "a Survivors frame is not taken for it")
 	fake.server_send(_view(1, "toy2"))                              # back to the toy game; its numbering starts again
 	eq(Feed.models.view.mark, "toy2", "the toy game is heard again")
-	eq(r.current_name, "title", "the router never left the title")
+	eq(r.current_name, "neutral", "the router stays on the neutral screen, never a Survivors one")
 	no_errors()
 
 

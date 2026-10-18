@@ -447,6 +447,9 @@ msgstr "{taken} of {total}"
 msgid "ui.cancel"
 msgstr "Cancel"
 
+msgid "ui.choose_game"
+msgstr "Choose a game"
+
 msgid "ui.close"
 msgstr "Close"
 
@@ -476,6 +479,15 @@ msgstr "Camp code"
 
 msgid "ui.fullscreen"
 msgstr "Full screen (F11)"
+
+msgid "ui.game_players"
+msgstr "{min} to {max} players"
+
+msgid "ui.game_players_exact"
+msgstr "{n} players"
+
+msgid "ui.game_unknown"
+msgstr "Another game"
 
 msgid "ui.goal"
 msgstr "YOUR SECRET GOAL"
@@ -531,6 +543,9 @@ msgstr "A seat that dropped off stays taken. Send them away to free the seat."
 msgid "ui.leave"
 msgstr "Leave camp"
 
+msgid "ui.leave_game"
+msgstr "Leave game"
+
 msgid "ui.lock"
 msgstr "Lock in for the night"
 
@@ -566,6 +581,12 @@ msgstr "Disconnected"
 
 msgid "ui.net.unreachable"
 msgstr "No signal: can't reach the server"
+
+msgid "ui.neutral_body"
+msgstr "This app has no picture for it yet. The game goes on; you will see it again when the next part starts."
+
+msgid "ui.neutral_title"
+msgstr "Waiting for this part of the game"
 
 msgid "ui.new_game"
 msgstr "New game"
@@ -660,6 +681,12 @@ msgstr "seat"
 msgid "ui.seat_n"
 msgstr "Seat {n}"
 
+msgid "ui.seat_range"
+msgstr "Needs {min} to {max} to start"
+
+msgid "ui.seat_range_exact"
+msgstr "{n} seats"
+
 msgid "ui.seats"
 msgstr "{taken} of {total} places by the fire"
 
@@ -686,6 +713,12 @@ msgstr "Theme"
 
 msgid "ui.timer_unknown"
 msgstr "Waiting for the server"
+
+msgid "ui.update_body"
+msgstr "This server needs a newer version of the app than the one you have."
+
+msgid "ui.update_game_body"
+msgstr "This game needs a newer version of the app than the one you have."
 
 msgid "ui.waiting_for_host"
 msgstr "Waiting for the host to begin"

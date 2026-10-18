@@ -6,8 +6,8 @@ extends Node
 
 ## Create a camp. `visibility` ("public" | "private") and `name` (at most 24 characters) are optional and are sent only
 ## when the server has shown it understands them; with neither, this is the plain create_room it always was.
-func create_room(visibility := "", camp_name := "") -> String:
-	return _done(Session.create_camp(visibility, camp_name))
+func create_room(visibility := "", camp_name := "", game := "") -> String:
+	return _done(Session.create_camp(visibility, camp_name, game))
 
 
 ## Join by code. `from_list`: the player tapped a camp in the open-camps list (a refusal then gets the neutral wording).
