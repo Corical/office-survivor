@@ -56,6 +56,10 @@ seat token. Restarts so far, for correlating odd disconnects:
 | 09:39 | test-room cleanup |
 | about 09:41 | the restart test |
 | 09:48 | the lobby-leave fix |
+| 11:02 | close codes, `seat_gone` / `room_gone`, news order, event args, goal and progress lines (section 7) |
+
+Rooms left on the Pi right now: `ZSKK` and `EBMM` (mine, finished or abandoned smoke tests), `RTEP` and possibly more
+from your live tests.
 
 **Test rooms.** Every `create_room` makes a real room folder on the Pi (up to 20). One finished smoke-test room, `ZSKK`,
 is there now. If you create many, tell the owner or me; removing rooms needs the service stopped, so do not delete by
@@ -109,8 +113,11 @@ new view.
 | `end` | `extracted`, `winners`, `results` |
 | `error` | `code`, `message` |
 
-`round.me`: `alias`, `rations`, `bandit`, `guards_left` (null = unlimited), `guarded`, `goal` = `{code, target, text}`,
-`goal_progress` = `{state: open|done|failed|end, text}`. (`goal` and `goal_progress` text are English for now: request 4.)
+`round.me`: `alias`, `rations`, `bandit`, `guards_left` (null = unlimited), `guarded`, `goal` = `{code, target, text, line}`,
+`goal_progress` = `{state: open|done|failed|end, text, line}`. **`line` = `{code, args}`**, the same shape as every other
+line, with templates in `arena/lines_en.json` (`goal_*` and `progress_*` codes, 20 of them); `text` is the same words in
+English, kept as a fallback. `goal.code` is still the goal's identity (`beat`, `give`, ...). `end.results[].goal` has `line` too.
+`progress_beat_band` carries `band` as the English label ("🟢 well fed"), not a key.
 
 `round.legal`: `{move kind: [target aliases]}`; kinds with no target (`scavenge`, `guard`) have an empty list. Show exactly
 these. `gift_amounts` is the legal amounts for `gift`. `my_pick` = `{kind, target, amount}` or null.
@@ -121,7 +128,8 @@ when ranges are off (they are on by default). Never exact rations for others.
 
 `reveal.news` and `reveal.private`: lists of `{code, args}`. Words: `arena/lines_en.json`, fill `{name}` from `args`;
 a list arg joins English-style (`[3,4,5]` -> `3, 4 and 5`). An empty `news` means a quiet night: show `news_quiet`.
-Code `event` carries one arg, `line`, a finished sentence from the engine.
+Code `event` carries `line` (a finished sentence from the engine: the fallback), `event` (the event id), `scope`
+(`camp` or `player`) and, for a player event, `who` (the alias it hit). The story **variant** is not available.
 `reveal.radio`: `[{phrase, about}]`, ordered by wording, **not** by send time (that is deliberate: bots post at the
 close). Phrase texts are in `bot/core.py` `RADIO_PHRASES`.
 
@@ -135,10 +143,16 @@ close). Phrase texts are in `bot/core.py` `RADIO_PHRASES`.
 | `hello_first` | first message was not `hello` | bug on the client |
 | `bad_message` | not a JSON object with a string `t` | bug on the client |
 | `refused` | a rule said no; `message` is safe to show | show it; the state did not change |
-| `taken_over` | the same token connected elsewhere; **you are about to be disconnected** | see request 1: this may not arrive |
+| `seat_gone` | `resume` with a token the server does not know, or whose room is gone | forget the token; **the connection stays open**, so `create_room` or `join_room` works on it |
+| `room_gone` | `join_room` with a code that matches no room | tell the player; the connection stays open |
+| `taken_over` | the same token connected elsewhere; **you are about to be disconnected** | stop; the close follows |
 | `server_error` | an unexpected failure on the server (logged there) | retry once, then tell the owner |
 
-Today **every** refusal is `refused`, including "That seat no longer exists." (request 2).
+**Close codes.** After `upgrade_required` the server closes with **4002**, and after `taken_over` with **4003**, each
+about **0.25 s after the message** so your poll sees the message first (live-checked: 0.26 s). Anything else that ends a
+connection (a dropped network, a frame over 4096 bytes) is an ordinary close with no code of ours. **4001 is not used**:
+`seat_gone` is an error on a connection that stays open (say so if you would rather it closed). From the moment a seat
+moves to another device, whatever the old connection still sends is ignored.
 
 ## 6. Behaviour that is easy to get wrong
 
@@ -151,7 +165,7 @@ Today **every** refusal is `refused`, including "That seat no longer exists." (r
 | You never pick | the server scavenges for you |
 | Pick or lock after locking | `refused`: "You've locked in. Your move is final this round." Disable the picker, never re-enable it locally |
 | Reveal ends | after 20 s, or when every connected human sent `continue`; then round n+1 opens (or `end` after round 10) |
-| Two devices, one token | the newest wins; the old one is sent `taken_over` and closed; more than 5 takeovers a minute is refused |
+| Two devices, one token | the newest wins; the old one is sent `taken_over`, then closed with 4003 a moment later (and ignored from the instant of the takeover); more than 5 takeovers a minute is refused |
 | Host drops | the lowest connected seat becomes host; you will see it in the next `lobby` |
 | `leave` in the lobby | your connection is dropped but **the seat stays counted as taken** (the join is in the log). After the 30 s grace the round stops waiting for it. A known limit, in `ARENA.md` section 7 |
 | After `end` | no more messages; the connection stays open. The room stays on disk |
@@ -159,14 +173,27 @@ Today **every** refusal is `refused`, including "That seat no longer exists." (r
 
 ## 7. Your four requests: where each stands
 
-None is built yet. I am writing down what I found, not promising a design.
+All four are now done, deployed to the Pi at 11:02 and checked live over the tailnet. Two differ from what was asked.
 
-| # | Request | Status |
+| # | Request | Result |
 |---|---|---|
-| 1 | Close codes (`4001` seat gone, `4002` upgrade required, `4003` taken over) sent after the message, then wait for the client's close | **Agreed in principle; not built.** Today `taken_over` and `upgrade_required` are sent and the socket closes right after, so your reproduced race is real. Small server change |
-| 2 | A distinct `seat_gone` error (and `room_gone`) instead of `refused` for a dead token | **Agreed in principle; not built.** Small server change |
-| 3 | `event` lines carrying an event id and variant next to `line` | **Not checked yet.** The engine's event records have an event name; whether the story variant is recorded I have not looked at |
-| 4 | Goal and goal progress as codes plus args | **Not built.** It means changing `engine/finish.py` (`goal_progress` returns text today), updating `docs/MECHANICS.md`, and re-recording tests: a bigger change than 1 and 2 |
+| 1 | Close codes after the terminal message | **Done, with one change.** `upgrade_required` then close **4002**, `taken_over` then close **4003**, each after a 0.25 s pause (commit `0e4826d`). 4001 is not used (see 5.3) |
+| 2 | A distinct `seat_gone` (and `room_gone`) error | **Done** (`0e4826d`). A token whose room folder was deleted is `seat_gone` too |
+| 3 | `event` lines carrying the event id and variant | **Half done** (`fa9a72c`). The event id (`event`), `scope` and `who` are sent beside `line`. **The variant cannot be sent**: the engine picks it from the seed each time and does not record it; recording it would add a field to every stored event record, and then every existing log (Torch's included) would fail its replay check. If a theme needs per-variant wording, the options are for the client to key on `event` alone, or for the owner to decide on a log-format change |
+| 4 | Goal and goal progress as codes plus args | **Done** (`023fa3e`, `2396502`). `goal.line` and `goal_progress.line` = `{code, args}`; English `text` kept. The wording is one table in `engine/finish.py` shared with Torch, and a frozen copy of the old functions is compared in over 30,000 states, so not a word changed for Torch |
+
+Your two new items from the second review:
+
+| Item | Result |
+|---|---|
+| Public news arrived in seat order | **Real leak, fixed** (`084ed7c`). The engine resolves seats in seat order and humans take the low seats, so the order of the lines told a watcher which seats are people. The reveal's `news` is now sorted by content (event stories first, then by wording). Your client-side sort is now redundant but harmless |
+| Guard income has no line | **Not a gap in the live game.** The only income a guard can get is `guard_income`, which exists only when the rule `guard_income_max` is above 0; the live rules leave it at 0, so it never happens. A guard's other income, the reward for catching a thief, has its own line (`caught_thief_paid`). No line added; say if you want one anyway |
+| Four codes never seen in 3,120 nights | Measured in 3,000 nights under the live rules with humans who miss the deadline 10% of the time: `scavenged_auto` 700 times and `news_quiet` 168 times, so **both are real, keep them**. `got_gift` 0 and `guard_up_1` 0: they only occur under other rule settings (gifts with no gift bonus; one-night guards), dead under today's rules but harmless to keep |
+
+**A rules fact you will hit:** the goal deck is dealt in order, one card per seat. In a **4-seat room only four goals ever
+appear** (beat, robbed twice and extract, clean thief, give). `grudge` needs 5 seats and `detective` needs 6, so the
+Detective goal never shows up in a 4-seat room. The owner has been told. Your goal screens still need all six for
+bigger rooms and other rule sets.
 
 Also missing, mentioned in the plan but not built: a `history` message (a player's past rounds on reconnect). Today a
 client that reconnects gets only the current screen, so keep your own record of past reveals if you want a history view.
@@ -175,7 +202,7 @@ client that reconnects gets only the current screen, so keep your own record of 
 
 | Proven (with a test or a live run) | Not proven |
 |---|---|
-| A whole game over the real tailnet address, including a drop and resume (`arena.tools.smoke`) | A real Godot client has never connected |
+| A whole game over the real tailnet address, including a drop and resume (`arena.tools.smoke`) | A Godot client in a window, on a phone: per the client session's tracker (10:46) Godot has played 2 full games headless, one on a local server and one on the Pi over wss, but nothing has been drawn on screen yet |
 | A server restart mid-round: same game, pick kept, deadline kept counting down (live, on the Pi) | Keepalive pings against Godot's `WebSocketPeer` |
 | No view leaks another seat's picks, goals, exact rations, locks or bot status (scramble test, 1,000+ checks, 3 planted leaks caught) | Phone behaviour: backgrounding, Android battery limits, cellular |
 | 300 random-action rooms always finish; a bad room is skipped and the rest load | More than one human playing at once on the live server (tested locally with 2 in unit tests, not on the Pi) |

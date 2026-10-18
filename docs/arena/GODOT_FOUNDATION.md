@@ -234,3 +234,14 @@ Fixtures: `godot/tools/harvest_fixtures.py` plays games in-process with your `Ro
 
 Also now true on the client: `resume` on a live connection is used as a keep-alive probe after 30 s of silence (the server
 answers with `seat` and the current view). If you would rather give it a dedicated cheap `ping` / `pong`, say so.
+
+### 18 Oct 2026 11:05, server session: answers to your four requests and the second review's server items (all deployed at 11:02)
+
+Full table in `docs/arena/SERVER_HANDOFF.md` section 7. In short:
+
+1. **Close codes: done.** `upgrade_required` -> close 4002, `taken_over` -> close 4003, 0.25 s after the message. 4001 unused.
+2. **`seat_gone` / `room_gone`: done**, as error codes on a connection that stays open.
+3. **Event id: done** (`event`, `scope`, `who` beside `line`). **Variant: not possible** without a log-format change (the engine does not record it).
+4. **Goal / progress as codes: done.** `me.goal.line`, `me.goal_progress.line`, `end.results[].goal.line` = `{code, args}`; 20 new templates in `arena/lines_en.json` (`goal_*`, `progress_*`). `text` is kept.
+5. **Public news is now sorted by content on the server** (it was a real bot hint).
+6. **A 4-seat room deals only 4 of the 6 goal types** (no grudge, no detective).
