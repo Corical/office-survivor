@@ -515,8 +515,16 @@ func _take_view(msg: Dictionary) -> void:
 	if pending_intent and t != "lobby":
 		pending_intent = {}
 	Log.event("session", "view", {"t": t, "round": msg.get("round", "-")})
-	_go(t)
+	_go(screen_for(msg))
 	view_changed.emit(view)
+
+
+## The screen a view asks for. A legacy Survivors view is its own screen; a `view` frame is whatever the ruleset says its phase
+## draws, else "view" (a phase nobody drew: the router shows no game screen for it).
+func screen_for(v: Dictionary) -> String:
+	if v.get("t") != "view":
+		return str(v.get("t"))
+	return str(ruleset.phases().get(str(v.get("phase")), {}).get("screen", "view"))
 
 
 func _on_error(msg: Dictionary) -> void:

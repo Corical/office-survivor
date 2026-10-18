@@ -17,6 +17,9 @@ class ToyRuleset:
 		return Schema.check(msg, {"dict": {"game": TYPE_STRING, "phase": TYPE_STRING, "phase_id": TYPE_STRING, "seq": Schema.ANY,
 			"?mark": Schema.ANY}}, "view")
 
+	func view_model(v: Dictionary) -> Dictionary:
+		return {"phase": v.get("phase"), "phase_id": v.get("phase_id"), "mark": v.get("mark"), "pot": int(v.get("pot", 0))}
+
 	func phases() -> Dictionary:
 		return {"deal": {"screen": "deal"}, "play": {"screen": "play"}}
 
@@ -142,7 +145,7 @@ func test_a_room_that_changes_game_gets_that_games_ruleset_and_its_frames_are_ju
 	_toy_room("CHG1")
 	check(Session.ruleset is ToyRuleset, "a toy room")
 	fake.server_send(_view(1))
-	eq(Session.screen, "view", "a toy view is taken (its screen is not drawn yet: no Survivors screen moves)")
+	eq(Session.screen, "deal", "a toy view is taken and asks for the screen its phase names")
 	# the same room now says it is a game this client does not have
 	fake.server_send(_view(2, "", "deal", "mystery"))
 	check(not (Session.ruleset is ToyRuleset), "the toy ruleset no longer judges this room")
@@ -469,3 +472,140 @@ func test_the_log_never_carries_the_arguments_of_an_act() -> void:
 	Intents.act("bid", {"amount": 99, "face": "SECRETWORD-789"})
 	var logged := "\n".join(Log.since(mark))
 	check(not ("SECRETWORD" in logged), "act arguments reached the log")
+
+
+# ---- Feed and the router follow the room's ruleset (C2) ----
+
+var _mounted: Array = []
+
+
+func teardown() -> void:
+	for s in _mounted:
+		s.free()
+	_mounted.clear()
+	super.teardown()
+
+
+## The real router with plain stand-ins for screens, so only its choice is under test.
+func _router() -> Control:
+	var r: Control = preload("res://main.gd").new()
+	r.screen_factory = func(_name): return Control.new()
+	add_child(r)
+	_mounted.append(r)
+	return r
+
+
+func _model_log() -> Array:
+	var seen: Array = []
+	Feed.model_changed.connect(func(kind, m): seen.append([kind, m]))
+	return seen
+
+
+func test_a_toy_game_runs_hello_view_act_view_end_to_end() -> void:
+	var r := _router()
+	Session.ruleset_factory = _toy_factory
+	var seen := _model_log()
+	go_online()
+	_seat("TOY9")
+	fake.server_send(_view(1, "dealt"))
+	eq(Feed.models.get("view", {}).get("phase"), "deal", "Feed asked the toy ruleset for the model of the view")
+	eq(Feed.models.get("view", {}).get("mark"), "dealt", "its own tiny model")
+	check(not Feed.models.has("round") and not Feed.models.has("lobby"), "no Survivors model was built for a toy view")
+	eq(Intents.act("bid", {"amount": 3, "face": 2}), "", "the toy verb goes out")
+	var a: Dictionary = fake.last("act")
+	eq(a.get("phase_id"), "pid-dealt", "naming the phase of the view the model came from")
+	var reply := _view(2, "played", "play")
+	reply["pot"] = 3
+	fake.server_send(reply)
+	eq(Feed.models.view.phase, "play", "the second phase")
+	eq(Feed.models.view.pot, 3, "carrying the toy's own field")
+	eq(Session.screen, "play", "Session asks for the screen the phase names")
+	eq(seen.filter(func(e): return e[0] == "view").size(), 2, "one model per view, announced")
+	eq(r.current_name, "title", "no screen is drawn for a toy phase yet, and no Survivors screen stands in for it")
+	no_errors()
+
+
+func test_the_router_shows_only_the_screens_the_rooms_game_names() -> void:
+	var r := _router()
+	go_online()
+	_seat("SURV", null)
+	for s in ["lobby", "round", "reveal", "end", "title", "upgrade"]:
+		check(r._routable(s), "'%s' is routable in a Survivors room" % s)
+	check(not r._routable("deal"), "a screen no script draws is not routable")
+	Intents.leave()
+	Session.ruleset_factory = _toy_factory
+	go_online()
+	_seat("TOY2", "toy", "tok-t2")
+	for s in ["lobby", "round", "reveal", "end"]:
+		check(not r._routable(s), "'%s' is not routable in a toy room" % s)
+	check(r._routable("title") and r._routable("upgrade"), "the shared screens still are")
+	Intents.leave()
+	go_online()
+	_seat("WHAT", "mystery", "tok-w")
+	for s in ["lobby", "round", "reveal", "end"]:
+		check(not r._routable(s), "'%s' is not routable in a room of a game this client lacks" % s)
+
+
+func test_a_view_for_an_unknown_game_never_reaches_feed() -> void:
+	var r := _router()
+	go_online()
+	_seat("WHAT", "mystery")
+	var seen := _model_log()
+	fake.server_send(_view(1, "x", "deal", "mystery"))
+	fake.server_send(round_view(1))
+	eq(seen.filter(func(e): return e[0] != "rooms").size(), 0, "no model was built")
+	eq(Feed.models.keys().filter(func(k): return k != "rooms").size(), 0, "none is held")
+	eq(r.current_name, "title", "and the router stayed put")
+	no_errors()
+
+
+func test_a_survivors_frame_in_a_toy_room_never_reaches_feed() -> void:
+	var r := _router()
+	Session.ruleset_factory = _toy_factory
+	go_online()
+	_seat("TOY3")
+	fake.server_send(_view(1, "dealt"))
+	var seen := _model_log()
+	fake.server_send({"t": "lobby", "room_code": "TOY3", "seats_taken": 1, "seats_total": 4, "host": true})
+	fake.server_send(round_view(5))
+	fake.server_send({"t": "reveal", "round": 5, "news": [], "private": [], "radio": [], "board": null, "seconds_left": 9})
+	fake.server_send({"t": "end", "extracted": [], "winners": [], "results": []})
+	eq(seen.size(), 0, "not one model was built from a Survivors frame")
+	eq(Feed.models.get("view", {}).get("mark"), "dealt", "the toy's model is untouched")
+	eq(Session.view.get("mark"), "dealt", "and so is the view")
+	check(notices.any(func(n): return n.kind == "unknown"), "the frames were reported, not swallowed")
+	eq(r.current_name, "title", "the router did not show a Survivors screen")
+	no_errors()
+
+
+func test_a_room_whose_game_changes_between_frames_is_judged_by_each_frame_game() -> void:
+	var r := _router()
+	Session.ruleset_factory = _toy_factory
+	go_online()
+	_seat("FLIP")
+	fake.server_send(_view(1, "toy1"))
+	eq(Feed.models.view.mark, "toy1", "toy model")
+	var seen := _model_log()
+	fake.server_send(_view(2, "ghost", "deal", "mystery"))        # the same room, now a game nobody here has
+	eq(seen.size(), 0, "nothing built for it")
+	eq(Feed.models.view.mark, "toy1", "the last toy model is not overwritten by a ghost")
+	fake.server_send(round_view(1))                                 # and it is not Survivors either
+	eq(seen.size(), 0, "a Survivors frame is not taken for it")
+	fake.server_send(_view(1, "toy2"))                              # back to the toy game; its numbering starts again
+	eq(Feed.models.view.mark, "toy2", "the toy game is heard again")
+	eq(r.current_name, "title", "the router never left the title")
+	no_errors()
+
+
+func test_survivors_still_builds_its_models_through_feed_after_a_toy_room() -> void:
+	_router()
+	Session.ruleset_factory = _toy_factory
+	go_online()
+	_seat("TOY4")
+	fake.server_send(_view(1, "dealt"))
+	Intents.leave()
+	go_online()
+	_seat("SURV", null, "tok-s")
+	fake.server_send(round_view(1))
+	check(Feed.models.has("round"), "the Survivors round model is built again")
+	eq(Session.screen, "round", "on the round screen")

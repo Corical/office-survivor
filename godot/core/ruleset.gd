@@ -52,6 +52,11 @@ func verbs() -> Dictionary:
 	return {}
 
 
+## The neutral model of a `view` frame (the new wire's one frame, any phase). {} for a game that draws nothing from it.
+func view_model(_view: Dictionary) -> Dictionary:
+	return {}
+
+
 ## Every translation key this ruleset can emit (a theme must cover them all).
 func all_keys() -> Array[String]:
 	return []
