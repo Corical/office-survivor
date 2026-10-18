@@ -14,13 +14,13 @@ const ALL: Array[String] = [
 	"ui.reduced_motion", "ui.on", "ui.off", "ui.rank", "ui.fullscreen",
 	"ui.open_camps", "ui.no_open_camps", "ui.camp_just_now", "ui.camp_min_ago", "ui.camp_hours_ago", "ui.camp_days_ago",
 	"ui.camp_seats", "ui.create_sheet_title", "ui.camp_name_hint", "ui.public", "ui.private", "ui.public_help",
-	"ui.private_help", "ui.create_go", "ui.cancel",
+	"ui.private_help", "ui.create_go", "ui.cancel", "ui.you_are_prefix", "ui.pick_prompt", "ui.goal_seat_note", "ui.move_unavailable",
 	"ui.net.connecting", "ui.net.online", "ui.net.reconnecting", "ui.net.unreachable", "ui.net.offline", "ui.net.stopped",
 	"notice.seat_gone", "notice.taken_over", "notice.too_big", "notice.flapping", "notice.upgrade_required",
 	"notice.invalid", "notice.unknown", "notice.generic", "notice.no_server_url", "notice.locked", "notice.in_flight",
 	"notice.camp_unavailable", "notice.room_full", "notice.room_started", "notice.room_gone", "ui.resume_code",
 	# --- end/lobby/title ---
-	"ui.best_legend", "ui.scroll_more", "ui.code_caption", "ui.copied", "ui.bots_fill", "ui.advanced", "ui.hide_advanced",
+	"ui.best_legend", "ui.code_caption", "ui.copied", "ui.bots_fill", "ui.advanced", "ui.hide_advanced",
 	"ui.advanced_hint",
 ]
 

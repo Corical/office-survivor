@@ -483,6 +483,9 @@ msgstr "goal met"
 msgid "ui.goal_missed"
 msgstr "goal missed"
 
+msgid "ui.goal_seat_note"
+msgstr "A seat is a place on the helicopter. Only a few are free; the players with the most rations at the end get them."
+
 msgid "ui.hide_advanced"
 msgstr "Hide advanced"
 
@@ -506,6 +509,9 @@ msgstr "{locked} of {total} locked in"
 
 msgid "ui.locking"
 msgstr "Locking in..."
+
+msgid "ui.move_unavailable"
+msgstr "{move} is not available tonight."
 
 msgid "ui.net.connecting"
 msgstr "Connecting..."
@@ -551,6 +557,9 @@ msgstr "PICK A TARGET"
 
 msgid "ui.pick_an_amount"
 msgstr "PICK AN AMOUNT"
+
+msgid "ui.pick_prompt"
+msgstr "Pick a move!"
 
 msgid "ui.private"
 msgstr "Private"
@@ -600,9 +609,6 @@ msgstr "AROUND THE FIRE"
 msgid "ui.round_of"
 msgstr "Night {round} of {rounds}"
 
-msgid "ui.scroll_more"
-msgstr "Scroll down: all {n} are listed below"
-
 msgid "ui.seat_mark"
 msgstr "seat"
 
@@ -641,6 +647,9 @@ msgstr "Winners"
 
 msgid "ui.you_are"
 msgstr "You are {alias}"
+
+msgid "ui.you_are_prefix"
+msgstr "You are"
 
 msgid "ui.you_mark"
 msgstr "(you)"

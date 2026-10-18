@@ -21,18 +21,45 @@ func _mount(node: Node) -> Node:
 	return node
 
 
-func _is_one_line(l: Label) -> bool:
-	return l.autowrap_mode == TextServer.AUTOWRAP_OFF and l.text_overrun_behavior == TextServer.OVERRUN_TRIM_ELLIPSIS
+## A name label fits when it shows ALL of its text: on one line, or on two; "trimmed" is only for a name longer than that.
+func _shows_all(l: Label) -> bool:
+	return l is FitLabel and not (l as FitLabel).describe().trimmed
 
 
-func test_a_name_label_is_one_line_with_an_ellipsis() -> void:
-	var l := Ui.name_label(LONG)
-	check(_is_one_line(l), "no wrapping, trimmed with an ellipsis")
-	check(l.clip_text, "clipped to its box")
-	l.free()
+func _fit_label_in(width: float, text: String) -> FitLabel:
+	var l := Ui.name_label(text, "", "NameLabel") as FitLabel
+	l.custom_minimum_size = Vector2(width, 30)
+	add_child(l)
+	_mounted.append(l)
+	l.size = Vector2(width, 30)
+	l._fit()
+	return l
 
 
-func test_the_round_screen_never_breaks_my_own_name_across_lines() -> void:
+func test_a_name_label_shrinks_then_wraps_and_only_then_trims() -> void:
+	var font := ThemeDB.fallback_font
+	var base: int = 18
+	var w_base: float = font.get_string_size("SoggyBiscuit", HORIZONTAL_ALIGNMENT_LEFT, -1, base).x
+	var roomy := _fit_label_in(w_base + 20.0, "SoggyBiscuit")
+	eq(roomy.describe().size, roomy.describe().base, "enough room: the theme's own size")
+	var tight := _fit_label_in(w_base * 0.8, "SoggyBiscuit")
+	check(tight.describe().size < tight.describe().base, "a little too wide: a smaller font")
+	eq(tight.describe().lines, 1, "still one line")
+	check(not tight.describe().trimmed, "and all of it shown")
+	var very := _fit_label_in(w_base * 0.45, "SoggyBiscuit")
+	eq(very.describe().lines, 2, "far too wide even small: two lines")
+	check(not very.describe().trimmed, "still all of it")
+	var absurd := _fit_label_in(w_base * 0.12, "SoggyBiscuit")
+	check(absurd.describe().trimmed, "only a hopeless width ends in an ellipsis")
+
+
+func test_the_games_own_12_letter_names_fit_at_phone_width() -> void:
+	for n in ["SoggyBiscuit", "LuckyLantern", "IronSpatula", "QuietBadger", "WobblyTable"]:
+		var l := _fit_label_in(150.0, n)
+		check(_shows_all(l), "%s shows all of itself in 150 px: %s" % [n, l.describe()])
+
+
+func test_the_round_screen_never_cuts_my_own_name() -> void:
 	Themes.use("placeholder")
 	in_round(1)
 	var v := round_view(1)
@@ -40,15 +67,16 @@ func test_the_round_screen_never_breaks_my_own_name_across_lines() -> void:
 	fake.server_send(v)
 	var s := _mount(RoundScreen.new())
 	var you := Ui.find(s, "you_are") as Label
-	check(you != null and _is_one_line(you), "the 'You are <name>' line is one line")
+	check(you is FitLabel, "my name is a fitted label")
+	eq(you.text, LONG, "the whole name, not a clipped copy")
 	var cells := Ui.find_all(s, "home_")
 	check(cells.size() >= 3, "the roster has its cells")
 	for e in cells:
 		for n in e.find_children("*", "Label", true, false):
-			check(_is_one_line(n), "roster cell labels are one line: " + n.text)
+			check(n is FitLabel, "roster cell labels are fitted: " + n.text)
 
 
-func test_the_end_screen_keeps_every_name_on_one_line() -> void:
+func test_the_end_screen_fits_every_name() -> void:
 	Themes.use("placeholder")
 	in_round(10)
 	var rows := []
@@ -59,9 +87,9 @@ func test_the_end_screen_keeps_every_name_on_one_line() -> void:
 	var s := _mount(EndScreen.new())
 	for r in [LONG, "Wolfgang Amadeus Mozart The Third", "Fig"]:
 		var l := Ui.find(s, "row_" + r) as Label
-		check(l != null and _is_one_line(l), "result row name is one line: " + r)
+		check(l != null and l is FitLabel and l.text == r, "result row name is a fitted label with the whole name: " + r)
 	for l in Ui.find_all(s, "cell_"):
-		check(_is_one_line(l), "stat values never wrap")
+		check(l is FitLabel, "stat values are fitted labels")
 
 
 func test_a_stage_plate_holds_the_longest_name() -> void:
