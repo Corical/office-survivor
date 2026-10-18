@@ -206,6 +206,34 @@ func test_a_refused_typed_join_is_worded_as_that_join_not_as_a_lost_seat() -> vo
 		eq(Session.expecting_seat(), false, "%s: nothing is waiting for a seat any more" % code)
 
 
+func _logged_since(m: int) -> String:
+	var n: int = Log.total - m
+	return "\n".join(Log.lines.slice(maxi(0, Log.lines.size() - n)))
+
+
+## Stranger pass: the idle probe's resume is answered by the view and then the seat. The seat for the seat we hold is an
+## echo, not a warning; a seat for any OTHER token or room is still ignored and still warned about.
+func test_the_seat_that_answers_an_idle_probe_is_not_a_warning_but_a_stranger_seat_is() -> void:
+	in_round(1)
+	var mine: String = Session.token                      # whatever the helper's seat is: that is the seat we hold
+	var room: String = Session.room_code
+	check(mine != "" and room != "", "a seat is held")
+	var m := Log.mark()
+	fake.server_send({"t": "seat", "token": mine, "room_code": room, "alias": "Mango", "host": true})
+	check(not ("unexpected_seat" in _logged_since(m)), "our own seat echoed back: no warning")
+	eq(Session.token, mine, "and nothing changed")
+	var m2 := Log.mark()
+	fake.server_send({"t": "seat", "token": "someone-else", "room_code": room, "alias": "Fig", "host": false})
+	check("unexpected_seat" in _logged_since(m2), "a seat with another token is still warned about")
+	eq(Session.token, mine, "and still changes nothing")
+	fake.server_send({"t": "seat", "token": mine, "room_code": "WXYZ", "alias": "Mango", "host": true})
+	eq(Session.room_code, room, "the right token for another room does not move us")
+	Session.token = ""
+	var m3 := Log.mark()
+	fake.server_send({"t": "seat", "token": "", "room_code": "", "alias": "x", "host": false})
+	check("unexpected_seat" in _logged_since(m3), "with no seat held, an empty-token seat is not an echo of anything")
+
+
 ## Stranger pass #11: 8 s after a refused code the log said `ack_timeout ... lost code=-1`: a refused join must not leave a
 ## wait running that later tears the connection down. Every refusal shape, then well past the ack deadline.
 func test_a_refused_join_leaves_no_wait_that_kills_the_line_later() -> void:

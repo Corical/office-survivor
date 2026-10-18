@@ -284,7 +284,13 @@ func apply(msg: Dictionary) -> void:
 			view_changed.emit(view)
 		"seat":
 			if not expecting_seat():
-				Log.event("session", "unexpected_seat", {}, "WARN")      # N06: a seat nobody asked for changes nothing
+				# The server answers the idle probe's `resume` with the view FIRST and the seat after it, so by the time the
+				# seat arrives the resume looks answered. A seat for the very seat we hold is that echo: harmless, not a
+				# warning (stranger pass: one WARN per client every 30 s). Any other seat is still ignored, and still a WARN.
+				if token != "" and str(msg.get("token")) == token and str(msg.get("room_code")) == room_code:
+					Log.event("session", "seat_echo", {})
+				else:
+					Log.event("session", "unexpected_seat", {}, "WARN")      # N06: a seat nobody asked for changes nothing
 				return
 			if str(msg.room_code) != room_code:
 				view = {}
