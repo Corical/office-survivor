@@ -34,7 +34,7 @@ def main():
     import gen_backdrops
     jobs = {}
     jobs["backdrop_far"] = gen_backdrops.far
-    for mod_name, table in (("gen_near", "JOBS"), ("gen_badges", "JOBS"), ("gen_props", "JOBS"), ("gen_ui", "JOBS"), ("gen_logo", "JOBS")):
+    for mod_name, table in (("gen_near", "JOBS"), ("gen_badges", "JOBS"), ("gen_props", "JOBS"), ("gen_avatars", "JOBS"), ("gen_ui", "JOBS"), ("gen_logo", "JOBS")):
         try:
             mod = __import__(mod_name)
             jobs.update(getattr(mod, table))
