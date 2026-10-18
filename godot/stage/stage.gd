@@ -22,7 +22,7 @@ var _out := {}                          # aliases currently marked as outcasts b
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(0, 340)
+	custom_minimum_size = Vector2(0, 390)
 	resized.connect(_layout)
 	Feed.model_changed.connect(_on_model)
 	_load()
@@ -54,8 +54,8 @@ func _load() -> void:
 
 func _layout() -> void:
 	_pos = {}
-	var c := size / 2.0 + Vector2(0, -10)
-	var r := minf(size.x, size.y) * 0.34
+	var c := size / 2.0 + Vector2(0, 26)                   # room above the ring for the caption
+	var r := minf(size.x, size.y) * 0.30
 	var others: Array = _roster.filter(func(e): return not e.is_me)
 	for e in _roster:
 		if e.is_me:
@@ -187,4 +187,4 @@ func _draw() -> void:
 	var li: int = int(cur.get("line_index", -1))
 	if li >= 0 and li < _model.lines.size():
 		var ln: Dictionary = _model.lines[li]
-		draw_string(font, Vector2(8, 22), Words.render(ln.key, ln.slots), HORIZONTAL_ALIGNMENT_LEFT, size.x - 16, fs - 2, col_text)
+		draw_multiline_string(font, Vector2(8, 20), Words.render(ln.key, ln.slots), HORIZONTAL_ALIGNMENT_LEFT, size.x - 16, fs - 3, 2, col_text)

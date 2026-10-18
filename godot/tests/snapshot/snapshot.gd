@@ -30,7 +30,9 @@ func _ready() -> void:
 	await _frames()
 	await _shot("01_title")
 
-	var round_row := _pick_round()
+	# one consistent night: the busiest reveal and the real round view it followed (so the Stage has a before-state)
+	var reveal_row := _pick_reveal()
+	var round_row := {"me": reveal_row.me, "msg": reveal_row.before}
 	var me: String = round_row.me
 	Net.connect_to("ws://test")
 	fake.server_open()
@@ -72,11 +74,18 @@ func _ready() -> void:
 	fake.server_send({"t": "hello_ok", "proto": 1})
 	fake.server_send({"t": "seat", "token": "snap-token", "room_code": "KXQM", "alias": me, "host": true})
 
-	var reveal_row := _pick_reveal()
 	fake.server_send(round_row.msg)
 	fake.server_send(reveal_row.msg)
 	await _frames()
 	await _shot("08_reveal")
+	var tl: Timeline = Feed.player.timeline
+	if tl != null and not tl.finished:
+		tl.advance(float(Timeline.DEFAULT_MS) * 1.5)
+		await _frames()
+		await _shot("08b_reveal_midway")
+		tl.advance(float(Timeline.DEFAULT_MS) * 1.0)
+		await _frames()
+		await _shot("08c_reveal_next_beat")
 
 	var end_row: Dictionary = Fixtures.of_type("end")[0]
 	fake.server_send(end_row.msg)
