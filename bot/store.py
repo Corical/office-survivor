@@ -92,6 +92,10 @@ class IdentityStore(JsonFileMap):
     def key_for(self, pid):
         return next((k for k, v in self.data.items() if v["pid"] == pid), None)
 
+    def remove(self, key):
+        if self.data.pop(str(key), None) is not None:
+            self.save()
+
 
 class TextStore(JsonFileMap):
     def put(self, ref, text):

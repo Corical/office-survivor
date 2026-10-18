@@ -80,6 +80,10 @@ class RoomGame(GameCore):
         self._timers = []
         self.listeners = []           # fn(event_name) called after any state change (the server pushes views)
         super().__init__(rules, store, identity, texts, aliases, seed_key, clock=scheduler.now)
+        seats = {j[0]: j[1] for j in self.joined}
+        for key, ident in list(self.identity.data.items()):      # a crash between the log line and the identity write
+            if not ident.get("sim") and seats.get(ident["pid"]) != ident["alias"]:
+                self.identity.remove(key)
         self._rearm()
 
     # ---------------- state from the log ----------------
@@ -99,7 +103,9 @@ class RoomGame(GameCore):
 
     def _apply_extra(self, rec, replay):
         t = rec["type"]
-        if t == "round_open":
+        if t == "left_lobby":
+            self.joined = [j for j in self.joined if j[0] != rec["pid"]]     # the pid is free again: the next join takes it
+        elif t == "round_open":
             self.round, self.opened_at, self.deadline = rec["round"], rec["opened_at"], rec["deadline"]
             self.locked, self.continued, self.close_reason, self.reveal_until = set(), set(), None, None
         elif t == "lock" and rec["round"] == self.round:
@@ -299,6 +305,17 @@ class RoomGame(GameCore):
             self.present.discard(pid)
             self._changed("quit")
             self._check_advance()
+
+    def leave_lobby(self, user_key):
+        """Give the seat back before the game starts: the seat is free for someone else and the token is dead."""
+        pid, _ = self._who(user_key)
+        if self.started:
+            raise GameError("The game has started; use leave to quit it for good.")
+        self._append({"type": "left_lobby", "pid": pid})
+        self.identity.remove(user_key)
+        self.present.discard(pid)
+        self.gone_since.pop(pid, None)
+        self._changed("left_lobby")
 
     # ---------------- restart ----------------
     def _rearm(self):

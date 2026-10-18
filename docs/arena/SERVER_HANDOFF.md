@@ -93,7 +93,7 @@ object with `"t"`.
 | `lock` | none | Needs a pick first. Final for the round |
 | `radio` | `phrase` (one of 8 keys), `about` (alias or null) | One per round |
 | `continue` | none | Reveal screen |
-| `leave` | none | Started game: permanent. Lobby: just disconnects (see 6) |
+| `leave` | none | Started game: permanent. Lobby: gives the seat back (free for someone else, token dead: `resume` with it answers `seat_gone`; a lobby left empty is deleted). Closing the app without `leave` keeps the seat (see 6) |
 
 **Never send a seat or player id.** The server takes the seat from the connection; extra fields are ignored.
 
@@ -171,7 +171,7 @@ moves to another device, whatever the old connection still sends is ignored.
 | `name` | Control, invisible (bidi, zero-width) and unsendable characters removed, whitespace runs collapsed to one space, cut to 24 characters, trimmed. Not a string = no label. The server never rejects a name, it cleans it |
 | Rate limit | One `list_rooms` per second per connection. A repeat inside the second gets `rate_limited` and no list; the refusal does not restart the clock |
 | Restart | `visibility`, `name` and age are in `room.json`; a room from before this feature loads as public, unnamed |
-| Seats of people who left | Unchanged: leaving the lobby does not free the seat (section 6), so `seats_taken` can overstate who is still there |
+| Seats of people who left | `leave` in the lobby frees the seat at once, so `seats_taken` drops. A player who only closes the app keeps the seat (section 6) |
 
 ## 6. Behaviour that is easy to get wrong
 
@@ -186,7 +186,7 @@ moves to another device, whatever the old connection still sends is ignored.
 | Reveal ends | after 20 s, or when every connected human sent `continue`; then round n+1 opens (or `end` after round 10) |
 | Two devices, one token | the newest wins; the old one is sent `taken_over`, then closed with 4003 a moment later (and ignored from the instant of the takeover); more than 5 takeovers a minute is refused |
 | Host drops | the lowest connected seat becomes host; you will see it in the next `lobby` |
-| `leave` in the lobby | your connection is dropped but **the seat stays counted as taken** (the join is in the log). After the 30 s grace the round stops waiting for it. A known limit, in `ARENA.md` section 7 |
+| `leave` in the lobby | the seat is given back (`left_lobby` in the log) and the count drops for everyone still there; your token is dead. **Closing the app without `leave` is different:** the seat stays taken in case you resume, and nothing frees it (`ARENA.md` section 7) |
 | After `end` | no more messages; the connection stays open. The room stays on disk |
 | Server restart | the same game continues with the same deadline (proven), reconnect and `resume` |
 

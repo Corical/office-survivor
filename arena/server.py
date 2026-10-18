@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import secrets
+import shutil
 import time
 import unicodedata
 
@@ -174,6 +175,14 @@ class Server:
         found.sort(key=lambda f: (-f[0], f[1]))
         return [f[2] for f in found[:self.max_rooms]]
 
+    def _drop_room(self, room):
+        """Delete a lobby that everyone left (nothing has been played, so nothing is lost)."""
+        self.rooms.pop(room.code, None)
+        for key in [k for k, c in self.by_token.items() if c == room.code]:
+            del self.by_token[key]
+        shutil.rmtree(room.path, ignore_errors=True)
+        log.info("room %s was left empty in the lobby and deleted", room.code)
+
     def load(self):
         base = os.path.join(self.data, "rooms")
         os.makedirs(base, exist_ok=True)
@@ -276,7 +285,7 @@ class Server:
             asyncio.ensure_future(self._close_after_pause(old, CLOSE_TAKEN_OVER, "taken_over"))
         room.conns[pid] = ws
         room.game.connect(pid)
-        alias = room.game.joined[pid][1]
+        alias = next(a for p, a, _, _ in room.game.joined if p == pid)      # pids have gaps once a seat is given back
         await ws.send(json.dumps({"t": "seat", "token": token, "room_code": room.code, "alias": alias,
                                   "host": pid == room.host_pid()}, ensure_ascii=False))
         await room.push_all()
@@ -318,10 +327,10 @@ class Server:
         if t == "resume":
             key = token_key(str(msg.get("token", "")))
             code = self.by_token.get(key)
-            if code is None or code not in self.rooms:
+            ident = self.rooms[code].identity.get(key) if code in self.rooms else None
+            if ident is None:
                 raise Coded("seat_gone", "That seat no longer exists.")
-            room = self.rooms[code]
-            return await self._seat(ws, room, room.identity.get(key)["pid"], msg["token"])
+            return await self._seat(ws, self.rooms[code], ident["pid"], msg["token"])
         if seat is None:
             raise GameError("Join or create a room first.")
         room, pid = seat
@@ -343,11 +352,18 @@ class Server:
         elif t == "continue":
             g.continue_(pid)
         elif t == "leave":
+            key = room.identity.key_for(pid)
             if g.started:
-                g.leave_seat(room.identity.key_for(pid))
-            room.conns.pop(pid, None)
-            g.disconnect(pid)               # not here any more: after the grace, the round stops waiting for this seat
+                g.leave_seat(key)
+                room.conns.pop(pid, None)
+                g.disconnect(pid)           # not here any more: after the grace, the round stops waiting for this seat
+            else:
+                room.conns.pop(pid, None)   # the seat goes back to the room: the token dies, the pid is never reused
+                g.leave_lobby(key)
+                self.by_token.pop(key, None)
             await room.push_all()
+            if not g.started and not g.joined:
+                self._drop_room(room)       # nobody left in the lobby: nothing to keep
             return None
         else:
             raise GameError(f"Unknown message type '{t}'.")

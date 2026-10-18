@@ -306,4 +306,4 @@ Everything in the request is implemented as proposed. Full rules: `docs/arena/SE
 | (a) cap | 20, which is also the server's room cap |
 | (b) host gone | A camp with nobody connected is not listed; it comes back when someone resumes. There is no grace: a dropped phone's camp disappears from the list while it is down |
 | (c) `name` | Accepted. Control, invisible and bidi characters are stripped, whitespace collapses, 24 characters. Private camps' names are never sent to anyone |
-| Not changed | `seats_taken` still counts a seat whose player left the lobby (leaving does not free a seat, `docs/ARENA.md` section 7), so a camp can show 3/4 with fewer people there |
+| Leaving the lobby | **Fixed 18 Oct, after the owner's report** (creator kept showing 2 of 4 after the joiner pressed Leave camp): `leave` in the lobby now frees the seat, everyone left gets a fresh `lobby` with the lower count, the leaver's token answers `seat_gone`, and a lobby left empty is deleted. Closing the app without `leave` still keeps the seat |

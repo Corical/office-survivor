@@ -6,7 +6,6 @@ extends Control
 
 ## Reasons a connection can end while the seat is kept: the title explains them (an upgrade has its own screen).
 const TERMINAL_ON_TITLE := ["taken_over", "too_big", "flapping"]
-const CODE_BOX_HEIGHT := 48.0       # chosen: as tall as the wood Join button's visible art (56 px high, ~4 px clear top and bottom)
 const MAX_CODE_SHOWN := 12         # real codes are 4 letters; a button must never grow with a hostile one
 
 var _notice := ""
@@ -93,7 +92,7 @@ func _build() -> void:
 	code.placeholder_text = Words.render("ui.enter_code")
 	code.text = _code_text
 	code.max_length = 8
-	code.custom_minimum_size = Vector2(160, CODE_BOX_HEIGHT)
+	code.custom_minimum_size = Vector2(160, Ui.MIN_ART_BUTTON_HEIGHT)          # as tall as the Join button beside it
 	code.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	code.text_changed.connect(func(t: String):
 		var caps := t.to_upper()                       # codes are capitals: show what will be sent, caret where it was
@@ -105,10 +104,6 @@ func _build() -> void:
 	row.add_child(code)
 	var join := Ui.button(Words.render("ui.join_room"), "join", func(): _reason(Intents.join_room(_code_text)))
 	join.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	# The wood art has ~4 px of clear margin above and below, so the 56 px Join button shows 48 px of wood. The code box is the
-	# same 48 px and both are centred in the row, so their tops, bottoms and baselines agree.
-	join.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	code.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(join)
 	menu.add_child(row)
 	entries.append(row)

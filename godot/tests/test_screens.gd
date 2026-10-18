@@ -540,6 +540,22 @@ func test_the_overlay_never_blocks_a_tap() -> void:
 	eq((Ui.find(r, "net_banner") as Label).mouse_filter, Control.MOUSE_FILTER_IGNORE, "banner ignores the mouse")
 
 
+# ---------------- the wood art is never squashed (owner's screenshot, Settings and Join) ----------------
+
+## The wood button art has 30 px top and 30 px bottom margins. A button drawn lower than that overlaps its own edges.
+func test_every_button_is_tall_enough_for_the_wood_art() -> void:
+	for variation in ["", "PrimaryButton", "Button", "SomethingElse"]:
+		var b := Ui.button("x", "b", func(): pass, false, variation)
+		check(b.custom_minimum_size.y >= 60.0, "variation '%s' is %s px tall: at least 60 for the art" % [variation, b.custom_minimum_size.y])
+		b.free()
+	var s := mount(TitleScreen)
+	var join := Ui.find(s, "join") as Control
+	var code := Ui.find(s, "code") as Control
+	check(join != null and code != null, "the join row exists")
+	if join != null and code != null:
+		eq(code.custom_minimum_size.y, join.custom_minimum_size.y, "the code box is as tall as Join beside it")
+
+
 # ---------------- a refused join code (stranger pass #11) ----------------
 
 func test_a_refused_code_is_said_once_not_twice() -> void:

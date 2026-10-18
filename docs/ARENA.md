@@ -65,6 +65,7 @@ quit, radio, night, finish), a room writes:
 | `lock` | round, pid | a player or a bot locks |
 | `round_closed` | round, reason, reveal_until | a round closes; reason is `all_locked` or `timeout` |
 | `continue` | round, pid | a human presses Continue in the reveal |
+| `left_lobby` | pid | a human gives their seat back in the lobby (`leave` before the start); the seat is free again and its pid goes to the next person who joins (pids stay 0..3, which the engine needs) |
 
 On restart every room is loaded from disk: a round whose deadline passed while the server was down closes at once;
 a round closed but not yet resolved is resolved (identically, from its moves and seed); a start with no round 1
@@ -103,7 +104,7 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `lock` | make the pick final |
 | `radio` | one fixed phrase this round |
 | `continue` | done reading the reveal |
-| `leave` | leave a started game for good (in the lobby: just disconnects) |
+| `leave` | leave a started game for good; in the lobby, give the seat back (free for someone else, the token is dead, and a lobby left empty is deleted) |
 
 <!-- check:server-messages -->
 | Server sends | Meaning |
@@ -187,6 +188,7 @@ by code as before. One `list_rooms` per `LIST_INTERVAL` per connection; an earli
 | `Only the host can start.` | start by a non-host |
 | `Amount must be a whole number.` | a gift amount that is not an integer |
 | `Unknown message type '{t}'.` | any other `t` |
+| `The game has started; use leave to quit it for good.` | `leave_lobby` after the start (the server only calls it in the lobby, so a client never sees this) |
 | `Visibility must be public or private.` | `create_room` with any other `visibility` (a typo must not publish a private camp) |
 | `Too many room lists; wait a second.` | a second `list_rooms` within `LIST_INTERVAL` on one connection |
 
@@ -202,7 +204,7 @@ they are listed in MECHANICS.md section 9.
 | In a 4-seat room only four goal types are ever dealt (beat, robbed twice and extract, clean thief, give): the goal deck is dealt in order, one card per seat, so **grudge and detective need 5 or more seats** | A rules fact (MECHANICS.md section 7), not a bug; it means the Detective goal never appears in a 4-seat room |
 | Wilderness event stories travel as English text (code `event`, arg `line`), with `event` (the id), `scope` (`camp` or `player`) and, for a player event, `who` beside it | `engine/events.py` writes the sentence. The story **variant** is not sent: the engine picks it from the seed each time and does not record it, and recording it would add a field to every stored event, which makes every existing log fail to replay |
 | Log writes fsync on the event loop | Rooms are capped (20 by default) and records are tiny |
-| Leaving the lobby does not free the seat (the join is in the log); the seat stays counted as taken and, once started, is a human who never answers | After the `grace` the round stops waiting for it. Freeing the seat needs a "left before the start" record: not built |
+| A player who closes the app in the lobby without pressing leave keeps the seat (they may come back with their token); nothing frees it | Once started, that seat is a human who never answers and after the `grace` the round stops waiting for it. A timeout that frees idle lobby seats: not built |
 | One server process per data folder | Two processes on one folder would both write the same rounds; the service manager (systemd) runs one |
 | `websockets` is not in the project venv or on the Pi yet | Installing it is a download: asked before deploy |
 
@@ -225,6 +227,7 @@ Update between games where you can: a restart does not lose a game, but players 
 
 | Date | Change |
 |---|---|
+| 18 October 2026 | Leaving the lobby gives the seat back (`left_lobby` record; the creator no longer sees a stuck 2 of 4). A freed pid is handed to the next joiner so pids stay 0..3. Live on the Pi 16:42 (commit feb9e90). |
 | 18 October 2026 | Open camps: `list_rooms` / `rooms`, `create_room` `visibility` and `name`, `features` in `hello_ok`, error codes `room_full`, `room_started`, `rate_limited`. Live on the Pi since 18 October 2026 15:41 (commit 4ffe082). |
 | 18 October 2026 | The Arena service on the Pi (tailnet-only, loopback behind Tailscale serve, resource ceilings). |
 | 18 October 2026 | This file created with the first Arena server: rooms, timed rounds, lock-in, early advance, bots that lock, resume and restart. |

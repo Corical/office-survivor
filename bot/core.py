@@ -111,6 +111,7 @@ class GameCore:
         t = rec["type"]
         if t == "join":
             self.joined.append((rec["pid"], rec["alias"], rec.get("sim", False), rec.get("personality")))
+            self.joined.sort(key=lambda j: j[0])       # pid order, even when a freed pid was handed out again
             if rec.get("sim"):
                 self.sims.add(rec["pid"])
                 self.personality[rec["pid"]] = rec["personality"]
@@ -283,7 +284,8 @@ class GameCore:
             raise GameError("The game is full.")
         rng = rng or random.Random()
         alias = rng.choice(free)
-        pid = len(self.joined)
+        used = {j[0] for j in self.joined}
+        pid = next(p for p in range(len(used) + 1) if p not in used)   # the lowest free pid: pids stay 0..n-1 (the engine needs that)
         personality = (personality or sims.pick_personality(rng)) if sim else None
         self.identity.put(user_key, pid, alias, sim=sim)
         self._append({"type": "join", "pid": pid, "alias": alias, "sim": sim, **({"personality": personality} if sim else {})})
