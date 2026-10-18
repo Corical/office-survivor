@@ -11,6 +11,7 @@ const MAX_CODE_SHOWN := 12          # real codes are 4 letters; a button must ne
 var _notice := ""
 var _code_text := ""
 var _show_settings := false
+var _show_advanced := false
 var _intro_played := false
 var _hero_node: Control                       # the logo and its glow, built once
 var _hero_tweens: Array = []
@@ -185,16 +186,6 @@ func _confirm_create() -> void:
 
 
 func _settings(menu: VBoxContainer, st: Dictionary) -> void:
-	menu.add_child(Ui.label(Words.render("ui.server_address"), "", "MutedLabel"))
-	var url := LineEdit.new()
-	url.set_meta("id", "server_url")
-	url.text = st.server_url
-	url.text_changed.connect(func(t): Intents.set_server_url(t))
-	menu.add_child(url)
-	var ids: Array = Themes.ids()
-	var label := "%s: %s" % [Words.render("ui.theme"), Themes.current.title]
-	menu.add_child(Ui.button(label, "theme_toggle", func():
-		Themes.use(ids[(ids.find(Themes.current.id) + 1) % ids.size()])))
 	var calm := "%s: %s" % [Words.render("ui.reduced_motion"), Words.render("ui.on" if Themes.reduced_motion else "ui.off")]
 	menu.add_child(Ui.button(calm, "reduced_motion_toggle", func():
 		Themes.reduced_motion = not Themes.reduced_motion
@@ -202,6 +193,19 @@ func _settings(menu: VBoxContainer, st: Dictionary) -> void:
 		_build()))
 	if Intents.can_fullscreen():
 		menu.add_child(Ui.button(Words.render("ui.fullscreen"), "fullscreen_toggle", func(): Intents.toggle_fullscreen()))
+	# the server address is for the few who were given one: folded away until asked for
+	menu.add_child(Ui.button(Words.render("ui.hide_advanced") if _show_advanced else Words.render("ui.advanced"),
+		"advanced_toggle", func():
+			_show_advanced = not _show_advanced
+			_build()))
+	if _show_advanced:
+		menu.add_child(Ui.label(Words.render("ui.server_address"), "", "MutedLabel"))
+		var url := LineEdit.new()
+		url.set_meta("id", "server_url")
+		url.text = st.server_url
+		url.text_changed.connect(func(t): Intents.set_server_url(t))
+		menu.add_child(url)
+		menu.add_child(Ui.label(Words.render("ui.advanced_hint"), "advanced_hint", "MutedLabel"))
 
 
 ## The logo, bobbing, over a glow that pulses. Null when the theme has no logo (the title is then plain text).

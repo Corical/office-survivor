@@ -49,8 +49,11 @@ func _play() -> void:
 	# do what a person does and tap again
 	var le: LineEdit = null
 	for attempt in 4:
-		if not await _tap("settings_toggle"):
+		if Ui.find(router.current, "advanced_toggle") == null and not await _tap("settings_toggle"):
 			return
+		await _frames(5)
+		if Ui.find(router.current, "server_url") == null and Ui.find(router.current, "advanced_toggle") != null:
+			await _tap("advanced_toggle")                  # the address is folded under Advanced
 		le = Ui.find(router.current, "server_url") as LineEdit
 		if le != null:
 			break
