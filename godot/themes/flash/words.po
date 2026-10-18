@@ -486,6 +486,9 @@ msgstr "{locked} of {total} locked in"
 msgid "ui.locking"
 msgstr "Locking in..."
 
+msgid "ui.move_unavailable"
+msgstr "{move} is not available tonight."
+
 msgid "ui.net.connecting"
 msgstr "Connecting..."
 

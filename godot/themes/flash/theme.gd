@@ -330,10 +330,19 @@ static func _buttons(th: Theme, bold: Font, t: ThemeDef) -> void:
 	empty.content_margin_left = 2
 	empty.content_margin_right = 2
 	empty.content_margin_top = 4
-	empty.content_margin_bottom = 4
+	empty.content_margin_bottom = 32                   # room for the caption (a label laid over the foot of the button)
 	for s in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		th.set_stylebox(s, "MoveButton", empty)
 	th.set_stylebox("focus", "MoveButton", _ring(20))
+	# MoveCaption: the word under a medallion; one line, shrunk to fit by the screen (FitLabel)
+	th.set_type_variation("MoveCaption", "Label")
+	th.set_font("font", "MoveCaption", bold)
+	th.set_font_size("font_size", "MoveCaption", 17)
+	th.set_constant("outline_size", "MoveCaption", 5)
+	th.set_color("font_color", "MoveCaption", PAPER)
+	th.set_color("font_outline_color", "MoveCaption", Color("0a0f1c"))
+	th.set_type_variation("MoveCaptionChosen", "MoveCaption")
+	th.set_color("font_color", "MoveCaptionChosen", EMBER_HI)
 	# MoveButtonChosen: the medallion you picked (its glow ring and lift are the screen's; this adds the word)
 	th.set_type_variation("MoveButtonChosen", "MoveButton")
 	for k in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_disabled_color"]:

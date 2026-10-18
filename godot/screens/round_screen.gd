@@ -31,6 +31,8 @@ var _pulsing := false
 var _pulse_tween: Tween
 var _left_int := -1                 # the whole seconds last shown, and when they changed (to move the ring smoothly)
 var _left_changed_ms := 0
+static var _seen_moves: Array = []         # every move offered so far this game, in the order first seen (keeps the row stable)
+static var _seen_round := 0
 var _prompt: Label                  # the line above the moves; it becomes "Pick a move!" when time is short and nothing is picked
 
 
@@ -118,7 +120,8 @@ func _tick() -> void:
 		_ring.value = smooth
 		_ring.state = stage
 	if _charge != null:
-		_charge.fraction = 1.0 - smooth / total if _m.lock.state == "open" else 1.0
+		var lock_live: bool = _m.lock.state == "open" and _lock_btn != null and not _lock_btn.disabled
+		_charge.fraction = (1.0 - smooth / total) if lock_live else 0.0       # a greyed-out Lock has no light moving across it
 	var open: bool = _m.lock.picker_open
 	if _prompt != null:                            # under 20 s with nothing picked, the line above the moves turns into a call to act
 		var nag := open and _m.my_pick == null and smooth <= float(tm.get("prompt_s", 20))
@@ -288,10 +291,23 @@ func _act(open: bool) -> VBoxContainer:
 	_prompt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	s.add_child(_prompt)
 	var moves := Ui.hbox(6)
+	var offered := {}
 	for p in _m.pickers:
-		var chosen := _is_chosen(p)
-		moves.add_child(_move_button(p, chosen, open))
+		offered[str(p.server_id)] = p
+	for p in _row_moves():
+		var live: bool = offered.has(str(p.server_id))
+		moves.add_child(_move_button(offered[str(p.server_id)] if live else p, live and _is_chosen(p), open and live))
 	s.add_child(moves)
+	# the reason a medallion is greyed out; the line is always there so the page does not move when it comes and goes
+	var why := Ui.name_label("", "why_unavailable", "MutedLabel")
+	why.custom_minimum_size = Vector2(0, 26)
+	var gone: Array = []
+	for p in _row_moves():
+		if not offered.has(str(p.server_id)):
+			gone.append(Words.render(str(p.key)))
+	if not gone.is_empty():
+		why.set_fit_text(Words.render("ui.move_unavailable", {"move": ", ".join(gone)}))
+	s.add_child(why)
 	if not _move.is_empty() and _move.takes_target:
 		s.add_child(Ui.label(Words.render("ui.pick_a_target"), "", "MutedLabel"))
 		var targets := GridContainer.new()
@@ -308,11 +324,32 @@ func _act(open: bool) -> VBoxContainer:
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			amounts.add_child(b)
 		s.add_child(amounts)
-	if _m.my_pick != null:
-		var pick := Ui.card()
-		pick.add_child(Ui.label(Words.render("ui.your_pick", {"pick": _describe(_m.my_pick)}), "my_pick", "NameLabel"))
-		s.add_child(pick)
+	# "Your pick" always takes its space (invisible until there is a pick) so choosing a move never pushes the page down
+	var pick := Ui.card()
+	var picked: bool = _m.my_pick != null
+	var pick_words := Words.render("ui.your_pick", {"pick": _describe(_m.my_pick) if picked else "..."})
+	pick.add_child(Ui.label(pick_words, "my_pick", "NameLabel"))
+	pick.modulate.a = 1.0 if picked else 0.0
+	s.add_child(pick)
 	return s
+
+
+## Every move that has been on offer this game, in the order first seen, plus any on offer now. A move that is not on offer
+## tonight stays in the row (greyed out, with the reason below) so the row never changes shape from one night to the next.
+func _row_moves() -> Array:
+	var round_no := int(_m.round)
+	if round_no < _seen_round or round_no <= 1:
+		_seen_moves = []                                   # a new game
+	_seen_round = round_no
+	for p in _m.pickers:
+		var known := false
+		for q in _seen_moves:
+			if str(q.server_id) == str(p.server_id):
+				known = true
+				break
+		if not known:
+			_seen_moves.append(p)
+	return _seen_moves
 
 
 ## Is this the move I have picked? Either what I tapped here, or what the server says I picked (after a reconnect).
@@ -333,7 +370,16 @@ func _move_button(p: Dictionary, chosen: bool, open: bool) -> Button:
 	var cb := func(): _choose(p)
 	if art == null:
 		return Ui.button(word, id, cb, not open, "ChosenButton" if chosen else "")
-	var b := Ui.button(word, id, cb, not open, "MoveButtonChosen" if chosen else "MoveButton")
+	var b := Ui.button("", id, cb, not open, "MoveButton")
+	b.tooltip_text = word
+	b.set_meta("caption", word)
+	var cap := Ui.name_label(word, "", "MoveCaptionChosen" if chosen else "MoveCaption")
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cap.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	cap.offset_top = -30
+	cap.offset_bottom = -4
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(cap)
 	b.icon = art
 	b.expand_icon = true
 	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
