@@ -276,6 +276,9 @@ class SimAI:
 
     def pick_investigate_target(self, p):
         cands = self.others(p)
+        if not cands:                    # everyone else quit: nobody to watch (the caller falls back to a legal move)
+            self._why.append("nobody left to watch")
+            return None
         susp = [(p.suspicion[q.pid] + self.public_susp[q.pid] + self.rng.random(), q.pid) for q in cands]
         top = max(susp)
         q = self.P(top[1])

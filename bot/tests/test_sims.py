@@ -118,6 +118,18 @@ class LegalMoves(unittest.TestCase):
             self.assertTrue(g.finished)
         self.assertEqual(problems, [])
 
+    def test_a_sim_left_alone_after_everyone_else_quit_keeps_playing_to_the_end(self):
+        """Found by the Arena fuzz test (18 Oct 2026): a sim that wanted to investigate with nobody left crashed the
+        night (simbrain pick_investigate_target took max() of nothing). With nobody to target it must fall back."""
+        for seed in range(30):
+            g, _ = make(seed, sims=1, humans=1)
+            g.quit("human-0")
+            for night in range(1, 11):
+                g.tick(now=night * DAY + 1)
+                g.tick(now=night * DAY + 7)
+            with self.subTest(seed=seed):
+                self.assertTrue(g.finished)
+
     def test_no_sim_ever_targets_a_player_who_quit(self):
         for seed in range(60):
             g, (store, ident, _) = make(seed, sims=7, humans=1)
