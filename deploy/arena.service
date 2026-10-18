@@ -1,0 +1,35 @@
+[Unit]
+Description=Arena - live Survivors rooms for the Godot client
+Wants=network-online.target time-sync.target
+After=network-online.target time-sync.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+User=arena
+Group=arena
+WorkingDirectory=/opt/arena
+Environment=ARENA_DATA=/var/lib/arena
+# Loopback only: Tailscale (tailnet-only https port, never Funnel) is the one way in. See deploy/arena-install.sh.
+Environment=ARENA_HOST=127.0.0.1
+Environment=ARENA_PORT=8770
+Environment=ARENA_TIMER=180
+Environment=PYTHONUNBUFFERED=1
+# The Pi has no hardware clock: wait (up to 2 minutes) until NTP says the time is right. Round deadlines are wall-clock.
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 60); do [ "$(timedatectl show -p NTPSynchronized --value)" = yes ] && exit 0; sleep 2; done; exit 1'
+ExecStart=/opt/arena/.venv/bin/python -m arena.server
+Restart=always
+RestartSec=5
+UMask=0077
+# The Pi runs about 25 other services: Arena gets a ceiling so a runaway room cannot starve them (chosen defaults).
+MemoryMax=400M
+CPUQuota=50%
+TasksMax=64
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/arena
+
+[Install]
+WantedBy=multi-user.target

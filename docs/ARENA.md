@@ -157,8 +157,24 @@ they are listed in MECHANICS.md section 9.
 | One server process per data folder | Two processes on one folder would both write the same rounds; the service manager (systemd) runs one |
 | `websockets` is not in the project venv or on the Pi yet | Installing it is a download: asked before deploy |
 
-## 8. Change log
+## 8. Running it on the Pi
+
+| What | Value |
+|---|---|
+| Service | `arena.service` (user `arena`, code `/opt/arena`, data `/var/lib/arena`, its own venv `/opt/arena/.venv`) |
+| Listens on | `127.0.0.1:8770` only; nothing on the Pi's network interfaces |
+| Way in | Tailscale `serve`, **tailnet only**: `wss://raspberrypi.tail87b476.ts.net:8470` |
+| Never | Funnel. The Pi's Funnel ports (443, 8443, 10000) belong to other apps; Arena is not on the public internet |
+| Ceilings | 400 MB memory, 50% of one CPU, 64 tasks (the Pi runs about 25 other services) |
+| Install / update | build a tarball from committed code (`git archive HEAD arena bot engine deploy docs/game.json docs/sim/survivors_sim.py docs/sim/events.py docs/sim/visibility.py docs/sim/simbrain.py`), copy it to `/tmp/arena-release.tar.gz`, run `sh deploy/arena-install.sh /tmp/arena-release.tar.gz` |
+| Torch | untouched by an Arena install or update; port 8765 belongs to another app and is not used |
+| Restart | rooms reload from `/var/lib/arena/rooms/*` and re-arm their timers; a game in progress carries on |
+
+Update between games where you can: a restart does not lose a game, but players are disconnected for a few seconds.
+
+## 9. Change log
 
 | Date | Change |
 |---|---|
+| 18 October 2026 | The Arena service on the Pi (tailnet-only, loopback behind Tailscale serve, resource ceilings). |
 | 18 October 2026 | This file created with the first Arena server: rooms, timed rounds, lock-in, early advance, bots that lock, resume and restart. |
