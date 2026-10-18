@@ -41,6 +41,17 @@ func end_model(_view: Dictionary, _me: String) -> Dictionary:
 	return {}
 
 
+## This game's phases: {phase_id: {"screen": screen id}}. A view whose phase is not listed gets the neutral phase screen.
+func phases() -> Dictionary:
+	return {}
+
+
+## This game's verbs, the client's copy of the server manifest: {verb: {arg: spec}}. A spec is {"type": "int" | "str" | "bool"}
+## plus any of "optional", "nullable", "min", "max", "max_len", "choices". Intents.act refuses anything outside it before it is sent.
+func verbs() -> Dictionary:
+	return {}
+
+
 ## Every translation key this ruleset can emit (a theme must cover them all).
 func all_keys() -> Array[String]:
 	return []

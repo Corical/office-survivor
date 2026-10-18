@@ -59,6 +59,13 @@ func copy_text(text: String) -> String:
 	return ""
 
 
+## One verb of the room's game on the generic wire. `args` is what the verb's table in the ruleset allows and nothing else; the
+## phase and the act id are added here, never by the caller. "" when sent, else why not (unknown_verb | bad_args | forbidden_arg |
+## no_phase | in_flight | ...). Nothing calls this yet but the tests: no Survivors screen is moved onto it.
+func act(verb: Variant, args: Variant = {}) -> String:
+	return _done(Session.act_verb(verb, args))
+
+
 func start() -> String:
 	return _done(Session.act("start"))
 

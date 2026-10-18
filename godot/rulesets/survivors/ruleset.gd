@@ -11,6 +11,15 @@ const NUM := Schema.NUM
 const ANY := Schema.ANY
 
 const VIEW_TYPES := ["lobby", "round", "reveal", "end"]
+const PHASES := {"lobby": {"screen": "lobby"}, "round": {"screen": "round"}, "reveal": {"screen": "reveal"}, "end": {"screen": "end"}}
+## The server manifest's verbs (arena/games/survivors.py), as the client checks them before sending.
+const VERBS := {
+	"pick": {"kind": {"type": "str", "max_len": 32}, "target": {"type": "str", "optional": true, "nullable": true},
+		"amount": {"type": "int", "optional": true, "min": 0, "max": 99}},
+	"lock": {},
+	"radio": {"phrase": {"type": "str", "max_len": 32}, "about": {"type": "str", "optional": true, "nullable": true}},
+	"continue": {},
+}
 const SEAT_GONE_CODES := ["seat_gone", "room_gone", "bad_token"]
 const SEAT_GONE_TEXTS := ["That seat no longer exists."]       # today's wording, until the server sends seat_gone
 
@@ -51,6 +60,14 @@ const SCHEMAS := {
 
 func view_types() -> Array:
 	return VIEW_TYPES
+
+
+func phases() -> Dictionary:
+	return PHASES
+
+
+func verbs() -> Dictionary:
+	return VERBS
 
 
 func seat_gone_codes() -> Array:
