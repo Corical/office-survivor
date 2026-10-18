@@ -19,7 +19,7 @@ msgid "band.well_fed"
 msgstr "Well fed"
 
 msgid "column.gave_away"
-msgstr "Gave away"
+msgstr "Given"
 
 msgid "column.rations"
 msgstr "Rations"
@@ -408,11 +408,23 @@ msgstr "Bandit"
 msgid "status.shield"
 msgstr "On guard"
 
+msgid "ui.advanced"
+msgstr "Advanced"
+
+msgid "ui.advanced_hint"
+msgstr "Only change this if you were given an address."
+
 msgid "ui.app_name"
 msgstr "Arena"
 
 msgid "ui.back_to_title"
 msgstr "Back to title"
+
+msgid "ui.best_legend"
+msgstr "[ ] = the most in the group"
+
+msgid "ui.bots_fill"
+msgstr "Empty seats are filled by bots when you start."
 
 msgid "ui.camp_days_ago"
 msgstr "{n} d ago"
@@ -438,8 +450,14 @@ msgstr "Cancel"
 msgid "ui.close"
 msgstr "Close"
 
+msgid "ui.code_caption"
+msgstr "Room code"
+
 msgid "ui.continue"
 msgstr "Continue"
+
+msgid "ui.copied"
+msgstr "Copied"
 
 msgid "ui.copy"
 msgstr "Copy"
@@ -476,6 +494,9 @@ msgstr "Tap to hide"
 
 msgid "ui.goal_tap_more"
 msgstr "Tap for details"
+
+msgid "ui.hide_advanced"
+msgstr "Hide advanced"
 
 msgid "ui.hide_settings"
 msgstr "Hide settings"

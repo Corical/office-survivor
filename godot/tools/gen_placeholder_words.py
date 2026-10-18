@@ -104,9 +104,17 @@ UI.update({
     "notice.unknown": "The server sent something this app doesn't know.",
     "notice.generic": "{text}", "notice.no_server_url": "Enter the server address first.",
     "notice.locked": "Your move is locked in.", "notice.in_flight": "Already sent.",
+    # --- end/lobby/title ---
+    "ui.best_legend": "[ ] = the most in the group",
+    "ui.code_caption": "Room code",
+    "ui.copied": "Copied",
+    "ui.bots_fill": "Empty seats are filled by bots when you start.",
+    "ui.advanced": "Advanced", "ui.hide_advanced": "Hide advanced",
+    "ui.advanced_hint": "Only change this if you were given an address.",
     # --- reveal/stage ---
     "ui.reveal_waiting": "Waiting for the others, {n} s",
 })
+UI["column.gave_away"] = "Given"       # one short word: a header must fit its column on one line
 
 
 def strip_emoji(text):

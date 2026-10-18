@@ -190,6 +190,8 @@ func _podium_member(r: Dictionary) -> Control:
 func _board(m: Dictionary, ranks: Array) -> Control:
 	var s := Ui.vbox(12)
 	s.add_child(Ui.label(Words.render("ui.results"), "", "MutedLabel"))
+	# what [ ] means: the highest of its column (ties all bracketed; a top of 0, and the unranked Robbed column, never)
+	s.add_child(Ui.label(Words.render("ui.best_legend"), "legend", "MutedLabel"))
 	var holder := Ui.vbox(10)
 	holder.set_meta("id", "results")
 	s.add_child(holder)
@@ -243,16 +245,21 @@ func _player_card(m: Dictionary, r: Dictionary, rank: int, best: Dictionary) -> 
 		if seat != null:
 			top.add_child(Ui.picture(seat, Vector2(40, 40)))
 	s.add_child(top)
-	var stats := Ui.hbox(6)
+	# one equal-width cell per column, header over value, both centred and on ONE line, so the numbers line up
+	var stats := HBoxContainer.new()
+	stats.add_theme_constant_override("separation", 2)
+	stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for c in m.columns:
 		var v: int = int(r.cells[c.id])
 		var is_top: bool = c.highlight and best.get(c.id, -1) == v and v > 0
 		var cell := Ui.vbox(0)
-		var head := Ui.label(Words.render(c.key), "head_" + c.id, "MutedLabel")
-		head.custom_minimum_size = Vector2(0, 42)           # room for two lines in every column, so the numbers line up
-		head.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		cell.custom_minimum_size = Vector2(1, 0)
+		var head := Ui.name_label(Words.render(c.key), "head_" + c.id, "MutedLabel")
+		head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cell.add_child(head)
-		var value := Ui.name_label(("[%d]" % v) if is_top else str(v), "cell_%s_%s" % [r.alias, c.id], "StatLabel")
+		var value := Ui.name_label(("[%d]" % v) if is_top else str(v), "cell_%s_%s" % [r.alias, c.id],
+			"StatLabelHot" if is_top else "StatLabel")
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cell.add_child(value)
 		stats.add_child(cell)
 	s.add_child(stats)

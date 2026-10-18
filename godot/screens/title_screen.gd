@@ -4,17 +4,19 @@ extends Control
 ## and talks only through Intents. The logo bobs and glows, the buttons are chunky and bounce when pressed, and the whole
 ## menu pops in the first time it appears (all of it from the theme's art and effect settings, none of it required).
 
-## Reasons a connection can end while the seat is kept: the title explains them (an upgrade has its own screen).
+## Reasons a connection can end that the title explains (an upgrade has its own screen; `kicked` also drops the seat).
 const TERMINAL_ON_TITLE := ["taken_over", "too_big", "flapping", "kicked"]
 const MAX_CODE_SHOWN := 12          # real codes are 4 letters; a button must never grow with a hostile one
 
 var _notice := ""
 var _code_text := ""
 var _show_settings := false
+var _show_advanced := false
 var _intro_played := false
 var _hero_node: Control                       # the logo and its glow, built once
 var _hero_tweens: Array = []
-var _sheet_open := false                      # the "new camp" form
+var _sheet_fresh := false                     # the sheet was just opened: fade it in once, not on every rebuild
+var _sheet_open := false                     # the "new camp" form
 var _vis := "public"
 var _camp_name := ""
 var _vis_buttons := {}
@@ -22,7 +24,7 @@ var _vis_help: Label
 
 
 func _ready() -> void:
-	Feed.status_changed.connect(func(_s): _build())
+	Feed.status_changed.connect(_on_status)
 	Feed.notice_raised.connect(_on_notice)
 	_build()
 	Intents.rooms_watch(true)                 # the open-camps list runs for as long as this screen does (menu rebuilds do not touch it)
@@ -30,6 +32,15 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	Intents.rooms_watch(false)
+
+
+## A tap on Create or Join is on its way into a camp (the seat may already have arrived): the screen is about to change, so
+## nothing here is laid out again until it does or the attempt fails. A relayout at this point showed a "Rejoin camp" button
+## for a few frames and jumped every button.
+func _on_status(st: Dictionary) -> void:
+	if st.get("entering", false):
+		return
+	_build()
 
 
 func _on_notice(n: Dictionary) -> void:
@@ -66,7 +77,7 @@ func _build() -> void:
 		var note := Ui.label(said, "notice")
 		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		menu.add_child(note)
-	if st.has_seat:
+	if st.has_seat and not st.get("entering", false):
 		var code_tag := str(st.room_code).left(MAX_CODE_SHOWN)
 		var resume_label := Words.render("ui.resume_code", {"code": code_tag}) if code_tag != "" else Words.render("ui.resume")
 		var resume := Ui.button(resume_label, "resume", func(): _show(Intents.resume()), false, "PrimaryButton")
@@ -106,7 +117,11 @@ func _build() -> void:
 	if _show_settings:
 		_settings(menu, st)
 	if _sheet_open:
-		add_child(_make_sheet())
+		var sheet := _make_sheet()
+		add_child(sheet)
+		if _sheet_fresh:
+			_sheet_fresh = false
+			_fade_in_sheet(sheet)
 	if not _intro_played:
 		_intro_played = true
 		Ui.intro_all(entries)
@@ -117,6 +132,7 @@ func _build() -> void:
 func _on_create() -> void:
 	if Feed.rooms_model().get("can_list", Feed.rooms_model().supported):
 		_sheet_open = true
+		_sheet_fresh = true
 		_build()
 		return
 	_reason(Intents.create_room())
@@ -162,6 +178,20 @@ func _make_sheet() -> Control:
 	return veil
 
 
+## The sheet comes in over the screen instead of cutting in: the veil fades up in the theme's transition time and the card
+## settles with the usual entrance. Reduced motion keeps the fade and drops the settling. A rebuild never replays it.
+func _fade_in_sheet(veil: Control) -> void:
+	var fx := Themes.fx("transition")
+	if fx.is_empty():
+		return
+	veil.modulate.a = 0.0
+	veil.create_tween().tween_property(veil, "modulate:a", 1.0, float(fx.get("fade", 0.2)))
+	if not Themes.reduced_motion:
+		var holder := veil.get_child(0)
+		if holder != null and holder.get_child_count() > 0:
+			Ui.intro(holder.get_child(0) as Control)
+
+
 func _pick_visibility(v: String) -> void:
 	_vis = v
 	_show_visibility()
@@ -185,16 +215,6 @@ func _confirm_create() -> void:
 
 
 func _settings(menu: VBoxContainer, st: Dictionary) -> void:
-	menu.add_child(Ui.label(Words.render("ui.server_address"), "", "MutedLabel"))
-	var url := LineEdit.new()
-	url.set_meta("id", "server_url")
-	url.text = st.server_url
-	url.text_changed.connect(func(t): Intents.set_server_url(t))
-	menu.add_child(url)
-	var ids: Array = Themes.ids()
-	var label := "%s: %s" % [Words.render("ui.theme"), Themes.current.title]
-	menu.add_child(Ui.button(label, "theme_toggle", func():
-		Themes.use(ids[(ids.find(Themes.current.id) + 1) % ids.size()])))
 	var calm := "%s: %s" % [Words.render("ui.reduced_motion"), Words.render("ui.on" if Themes.reduced_motion else "ui.off")]
 	menu.add_child(Ui.button(calm, "reduced_motion_toggle", func():
 		Themes.reduced_motion = not Themes.reduced_motion
@@ -202,6 +222,19 @@ func _settings(menu: VBoxContainer, st: Dictionary) -> void:
 		_build()))
 	if Intents.can_fullscreen():
 		menu.add_child(Ui.button(Words.render("ui.fullscreen"), "fullscreen_toggle", func(): Intents.toggle_fullscreen()))
+	# the server address is for the few who were given one: folded away until asked for
+	menu.add_child(Ui.button(Words.render("ui.hide_advanced") if _show_advanced else Words.render("ui.advanced"),
+		"advanced_toggle", func():
+			_show_advanced = not _show_advanced
+			_build()))
+	if _show_advanced:
+		menu.add_child(Ui.label(Words.render("ui.server_address"), "", "MutedLabel"))
+		var url := LineEdit.new()
+		url.set_meta("id", "server_url")
+		url.text = st.server_url
+		url.text_changed.connect(func(t): Intents.set_server_url(t))
+		menu.add_child(url)
+		menu.add_child(Ui.label(Words.render("ui.advanced_hint"), "advanced_hint", "MutedLabel"))
 
 
 ## The logo, bobbing, over a glow that pulses. Null when the theme has no logo (the title is then plain text).
@@ -225,14 +258,19 @@ func _hero() -> Control:
 		add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 		glow.material = add
 		holder.add_child(glow)
-	var pic := Ui.picture(logo, Vector2.ZERO)
+	# The logo is a Sprite2D under a Node2D, NOT a Control: the engine rounds every Control's position to whole pixels, so a
+	# bobbing Control moves in 1 px steps (it holds a few frames, then jumps). A Node2D's position is not rounded, so the bob
+	# is a true sub-pixel glide. Nothing is laid out or resized while it animates, so the image keeps its exact size.
+	var pic := Node2D.new()
 	holder.add_child(pic)
-	# The pictures are NOT anchored and NOT in a container: the holder's size sets their size once (when it changes), and
-	# the bob moves only `position`. Nothing is laid out and nothing is resized while it animates, so the image keeps its
-	# exact size and does not shimmer.
+	var sprite := Sprite2D.new()
+	sprite.texture = logo
+	pic.add_child(sprite)
 	var fit := func():
-		pic.size = holder.size
-		pic.position = Vector2(0.0, pic.position.y)
+		var ts := logo.get_size()
+		var k := minf(holder.size.x / ts.x, holder.size.y / ts.y) if ts.x > 0.0 and ts.y > 0.0 else 1.0
+		sprite.scale = Vector2(k, k)                                  # as a picture kept to its box without distortion
+		sprite.position = holder.size * 0.5
 		if glow != null:
 			glow.size = holder.size + Vector2(180.0, 100.0)
 			glow.position = Vector2(-90.0, -50.0)
@@ -268,7 +306,7 @@ func _drop_hero() -> void:
 		_hero_node = null
 
 
-func _bob(v: float, pic: Control) -> void:
+func _bob(v: float, pic: Node2D) -> void:
 	pic.position.y = v
 
 

@@ -45,6 +45,20 @@ func resume() -> bool:
 	return Session.resume_if_stored()
 
 
+## Where copied text goes. The real clipboard by default; a test swaps it so it never touches the machine's clipboard.
+var clipboard_set: Callable = func(text: String): DisplayServer.clipboard_set(text)
+const COPY_MAX := 64                      # chosen: a camp code is 4 letters; nothing longer is ever worth copying
+
+
+## Put text (a camp code) on the clipboard. "" when copied, else why not (empty).
+func copy_text(text: String) -> String:
+	var clean := text.strip_edges().left(COPY_MAX)
+	if clean == "":
+		return "empty"
+	clipboard_set.call(clean)
+	return ""
+
+
 func start() -> String:
 	return _done(Session.act("start"))
 

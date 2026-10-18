@@ -99,11 +99,28 @@ func test_settings_shows_the_server_address_and_editing_it_changes_it() -> void:
 	var s := mount(TitleScreen)
 	check(Ui.find(s, "server_url") == null, "hidden at first")
 	press(s, "settings_toggle")
+	check(Ui.find(s, "server_url") == null, "still folded away after opening Settings")
+	check(Ui.find(s, "reduced_motion_toggle") != null, "calm mode is visible without opening Advanced")
+	press(s, "advanced_toggle")
 	var url := Ui.find(s, "server_url") as LineEdit
-	check(url != null, "shown after the toggle")
+	check(url != null, "shown after the Advanced toggle")
+	check("Only change this if you were given an address." in text_of(s, "advanced_hint"), "with its one-line warning")
 	eq(url.text, "ws://test", "current address")
 	url.text_changed.emit("wss://other.example:8470")
 	eq(Session.server_url, "wss://other.example:8470", "applied")
+
+
+func test_settings_has_no_theme_button_and_nothing_a_player_can_tap_swaps_the_look() -> void:
+	Themes.use("flash")
+	var s := mount(TitleScreen)
+	press(s, "settings_toggle")
+	press(s, "advanced_toggle")
+	check(Ui.find(s, "theme_toggle") == null, "no Theme button in Settings")
+	for t in Ui.texts(s):
+		check(not t.begins_with("Theme"), "no control worded as a theme switch: " + t)
+	press(s, "advanced_toggle")
+	eq(Themes.current.id, "flash", "the look is untouched")
+	check(Ui.find(s, "server_url") == null, "Advanced folds away again")
 
 
 func test_a_typo_in_the_address_never_costs_the_stored_seat() -> void:
@@ -111,6 +128,7 @@ func test_a_typo_in_the_address_never_costs_the_stored_seat() -> void:
 	Session.room_code = "ABCD"
 	var s := mount(TitleScreen)
 	press(s, "settings_toggle")
+	press(s, "advanced_toggle")
 	(Ui.find(s, "server_url") as LineEdit).text_changed.emit("not an address")
 	press(s, "create")
 	eq(Session.token, "keep", "seat kept")
@@ -127,7 +145,7 @@ func _to_lobby(is_host: bool) -> void:
 func test_lobby_shows_the_room_code_and_seats_and_lets_the_host_start() -> void:
 	_to_lobby(true)
 	var s := mount(LobbyScreen)
-	eq(text_of(s, "room_code"), "Room ABCD", "code")
+	eq(text_of(s, "room_code"), "ABCD", "the code alone, big")
 	eq(text_of(s, "seats"), "2 of 4 seats taken", "seats")
 	press(s, "start")
 	eq(fake.count("start"), 1, "start sent")

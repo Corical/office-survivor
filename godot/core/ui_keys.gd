@@ -20,6 +20,9 @@ const ALL: Array[String] = [
 	"notice.invalid", "notice.unknown", "notice.generic", "notice.no_server_url", "notice.locked", "notice.in_flight",
 	"notice.camp_unavailable", "notice.room_full", "notice.room_started", "notice.room_gone", "ui.resume_code",
 	"notice.kicked", "ui.kick", "ui.kick_confirm", "ui.seat_n", "ui.seat_here", "ui.seat_dropped", "ui.kick_help",
+	# --- end/lobby/title ---
+	"ui.best_legend", "ui.code_caption", "ui.copied", "ui.bots_fill", "ui.advanced", "ui.hide_advanced",
+	"ui.advanced_hint",
 	# --- reveal/stage ---
 	"ui.reveal_waiting",
 ]
