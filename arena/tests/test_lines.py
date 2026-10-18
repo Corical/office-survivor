@@ -74,6 +74,22 @@ def play_random(seed, humans, events, rules):
         g.tick(now=night * 300 + 7)
 
 
+def play_random_game_keeping_logs(seed):
+    """A finished all-human-plus-bots game with events on, for tests that read its night records."""
+    from engine import Rules
+    rng = random.Random(seed)
+    g = Checking(_official(), MemoryEventStore(), MemoryIdentityStore(), MemoryTextStore(), ALIASES, f"ev-{seed}",
+                 clock=lambda: 0)
+    for i in range(3):
+        g.join(f"h{i}", rng=random.Random(rng.random()))
+    g.gm_add_sims(3, rng=random.Random(seed))
+    g.gm_start(day_seconds=300, news_delay=5, now=0, events="gentle", ranges=True)
+    for night in range(1, g.rules.rounds + 1):
+        g.tick(now=night * 300 + 1)
+        g.tick(now=night * 300 + 7)
+    return g
+
+
 class LinesMatchTorch(unittest.TestCase):
     def test_codes_render_to_torchs_exact_words(self):
         Checking.seen, Checking.mismatches = set(), []
@@ -114,6 +130,35 @@ class LinesMatchTorch(unittest.TestCase):
                 with self.subTest(night=night, ev=ev[0]["type"]):
                     self.assertEqual([render(c) for c in private_codes(ev, me, (4, False), night, 2)],
                                      private_lines(ev, me, (4, False), night, 2))
+
+    def test_event_lines_carry_the_event_id_scope_and_player_beside_the_sentence(self):
+        """Client request 3 (18 Oct 2026): a theme with its own words for an event needs the id; the sentence stays as
+        the fallback. The story variant is not in the engine's log, so it is not sent (see ARENA.md)."""
+        from engine.events import EVENTS
+        ids = {e["id"] for e in EVENTS}
+        seen = {"camp": 0, "player": 0}
+        for seed in range(60):
+            Checking.seen, Checking.mismatches = set(), []
+            g = play_random_game_keeping_logs(seed)
+            for rec in g.store.records:
+                if rec["type"] != "night":
+                    continue
+                public = [e for e in rec["events"] if e["type"] == "event" and e.get("line")]
+                lines = [c for c in news_codes(rec["events"]) if c["code"] == "event"]
+                self.assertEqual(len(lines), len(public), f"seed {seed}: one event line per public event")
+                for line, ev in zip(lines, public):
+                    a = line["args"]
+                    self.assertIn(a["event"], ids)
+                    self.assertEqual(a["event"], ev["event"])
+                    self.assertEqual(a["scope"], ev["scope"])
+                    self.assertEqual(a["line"], ev["line"])
+                    if ev["scope"] == "player":
+                        self.assertEqual(a["who"], ev["player"])
+                    else:
+                        self.assertNotIn("who", a)
+                    seen[ev["scope"]] += 1
+        self.assertGreater(seen["camp"], 0)
+        self.assertGreater(seen["player"], 0)
 
     def test_json_for_the_client_equals_the_table(self):
         with open(JSON_PATH, encoding="utf-8") as f:

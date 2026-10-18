@@ -173,7 +173,7 @@ they are listed in MECHANICS.md section 9.
 |---|---|
 | When the last human locks before the bots, the remaining bots lock in the same instant | A small timing hint; the count still includes bots |
 | Goal wording and goal progress travel as English text (with the goal code) | The engine writes them; a second theme needs codes |
-| Wilderness event stories travel as English text (code `event`) | Same: `engine/events.py` writes them |
+| Wilderness event stories travel as English text (code `event`, arg `line`), with `event` (the id), `scope` (`camp` or `player`) and, for a player event, `who` beside it | `engine/events.py` writes the sentence. The story **variant** is not sent: the engine picks it from the seed each time and does not record it, and recording it would add a field to every stored event, which makes every existing log fail to replay |
 | Log writes fsync on the event loop | Rooms are capped (20 by default) and records are tiny |
 | Leaving the lobby does not free the seat (the join is in the log); the seat stays counted as taken and, once started, is a human who never answers | After the `grace` the round stops waiting for it. Freeing the seat needs a "left before the start" record: not built |
 | One server process per data folder | Two processes on one folder would both write the same rounds; the service manager (systemd) runs one |

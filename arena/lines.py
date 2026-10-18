@@ -68,6 +68,16 @@ def _l(code, **args):
     return {"code": code, "args": args}
 
 
+def _event_line(e):
+    """A wilderness story: the engine's finished sentence, plus the event id, who it hit (or the camp), so a client
+    with its own words for that event can use them and fall back on the sentence. The story variant is not in the
+    engine's log, so it cannot be sent (adding it would change every stored event record and break their replay)."""
+    args = {"line": e["line"], "event": e["event"], "scope": e["scope"]}
+    if e["scope"] == "player":
+        args["who"] = e["player"]
+    return _l("event", **args)
+
+
 def _and(nums):
     """[3] -> '3'; [3, 4] -> '3 and 4'; [3, 4, 5] -> '3, 4 and 5' (Torch's guard span wording)."""
     nums = [str(n) for n in nums]
@@ -87,7 +97,7 @@ def news_codes(events):
     idol = {e["player"] for e in events if e["type"] == "event" and e.get("event") == "idol_used"}
     for e in events:
         if e["type"] == "event" and e.get("line"):
-            wild_lines.append(_l("event", line=e["line"]))
+            wild_lines.append(_event_line(e))
         elif e["type"] == "event" and e.get("event") == "idol_used":
             out.append(_l("news_idol", player=e["player"]))
         elif e["type"] == "steal" and e["target"] in idol and e["outcome"] in ("success", "empty"):
@@ -127,10 +137,10 @@ def private_codes(events, p, before, night=None, guard_nights=2):
             elif e.get("event") == "idol_used":
                 out.append(_l("idol_saved"))
             elif e.get("line"):
-                out.append(_l("event", line=e["line"]))
+                out.append(_event_line(e))
         elif t == "event" and e.get("scope") == "camp" and e.get("line") and any(
                 x["type"] == "ration" and x["player"] == me and x.get("detail") == e["event"] for x in events):
-            out.append(_l("event", line=e["line"]))
+            out.append(_event_line(e))
         elif t == "steal" and e["thief"] == me and e["target"] in idol:
             out.append(_l("idol_blocked", target=e["target"]))
         elif t == "scavenge" and e["player"] == me:
