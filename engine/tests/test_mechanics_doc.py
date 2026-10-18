@@ -10,10 +10,10 @@ code:
     constants         numbers that are typed into the code (gift sizes, delays, limits...)
     seats             seats for every possible player count
     phases            the numbered phases of engine/resolve.py
-    modes, events, variants       wilderness events (bot/game.py EVENT_MODES, engine/events.py)
+    modes, events, variants       wilderness events (bot/core.py EVENT_MODES, engine/events.py)
     bands             engine/visibility.py band edges and labels
     goals             engine/deal.py GOALS and engine/finish.py objective_text wording
-    radio             bot/game.py RADIO_PHRASES
+    radio             bot/core.py RADIO_PHRASES
     ledger            every ration "reason" the engine books, and whether it creates, destroys or moves food
     commands          every slash command in bot/discord_app.py, its options and its description
     reveal-columns, awards        bot/reveal_image.py
@@ -302,14 +302,14 @@ class MechanicsDoc(unittest.TestCase):
     # ------------------------------------------------------------------ section 5: events
     def test_event_modes(self):
         rows = self.table("modes", "event modes (section 5)")
-        code = self.ast_assign("bot/game.py", "EVENT_MODES")
+        code = self.ast_assign("bot/core.py", "EVENT_MODES")
         doc = {cell(r["Mode"]): kwargs(r["Settings"], f"check:modes row {r['Mode']}") for r in rows}
         problems = []
         for mode, settings in code.items():
             if mode not in doc:
                 problems.append(f"EVENT_MODES has mode `{mode}` ({S(settings)}) with no row in check:modes.")
             elif doc[mode] != settings:
-                problems.append(f"Mode `{mode}`: the doc says {S(doc[mode])} but bot/game.py EVENT_MODES has "
+                problems.append(f"Mode `{mode}`: the doc says {S(doc[mode])} but bot/core.py EVENT_MODES has "
                                 f"{S(settings)}. Fix the Settings cell.")
         problems += [f"check:modes lists mode `{m}` that EVENT_MODES does not have." for m in doc if m not in code]
         events_lists = re.findall(r"events=\[(.*?)\]", read("bot/discord_app.py"), re.S)      # not the cast= list beside it
@@ -321,7 +321,7 @@ class MechanicsDoc(unittest.TestCase):
 
     def test_event_library(self):
         rows = self.table("events", "wilderness events (section 5)")
-        gentle = Rules(**self.ast_assign("bot/game.py", "EVENT_MODES")["gentle"])
+        gentle = Rules(**self.ast_assign("bot/core.py", "EVENT_MODES")["gentle"])
         weights = {e["id"]: wild._weight(e, gentle) for e in wild.EVENTS}
         total = sum(weights.values())
         doc = {cell(r["Event"]): r for r in rows}
@@ -426,7 +426,7 @@ class MechanicsDoc(unittest.TestCase):
     # ------------------------------------------------------------------ section 9: what players see
     def test_radio_phrases(self):
         rows = self.table("radio", "radio phrases (section 9)")
-        code = self.ast_assign("bot/game.py", "RADIO_PHRASES")
+        code = self.ast_assign("bot/core.py", "RADIO_PHRASES")
         doc = {cell(r["Key"]): cell(r["Line"]) for r in rows}
         problems = []
         for key, text in code.items():
@@ -533,20 +533,20 @@ class MechanicsDoc(unittest.TestCase):
                                 f"Update the row to the new wording, or delete it if the line is gone.")
         # the other way round: every refusal and every news / DM line typed in the code needs a row
         found = []
-        game_tree = ast.parse(read("bot/game.py"))
-        for node in ast.walk(game_tree):
-            if isinstance(node, ast.FunctionDef) and node.name == "endgame_note":
-                for sub in ast.walk(node):
-                    if isinstance(sub, ast.Return) and sub.value is not None:
-                        found += [(t, "bot/game.py endgame_note") for t in strings_in(sub.value)]
-            if (isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "GameError"
-                    and node.args):
-                found += [(t, "bot/game.py GameError") for t in strings_in(node.args[0])]
-            if isinstance(node, ast.FunctionDef) and node.name in ("news_lines", "private_lines"):
-                for sub in ast.walk(node):
-                    if (isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute)
-                            and sub.func.attr in ("append", "insert") and sub.args):
-                        found += [(t, f"bot/game.py {node.name}") for t in strings_in(sub.args[-1])]
+        for rel in ("bot/game.py", "bot/core.py"):         # Torch's wording, and the game core's refusals
+            for node in ast.walk(ast.parse(read(rel))):
+                if isinstance(node, ast.FunctionDef) and node.name == "endgame_note":
+                    for sub in ast.walk(node):
+                        if isinstance(sub, ast.Return) and sub.value is not None:
+                            found += [(t, f"{rel} endgame_note") for t in strings_in(sub.value)]
+                if (isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "GameError"
+                        and node.args):
+                    found += [(t, f"{rel} GameError") for t in strings_in(node.args[0])]
+                if isinstance(node, ast.FunctionDef) and node.name in ("news_lines", "private_lines"):
+                    for sub in ast.walk(node):
+                        if (isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute)
+                                and sub.func.attr in ("append", "insert") and sub.args):
+                            found += [(t, f"{rel} {node.name}") for t in strings_in(sub.args[-1])]
         for node in ast.walk(ast.parse(read("engine/moves.py"))):
             if isinstance(node, ast.FunctionDef) and node.name == "validate":
                 for sub in ast.walk(node):

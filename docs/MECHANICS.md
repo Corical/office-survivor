@@ -685,11 +685,11 @@ Lines are listed with placeholders in braces. The test checks that the fixed wor
 | Joined | reply | `You're in. Your secret alias is **{alias}**. Tell no one.` | `bot/game.py` |
 | Already in | reply | `You're already in as **{alias}**.` | `bot/game.py` |
 | Closed | reply | `The game has already started; joining is closed.` | `bot/game.py` |
-| Full | reply | `The game is full.` | `bot/game.py` |
-| Not joined | reply | `You haven't joined. Use /join.` | `bot/game.py` |
+| Full | reply | `The game is full.` | `bot/core.py` |
+| Not joined | reply | `You haven't joined. Use /join.` | `bot/core.py` |
 | No round | reply | `There's no round open right now.` | `bot/game.py` |
 | Too late | reply | `Tonight's deadline has passed; wait for the next round.` | `bot/game.py` |
-| Unknown alias | reply | `There's no player called '{alias}'.` | `bot/game.py` |
+| Unknown alias | reply | `There's no player called '{alias}'.` | `bot/core.py` |
 | Move saved | reply | `{label}: you'll {what}. You can change your mind until the deadline.` | `bot/game.py` |
 | Play header | reply | `**{label}**: {alias}, {state}. What will you do tonight?` | `bot/game.py` |
 | Status line | reply | `**{alias}**: 🥫 {n} rations` | `bot/game.py` |
@@ -723,10 +723,10 @@ Lines are listed with placeholders in braces. The test checks that the fixed wor
 | Goal text | reply | `robbed {target} {n}/{goal}` | `engine/finish.py` |
 | Radio posted (one silent post per night, then `- {text}` per message) | #radio | `📻 **On the radio last night** (anonymous)` | `bot/discord_app.py` |
 | Radio sent | reply | `Your anonymous message goes out with the morning news.` | `bot/game.py` |
-| Radio used | reply | `One radio message a day. Yours goes out with the morning news.` | `bot/game.py` |
+| Radio used | reply | `One radio message a day. Yours goes out with the morning news.` | `bot/core.py` |
 | Radio closed | reply | `Radio opens when the game starts.` | `bot/game.py` |
-| Radio: bad line | reply | `Pick one of the radio lines.` | `bot/game.py` |
-| Radio: no subject | reply | `Pick who it's about.` | `bot/game.py` |
+| Radio: bad line | reply | `Pick one of the radio lines.` | `bot/core.py` |
+| Radio: no subject | reply | `Pick who it's about.` | `bot/core.py` |
 | Radio picker | reply | `📻 Pick a line. It goes out anonymously with the morning news.` | `bot/discord_app.py` |
 | Radio already used | reply | `📻 You've already used today's radio message. It goes out with the morning news.` | `bot/discord_app.py` |
 | Board: waiting | #news | `⏳ Waiting for the Game Master to start. /join to play.` | `bot/game.py` |
@@ -862,3 +862,4 @@ Verified on 17 October 2026. Remove an item here when it is fixed.
 | 17 October 2026 | Night DMs explain every ration and say which night a guard covers. Only Torch speaks in #news and #radio (threads shut). |
 | 17 October 2026 | Sims play with the simulator's own AI (beliefs rebuilt from the log on restart), deal a balanced cast by default (`cast` on `/gm pilot` and `/gm add-sims`), and post radio by personality (about 1.7 lines a night for eight). New DM line for a player who exposes their own thief. |
 | 17 October 2026 | A new season avoids the aliases of the newest archived season. |
+| 18 October 2026 | No rule change. The game core (log, replay, moves, quits, radio storage, sims, finish) moved from `bot/game.py` into `bot/core.py` (`GameCore`), so the live Godot rooms can share it; Torch's wording, schedule and outbox stay in `bot/game.py`. Refusals that moved: "The game is full.", "You haven't joined.", unknown alias, and the three radio refusals. Proven unchanged by `bot/tests/test_core_fixtures.py` (five full games, every record and reply byte for byte) and the golden master. |

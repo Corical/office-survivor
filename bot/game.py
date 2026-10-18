@@ -1,39 +1,20 @@
-"""Torch's game service: everything players and the Game Master can do, independent of Discord.
+"""Torch's game service: everything players and the Game Master can do in Discord's words, on top of the game core.
 
-Truth is the event log (EventStore). Who-is-who lives in IdentityStore, radio text in TextStore. The service never
-talks to Discord: anything to send goes into the log as an outbox intent ("post", "dm"), the adapter delivers it and
-reports back with `mark_sent`. On load the log is folded back into state and every stored night is re-resolved from
-its moves and seed; a mismatch stops the bot rather than letting it run on a state it can't reproduce.
+The rules, the log, replay, moves, quits, radio and the sims live in bot/core.py (GameCore), shared with the live
+Godot rooms. This layer adds what is Torch's own: the compressed-day schedule, the wording of every reply, the
+#news / #radio / DM lines, and the outbox. The service never talks to Discord: anything to send goes into the log as an
+outbox intent ("post", "dm"), the adapter delivers it and reports back with `mark_sent`.
 """
-import hashlib
 import logging
-import random
 import time
-from collections import Counter
-from dataclasses import dataclass, fields, replace
+from dataclasses import dataclass
 
-from engine import ENGINE_VERSION, PlayerState, Rules, resolve_night
-from engine import events as wild
+from engine.finish import goal_progress, objective_text
 from engine.visibility import band_label, morning_board
-from engine.deal import deal
-from engine.finish import finish, goal_progress, objective_text
-from engine.moves import can_guard, legal_moves, validate
 
-from . import sims
-from .brain import SimBrain, SimSeat
+from .core import EVENT_MODES, RADIO_PHRASES, GameCore, GameError, night_seed  # noqa: F401 (re-exported)
 
 log = logging.getLogger("torch.game")
-# Radio is fixed phrases so nobody can be recognised by their writing style (owner, 17 Oct 2026).
-RADIO_PHRASES = {
-    "saw": "I saw {a} sneaking around last night.",
-    "trust": "Don't trust {a}.",
-    "lying": "{a} is lying about their rations.",
-    "guarding": "{a} is guarding. Don't waste your night on them.",
-    "easy": "{a} looks like an easy target.",
-    "innocent": "{a} is innocent. Leave them alone.",
-    "watch": "Someone should watch {a}'s back tonight.",
-    "me": "I'm innocent. Leave me alone.",
-}
 
 
 @dataclass
@@ -51,25 +32,6 @@ class Schedule:
 
 
 SAST = __import__("datetime").timezone(__import__("datetime").timedelta(hours=2), "SAST")   # no daylight saving
-
-
-EVENT_MODES = {   # /gm start events:... ; "gentle" = events round 2's kindest design (docs/sim/results/events_sweep2.md)
-    "off": {},
-    "gentle": {"events_per_night": 1.0, "events_bias": "top", "events_rats_relative": True},
-}
-
-
-class _EventCtx:
-    """What engine/events.py needs from a game, for Torch: the active players, rules, night, a seed, and two writers
-    that turn every event and ration change into a record in the night's event list."""
-
-    def __init__(self, players, rules, night, seed, emit):
-        self.players, self.r, self.night, self.seed = players, rules, night, seed
-        self.event_tally = Counter()
-        self.L = emit
-        self.ledger = lambda p, delta, reason, balance, detail="": emit(
-            "ration", player=p.name, delta=delta, reason=reason, balance=balance, detail=detail)
-
 
 FINAL_STRETCH = 3       # the last this-many nights get a countdown (owner, 17 Oct 2026)
 
@@ -94,153 +56,43 @@ def night_label(schedule, night, closed=False):
     return f"Night {night} ({'closed' if closed else 'closes'} {end.strftime('%H:%M')})"
 
 
-def night_seed(season_id, night):
-    return int(hashlib.sha256(f"{season_id}:{night}".encode()).hexdigest()[:16], 16)
+class GameService(GameCore):
+    def __init__(self, rules, store, identity, texts, aliases, season_id, clock=time.time, avoid_aliases=()):
+        self.season_id = season_id            # Torch's seed key: never shown to players
+        super().__init__(rules, store, identity, texts, aliases, season_id, clock=clock, avoid_aliases=avoid_aliases)
 
-
-class GameError(Exception):
-    """A player-facing refusal: the text is safe to show to the player who asked."""
-
-
-class GameService:
-    def __init__(self, rules: Rules, store, identity, texts, aliases, season_id, clock=time.time, avoid_aliases=()):
-        self.rules, self.store, self.identity, self.texts = rules, store, identity, texts
-        self.aliases, self.season_id, self.clock = list(aliases), season_id, clock
-        self.avoid_aliases = set(avoid_aliases)    # last season's aliases: handed out only when nothing else is free
-        self._reset()
-        self._load()
-
-    # ---------------- state from the log ----------------
+    # ---------------- state from the log: Torch's own parts ----------------
     def _reset(self):
-        self.players = {}          # pid -> PlayerState (after start)
-        self.joined = []           # [(pid, alias, sim, personality)] before start
-        self.started = False
-        self.finished = False
+        super()._reset()
         self.schedule = None
-        self.night = 0             # last resolved night
-        self.moves = {}            # pid -> move for night+1
-        self.radio_pending = []    # text refs to post with the next news
-        self.quit_ids = set()
-        self.event_counts = Counter()  # wilderness events so far this game, for the no-repeat story decks
-        self.events_mode, self.ranges = "off", False
-        self.personality = {}      # pid -> personality for sims
-        self.sims = set()
         self.news_posted = set()   # nights whose news intents exist
         self.intents, self.sent = {}, set()
-        self.last_private = {}     # pid -> [lines] from the last resolved night
-        self.brain = None          # the sims' beliefs (bot/brain.py): rebuilt from the log, never saved
 
-    def _load(self):
-        for rec in self.store.load():
-            self._apply(rec, replay=True)
+    def _loaded(self):
         log.info("state rebuilt: started=%s night=%d players=%d pending_outbox=%d", self.started, self.night,
                  len(self.players) or len(self.joined), len(self.pending_outbox()))
 
-    def _append(self, rec):
-        self.store.append(rec)
-        self._apply(rec, replay=False)
-
     def _apply(self, rec, replay):
-        t = rec["type"]
         for intent in rec.get("outbox", []):      # messages ride inside the record that causes them: one write
             self.intents[intent["id"]] = intent
-        if t == "join":
-            self.joined.append((rec["pid"], rec["alias"], rec.get("sim", False), rec.get("personality")))
-            if rec.get("sim"):
-                self.sims.add(rec["pid"])
-                self.personality[rec["pid"]] = rec["personality"]
-        elif t == "start":
-            self.started = True
-            self.schedule = Schedule(rec["start_ts"], rec["day_seconds"], rec["news_delay"])
-            # A game is played and replayed under the rules it STARTED with, never today's: a rule change between
-            # restarts must not rewrite (or refuse to load) a game already in progress. Fields newer than the log
-            # take their defaults, which is what that game ran on.
-            known = {f.name for f in fields(Rules)}
-            self.rules = Rules(**{k: v for k, v in rec.get("rules", {}).items() if k in known}) \
-                if rec.get("rules") else self.rules
-            self.events_mode = rec.get("events", "off")            # older logs have no key: events off
-            self.ranges = rec.get("ranges", False)                  # morning ration ranges in #news
-            self.rules = replace(self.rules, **EVENT_MODES[self.events_mode])
-            for c in rec["roster"]:
-                self.players[c["pid"]] = SimSeat(pid=c["pid"], name=c["alias"], rations=self.rules.start_rations,
-                                                 objective=c["objective"], obj_target=c["target"],
-                                                 arch=self.personality.get(c["pid"], ""))
-            if self.sims:
-                self.brain = SimBrain(self.rules, self.players, night_seed(self.season_id, -2), self.ranges)
-        elif t == "move":
-            if rec["night"] == self.night + 1:
-                self.moves[rec["pid"]] = tuple(rec["move"])
-        elif t == "quit":
-            self.quit_ids.add(rec["pid"])
-            if rec["pid"] in self.players:
-                self.players[rec["pid"]].rations = 0     # owner decision: a quitter's food leaves the game
-            self.moves.pop(rec["pid"], None)
-        elif t == "radio":
-            self.radio_pending.append(rec["ref"])
-        elif t == "night":
-            if replay:
-                self._replay_night(rec)
-            self.night = rec["night"]
-            self.moves = {}
-            self.last_private = {int(k): v for k, v in rec["private"].items()}
-            self.event_counts.update(e["event"] for e in rec["events"] if e["type"] == "event" and "scope" in e)
-        elif t == "news":
+        super()._apply(rec, replay)
+
+    def _on_start(self, rec):
+        self.schedule = Schedule(rec["start_ts"], rec["day_seconds"], rec["news_delay"])
+
+    def _apply_extra(self, rec, replay):
+        t = rec["type"]
+        if t == "news":
             self.news_posted.add(rec["night"])
             self.radio_pending = []
         elif t == "sent":
             self.sent.add(rec["id"])
-        elif t == "finish":
-            if replay:
-                self._run_finish(check=rec["events"])
-            self.finished = True
 
-    def _replay_night(self, rec):
-        events = self._resolve(rec["night"], {int(k): tuple(v) for k, v in rec["moves"].items()})
-        if events != rec["events"]:
-            raise RuntimeError(f"night {rec['night']} does not replay: the log and the engine disagree")
+    def _private_for(self, events, p, before, night):
+        return private_lines(events, p, before, night, self.rules.guard_nights)
 
-    def _active(self):
-        return [p for pid, p in sorted(self.players.items()) if pid not in self.quit_ids]
-
-    def _resolve(self, night, moves):
-        events = []
-        emit = lambda _t, **f: events.append({"type": _t, **f})    # noqa: E731
-        flags = frozenset()
-        if self.rules.events_per_night > 0:      # wilderness events first, from their own dice (engine/events.py)
-            ctx = _EventCtx(self._active(), self.rules, night, self.season_id, emit)
-            if self.brain:
-                ctx.public_delta = self.brain.public_delta     # public event finds and losses reach the sims' beliefs
-            ctx.event_tally.update(self.event_counts)          # earlier nights count, so story decks don't restart
-            flags, lines = wild.run_night_events(ctx, wild.rng_for(self.season_id, night))
-            public = [e for e in events if e["type"] == "event" and e["visibility"] == "public"]
-            for e, line in zip(public, lines):   # each public event wrote one #news line, in the same order
-                e["line"] = line
-        res = resolve_night(self._active(), moves, self.rules, random.Random(night_seed(self.season_id, night)), night,
-                            emit=emit, flags=flags, obs=self.brain.observer if self.brain else None)
-        if self.brain:       # live and replayed nights both pass here exactly once: that is how a restart rebuilds it
-            self.brain.end_night(night, res)
-        return events
-
-    def _run_finish(self, check=None):
-        events = []
-        finish(list(self.players.values()), self.rules, random.Random(night_seed(self.season_id, 0)),
-               emit=lambda _t, **f: events.append({"type": _t, **f}), quit_ids=frozenset(self.quit_ids))
-        if check is not None and events != check:
-            raise RuntimeError("the final scoring does not replay")
-        return events
-
-    # ---------------- helpers ----------------
-    def _who(self, user_key):
-        ident = self.identity.get(user_key)
-        if not ident:
-            raise GameError("You haven't joined. Use /join.")
-        return ident["pid"], ident["alias"]
-
-    def _pid_by_alias(self, alias):
-        for pid, p in self.players.items():
-            if p.name.lower() == (alias or "").strip().lower():
-                return pid
-        raise GameError(f"There's no player called '{alias}'.")
+    def _quit_extra(self, alias):
+        return {"outbox": self._intents(("news", f"{alias} has left the game. Their food goes with them.", None))}
 
     def _intents(self, *msgs):
         """Outbox intents for (to, text, ref) tuples, numbered after those already known."""
@@ -248,30 +100,13 @@ class GameService:
         return [{"id": f"o{n + i + 1}", "to": to, **({"text": text} if text else {}), **({"ref": ref} if ref else {})}
                 for i, (to, text, ref) in enumerate(msgs)]
 
-    def alias_list(self, user_key=None):
-        """Aliases still in the game, alphabetical (never join order: that would hint at who is who), without the
-        asking player's own alias: you can't target yourself, so you shouldn't be offered."""
-        me = (self.identity.get(user_key) or {}).get("pid") if user_key else None
-        return sorted(p.name for pid, p in self.players.items() if pid not in self.quit_ids and pid != me)
-
     # ---------------- player commands ----------------
     def join(self, user_key, sim=False, rng=None, personality=None):
         if self.started:
             raise GameError("The game has already started; joining is closed.")
         if self.identity.get(user_key):
             return f"You're already in as **{self.identity.get(user_key)['alias']}**."
-        taken = {a for _, a, _, _ in self.joined}
-        free = [a for a in self.aliases if a not in taken]
-        free = [a for a in free if a not in self.avoid_aliases] or free      # a fresh name if there is one
-        if not free:
-            raise GameError("The game is full.")
-        rng = rng or random.Random()
-        alias = rng.choice(free)
-        pid = len(self.joined)
-        personality = (personality or sims.pick_personality(rng)) if sim else None
-        self.identity.put(user_key, pid, alias, sim=sim)
-        self._append({"type": "join", "pid": pid, "alias": alias, "sim": sim, **({"personality": personality} if sim else {})})
-        log.info("join pid=%d sim=%s", pid, sim)
+        alias = self.add_player(user_key, sim=sim, rng=rng, personality=personality)
         return (f"You're in. Your secret alias is **{alias}**. Tell no one.")
 
     def submit(self, user_key, kind, target_alias=None, amount=0, at=None):
@@ -282,13 +117,7 @@ class GameService:
         at = self.clock() if at is None else at
         if at >= self.schedule.deadline(night):
             raise GameError("Tonight's deadline has passed; wait for the next round.")
-        target = self._pid_by_alias(target_alias) if target_alias else None
-        move = (kind, target, int(amount or 0), False)
-        why = validate(self._active(), pid, move, self.rules, night, frozenset(self.quit_ids))
-        if why:
-            raise GameError(why)
-        self._append({"type": "move", "night": night, "pid": pid, "move": list(move), "at": at})
-        log.info("move night=%d pid=%d kind=%s", night, pid, kind)
+        self.record_move(pid, kind, target_alias, amount, at)
         what = {"scavenge": "🥫 scavenge", "guard": "🛡️ guard", "steal": f"🥷 steal from {target_alias}",
                 "investigate": f"🔍 investigate {target_alias}", "gift": f"🎁 give {target_alias} {amount}"}[kind]
         note = endgame_note(night, self.rules.rounds)
@@ -305,15 +134,12 @@ class GameService:
             raise GameError("You're not in this game.")
         night = self.night + 1
         p = self.players[pid]
-        legal = legal_moves(self._active(), pid, self.rules, night, frozenset(self.quit_ids))
-        amounts = legal.pop("gift_amounts", [])
-        moves = {k: sorted(self.players[t].name for t in v) for k, v in legal.items()}
+        moves, amounts = self.legal_for(pid)
         state = "🏴‍☠️ bandit" if p.bandit else f"🥫 {p.rations} rations"
-        radio_free = not any(r.startswith(f"r{night}-{pid}-") for r in self.radio_pending)
         note = endgame_note(night, self.rules.rounds)
         return {"header": f"**{night_label(self.schedule, night)}**: {alias}, {state}. What will you do tonight?"
                           + (f"\n{note}" if note else ""),
-                "moves": moves, "gift_amounts": amounts, "radio": radio_free}
+                "moves": moves, "gift_amounts": amounts, "radio": not self.radio_used(pid, night)}
 
     def board(self):
         """(key, text) for the live status board in #news, or None before anyone has joined. Public facts only.
@@ -349,36 +175,12 @@ class GameService:
         if not self.started or self.finished:
             raise GameError("Radio opens when the game starts.")
         pid, _ = self._who(user_key)
-        used = any(r.startswith(f"r{self.night + 1}-{pid}-") for r in self.radio_pending)
         return {"lines": [(k, t.replace("{a}", "…")) for k, t in RADIO_PHRASES.items()],
-                "about": self.alias_list(user_key), "available": not used}
-
-    @staticmethod
-    def radio_needs_player(phrase):
-        return "{a}" in RADIO_PHRASES.get(phrase, "")
+                "about": self.alias_list(user_key), "available": not self.radio_used(pid)}
 
     def radio(self, user_key, phrase, about=None):
-        pid, _ = self._who(user_key)
-        if not self.started or self.finished:
-            raise GameError("Radio opens when the game starts.")
-        if phrase not in RADIO_PHRASES:
-            raise GameError("Pick one of the radio lines.")
-        needs_player = "{a}" in RADIO_PHRASES[phrase]
-        if needs_player and not about:
-            raise GameError("Pick who it's about.")
-        about_pid = self._pid_by_alias(about) if needs_player else None
-        if any(r.startswith(f"r{self.night + 1}-{pid}-") for r in self.radio_pending):
-            raise GameError("One radio message a day. Yours goes out with the morning news.")
-        self._post_radio(pid, phrase, about_pid)
+        self.record_radio(user_key, phrase, about)
         return "Your anonymous message goes out with the morning news."
-
-    def _post_radio(self, pid, phrase, about_pid):
-        """The one way a radio line reaches #radio, for players and sims alike: text to the text store, a record in the
-        log, posted with the next morning news."""
-        text = RADIO_PHRASES[phrase].format(a=self.players[about_pid].name if about_pid is not None else "")
-        ref = f"r{self.night + 1}-{pid}-{len(self.radio_pending)}"
-        self.texts.put(ref, text)
-        self._append({"type": "radio", "ref": ref, "night": self.night + 1})
 
     def status(self, user_key):
         pid, alias = self._who(user_key)
@@ -407,26 +209,11 @@ class GameService:
         return "\n".join(lines) if lines else "Nothing to report yet."
 
     def quit(self, user_key):
-        pid, alias = self._who(user_key)
-        if pid in self.quit_ids:
+        if not self.leave(user_key):
             return "You've already left."
-        self._append({"type": "quit", "pid": pid, "night": self.night + 1,
-                      "outbox": self._intents(("news", f"{alias} has left the game. Their food goes with them.", None))})
         return "You've left the game. Thanks for playing."
 
     # ---------------- Game Master ----------------
-    def gm_add_sims(self, n, rng=None, cast="balanced"):
-        """Add n sims. cast "balanced": one of each of the eight personalities before any repeats (continuing the cycle
-        across batches); "office": each drawn from the simulator's office mix (a saint is only 8%)."""
-        if cast not in sims.CASTS:
-            raise ValueError(f"cast must be one of {sims.CASTS}, not {cast!r}")
-        rng = rng or random.Random()
-        out = []
-        for _ in range(n):
-            pick = sims.balanced_pick(rng, self.personality.values()) if cast == "balanced" else None
-            out.append(self.join(f"sim:{len(self.joined)}", sim=True, rng=rng, personality=pick))
-        return out
-
     def gm_start(self, day_seconds, news_delay=5.0, now=None, events="off", ranges=False):
         if events not in EVENT_MODES:
             raise GameError(f"events must be one of: {', '.join(EVENT_MODES)}.")
@@ -435,30 +222,23 @@ class GameService:
         if len(self.joined) < 2:
             raise GameError("Need at least 2 players.")
         now = self.clock() if now is None else now
-        hand = deal([pid for pid, _, _, _ in self.joined], random.Random(night_seed(self.season_id, -1)))
-        roster = [{"pid": pid, "alias": alias, "objective": hand[pid][0], "target": hand[pid][1]}
-                  for pid, alias, _, _ in self.joined]
-        msgs = [("news", f"🔥 The game has begun: {len(roster)} survivors, {self.rules.rounds} rounds. "
-                         f"Check /status for your secret goal. Choose a move before each deadline.", None)]
-        msgs += [(f"dm:{c['pid']}", "🔥 The game has begun. Use /status any time to see your rations and your "
-                                    "secret goal.", None) for c in roster if c["pid"] not in self.sims]
-        if events != "off":
-            msgs[0] = ("news", msgs[0][1] + " 🌴 Wilderness events are on: luck, good and bad, can strike anyone.", None)
-        if ranges:
-            msgs[0] = ("news", msgs[0][1] + " 📊 Every morning #news shows everyone's ration range "
-                               "(🟢 7+ · 🟡 3-6 · 🔴 1-2 · 🏴‍☠️ bandit), never the exact count.", None)
-        self._append({"type": "start", "start_ts": now, "day_seconds": day_seconds, "news_delay": news_delay,
-                      "events": events, "ranges": bool(ranges),
-                      "roster": roster, "engine_version": ENGINE_VERSION, "season": self.season_id,
-                      "rules": {**vars(self.rules), "players": len(roster)}, "outbox": self._intents(*msgs)})
-        log.info("game started: %d players, day=%ss", len(roster), day_seconds)
 
-    def gm_who_moved(self):
-        """Who has chosen tonight (never anyone's rations)."""
-        done = [p.name for pid, p in sorted(self.players.items()) if pid in self.moves and pid not in self.sims]
-        waiting = [p.name for pid, p in sorted(self.players.items())
-                   if pid not in self.moves and pid not in self.sims and pid not in self.quit_ids]
-        return done, waiting
+        def extra(roster):
+            msgs = [("news", f"🔥 The game has begun: {len(roster)} survivors, {self.rules.rounds} rounds. "
+                             f"Check /status for your secret goal. Choose a move before each deadline.", None)]
+            msgs += [(f"dm:{c['pid']}", "🔥 The game has begun. Use /status any time to see your rations and your "
+                                        "secret goal.", None) for c in roster if c["pid"] not in self.sims]
+            if events != "off":
+                msgs[0] = ("news", msgs[0][1] + " 🌴 Wilderness events are on: luck, good and bad, can strike anyone.",
+                           None)
+            if ranges:
+                msgs[0] = ("news", msgs[0][1] + " 📊 Every morning #news shows everyone's ration range "
+                                   "(🟢 7+ · 🟡 3-6 · 🔴 1-2 · 🏴‍☠️ bandit), never the exact count.", None)
+            return {"start_ts": now, "day_seconds": day_seconds, "news_delay": news_delay, "season": self.season_id,
+                    "outbox": self._intents(*msgs)}
+
+        roster = self.start_game(events=events, ranges=ranges, extra=extra)
+        log.info("game started: %d players, day=%ss", len(roster), day_seconds)
 
     # ---------------- the clock ----------------
     def tick(self, now=None):
@@ -473,42 +253,6 @@ class GameService:
             self._post_news(self.night)
         if self.night == self.rules.rounds and self.night in self.news_posted and not self.finished:
             self._finish_game()
-
-    def _sim_radio(self, night):
-        """The sims' radio for day `night`, decided at the deadline from what each knew then, so it goes out with this
-        morning's news like any player's. Its own dice (season and night), so it never moves a sim's choice. Safe to
-        run again after a crash: every sim is decided again identically and one that already has a line today is skipped."""
-        rng = random.Random(night_seed(self.season_id, night) ^ 0x7AD10)
-        quit_ids = frozenset(self.quit_ids)
-        for p in self._active():
-            if p.pid not in self.sims:
-                continue
-            pick = self.brain.radio(p, night, rng, quit_ids)
-            if pick and not any(r.startswith(f"r{night}-{p.pid}-") for r in self.radio_pending):
-                self._post_radio(p.pid, pick[0], pick[1])
-
-    def _resolve_due(self, night):
-        rng = random.Random(night_seed(self.season_id, night) ^ 0x51A5)
-        active = self._active()
-        moves = {}
-        for p in active:
-            m = self.moves.get(p.pid)
-            if m is not None and validate(active, p.pid, m, self.rules, night, frozenset(self.quit_ids)) is None:
-                moves[p.pid] = m
-            elif p.pid in self.sims:
-                moves[p.pid] = self.brain.decide(p, active, night, rng, self.quit_ids)
-            else:
-                moves[p.pid] = ("scavenge", None, 0, True)      # missed the deadline (or the move went stale)
-        if self.brain:
-            self._sim_radio(night)          # before the night record: a crash between the two is repaired on the retry
-        before = {pid: (p.rations, p.bandit) for pid, p in self.players.items()}
-        events = self._resolve(night, moves)
-        private = {pid: private_lines(events, self.players[pid], before[pid], night, self.rules.guard_nights)
-                   for pid in moves if pid not in self.sims}
-        self._append({"type": "night", "night": night, "seed": night_seed(self.season_id, night),
-                      "moves": {str(k): list(v) for k, v in moves.items()}, "events": events,
-                      "private": {str(k): v for k, v in private.items()}})
-        log.info("night %d resolved: %d moves, %d events", night, len(moves), len(events))
 
     def _post_news(self, night):
         rec = self._night_record(night)
