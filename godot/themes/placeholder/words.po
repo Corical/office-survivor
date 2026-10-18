@@ -324,6 +324,9 @@ msgstr "something"
 msgid "move.unknown.help"
 msgstr "No description."
 
+msgid "notice.camp_unavailable"
+msgstr "That camp filled up or closed first. Here is the fresh list."
+
 msgid "notice.flapping"
 msgstr "The connection keeps dropping. Another device may have your seat."
 
@@ -399,6 +402,27 @@ msgstr "Arena"
 msgid "ui.back_to_title"
 msgstr "Back to title"
 
+msgid "ui.camp_days_ago"
+msgstr "{n} d ago"
+
+msgid "ui.camp_hours_ago"
+msgstr "{n} h ago"
+
+msgid "ui.camp_just_now"
+msgstr "just now"
+
+msgid "ui.camp_min_ago"
+msgstr "{n} min ago"
+
+msgid "ui.camp_name_hint"
+msgstr "Camp name (optional)"
+
+msgid "ui.camp_seats"
+msgstr "{taken} of {total}"
+
+msgid "ui.cancel"
+msgstr "Cancel"
+
 msgid "ui.close"
 msgstr "Close"
 
@@ -408,8 +432,14 @@ msgstr "Continue"
 msgid "ui.copy"
 msgstr "Copy"
 
+msgid "ui.create_go"
+msgstr "Create"
+
 msgid "ui.create_room"
 msgstr "Create room"
+
+msgid "ui.create_sheet_title"
+msgstr "New camp"
 
 msgid "ui.enter_code"
 msgstr "Room code"
@@ -465,6 +495,9 @@ msgstr "Can't reach the server"
 msgid "ui.new_game"
 msgstr "New game"
 
+msgid "ui.no_open_camps"
+msgstr "No open camps. Create one."
+
 msgid "ui.nothing_to_show"
 msgstr "Nothing yet."
 
@@ -474,6 +507,9 @@ msgstr "Off"
 msgid "ui.on"
 msgstr "On"
 
+msgid "ui.open_camps"
+msgstr "Open camps"
+
 msgid "ui.pick_a_move"
 msgstr "Pick a move"
 
@@ -482,6 +518,18 @@ msgstr "Pick a target"
 
 msgid "ui.pick_an_amount"
 msgstr "Pick an amount"
+
+msgid "ui.private"
+msgstr "Private"
+
+msgid "ui.private_help"
+msgstr "Not listed. Only people you give the code to can join."
+
+msgid "ui.public"
+msgstr "Public"
+
+msgid "ui.public_help"
+msgstr "Anyone who opens the app can see this camp and join it."
 
 msgid "ui.radio"
 msgstr "Radio"
