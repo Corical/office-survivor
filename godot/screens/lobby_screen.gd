@@ -89,7 +89,7 @@ func _copy_row(text: String) -> Control:
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	var b := Ui.button(Words.render("ui.copy"), "copy_code", func(): _on_copy(text))
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	b.custom_minimum_size = Vector2(180, 56)
+	b.custom_minimum_size = Vector2(180, Ui.MIN_ART_BUTTON_HEIGHT)          # a wood button is never shorter than its art's edges
 	_copy_button = b
 	row.add_child(b)
 	return row

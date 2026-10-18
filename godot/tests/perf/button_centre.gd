@@ -12,10 +12,11 @@ const SAMPLE := "HHHH"              # capitals: the body of any word sits betwee
 const TOLERANCE_PX := 1.0
 
 ## name, theme variation, height the screens give it, kind: "wood_dark_text" | "wood_light_text" | "flat"
-## Heights: Ui.button gives 72 to a PrimaryButton and 56 to everything else; the pill is its own padding (15 px text + 6 + 6).
+## Heights: Ui.button gives 72 to a PrimaryButton and Ui.MIN_ART_BUTTON_HEIGHT (64) to every other wood button; the chosen
+## pick is flat (56); the pill is its own padding (15 px text + 6 + 6).
 const CASES := [
 	["Create / Continue / Start / Back / sheet Create", "PrimaryButton", 72, "wood_dark_text"],
-	["Settings / Join / Cancel / Leave / Copy / Advanced / sheet Public-Private", "Button", 56, "wood_light_text"],
+	["Settings / Join / Cancel / Leave / Copy / Advanced / sheet Public-Private", "Button", 64, "wood_light_text"],
 	["Chosen (picked amount / sheet choice)", "ChosenButton", 56, "flat"],
 	["Skip pill", "SkipPill", 44, "flat"],
 ]
@@ -56,7 +57,131 @@ func _ready() -> void:
 	for c in cases:
 		_measure(img, c[0], c[1], c[2], c[3])
 	print("CENTRE DONE: %d off by more than %.1f px" % [_failed, TOLERANCE_PX])
+	await _studs(bg)
 	get_tree().quit(1 if _failed > 0 else 0)
+
+
+## The brass studs at the two ends of a wood button must be ROUND. Renders each wood variation at 2x (the control scaled 2x,
+## so the art is drawn at twice the pixels), cuts out each end's stud (the pixels that differ strongly from the wood around
+## them, in a window beside the end cap) and prints its width / height; FAILS outside STUD_RATIO_MIN..STUD_RATIO_MAX.
+const STUD_DARK := 55.0                              # brightness below which a pixel belongs to the stud's dark ring
+const STUD_W := 160
+const STUD_RATIO_MIN := 0.8
+const STUD_RATIO_MAX := 1.25
+const STUD_CASES := [["PrimaryButton", 72], ["Button", 64], ["Button", 72]]       # the heights the screens give wood buttons
+
+
+func _studs(bg: Control) -> void:
+	for c in get_children():
+		if c != bg:
+			remove_child(c)
+			c.queue_free()
+	var y := 6
+	var cases: Array = []
+	for c in STUD_CASES:
+		for pressed in [false, true]:
+			var b := Button.new()
+			b.text = ""
+			b.theme_type_variation = c[0]
+			b.toggle_mode = true
+			b.button_pressed = pressed
+			b.size = Vector2(STUD_W, c[1])
+			b.scale = Vector2(2, 2)
+			b.position = Vector2(20, y)
+			b.focus_mode = Control.FOCUS_NONE
+			add_child(b)
+			cases.append([c[0], int(c[1]), pressed, Rect2i(20, y, STUD_W * 2, int(c[1]) * 2)])
+			y += int(c[1]) * 2 + 6
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	var img := get_viewport().get_texture().get_image()
+	img.save_png("user://button_studs_2x.png")
+	for k in cases:
+		for end in ["left", "right"]:
+			_stud(img, k, end)
+	print("STUDS DONE: %d off" % [_failed])
+
+
+func _stud(img: Image, k: Array, end: String) -> void:
+	var r: Rect2i = k[3]
+	# Where the stud sits (measured on the art): about 12.5 px in from the end and 25 px down, in the top edge of the art, at
+	# every height. The window (logical px 4..22 across, 14..36 down, doubled) holds the stud and some plain wood, never the
+	# cap's outline.
+	var win_w := 47
+	var x0 := r.position.x + 11 if end == "left" else r.end.x - 11 - win_w
+	var y0 := r.position.y + 24
+	var y1 := r.position.y + 100                          # the pressed stud sits about 12 px (2x) lower
+	var lums: Array = []
+	for yy in range(y0, y1):
+		for xx in range(x0, x0 + win_w):
+			lums.append(_lum(img.get_pixel(xx, yy)))
+	var sorted := lums.duplicate()
+	sorted.sort()
+	var median: float = sorted[sorted.size() / 2]
+	# the stud is the biggest connected blob of pixels that differ strongly from the wood around it (scattered grain and
+	# gradient pixels are other, smaller blobs)
+	var win_h := y1 - y0
+	var mask := PackedByteArray()
+	mask.resize(win_w * win_h)
+	for i in lums.size():
+		mask[i] = 1 if lums[i] < STUD_DARK else 0           # the stud's dark ring (the same in every tint and state)
+	var minx := 0
+	var maxx := -1
+	var miny := 0
+	var maxy := -1
+	var count := 0
+	var seen := PackedByteArray()
+	seen.resize(win_w * win_h)
+	for start in mask.size():
+		if mask[start] == 0 or seen[start] == 1:
+			continue
+		var stack: Array = [start]
+		seen[start] = 1
+		var n := 0
+		var bx0 := win_w
+		var bx1 := -1
+		var by0 := win_h
+		var by1 := -1
+		while not stack.is_empty():
+			var p: int = stack.pop_back()
+			var px := p % win_w
+			var py := p / win_w
+			n += 1
+			bx0 = mini(bx0, px)
+			bx1 = maxi(bx1, px)
+			by0 = mini(by0, py)
+			by1 = maxi(by1, py)
+			for dy in [-1, 0, 1]:
+				for dx in [-1, 0, 1]:
+					var qx: int = px + dx
+					var qy: int = py + dy
+					if qx < 0 or qy < 0 or qx >= win_w or qy >= win_h:
+						continue
+					var q := qy * win_w + qx
+					if mask[q] == 1 and seen[q] == 0:
+						seen[q] = 1
+						stack.append(q)
+		# a blob touching the window's edge is the cap's outline, a seam or the rim highlight, not a stud sitting in plain wood
+		var touches := bx0 == 0 or bx1 == win_w - 1 or by0 == 0 or by1 == win_h - 1
+		if n > count and not touches and n >= 40:
+			count = n
+			minx = bx0
+			maxx = bx1
+			miny = by0
+			maxy = by1
+	var name := "%s %d px %s %s stud" % [k[0], k[1], "pressed" if k[2] else "normal", end]
+	if count < 12:
+		_failed += 1
+		print("STUD FAIL %s: not found (%d pixels differ from the wood)" % [name, count])
+		return
+	var w := float(maxx - minx + 1)
+	var h := float(maxy - miny + 1)
+	var ratio := w / h
+	var bad := ratio < STUD_RATIO_MIN or ratio > STUD_RATIO_MAX
+	if bad:
+		_failed += 1
+	print("STUD %s%s: %dx%d px at 2x, width/height %.2f (%d px)" % ["FAIL " if bad else "", name, int(w), int(h), ratio, count])
 
 
 func _lum(p: Color) -> float:
