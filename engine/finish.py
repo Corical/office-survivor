@@ -1,52 +1,101 @@
 """End of game: helicopter seats, secret goals, points and the winner. Pure; randomness only for coin-flip ties."""
 
 
+# The wording of each goal and of each line of goal progress, as templates ({name} is filled from the line's args).
+# One table serves Torch's /status (rendered here, in English) and the live rooms (the code and values go to the client,
+# which words them in its own theme). arena/tests and engine/tests/test_goal_codes.py hold the English to a frozen copy
+# of what these lines said before they became templates.
+GOAL_LINES = {
+    "goal_give": "give away {n} rations over the game",
+    "goal_beat": "finish with more rations than {target}",
+    "goal_robbed2_extract": "get robbed at least {n}x and still extract",
+    "goal_steal3_clean": "steal 3 times before you're ever caught",
+    "goal_detective": "expose a thief red-handed with /investigate at least once",
+    "goal_grudge_deny": "make sure {target} doesn't extract",
+    "goal_grudge_rob": "successfully rob {target} at least {n}x",
+}
+PROGRESS_LINES = {
+    "progress_target_left": "your target left the game, so this goal no longer counts",
+    "progress_clean_done": "3/3 clean steals before you were ever caught",
+    "progress_clean_failed": "you were caught before your 3rd clean steal ({have}/3)",
+    "progress_clean_open": "{have}/3 clean steals, never caught so far",
+    "progress_give": "{have}/{need} given",
+    "progress_detective_done": "thief exposed",
+    "progress_detective_open": "0/1 thieves exposed",
+    "progress_robbed_end": "robbed {have}/{need} ✓. Now hold a seat on the helicopter",
+    "progress_robbed_open": "robbed {have}/{need} so far, and you'll need a seat at the end",
+    "progress_beat": "decided at the end: you have {rations}, {target}'s stash is secret.",
+    "progress_beat_band": "decided at the end: you have {rations}, {target}'s stash is secret. They look {band} this morning.",
+    "progress_grudge_deny": "decided at the end: who gets a seat is only known when the helicopter comes",
+    "progress_grudge_rob": "robbed {target} {have}/{need}",
+}
+
+
+def render_line(code, args):
+    """A goal or progress line in English from its code and values."""
+    return {**GOAL_LINES, **PROGRESS_LINES}[code].format(**args)
+
+
+def goal_line(o, rules, target_name="@player"):
+    """(code, args) for a goal's wording: what the player's secret goal says."""
+    if o == "give":
+        return "goal_give", {"n": rules.give_goal}
+    if o == "beat":
+        return "goal_beat", {"target": target_name}
+    if o == "robbed2_extract":
+        return "goal_robbed2_extract", {"n": rules.robbed_goal}
+    if o == "steal3_clean":
+        return "goal_steal3_clean", {}
+    if o == "detective":
+        return "goal_detective", {}
+    if rules.grudge_goal == "deny":                  # o == "grudge"
+        return "goal_grudge_deny", {"target": target_name}
+    return "goal_grudge_rob", {"target": target_name, "n": rules.grudge_robs}
+
+
 def objective_text(o, rules, target_name="@player"):
-    return {
-        "give": f"give away {rules.give_goal} rations over the game",
-        "beat": f"finish with more rations than {target_name}",
-        "robbed2_extract": f"get robbed at least {rules.robbed_goal}x and still extract",
-        "steal3_clean": "steal 3 times before you're ever caught",
-        "detective": "expose a thief red-handed with /investigate at least once",
-        "grudge": (f"make sure {target_name} doesn't extract" if rules.grudge_goal == "deny"
-                   else f"successfully rob {target_name} at least {rules.grudge_robs}x"),
-    }[o]
+    return render_line(*goal_line(o, rules, target_name))
 
 
-def goal_progress(p, players, rules, quit_ids=frozenset(), target_band=None):
-    """(state, text) for /status mid-game: state is 'done' (can no longer be lost), 'failed' (can no longer be met),
-    'open' or 'end' (only the reveal can tell). Uses the same counters `finish` scores with, and only facts the
+def goal_progress_line(p, players, rules, quit_ids=frozenset(), target_band=None):
+    """(state, code, args) for a goal's progress: state is 'done' (can no longer be lost), 'failed' (can no longer be
+    met), 'open' or 'end' (only the reveal can tell). Uses the same counters `finish` scores with, and only facts the
     player may know: never another player's exact rations (`target_band` is passed only when ranges are public)."""
     r, o = rules, p.objective
     P = {q.pid: q for q in players}
     if o in ("beat", "grudge") and p.obj_target in quit_ids:
-        return "failed", "your target left the game, so this goal no longer counts"
+        return "failed", "progress_target_left", {}
     if o == "steal3_clean":                      # owner, 17 Oct 2026: 3 clean steals before a catch locks it in
         if p.clean_steals >= 3:
-            return "done", "3/3 clean steals before you were ever caught"
+            return "done", "progress_clean_done", {}
         if p.steals_caught:
-            return "failed", f"you were caught before your 3rd clean steal ({p.clean_steals}/3)"
-        return "open", f"{p.clean_steals}/3 clean steals, never caught so far"
+            return "failed", "progress_clean_failed", {"have": p.clean_steals}
+        return "open", "progress_clean_open", {"have": p.clean_steals}
     if o == "give":
-        return ("done", f"{p.gifted_out}/{r.give_goal} given") if p.gifted_out >= r.give_goal \
-            else ("open", f"{p.gifted_out}/{r.give_goal} given")
+        return ("done" if p.gifted_out >= r.give_goal else "open"), "progress_give", \
+            {"have": p.gifted_out, "need": r.give_goal}
     if o == "detective":
-        n = getattr(p, "exposures", 0)
-        return ("done", "thief exposed") if n >= 1 else ("open", "0/1 thieves exposed")
+        return ("done", "progress_detective_done", {}) if getattr(p, "exposures", 0) >= 1 \
+            else ("open", "progress_detective_open", {})
     if o == "robbed2_extract":
-        if p.times_robbed >= r.robbed_goal:
-            return "end", f"robbed {p.times_robbed}/{r.robbed_goal} ✓. Now hold a seat on the helicopter"
-        return "open", f"robbed {p.times_robbed}/{r.robbed_goal} so far, and you'll need a seat at the end"
+        args = {"have": p.times_robbed, "need": r.robbed_goal}
+        return ("end", "progress_robbed_end", args) if p.times_robbed >= r.robbed_goal \
+            else ("open", "progress_robbed_open", args)
     if o == "beat":
-        tgt = P[p.obj_target].name
-        seen = f" They look {target_band} this morning." if target_band else ""
-        return "end", f"decided at the end: you have {p.rations}, {tgt}'s stash is secret.{seen}"
+        args = {"rations": p.rations, "target": P[p.obj_target].name}
+        if target_band:
+            return "end", "progress_beat_band", {**args, "band": target_band}
+        return "end", "progress_beat", args
     if r.grudge_goal == "deny":
-        return "end", f"decided at the end: who gets a seat is only known when the helicopter comes"
-    tgt = P[p.obj_target].name
-    if p.grudge_hits >= r.grudge_robs:
-        return "done", f"robbed {tgt} {p.grudge_hits}/{r.grudge_robs}"
-    return "open", f"robbed {tgt} {p.grudge_hits}/{r.grudge_robs}"
+        return "end", "progress_grudge_deny", {}
+    return ("done" if p.grudge_hits >= r.grudge_robs else "open"), "progress_grudge_rob", \
+        {"target": P[p.obj_target].name, "have": p.grudge_hits, "need": r.grudge_robs}
+
+
+def goal_progress(p, players, rules, quit_ids=frozenset(), target_band=None):
+    """(state, text) for /status mid-game: goal_progress_line, in English."""
+    state, code, args = goal_progress_line(p, players, rules, quit_ids, target_band)
+    return state, render_line(code, args)
 
 
 def finish(players, rules, rng, emit=lambda _type, **f: None, quit_ids=frozenset()):
