@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 - Build 32.0.101.7092 - Compatibility - Using Device: Intel - Intel(R) Iris(R) Xe Graphics
+
+2026-10-18T13:41:53.322 INFO [log] start build=0.1.0-foundation debug=true os=Windows path=user://client.log
+2026-10-18T13:41:53.641 INFO [themes] use id=flash
+2026-10-18T13:41:53.681 INFO [themes] use id=flash
+SHIMMER linear: mean step difference 0.310, worst step 1.328
+SHIMMER linear + mipmaps: mean step difference 0.260, worst step 1.036
+SHIMMER DONE

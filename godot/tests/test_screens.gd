@@ -475,6 +475,33 @@ func test_the_overlay_is_quiet_when_all_is_well_and_speaks_when_not() -> void:
 	eq(banner.text, "Reconnecting...", "in the theme's words")
 
 
+func _overlay_of(r: Node) -> Overlay:
+	for c in r.get_children():
+		if c is Overlay:
+			return c
+	return null
+
+
+func test_the_banner_is_calm_while_connecting_and_alarming_only_when_it_has_given_up() -> void:
+	for net in ["connecting", "reconnecting"]:
+		eq(Overlay.variation_for({"net": net, "terminal": ""}), "Banner", "%s is calm" % net)
+	for net in ["unreachable", "offline", "stopped"]:
+		eq(Overlay.variation_for({"net": net, "terminal": ""}), "BannerAlert", "%s is an alert" % net)
+	eq(Overlay.variation_for({"net": "online", "terminal": "taken_over"}), "BannerAlert", "a terminal reason is an alert")
+
+
+func test_the_live_overlay_wears_the_calm_look_while_reconnecting() -> void:
+	var r := mount(preload("res://main.gd"))
+	go_online()
+	fake.server_close(1006)                           # the line dropped: the app is trying again
+	var o := _overlay_of(r)
+	eq(o.banner_variation(), "Banner", "reconnecting is not red")
+	o._on_status({"net": "unreachable", "net_key": "ui.net.unreachable", "terminal": ""})
+	eq(o.banner_variation(), "BannerAlert", "unreachable is")
+	o._on_status({"net": "connecting", "net_key": "ui.net.connecting", "terminal": ""})
+	eq(o.banner_variation(), "Banner", "and back to calm when it tries again")
+
+
 func test_a_notice_reaches_the_overlay_in_the_themes_words() -> void:
 	var r := mount(preload("res://main.gd"))
 	in_round()

@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 - Build 32.0.101.7092 - Compatibility - Using Device: Intel - Intel(R) Iris(R) Xe Graphics
+
+2026-10-18T13:45:02.322 INFO [log] start build=0.1.0-foundation debug=true os=Windows path=user://client.log
+2026-10-18T13:45:02.661 INFO [themes] use id=flash
+2026-10-18T13:45:02.700 INFO [themes] use id=flash
+CENTRE PrimaryButton normal: face rows 5..53, text rows 21..39, text middle is 1.0 px below the face middle
+CENTRE PrimaryButton pressed: face rows 11..60, text rows 27..45, text middle is 0.5 px below the face middle
+CENTRE Button normal: face rows 5..53, text rows 21..37, text middle is 0.0 px above the face middle
+CENTRE Button pressed: face rows 11..60, text rows 27..43, text middle is 0.5 px above the face middle
+CENTRE DONE

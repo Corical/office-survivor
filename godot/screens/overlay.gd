@@ -11,6 +11,7 @@ var _banner: Label
 var _banner_panel: PanelContainer
 var _notice: Label
 var _notice_panel: PanelContainer
+var _dot: PulseDot
 var _hide: Tween
 
 
@@ -23,8 +24,11 @@ func _ready() -> void:
 	add_theme_constant_override("separation", 8)
 	_banner = Ui.label("", "net_banner", "MutedLabel")
 	_notice = Ui.label("", "notice_toast")
-	_banner_panel = _wrap(_banner)
-	_notice_panel = _wrap(_notice)
+	_banner_panel = _wrap(_banner, "Banner")
+	_dot = PulseDot.new()
+	(_banner.get_parent() as Control).add_child(_dot)
+	(_banner.get_parent() as Control).move_child(_dot, 0)
+	_notice_panel = _wrap(_notice, "BannerAlert")
 	_notice.visible = false                              # nothing to say until a notice arrives
 	_notice_panel.visible = false
 	Feed.status_changed.connect(_on_status)
@@ -32,14 +36,30 @@ func _ready() -> void:
 	_on_status(Feed.status())
 
 
-## A label inside a banner panel; both ignore the mouse.
-func _wrap(label: Label) -> PanelContainer:
-	var panel := Ui.card("Banner")
+## A label inside a banner panel (in a row, so a marker can sit before it); all of it ignores the mouse.
+func _wrap(label: Label, variation: String) -> PanelContainer:
+	var panel := Ui.card(variation)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(label)
+	var row := Ui.hbox(10)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(label)
+	panel.add_child(row)
 	add_child(panel)
 	return panel
+
+
+## Which look the connection banner has: calm while the app is still trying (connecting, reconnecting: nothing is wrong
+## yet), alert once it has given up or been stopped. Only the variation's NAME is chosen here; the theme owns the colours.
+static func variation_for(st: Dictionary) -> String:
+	if st.terminal != "" or st.net in ["unreachable", "offline", "stopped"]:
+		return "BannerAlert"
+	return "Banner"
+
+
+## For tests: the variation the connection banner currently wears.
+func banner_variation() -> String:
+	return _banner_panel.theme_type_variation
 
 
 func _on_status(st: Dictionary) -> void:
@@ -48,6 +68,10 @@ func _on_status(st: Dictionary) -> void:
 	_banner.visible = not quiet
 	_banner_panel.visible = not quiet
 	_banner.text = Words.render(st.net_key)
+	var variation := variation_for(st)
+	if _banner_panel.theme_type_variation != variation:
+		_banner_panel.theme_type_variation = variation
+	_dot.visible = variation == "Banner"                     # the breathing dot says "still trying"; an alert has no dot
 	if was_quiet and not quiet:
 		_drop_in(_banner_panel)
 

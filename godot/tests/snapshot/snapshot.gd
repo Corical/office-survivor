@@ -52,6 +52,19 @@ func _ready() -> void:
 	await _size(DESKTOP)
 	await _shot("01c_title_desktop")
 	await _size(PHONE)
+	# the connection banner in its two looks: still trying (calm), and given up (alert)
+	var overlay: Overlay = null
+	for c in router.get_children():
+		if c is Overlay:
+			overlay = c
+	if overlay != null:
+		overlay._on_status({"net": "connecting", "net_key": "ui.net.connecting", "terminal": ""})
+		await _wait(0.5)
+		await _shot("01d_banner_connecting")
+		overlay._on_status({"net": "unreachable", "net_key": "ui.net.unreachable", "terminal": ""})
+		await _wait(0.5)
+		await _shot("01e_banner_unreachable")
+		overlay._on_status({"net": "online", "net_key": "ui.net.online", "terminal": ""})
 
 	# one consistent night: a busy round view and the reveal that follows it, with the fixtures' aliases renamed
 	var base_round: Dictionary = _pick_round()
