@@ -206,6 +206,23 @@ func test_a_refused_typed_join_is_worded_as_that_join_not_as_a_lost_seat() -> vo
 		eq(Session.expecting_seat(), false, "%s: nothing is waiting for a seat any more" % code)
 
 
+## Stranger pass #11: 8 s after a refused code the log said `ack_timeout ... lost code=-1`: a refused join must not leave a
+## wait running that later tears the connection down. Every refusal shape, then well past the ack deadline.
+func test_a_refused_join_leaves_no_wait_that_kills_the_line_later() -> void:
+	for pair in [["room_gone", "x"], ["room_full", "x"], ["room_started", "x"], ["refused", "There's no room with that code."],
+			["refused", "anything else"], ["bad_request", "x"]]:
+		setup()
+		go_online()
+		eq(Session.begin("join_room", {"code": "ZZZZ"}), "", "the join goes out: %s" % [pair])
+		fake.server_send({"t": "error", "code": pair[0], "message": pair[1]})
+		var opened_before := fake.open_urls.size()
+		clock.advance(Net.ACK_TIMEOUT_MS + 3000)
+		Net.tick()
+		eq(Net.state, "online", "still on the line 11 s after a refusal: %s" % [pair])
+		eq(fake.open_urls.size(), opened_before, "no reconnect was triggered: %s" % [pair])
+		eq(Session.begin("join_room", {"code": "ABCD"}), "", "and the next try goes out: %s" % [pair])
+
+
 ## A refused RESUME with room_gone is still the end of that seat (the camp is gone, the seat with it), and it must not be
 ## mistaken for a join refusal just because both use the same code.
 func test_a_resume_that_hears_room_gone_still_ends_the_seat() -> void:

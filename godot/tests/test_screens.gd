@@ -519,6 +519,45 @@ func test_the_overlay_never_blocks_a_tap() -> void:
 	eq((Ui.find(r, "net_banner") as Label).mouse_filter, Control.MOUSE_FILTER_IGNORE, "banner ignores the mouse")
 
 
+# ---------------- a refused join code (stranger pass #11) ----------------
+
+func test_a_refused_code_is_said_once_not_twice() -> void:
+	var r := mount(preload("res://main.gd"))
+	go_online()
+	Session.begin("join_room", {"code": "ZZZZ"})
+	fake.server_send({"t": "error", "code": "room_gone", "message": "There's no room with that code."})
+	var title := _find_title(r)
+	var inline_note := Ui.find(title, "notice") as Label
+	check(inline_note != null and inline_note.text != "", "the title says it, in the page")
+	var toast := Ui.find(r, "notice_toast") as Label
+	check(toast == null or not toast.visible, "and the corner toast does not repeat the same sentence")
+
+
+func test_the_join_code_box_shows_capitals_and_keeps_the_caret() -> void:
+	var s := mount(TitleScreen)
+	var box := Ui.find(s, "code") as LineEdit
+	box.text = "zz"
+	box.caret_column = 2
+	box.text_changed.emit("zz")
+	eq(box.text, "ZZ", "what is typed is shown in capitals (codes are capitals)")
+	eq(box.caret_column, 2, "and the caret stays where the player was typing")
+	box.text = "ab1"
+	box.caret_column = 1
+	box.text_changed.emit("ab1")
+	eq(box.text, "AB1", "mixed input")
+	eq(box.caret_column, 1, "caret in the middle stays in the middle")
+	box.text = ""
+	box.text_changed.emit("")
+	eq(box.text, "", "empty stays empty")
+
+
+func _find_title(root: Node) -> Control:
+	for c in root.find_children("*", "Control", true, false):
+		if c is TitleScreen:
+			return c
+	return null
+
+
 # ---------------- why the connection ended is still there when the title appears (stranger pass #7) ----------------
 
 func _title_text(s: Control) -> String:

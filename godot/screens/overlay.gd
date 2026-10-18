@@ -77,6 +77,10 @@ func _on_status(st: Dictionary) -> void:
 
 
 func _on_notice(n: Dictionary) -> void:
+	# The title screen writes its own notices into the page (and re-reads a terminal reason from state), so a toast saying the
+	# same sentence in the corner is a duplicate (stranger pass #11).
+	if Feed.status().screen == "title":
+		return
 	_notice.text = Words.render(n.key, {"text": n.text})
 	_notice.visible = true
 	_notice_panel.visible = true

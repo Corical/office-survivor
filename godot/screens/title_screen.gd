@@ -83,7 +83,13 @@ func _build() -> void:
 	code.max_length = 8
 	code.custom_minimum_size = Vector2(160, 56)
 	code.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	code.text_changed.connect(func(t): _code_text = t)
+	code.text_changed.connect(func(t: String):
+		var caps := t.to_upper()                       # codes are capitals: show what will be sent, caret where it was
+		if caps != t:
+			var at := code.caret_column
+			code.text = caps
+			code.caret_column = at
+		_code_text = caps)
 	row.add_child(code)
 	var join := Ui.button(Words.render("ui.join_room"), "join", func(): _reason(Intents.join_room(_code_text)))
 	join.size_flags_horizontal = Control.SIZE_EXPAND_FILL
