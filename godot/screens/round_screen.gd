@@ -11,6 +11,7 @@ const RING_PX := 112.0              # chosen: the clock ring, large enough to ho
 const TIMER_VARIATIONS := ["HeaderLabel", "TimerWarn", "TimerUrgent"]       # calm, under 30 s, under 10 s (the theme owns the colours)
 const MOVE_MIN_H := 142.0
 const AVATAR_PX := 76.0
+const HOLD_MAX_MS := 2000           # chosen: the longest a rebuild waits for a held press to be released
 
 var _m: Dictionary = {}
 var _move: Dictionary = {}          # the picker being filled in (local, until a pick is sent)
@@ -27,6 +28,9 @@ var _lanterns: HBoxContainer
 var _wide := false
 var _sig := ""                      # what the screen currently shows, so an unchanged push does not rebuild it
 var _building := false
+var _held := {}                     # the presses (mouse buttons, fingers) that are down right now
+var _held_since_ms := 0
+var _rebuild_waiting := false       # a rebuild was due while a press was held: done on its release
 var _avatars := {}                  # alias -> avatar number for this roster
 var _intro_played := false
 var _pulsing := false
@@ -49,7 +53,50 @@ func _ready() -> void:
 ## Only a change between the phone layout and the wide one needs a rebuild (and never while one is running).
 func _on_resized() -> void:
 	if not _building and (size.x >= WIDE_PX) != _wide:
-		_build()
+		_rebuild()
+
+
+## A press is held (mouse or finger): the buttons must stay the same nodes until it is released, or the release lands on a
+## new button and the tap is lost. A held press that never reports its release (focus lost) cannot freeze the screen for
+## longer than HOLD_MAX_MS.
+func _input(ev: InputEvent) -> void:
+	if ev is InputEventMouseButton:
+		_note_press("mouse%d" % ev.button_index, ev.pressed)
+	elif ev is InputEventScreenTouch:
+		_note_press("touch%d" % ev.index, ev.pressed)
+
+
+func _note_press(key: String, down: bool) -> void:
+	if down:
+		if _held.is_empty():
+			_held_since_ms = Time.get_ticks_msec()
+		_held[key] = true
+		return
+	_held.erase(key)
+	if _held.is_empty() and _rebuild_waiting:
+		call_deferred("_apply_waiting_rebuild")      # after this release has reached the button it was aimed at
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_held.clear()
+		if _rebuild_waiting:
+			call_deferred("_apply_waiting_rebuild")
+
+
+func _apply_waiting_rebuild() -> void:
+	if _rebuild_waiting and _held.is_empty():
+		_rebuild()
+
+
+## Rebuild now, or when the press that is held is let go.
+func _rebuild() -> void:
+	if not _held.is_empty() and Time.get_ticks_msec() - _held_since_ms <= HOLD_MAX_MS:
+		_rebuild_waiting = true
+		return
+	_held.clear()
+	_rebuild_waiting = false
+	_build()
 
 
 func _on_model(kind: String, m: Dictionary) -> void:
@@ -62,7 +109,7 @@ func _on_model(kind: String, m: Dictionary) -> void:
 		_radio_phrase = {}
 	_m = m
 	if _signature(m) != _sig:
-		_build()
+		_rebuild()
 	else:
 		_refresh_live()       # only the clock and the locked count moved: update them in place, keep the buttons
 
@@ -88,6 +135,8 @@ func _refresh_live() -> void:
 
 
 func _process(_delta: float) -> void:
+	if _rebuild_waiting and not _held.is_empty() and Time.get_ticks_msec() - _held_since_ms > HOLD_MAX_MS:
+		_rebuild()
 	_tick()
 
 
@@ -175,6 +224,7 @@ func _build() -> void:
 	if _building:
 		return
 	_building = true
+	_rebuild_waiting = false
 	_wide = size.x >= WIDE_PX
 	_sig = _signature(_m) if not _m.is_empty() else ""
 	for c in get_children():

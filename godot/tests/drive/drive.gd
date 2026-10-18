@@ -16,6 +16,7 @@ var rounds_played := 0
 var reveals_seen := 0
 var moves_used := {}
 var radios := 0
+var retries := 0                      # title and lobby taps repeated (the round screen has none: see _play_round)
 var _t0 := 0
 var _mark := 0
 
@@ -49,6 +50,7 @@ func _play() -> void:
 	# do what a person does and tap again
 	var le: LineEdit = null
 	for attempt in 4:
+		retries += 1 if attempt > 0 else 0
 		if Ui.find(router.current, "advanced_toggle") == null and not await _tap("settings_toggle"):
 			return
 		await _frames(5)
@@ -65,6 +67,7 @@ func _play() -> void:
 	await _shot("02_settings")
 	await _tap("settings_toggle")
 	for attempt in 3:
+		retries += 1 if attempt > 0 else 0
 		if not await _tap("create"):
 			return
 		await _frames(10)
@@ -120,13 +123,9 @@ func _play_round(r: int) -> bool:
 	var usable: Array = m.pickers.filter(func(p): return (not p.takes_target) or not p.targets.is_empty())
 	var p: Dictionary = usable[(r - 1) % usable.size()]
 	moves_used[p.move_id] = moves_used.get(p.move_id, 0) + 1
-	for attempt in 3:                           # a tap that lands while the screen rebuilds is lost, as for a thumb: tap again
-		if not await _tap("move_" + p.server_id):
-			return false
-		if not p.takes_target or await _until(func(): return Ui.find(router.current, "target_" + p.targets[0]) != null, 1.5):
-			break
-		if Feed.models.round.my_pick != null:
-			break
+	# one tap each, no retries: the round screen keeps its buttons while a press is held, so a tap is never lost to a rebuild
+	if not await _tap("move_" + p.server_id):
+		return false
 	if p.takes_target:
 		if not await _tap("target_" + p.targets[0]):
 			return false
@@ -142,14 +141,7 @@ func _play_round(r: int) -> bool:
 	if r % 2 == 0 and Feed.models.round.radio.available:
 		if await _tap("radio_toggle"):
 			var ph: Dictionary = Feed.models.round.radio.phrases[0]
-			var tapped := false
-			for attempt in 3:                   # tap again if a rebuild swallowed the tap
-				tapped = await _tap("phrase_" + ph.server_id)
-				if not tapped or not ph.needs_player:
-					break
-				var others0: Array = Feed.models.round.roster.filter(func(e): return not e.is_me)
-				if await _until(func(): return Ui.find(router.current, "about_" + others0[0].alias) != null, 1.5):
-					break
+			var tapped: bool = await _tap("phrase_" + ph.server_id)
 			if tapped:
 				if ph.needs_player:
 					var others: Array = Feed.models.round.roster.filter(func(e): return not e.is_me)
@@ -277,8 +269,8 @@ func _finish() -> void:
 	for l in Log.since(_mark, "ERROR"):
 		problems.append("log: " + l)
 	var warns := Log.since(_mark, "WARN")
-	print("DRIVE: taps=%d rounds=%d reveals=%d radios=%d moves=%s warnings=%d screen=%s" % [taps, rounds_played,
-		reveals_seen, radios, JSON.stringify(moves_used), warns.size(), router.current_name])
+	print("DRIVE: taps=%d retries=%d rounds=%d reveals=%d radios=%d moves=%s warnings=%d screen=%s" % [taps, retries,
+		rounds_played, reveals_seen, radios, JSON.stringify(moves_used), warns.size(), router.current_name])
 	for w in warns:
 		print("  warn: ", w)
 	if rounds_played != 10:
