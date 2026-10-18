@@ -19,6 +19,12 @@ class Layer extends Control:
 
 const STAR_SEED := 20261018
 const PAN_PER_SCREEN := 1.0                 # parallax steps per screen index (scaled by ambient.parallax_px)
+const MAX_UPSCALE := 1.25                   # chosen: the most an art pixel is stretched on screen before the picture looks soft
+const HORIZON_AT := 0.38                    # chosen: in a wide window the horizon sits this far down
+const HORIZON_IN_ART := 0.635               # where the horizon is in the far art (row 1220 of 1920)
+const NEAR_EDGE_L := 270.0                  # the near art's dark arch ends here on the left (art pixels from the left edge)
+const NEAR_EDGE_R := 810.0                  # and here on the right
+const NEAR_SOFT_PX := 150.0                 # chosen: width of the soft strip beside each edge (logical px)
 
 var _ambient: Dictionary = {}
 var _flicker: Dictionary = {}
@@ -40,6 +46,7 @@ var _tex_cloud: Texture2D
 var _tex_star: Texture2D
 var _tex_glow: Texture2D
 var _add: CanvasItemMaterial
+var _soft: Texture2D
 
 
 func _ready() -> void:
@@ -85,6 +92,7 @@ func _setup() -> void:
 	_tex_cloud = Themes.texture("cloud")
 	_tex_star = Themes.texture("fx_spark")
 	_tex_glow = Themes.texture("campfire_glow")
+	_soft = null
 	_setup_embers()
 	set_process(not _ambient.is_empty() or not _flicker.is_empty() or _embers.emitting)
 	for l in [_back, _front, _glow]:
@@ -180,10 +188,69 @@ func _cover(c: CanvasItem, tex: Texture2D, shift_x: float, extra: float) -> void
 	c.draw_texture_rect(tex, Rect2((size.x - w) * 0.5 + shift_x, size.y - h, w, h), false)
 
 
+## How many screen pixels one logical unit is (the window stretch), so an art pixel's real on-screen size can be known.
+func _screen_scale() -> float:
+	return maxf(0.01, get_viewport().get_final_transform().get_scale().x) if is_inside_tree() else 1.0
+
+
+## The most one art pixel may be stretched to on screen. Past this the picture goes soft, so a wide window gets more scene
+## (mirrored at the sides, ground at the foot) instead of a bigger picture.
+func _max_scale() -> float:
+	return MAX_UPSCALE / _screen_scale()
+
+
+## The cover scale this window would need for `tex` (width or height, whichever is larger).
+func _cover_scale(tex: Texture2D, extra: float) -> float:
+	return maxf((size.x + extra * 2.0) / float(tex.get_width()), size.y / float(tex.get_height()))
+
+
+## `tex` into `r`, mirrored left-to-right when `flip` (a negative scale about the rectangle's own middle).
+func _draw_flipped(c: CanvasItem, tex: Texture2D, r: Rect2, flip: bool) -> void:
+	if not flip:
+		c.draw_texture_rect(tex, r, false)
+		return
+	c.draw_set_transform(Vector2(r.position.x + r.size.x, r.position.y), 0.0, Vector2(-1.0, 1.0))
+	c.draw_texture_rect(tex, Rect2(Vector2.ZERO, r.size), false)
+	c.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## The far scene in a window too wide for the portrait art at a sharp scale: drawn at the capped scale with the horizon at a
+## fixed height, and the art mirrored left and right as far as the window goes (a mirror is continuous at every seam).
+func _far_wide(c: CanvasItem, tex: Texture2D, shift_x: float) -> void:
+	var s := _max_scale()
+	var w := float(tex.get_width()) * s
+	var h := float(tex.get_height()) * s
+	var top := minf(0.0, maxf(size.y * HORIZON_AT - h * HORIZON_IN_ART, size.y - h))
+	var x0 := (size.x - w) * 0.5 + shift_x
+	var first := -ceili(x0 / w) - 1
+	var last := ceili((size.x - x0) / w) + 1
+	for k in range(first, last + 1):
+		var x := x0 + float(k) * w
+		_draw_flipped(c, tex, Rect2(x, top, w, h), k % 2 != 0)
+
+
+## A strip that is the night's shade at its left edge and clear at its right (flipped for the right-hand side).
+func _soft_edge() -> Texture2D:
+	if _soft == null:
+		var g := Gradient.new()
+		g.colors = PackedColorArray([Themes.color_a("ink", 0.62), Themes.color_a("ink", 0.0)])
+		var t := GradientTexture2D.new()
+		t.gradient = g
+		t.fill_from = Vector2(0, 0)
+		t.fill_to = Vector2(1, 0)
+		t.width = 64
+		t.height = 4
+		_soft = t
+	return _soft
+
+
 func _paint_back(c: Layer) -> void:
 	var margin := float(_ambient.get("parallax_px", 0.0)) * 3.0 + float(_ambient.get("drift_px", 0.0)) * 2.0 + 4.0
 	if _tex_far != null:
-		_cover(c, _tex_far, _shift(0.35), margin)
+		if _cover_scale(_tex_far, margin) > _max_scale():
+			_far_wide(c, _tex_far, _shift(0.35))
+		else:
+			_cover(c, _tex_far, _shift(0.35), margin)
 	if _tex_star != null and not _ambient.is_empty():
 		var n := mini(int(_ambient.get("stars", 0)), _stars.size())
 		var calm := Themes.reduced_motion
@@ -213,7 +280,23 @@ func _paint_front(c: Layer) -> void:
 	if _tex_near == null:
 		return
 	var margin := float(_ambient.get("parallax_px", 0.0)) * 3.0 + float(_ambient.get("drift_px", 0.0)) * 2.0 + 4.0
-	_cover(c, _tex_near, _shift(1.0), margin)
+	if _cover_scale(_tex_near, margin) <= _max_scale():
+		_cover(c, _tex_near, _shift(1.0), margin)
+		return
+	# a wide window: the framing leaves and palms hug the two edges at a sharp scale (the left half of the art on the left,
+	# the right half on the right) and the middle stays open for the screen's own content
+	var s := minf(_max_scale(), size.y / float(_tex_near.get_height()) * 2.0)
+	var half := float(_tex_near.get_width()) * 0.5
+	var h := float(_tex_near.get_height()) * s
+	var sh := _shift(1.0)
+	c.draw_texture_rect_region(_tex_near, Rect2(-margin + sh, size.y - h, half * s, h), Rect2(0, 0, half, _tex_near.get_height()))
+	var right_x := size.x + margin + sh - half * s
+	c.draw_texture_rect_region(_tex_near, Rect2(right_x, size.y - h, half * s, h), Rect2(half, 0, half, _tex_near.get_height()))
+	# the art's dark arch ends in a straight edge: a soft strip beside it so the edge reads as shade, not as a wall
+	var soft := _soft_edge()
+	var strip := NEAR_SOFT_PX
+	_draw_flipped(c, soft, Rect2(-margin + sh + NEAR_EDGE_L * s, size.y - h, strip, h), false)
+	_draw_flipped(c, soft, Rect2(right_x + (NEAR_EDGE_R - half) * s - strip, size.y - h, strip, h), true)
 
 
 func _paint_glow(c: Layer) -> void:
