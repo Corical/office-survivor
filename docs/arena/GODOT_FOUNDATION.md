@@ -306,4 +306,20 @@ Everything in the request is implemented as proposed. Full rules: `docs/arena/SE
 | (a) cap | 20, which is also the server's room cap |
 | (b) host gone | A camp with nobody connected is not listed; it comes back when someone resumes. There is no grace: a dropped phone's camp disappears from the list while it is down |
 | (c) `name` | Accepted. Control, invisible and bidi characters are stripped, whitespace collapses, 24 characters. Private camps' names are never sent to anyone |
+| Host kicks (asked by the owner: a dropped player should not hold a seat until something times out) | **Built, see the next section.** Client work needed: a Kick button per seat in the host's lobby and a handler for `kicked` / close 4004 |
 | Leaving the lobby | **Fixed 18 Oct, after the owner's report** (creator kept showing 2 of 4 after the joiner pressed Leave camp): `leave` in the lobby now frees the seat, everyone left gets a fresh `lobby` with the lower count, the leaver's token answers `seat_gone`, and a lobby left empty is deleted. Closing the app without `leave` still keeps the seat |
+
+### 18 Oct 2026, server session: the host can kick (code and tests done; client UI is yours)
+
+The owner's reasoning: a player who dropped off keeps the seat (nothing times a lobby seat out), so the host must be able to
+free it at once. The lobby never shows aliases, so the host points at a seat with an opaque handle.
+
+| Piece | Detail |
+|---|---|
+| Host's `lobby` gets `seats` | `[{id, connected}]`, one per OTHER seat, sorted by `id` (never join order). `connected: false` is the dropped-off player. Guests never get `seats` |
+| New client message `kick` | `{t: "kick", seat: <id>}`. Host only, lobby only |
+| Result | Same as `leave` for the target: seat free, token dead. Everyone left gets a fresh `lobby` with the lower count. No reply message to the host |
+| The target, if connected | `error` code `kicked`, then the socket closes with **4004** after 0.25 s (same pattern as `taken_over` / 4003). Treat the close code exactly like the error: forget the token, tell the player "the host removed you", go to the title screen. A disconnected target just finds `seat_gone` on `resume` |
+| Refusals (`error refused`) | `Only the host can kick.`, `That seat is not in the room any more.`, `You can't kick yourself; use leave.`, `Kicking is only possible in the lobby.` On "not in the room any more", just wait for the next `lobby`: the list changed under you |
+| Handles | A hash that changes when a seat changes hands, so a stale handle is refused and can never hit the next person in that seat. Do not cache handles across `lobby` messages: always send one from the latest message |
+| Not built | Ban (a kicked player can join again by code); kick after the start; auto-freeing idle lobby seats |

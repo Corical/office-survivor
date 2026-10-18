@@ -8,6 +8,7 @@ A goal and its progress each travel twice: as a line (`line` = code + values, wo
 arena/lines_en.json) and as English `text` (the same words, kept as a fallback). Both come from the one template table
 in engine/finish.py, which Torch's /status uses too. Still English only: wilderness event sentences (see lines.py).
 """
+import hashlib
 import re
 
 from bot.core import RADIO_PHRASES
@@ -45,9 +46,22 @@ def _board(g):
     return [{"alias": p.name, "band": _band(p)} for p in sorted(g._active(), key=lambda p: p.name)]
 
 
+def seat_handle(g, pid):
+    """An opaque name for one seat's current occupant, so the host can point at a seat without the lobby showing aliases
+    or join order. A hash of the room's secret salt, the pid, the alias and the occupant's key: it changes when a seat
+    changes hands, so a stale handle can never hit the next person who takes that seat."""
+    alias = next(j[1] for j in g.joined if j[0] == pid)
+    seed = f"{g.seed_key}:kick:{pid}:{alias}:{g.identity.key_for(pid)}"
+    return hashlib.sha256(seed.encode()).hexdigest()[:8]
+
+
 def lobby(g, pid, room_code, host):
-    return {"t": "lobby", "room_code": room_code, "seats_taken": len(g.joined), "seats_total": g.settings.seats,
-            "host": bool(host)}
+    msg = {"t": "lobby", "room_code": room_code, "seats_taken": len(g.joined), "seats_total": g.settings.seats,
+           "host": bool(host)}
+    if host:           # the host alone is told which other seats are there and whether anyone is connected to them
+        msg["seats"] = sorted(({"id": seat_handle(g, j[0]), "connected": j[0] in g.present}
+                               for j in g.joined if j[0] != pid), key=lambda s: s["id"])    # by handle, never by join order
+    return msg
 
 
 def round_view(g, pid):

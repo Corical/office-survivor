@@ -87,6 +87,7 @@ object with `"t"`.
 | `create_room` | optional `visibility` (`"public"` default, or `"private"`; anything else is refused) and `name` (the camp's label, see 5.4) | You become host. Replies: `seat`, then `lobby` |
 | `join_room` | `code` | Not case sensitive. Errors `room_gone`, `room_started`, `room_full` (see 5.3) |
 | `list_rooms` | none | Allowed any time after `hello`, seated or not. Reply: `rooms` (see 5.4). One per second per connection |
+| `kick` | `seat` (a handle from the host's `lobby.seats`) | Host only, lobby only. The one message that names a seat, and only by an opaque handle. Frees the seat like `leave`. No reply of its own: everyone left gets a fresh `lobby`; refusals come as `error refused` (see ARENA.md for the four texts) |
 | `resume` | `token` | Replies: `seat`, then your current screen |
 | `start` | none | Host only. Bots fill the empty seats |
 | `pick` | `kind`, `target` (alias or null), `amount` (int) | May repeat until you lock |
@@ -109,7 +110,7 @@ new view.
 | `rooms` | `rooms`: [{`code`, `seats_taken`, `seats_total`, `age_s`, `name`}] (see 5.4) |
 | `upgrade_required` | `min_proto`, `message` (connection then closes) |
 | `seat` | `token` (store it; hashed on the server), `room_code`, `alias` (secret, yours), `host` |
-| `lobby` | `room_code`, `seats_taken`, `seats_total` (4), `host` (this can change if the host drops) |
+| `lobby` | `room_code`, `seats_taken`, `seats_total` (4), `host` (this can change if the host drops). **Host only:** `seats` = [{`id`, `connected`}], one per OTHER seat, ordered by `id` (never join order); `id` is an 8-hex handle for `kick`, `connected` is false for a seat whose player dropped off |
 | `round` | `round`, `rounds`, `seconds_left`, `me`, `legal`, `gift_amounts`, `my_pick`, `my_locked`, `locked_count`, `seats_total`, `radio_available`, `radio_phrases`, `aliases`, `board` |
 | `reveal` | `round`, `news`, `private`, `radio`, `board`, `seconds_left` |
 | `end` | `extracted`, `winners`, `results` |
@@ -147,6 +148,7 @@ close). Phrase texts are in `bot/core.py` `RADIO_PHRASES`.
 | `refused` | a rule said no; `message` is safe to show | show it; the state did not change |
 | `seat_gone` | `resume` with a token the server does not know, or whose room is gone | forget the token; **the connection stays open**, so `create_room` or `join_room` works on it |
 | `room_gone` | `join_room` with a code that matches no room | tell the player; the connection stays open |
+| `kicked` | the host removed you in the lobby; **you are about to be disconnected with close code 4004** | forget the token, show "the host removed you", go back to the title screen |
 | `room_started` | `join_room` for a game that has already started | neutral message, refresh the list; the connection stays open |
 | `room_full` | `join_room` for a room with all 4 seats taken | neutral message, refresh the list; the connection stays open |
 | `rate_limited` | a second `list_rooms` inside one second on this connection | no list was sent; ask again later |
