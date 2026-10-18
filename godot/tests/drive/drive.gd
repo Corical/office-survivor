@@ -45,27 +45,33 @@ func _ready() -> void:
 
 func _play() -> void:
 	await _shot("01_title")
-	if not await _tap("settings_toggle"):
-		return
-	var le := Ui.find(router.current, "server_url") as LineEdit
-	var tries := 0
-	while le == null and tries < 3:                  # the open-camps list arriving moves the button under the first tap
-		tries += 1
+	# a tap that lands while the title rebuilds (the connection coming up re-lays it out) is lost, as it would be for a thumb:
+	# do what a person does and tap again
+	var le: LineEdit = null
+	for attempt in 4:
 		if not await _tap("settings_toggle"):
 			return
 		le = Ui.find(router.current, "server_url") as LineEdit
+		if le != null:
+			break
+		await _frames(20)
 	if le == null:
 		return _fail("no server address field after opening settings")
 	le.text = url
 	le.text_changed.emit(url)                              # typing the address
 	await _shot("02_settings")
 	await _tap("settings_toggle")
-	if not await _tap("create"):
-		return
-	if await _until(func(): return Ui.find(router.current, "sheet_create") != null, 1.0):
-		if not await _tap("sheet_create"):                 # the new-camp sheet opens first on a server that lists camps
+	for attempt in 3:
+		if not await _tap("create"):
 			return
-	if not await _until(func(): return router.current_name == "lobby", 12.0):
+		await _frames(10)
+		if Ui.find(router.current, "sheet_create") != null:     # a server that lists camps asks public or private first
+			await _shot("02b_create_sheet")
+			if not await _tap("sheet_create"):
+				return
+		if await _until(func(): return router.current_name == "lobby", 4.0):
+			break
+	if not await _until(func(): return router.current_name == "lobby", 8.0):
 		return _fail("never reached the lobby after Create room (screen=%s net=%s)" % [router.current_name, Net.state])
 	await _frames(3)
 	await _shot("03_lobby")

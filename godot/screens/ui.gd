@@ -24,13 +24,11 @@ static func label(text: String, id := "", variation := "") -> Label:
 	return l
 
 
-## A name: one line, trimmed with an ellipsis when it does not fit, never broken in the middle of a word.
+## A name: it shrinks to fit the room it has (a 12-letter name must read in full on a phone), then wraps to two lines, and
+## only a name longer than that ends in an ellipsis. See FitLabel.
 static func name_label(text: String, id := "", variation := "NameLabel") -> Label:
-	var l := Label.new()
+	var l := FitLabel.new()
 	l.text = text
-	l.autowrap_mode = TextServer.AUTOWRAP_OFF
-	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	l.clip_text = true
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if id != "":
@@ -79,6 +77,37 @@ static func flow() -> HFlowContainer:
 	return f
 
 
+## Fill a card-shaped Button with a face, a fitted name and a quieter line under it. The content sits inside the style's own
+## content margins (read from the style, not written here) and ignores the mouse, so the whole card is the tap target.
+static func fill_person_card(b: Button, face: Texture2D, who: String, sub: String, face_px := 52.0) -> void:
+	var build := func():
+		var sb := b.get_theme_stylebox("normal")
+		var pad := MarginContainer.new()
+		pad.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		pad.add_theme_constant_override("margin_left", int(sb.get_margin(SIDE_LEFT)))
+		pad.add_theme_constant_override("margin_right", int(sb.get_margin(SIDE_RIGHT)))
+		pad.add_theme_constant_override("margin_top", int(sb.get_margin(SIDE_TOP)))
+		pad.add_theme_constant_override("margin_bottom", int(sb.get_margin(SIDE_BOTTOM)))
+		b.add_child(pad)
+		var row := hbox(10)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		pad.add_child(row)
+		if face != null:
+			row.add_child(picture(face, Vector2(face_px, face_px)))
+		var words := vbox(0)
+		words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		words.add_child(name_label(who, "", "NameLabel"))
+		if sub != "":
+			words.add_child(name_label(sub, "", "MutedLabel"))
+		row.add_child(words)
+	if b.is_inside_tree():
+		build.call()
+	else:
+		b.ready.connect(build, CONNECT_ONE_SHOT)
+
+
 ## A panel in the theme's card style (`variation` names another: "CardHot", "Plate"...). It lets drags through, so a card
 ## never stops a finger scrolling the page.
 static func card(variation := "Card") -> PanelContainer:
@@ -106,9 +135,7 @@ static func picture(tex: Texture2D, min_size: Vector2, id := "") -> TextureRect:
 static func page(owner_control: Control) -> VBoxContainer:
 	owner_control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var margin := _margin(owner_control)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
+	var scroll := _scroller(margin)
 	var col := vbox(12)
 	scroll.add_child(col)
 	return col
@@ -127,9 +154,7 @@ static func page_docked(owner_control: Control) -> Dictionary:
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 16 if side != "bottom" else 4)
 	root.add_child(margin)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
+	var scroll := _scroller(margin)
 	var col := vbox(12)
 	scroll.add_child(col)
 	var dock := card("Dock")
@@ -138,6 +163,19 @@ static func page_docked(owner_control: Control) -> Dictionary:
 	var dock_col := vbox(8)
 	dock.add_child(dock_col)
 	return {"col": col, "dock": dock_col}
+
+
+## A page's scroller: vertical only, with no visible scrollbar (a bar that appears takes width and moves the whole page), and a
+## ScrollHint over it that says when there is more below.
+static func _scroller(margin: Control) -> ScrollContainer:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	margin.add_child(scroll)
+	var hint := ScrollHint.new()
+	margin.add_child(hint)
+	hint.setup(scroll)
+	return scroll
 
 
 static func _margin(owner_control: Control) -> MarginContainer:

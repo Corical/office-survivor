@@ -159,7 +159,8 @@ func _round_screen(n := 1) -> Control:
 func test_round_shows_who_i_am_the_round_the_goal_and_everyone() -> void:
 	var s := _round_screen(3)
 	eq(text_of(s, "round_of"), "Round 3 of 10", "round")
-	eq(text_of(s, "you_are"), "You are Mango", "alias")
+	eq(text_of(s, "you_are_prefix"), "You are", "the small line")
+	eq(text_of(s, "you_are"), "Mango", "my name, with the whole width")
 	eq(text_of(s, "resource"), "Rations: 7", "my exact food")
 	eq(text_of(s, "goal"), "give away 3 rations over the game", "goal worded from the server's text")
 	check(Ui.find(s, "home_Mango") != null and Ui.find(s, "home_Fig") != null and Ui.find(s, "home_Kiwi") != null, "everyone has a home")
@@ -305,6 +306,8 @@ func test_the_goal_status_line_does_not_say_decided_at_the_end_twice() -> void:
 		"args": {"rations": 8, "target": "Fig"}}}
 	fake.server_send(v)
 	var s := mount(RoundScreen)
+	s._goal_open = true                                   # at phone width the detail opens with a tap
+	s._build()
 	var text: String = (Ui.find(s, "goal_status") as Label).text
 	eq(text.to_lower().count("decided at the end"), 1, "once, not twice: " + text)
 
@@ -409,7 +412,7 @@ func test_end_shows_the_winner_and_the_results_in_the_servers_order() -> void:
 	eq(text_of(s, "winners"), "Fig", "winner")
 	var order: Array = Ui.find_all(s, "row_").map(func(l): return l.get_meta("id"))
 	eq(order, ["row_Fig", "row_Mango", "row_Kiwi"], "the server's order")
-	check("(you)" in text_of(s, "row_Mango"), "I am marked")
+	check(Ui.find(s, "you_Mango") != null and text_of(s, "you_Mango") == "(you)", "I am marked, beside my name")
 	check("winner" in text_of(s, "marks_Fig") and "seat" in text_of(s, "marks_Fig"), "winner with a seat")
 	check("goal missed" in text_of(s, "marks_Mango"), "goal missed shown")
 

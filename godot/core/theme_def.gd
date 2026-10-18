@@ -47,7 +47,8 @@ const DEFAULT_COLORS := {
 	"shield": Color(0.45, 0.85, 0.95),
 	"mark": Color(0.85, 0.65, 1.0),
 	"ring_track": Color(0.1, 0.12, 0.2),
-	"ring_fill": Color(1.0, 0.7, 0.28),
+	"ring_fill": Color(0.75, 0.9, 1.0),
+	"ring_warn": Color(1.0, 0.7, 0.28),
 	"ring_urgent": Color(1.0, 0.45, 0.4),
 	"lock_fill": Color(1.0, 1.0, 1.0, 0.28),
 }
