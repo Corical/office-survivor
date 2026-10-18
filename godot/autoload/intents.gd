@@ -26,6 +26,15 @@ func list_rooms() -> String:
 	return Session.rooms_refresh()
 
 
+## Full screen on a desktop window (a phone is always full screen: then there is nothing to offer).
+func can_fullscreen() -> bool:
+	return WindowModes.available()
+
+
+func toggle_fullscreen() -> void:
+	WindowModes.toggle()
+
+
 ## Resume a stored seat on launch. False when there is none (or no usable server address).
 func resume() -> bool:
 	return Session.resume_if_stored()

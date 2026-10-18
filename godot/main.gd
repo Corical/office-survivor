@@ -21,6 +21,8 @@ var _vignette: TextureRect
 
 
 func _ready() -> void:
+	if Themes.settings_store == null and DisplayServer.get_name() != "headless":
+		Themes.enable_settings(SessionStore.new("user://settings.json"))      # calm mode survives a restart
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if Themes.current:
 		theme = Themes.current.godot_theme
@@ -42,6 +44,13 @@ func _ready() -> void:
 	Themes.theme_changed.connect(_on_theme)
 	_route(Feed.status())
 	Intents.resume()                         # a stored seat resumes on launch
+
+
+## F11 or Alt+Enter toggles full screen on a desktop. `_input`, not `_unhandled_input`: a focused text box would swallow Enter.
+func _input(event: InputEvent) -> void:
+	if WindowModes.is_toggle(event):
+		WindowModes.toggle()
+		get_viewport().set_input_as_handled()
 
 
 ## The soft dark edge that frames the picture. The theme may have none.

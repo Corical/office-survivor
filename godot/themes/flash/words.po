@@ -358,7 +358,7 @@ msgid "notice.seat_gone"
 msgstr "That game is no longer available."
 
 msgid "notice.taken_over"
-msgstr "This seat was opened on another device."
+msgstr "Your camp was opened on another device. Rejoin here to take it back."
 
 msgid "notice.too_big"
 msgstr "The server sent something too large."
@@ -452,6 +452,9 @@ msgstr "Light a new fire"
 
 msgid "ui.enter_code"
 msgstr "Camp code"
+
+msgid "ui.fullscreen"
+msgstr "Full screen (F11)"
 
 msgid "ui.goal"
 msgstr "YOUR SECRET GOAL"
@@ -569,6 +572,9 @@ msgstr "RESULTS"
 
 msgid "ui.resume"
 msgstr "Rejoin camp"
+
+msgid "ui.resume_code"
+msgstr "Rejoin camp {code}"
 
 msgid "ui.reveal_title"
 msgstr "What happened in the night"

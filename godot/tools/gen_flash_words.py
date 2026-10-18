@@ -101,6 +101,8 @@ OVERRIDES = {
     "ui.radio_pick_player": "ABOUT WHOM?",
     "ui.results": "RESULTS",
     "ui.resume": "Rejoin camp",
+    "ui.resume_code": "Rejoin camp {code}",
+    "notice.taken_over": "Your camp was opened on another device. Rejoin here to take it back.",
     "ui.reveal_title": "What happened in the night",
     "ui.room_code": "Camp {code}",
     "ui.roster": "AROUND THE FIRE",
