@@ -1,0 +1,112 @@
+"""What each seat is sent: built field by field from an explicit list, never by passing state through.
+
+Every function takes the room and ONE pid and returns a plain dict (the protocol message, docs/arena/GODOT_FOUNDATION.md
+section 5.2). Nothing here may read another player's pick, goal, private lines or exact rations, or whether a seat is
+a bot; arena/tests/test_views.py changes all of those and requires the view to stay byte-identical.
+
+Two fields still carry English from the engine (a theme will need them as codes): a goal's wording (`text`, from
+engine/finish.py objective_text) and goal progress (`text`, from goal_progress).
+"""
+import re
+
+from bot.core import RADIO_PHRASES
+from engine.finish import goal_progress, objective_text
+from engine.visibility import band_index
+
+from .lines import news_codes
+
+BANDS = ("well_fed", "getting_by", "starving", "bandit")
+PROTO = 1
+
+
+def _band(p):
+    return BANDS[min(band_index(p), len(BANDS) - 1)]
+
+
+def _goal(g, p):
+    tgt = g.players[p.obj_target].name if p.obj_target >= 0 else None
+    return {"code": p.objective, "target": tgt, "text": objective_text(p.objective, g.rules, tgt or "")}
+
+
+def _board(g):
+    if not g.ranges:
+        return None
+    return [{"alias": p.name, "band": _band(p)} for p in sorted(g._active(), key=lambda p: p.name)]
+
+
+def lobby(g, pid, room_code, host):
+    return {"t": "lobby", "room_code": room_code, "seats_taken": len(g.joined), "seats_total": g.settings.seats,
+            "host": bool(host)}
+
+
+def round_view(g, pid):
+    p = g.players[pid]
+    move = g.moves.get(pid)
+    tgt_band = band_index(g.players[p.obj_target]) if g.ranges and p.obj_target >= 0 else None
+    from engine.visibility import band_label
+    state, how = goal_progress(p, list(g.players.values()), g.rules, frozenset(g.quit_ids),
+                               band_label(g.players[p.obj_target]) if tgt_band is not None else None)
+    legal, amounts = g.legal_for(pid) if pid not in g.quit_ids else ({}, [])
+    return {
+        "t": "round", "round": g.round, "rounds": g.rules.rounds,
+        "seconds_left": max(0.0, round(g.deadline - g.sched.now(), 1)),
+        "me": {"alias": p.name, "rations": p.rations, "bandit": p.bandit,
+               "guards_left": (g.rules.guard_limit - p.guards_used) if g.rules.guard_limit else None,
+               "guarded": p.guard_until >= g.round,
+               "goal": _goal(g, p), "goal_progress": {"state": state, "text": how}},
+        "legal": legal, "gift_amounts": amounts,
+        "my_pick": None if not move else {"kind": move[0], "target": g.players[move[1]].name if move[1] is not None
+                                          else None, "amount": move[2]},
+        "my_locked": pid in g.locked,
+        "locked_count": len(g.locked & {q.pid for q in g._active()}), "seats_total": len(g._active()),
+        "radio_available": not g.radio_used(pid),
+        "radio_phrases": [{"key": k, "needs_player": "{a}" in t} for k, t in RADIO_PHRASES.items()],
+        "aliases": sorted(q.name for q in g._active() if q.pid != pid),
+        "board": _board(g),
+    }
+
+
+_PHRASE_RE = {k: re.compile("^" + re.escape(t).replace(re.escape("{a}"), "(?P<a>.+)") + "$")
+              for k, t in RADIO_PHRASES.items()}
+
+
+def _radio_line(text):
+    for k, rx in _PHRASE_RE.items():
+        m = rx.match(text)
+        if m:
+            return {"phrase": k, "about": m.groupdict().get("a")}
+    return {"phrase": None, "about": None}
+
+
+def reveal_view(g, pid):
+    n = g.closed
+    rec = g.night_record(n)
+    texts = sorted(g.texts.get(ref) for ref in g.radio_pending if ref.startswith(f"r{n}-"))
+    return {
+        "t": "reveal", "round": n,
+        "news": news_codes(rec["events"]),
+        "private": rec["private"].get(str(pid), []),
+        # sorted by wording, never by when it was sent: bots decide at the close, so send order would unmask them
+        "radio": [_radio_line(t) for t in texts],
+        "board": _board(g),
+        "seconds_left": max(0.0, round(g.reveal_until - g.sched.now(), 1)),
+    }
+
+
+def end_view(g, pid):
+    fin = next(r for r in g.store.load() if r["type"] == "finish")
+    ext = next(e for e in fin["events"] if e["type"] == "extraction")["extracted"]
+    end = next(e for e in fin["events"] if e["type"] == "game_end")
+    by_name = {p.name: p for p in g.players.values()}
+    results = []
+    for e in sorted((e for e in fin["events"] if e["type"] == "result"), key=lambda e: (-e["score"], e["player"])):
+        results.append({"alias": e["player"], "score": e["score"], "rations": e["rations"],
+                        "seat": e["player"] in ext, "goal": _goal(g, by_name[e["player"]]),
+                        "goal_done": e["objective_done"], "stole": e["stole"], "times_robbed": e["times_robbed"],
+                        "gave_away": e["gave_away"]})
+    return {"t": "end", "extracted": ext, "winners": end["winners"], "results": results}
+
+
+def view_for(g, pid):
+    """The current screen for `pid` (None in the lobby: the server sends `lobby` with the room code)."""
+    return {"round": round_view, "reveal": reveal_view, "end": end_view}.get(g.phase, lambda g, p: None)(g, pid)

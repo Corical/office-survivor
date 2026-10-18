@@ -123,6 +123,9 @@ class RoomGame(GameCore):
             return "round"
         return "reveal"
 
+    def night_record(self, n):
+        return next(r for r in self.store.load() if r["type"] == "night" and r["night"] == n)
+
     def humans(self):
         return [p.pid for p in self._active() if p.pid not in self.sims]
 
