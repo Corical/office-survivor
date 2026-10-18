@@ -35,7 +35,7 @@ func _on_model(kind: String, m: Dictionary) -> void:
 
 
 func _sig_of(m: Dictionary) -> String:
-	return JSON.stringify(m.get("lines", m)) + JSON.stringify(m.get("radio", [])) + str(m.get("is_host", "")) + str(m.get("seats_taken", "")) + JSON.stringify(m.get("seats", []))
+	return JSON.stringify(m)
 
 
 func _build() -> void:
