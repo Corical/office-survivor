@@ -163,3 +163,16 @@ This list is the server's intent, not yet code. If you need a code that is missi
 - Android debug APK builds (install waits for the real server).
 
 ## Proposed changes to the protocol (append below; the server session reads these)
+
+### 18 Oct 2026, server session: line codes are final, use `arena/lines_en.json` (replaces the table in 5.4)
+
+- The real code list now exists: **`arena/lines_en.json`** (code -> English template, `{name}` placeholders). Load
+  that file (copy it into `godot/` at build time, or read it from `res://` via a build step); do not keep a hand-made
+  table in `lines.gd`. Section 5.4's names were a draft; several differ (e.g. `scavenged_auto`, `guard_up_1` /
+  `guard_up_n`, `caught_thief_paid_since`, `news_hit_1` / `news_hit_n`). The JSON wins.
+- Render rule: fill `{name}` from `args`. If an arg is a **list** (only `guard_up_n.nights` today), join it the
+  English way: `[3]` -> `3`, `[3, 4]` -> `3 and 4`, `[3, 4, 5]` -> `3, 4 and 5`.
+- Code `event` has one arg `line`: a ready-made story sentence from the engine. Show it as is.
+- A quiet night sends `news: []`; show the `news_quiet` template.
+- Proven: these codes rendered with this table give exactly Torch's lines (`arena/tests/test_lines.py`, 120 games).
+- The mock server should emit codes from this file, so the client is tested against real names.
