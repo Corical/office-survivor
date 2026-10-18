@@ -6,6 +6,7 @@ extends RefCounted
 const DEFAULT_ID := "placeholder"
 const THEMES := {
 	"placeholder": preload("res://themes/placeholder/theme.gd"),
+	"flash": preload("res://themes/flash/theme.gd"),
 }
 
 
