@@ -86,7 +86,14 @@ class Room:
                              TextStore(os.path.join(path, "texts.json")), aliases, salt, scheduler, settings)
         self.conns = {}                  # pid -> websocket
         self.takeovers = {}              # pid -> [times]
-        self.game.listeners.append(lambda what: asyncio.ensure_future(self.push_all()))
+        self.game.listeners.append(self._on_change)
+
+    def _on_change(self, what):
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:             # loading or a tool outside the server loop: nobody to push to
+            return
+        asyncio.ensure_future(self.push_all())
 
     def host_pid(self):
         """The lowest connected human seat runs the lobby (so a lost host is replaced by the next one)."""
