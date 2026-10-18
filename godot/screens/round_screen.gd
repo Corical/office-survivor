@@ -7,7 +7,8 @@ extends Control
 ## right). The look comes from the theme: medallion moves, player cards, a ring clock, lanterns for the locked seats.
 
 const WIDE_PX := 900                # chosen: at this width and above the screen uses two columns
-const RING_PX := 104.0              # chosen: the clock ring, large enough to hold "180 s"
+const RING_PX := 112.0              # chosen: the clock ring, large enough to hold "180 s" with room round it
+const TIMER_VARIATIONS := ["HeaderLabel", "TimerWarn", "TimerUrgent"]       # calm, under 30 s, under 10 s (the theme owns the colours)
 const MOVE_MIN_H := 142.0
 const AVATAR_PX := 76.0
 
@@ -28,8 +29,9 @@ var _avatars := {}                  # alias -> avatar number for this roster
 var _intro_played := false
 var _pulsing := false
 var _pulse_tween: Tween
-var _left_int := -1                 # the whole seconds last shown, and how long ago they changed (to move the ring smoothly)
-var _left_age := 0.0
+var _left_int := -1                 # the whole seconds last shown, and when they changed (to move the ring smoothly)
+var _left_changed_ms := 0
+var _prompt: Label                  # the line above the moves; it becomes "Pick a move!" when time is short and nothing is picked
 
 
 func _ready() -> void:
@@ -90,39 +92,58 @@ func _tick() -> void:
 		return
 	var t: Dictionary = _m.timer
 	if not t.known:
-		_timer_label.text = Words.render("ui.timer_unknown")
+		_say(_timer_label, Words.render("ui.timer_unknown"))
 		_set_variation(_timer_label, "MutedLabel")
 		if _ring != null:
 			_ring.value = 0.0
-			_ring.urgent = false
+			_ring.state = 0
 		_set_pulse(false)
 		return
-	_set_variation(_timer_label, "HeaderLabel")
 	var left := Feed.seconds_left()
-	_timer_label.text = Words.render("ui.seconds", {"n": left})
-	# the clock arrives in whole seconds; the ring and the charge glide between them
+	_say(_timer_label, Words.render("ui.seconds", {"n": left}))
+	# The server's clock reaches us in whole seconds. The ring and the charge are drawn from the milliseconds since the last
+	# change (read from the engine's own clock, so a slow frame cannot stall them): they drain a little every frame.
+	var now_ms := Time.get_ticks_msec()
 	if left != _left_int:
 		_left_int = left
-		_left_age = 0.0
-	else:
-		_left_age = minf(1.0, _left_age + get_process_delta_time())
-	var smooth := maxf(0.0, float(left) - _left_age)
+		_left_changed_ms = now_ms
+	var age := clampf(float(now_ms - _left_changed_ms) / 1000.0, 0.0, 1.0)
+	var smooth := maxf(0.0, float(left) - age)
 	var total := maxf(1.0, float(t.total_s))
-	var open: bool = _m.lock.picker_open
-	var last_s := float(Themes.fx("pulse").get("last_s", 10))
-	var urgent := open and smooth <= last_s
+	var tm := Themes.fx("timer")
+	var stage := 2 if smooth <= float(tm.get("urgent_s", 10)) else (1 if smooth <= float(tm.get("warn_s", 30)) else 0)
+	_set_variation(_timer_label, TIMER_VARIATIONS[stage])
 	if _ring != null:
 		_ring.max_value = total
 		_ring.value = smooth
-		_ring.urgent = urgent
+		_ring.state = stage
 	if _charge != null:
 		_charge.fraction = 1.0 - smooth / total if _m.lock.state == "open" else 1.0
-	_set_pulse(urgent and _lock_btn != null and not _lock_btn.disabled)
+	var open: bool = _m.lock.picker_open
+	if _prompt != null:                            # under 20 s with nothing picked, the line above the moves turns into a call to act
+		var nag := open and _m.my_pick == null and smooth <= float(tm.get("prompt_s", 20))
+		_set_variation(_prompt, "PromptLabel" if nag else "MutedLabel")
+		var words := Words.render("ui.pick_prompt") if nag else Words.render("ui.pick_a_move")
+		if _prompt.text != words:
+			_prompt.text = words
+	_set_pulse(stage == 2 and open and _lock_btn != null and not _lock_btn.disabled)
+
+
+## Set a label's words; a fitted label is refitted at once.
+static func _say(l: Label, words: String) -> void:
+	if l.text == words:
+		return
+	if l is FitLabel:
+		(l as FitLabel).set_fit_text(words)
+	else:
+		l.text = words
 
 
 static func _set_variation(l: Control, variation: String) -> void:
 	if l.theme_type_variation != variation:
 		l.theme_type_variation = variation
+		if l is FitLabel:
+			(l as FitLabel).restyle()                  # its font size is part of the variation: fit again from the new one
 
 
 ## The Lock button breathes while there is little time left and a pick waiting to be locked.
@@ -156,6 +177,7 @@ func _build() -> void:
 		c.queue_free()
 	_timer_label = null
 	_ring = null
+	_prompt = null
 	_lock_btn = null
 	_charge = null
 	_lanterns = null
@@ -246,14 +268,14 @@ func _head() -> Control:
 	_ring.custom_minimum_size = Vector2(RING_PX, RING_PX)
 	_ring.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_ring.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_timer_label = Ui.label("", "timer_label", "HeaderLabel")
+	_timer_label = Ui.name_label("", "timer_label", "HeaderLabel")
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_timer_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ring.add_child(_timer_label)
 	_timer_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_timer_label.offset_left = 14
-	_timer_label.offset_right = -14
+	_timer_label.offset_left = 22                       # clear of the ring's stroke on both sides
+	_timer_label.offset_right = -22
 	row.add_child(_ring)
 	return card
 
@@ -261,7 +283,10 @@ func _head() -> Control:
 ## The moves, their targets and amounts, and my pick. (Lock lives in the dock.)
 func _act(open: bool) -> VBoxContainer:
 	var s := Ui.vbox(10)
-	s.add_child(Ui.label(Words.render("ui.pick_a_move"), "", "MutedLabel"))
+	_prompt = Ui.label(Words.render("ui.pick_a_move"), "pick_prompt", "MutedLabel")
+	_prompt.custom_minimum_size = Vector2(0, 30)       # the same height whether it is the quiet label or the prompt: nothing jumps
+	_prompt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	s.add_child(_prompt)
 	var moves := Ui.hbox(6)
 	for p in _m.pickers:
 		var chosen := _is_chosen(p)

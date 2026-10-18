@@ -27,6 +27,13 @@ func set_fit_text(t: String) -> void:
 	_fit()
 
 
+## The theme variation changed (a different font size or colour): read it afresh and fit again.
+func restyle() -> void:
+	_settings = null
+	label_settings = null
+	_fit()
+
+
 func _fit() -> void:
 	if _fitting or not is_inside_tree() or size.x < 8.0:
 		return

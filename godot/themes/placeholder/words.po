@@ -528,6 +528,9 @@ msgstr "Pick a target"
 msgid "ui.pick_an_amount"
 msgstr "Pick an amount"
 
+msgid "ui.pick_prompt"
+msgstr "Pick a move!"
+
 msgid "ui.private"
 msgstr "Private"
 
