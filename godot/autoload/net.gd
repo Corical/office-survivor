@@ -41,6 +41,9 @@ var handshake_done := false
 ## `features` from the latest hello_ok (null when the server sent none). Set right before `handshaken` fires, so whoever
 ## handles that signal reads this connection's value, never a previous connection's.
 var server_features: Variant = null
+## `games` from the latest hello_ok, as the server sent it (null when it sent none: the old server, Survivors only). Cleaned by
+## RoomsWatch.sanitize_games, never trusted here. Set right before `handshaken` fires, like `server_features`.
+var server_games: Variant = null
 var attempt := 0
 var probe_ms := PROBE_MS
 var log_payloads := OS.is_debug_build()
@@ -83,6 +86,7 @@ func reset() -> void:
 	_short_lives = 0
 	attempt = 0
 	handshake_done = false
+	server_games = null
 	url = ""
 	probe_ms = PROBE_MS
 	if transport:
@@ -320,6 +324,7 @@ func _on_text(text: String) -> void:
 				return
 			handshake_done = true
 			server_features = msg.get("features")
+			server_games = msg.get("games")
 			_hello_deadline = -1
 			_up_since = clock.now_msec()      # attempt is NOT reset here: only a connection that stays up earns that
 			_set_state("online")

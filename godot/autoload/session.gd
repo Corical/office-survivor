@@ -29,6 +29,8 @@ const CONTINUE_ACK_MAX_MS := 120000            # chosen: no reveal waits longer 
 const KICK_SEAT_GONE_TEXT := "That seat is not in the room any more."
 ## What the server answers a join_room with when the camp cannot be joined (rooms listing and typed codes alike).
 const JOIN_REFUSAL_CODES: Array[String] = ["room_full", "room_started", "room_gone"]
+## The games this server offers, cleaned (RoomsWatch.sanitize_games). Empty: no `games` in hello_ok, so no picker and Survivors only.
+var games: Array = []
 var token := ""
 var room_code := ""
 var alias := ""
@@ -105,6 +107,7 @@ func reset(s: SessionStore = null, c: Clock = null) -> void:
 	_last_type = ""
 	_last_key = ""
 	rooms = RoomsWatch.new()
+	games = []
 	_watchers = 0
 	_watch_reconnect_at = -1
 	_wire = 0
@@ -451,6 +454,18 @@ func _on_error(msg: Dictionary) -> void:
 		return
 	if code == "taken_over" or code == "kicked":
 		return                        # Net also stops; _on_terminal handles the screen
+	# The camp's game cannot run right now (resume, or a join that is not a typed one). The seat is NOT gone: keep the token, say it
+	# in the server's plain words (the generic notice), stay where we are, and do not drop the line to retry: the server keeps it open.
+	if code == "room_unavailable":
+		if _last_key != "":
+			_inflight.erase(_last_key)
+			Net.ack(_last_type)
+		_inflight.erase("resume")
+		Net.ack("resume")
+		awaiting_view = false
+		pending_intent = {}
+		notice.emit("error", code, text)
+		return
 	# A kick the server refused because that seat left first: the list changed under the host and a fresh lobby is on its way.
 	# Nothing to tell them; just release the guard so the next kick can go.
 	if _last_key == "kick" and text == KICK_SEAT_GONE_TEXT:
@@ -515,6 +530,7 @@ func _seat_gone(code: String, text: String) -> void:
 
 func _on_handshaken() -> void:
 	_inflight = {}                    # after a reconnect the fresh view decides; keep nothing else
+	games = RoomsWatch.sanitize_games(Net.server_games)
 	rooms.on_features(Net.server_features)          # before the first list_rooms: a server that said no is never asked
 	rooms.on_connected(clock.now_msec())
 	rooms_changed.emit(rooms.model())
