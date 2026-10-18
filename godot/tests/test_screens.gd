@@ -306,6 +306,8 @@ func test_the_goal_status_line_does_not_say_decided_at_the_end_twice() -> void:
 		"args": {"rations": 8, "target": "Fig"}}}
 	fake.server_send(v)
 	var s := mount(RoundScreen)
+	s._goal_open = true                                   # at phone width the detail opens with a tap
+	s._build()
 	var text: String = (Ui.find(s, "goal_status") as Label).text
 	eq(text.to_lower().count("decided at the end"), 1, "once, not twice: " + text)
 
