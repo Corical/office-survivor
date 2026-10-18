@@ -95,9 +95,12 @@ func _seat(host: bool) -> void:
 
 func _lobby() -> void:
 	_seat(true)
-	var states := [["host_1of4", true, 1], ["host_4of4", true, 4], ["guest_2of4", false, 2]]
+	var here := {"id": "h-a", "connected": true}
+	var gone := {"id": "h-b", "connected": false}
+	var states := [["host_1of4", true, 1, []], ["host_4of4", true, 4, [here, here, here]], ["guest_2of4", false, 2, []],
+		["host_dropped_seat", true, 3, [here, gone]], ["host_all_here", true, 3, [here, {"id": "h-c", "connected": true}]]]
 	for st in states:
-		fake.server_send({"t": "lobby", "room_code": "KXQM", "seats_taken": st[2], "seats_total": 4, "host": st[1]})
+		fake.server_send({"t": "lobby", "room_code": "KXQM", "seats_taken": st[2], "seats_total": 4, "host": st[1], "seats": st[3]})
 		await _wait(0.8)
 		for s in SIZES:
 			await _size(s)
