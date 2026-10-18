@@ -10,14 +10,30 @@ const STEP_MIN_H := [118.0, 84.0, 60.0]    # chosen: heights of the first, secon
 
 var _intro_played := false
 var _avatars := {}
+var _wide := false
+var _building := false
 
 
 func _ready() -> void:
 	Feed.model_changed.connect(func(kind, _m): if kind == "end": _build())
+	resized.connect(_on_resized)
 	_build()
 
 
+## The window grew past (or shrank below) the width where the board sits beside the podium: lay it out again.
+func _on_resized() -> void:
+	if not _building and (size.x >= WIDE_PX) != _wide:
+		_build()
+
+
 func _build() -> void:
+	_building = true
+	_wide = size.x >= WIDE_PX
+	_build_screen()
+	_building = false
+
+
+func _build_screen() -> void:
 	for c in get_children():
 		remove_child(c)
 		c.queue_free()
@@ -34,7 +50,7 @@ func _build() -> void:
 	var header := _header(m)
 	var podium := _podium(m, ranks)
 	var board := _board(m, ranks)
-	if size.x >= WIDE_PX:
+	if _wide:
 		var cols := HBoxContainer.new()
 		cols.add_theme_constant_override("separation", 32)
 		cols.size_flags_horizontal = Control.SIZE_EXPAND_FILL
