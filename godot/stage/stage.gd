@@ -20,6 +20,7 @@ const PLATE_LINE_GAP := 2.0
 const PLATE_MIN_MARGIN_X := 12.0        # a plate's padding never drops below this, whatever the style says
 const PLATE_MIN_MARGIN_Y := 7.0
 const PLATE_DEFAULT_EDGE := 3.0         # the rim of a plate when the theme does not say (constant plate_edge)
+const FLOAT_CLEAR := 6.0                # a floating number keeps this far from every plate for its whole rise
 const ICON_PX := 20.0
 const ICON_GAP := 6.0
 const SHAKE_DECAY := 46.0               # chosen: pixels of shake lost per second
@@ -420,15 +421,13 @@ func _crumbs(b: Dictionary, from_pos: Vector2, to_pos: Vector2) -> void:
 	var amount_in := int(b.amount_in)
 	var amount_out := int(b.amount_out)
 	var fl := Themes.fx("stage.float")
-	var rise := float(fl.get("rise", 50.0))
-	var life := float(fl.get("time", 1.0))
 	var tint := _tint_for(String(b.style))
 	if f.is_empty() or crumb == null:
 		# reduced motion or no crumb art: the numbers still show, the crumbs do not fly
 		if b.to != OFFSTAGE and amount_in > 0 and not fl.is_empty():
-			_pool.spawn_text("+%d" % amount_in, to_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, 0.35, life, Themes.color("gain"))
+			_float_text("+%d" % amount_in, to_pos, 0.35, Themes.color("gain"))
 		if b.from != OFFSTAGE and amount_out > 0 and not fl.is_empty():
-			_pool.spawn_text("-%d" % amount_out, from_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, 0.0, life, Themes.color("loss"))
+			_float_text("-%d" % amount_out, from_pos, 0.0, Themes.color("loss"))
 		return
 	var n := mini(maxi(amount_in, amount_out), int(f.get("max", 8)))
 	var flight := float(f.get("flight", 0.6))
@@ -443,9 +442,72 @@ func _crumbs(b: Dictionary, from_pos: Vector2, to_pos: Vector2) -> void:
 			2.0 * side, true)
 	var landed := flight + float(maxi(n - 1, 0)) * stagger
 	if b.to != OFFSTAGE and amount_in > 0:
-		_pool.spawn_text("+%d" % amount_in, to_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, landed * 0.9, life, Themes.color("gain"))
+		_float_text("+%d" % amount_in, to_pos, landed * 0.9, Themes.color("gain"))
 	if b.from != OFFSTAGE and amount_out > 0:
-		_pool.spawn_text("-%d" % amount_out, from_pos + Vector2(-_hut_px * 0.62, -_hut_px * 0.2), rise, 0.0, life, Themes.color("loss"))
+		_float_text("-%d" % amount_out, from_pos, 0.0, Themes.color("loss"))
+
+
+## A floating "+N" / "-N" for the home at `home`. It starts beside the hut, at the first spot whose WHOLE rise stays at least
+## FLOAT_CLEAR px from every plate (its own and all the others) and from every other number already waiting or rising, and
+## inside the Stage; so two numbers never share pixels and none ever crosses a name.
+func _float_text(text: String, home: Vector2, delay: float, col: Color) -> void:
+	var fl := Themes.fx("stage.float")
+	if fl.is_empty():
+		return
+	var rise := float(fl.get("rise", 50.0))
+	var life := float(fl.get("time", 1.0))
+	_pool.spawn_text(text, _float_spot(text, home, rise), rise, delay, life, col)
+
+
+## Where a number may start, as multiples of the hut size from the hut's centre: a grid around it, nearest first (so left of the
+## hut and right of the avatar come before anything further out). Built once.
+static var _spots: Array = []
+
+
+static func _float_spots() -> Array:
+	if _spots.is_empty():
+		var all: Array = []
+		for ix in range(-9, 11):
+			for iy in range(-5, 6):
+				all.append(Vector2(float(ix) * 0.2 + 0.08, float(iy) * 0.18))
+		all.sort_custom(func(a, b): return a.length() < b.length())
+		_spots = all
+	return _spots
+
+
+func _float_spot(text: String, home: Vector2, rise: float) -> Vector2:
+	var font := get_theme_default_font()
+	var fs := get_theme_default_font_size() + 6
+	var big := int(float(fs) * 1.45)                       # the size a number pops to
+	var out := FxPool.FLOAT_OUTLINE
+	var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, big).x + out * 2.0
+	var asc := font.get_ascent(big)
+	var h := font.get_height(big) + out * 2.0
+	var obstacles: Array = []
+	for a in _plates:
+		obstacles.append((_plates[a].rect as Rect2).grow(FLOAT_CLEAR))
+	for b in _pool.text_boxes(font, fs, true):
+		obstacles.append((b.rect as Rect2).grow(4.0))
+	var bounds := Rect2(Vector2.ZERO, size).grow(-2.0)
+	var hs := _hut_px
+	var first := home
+	var tried := 0
+	for o in _float_spots():
+		var start: Vector2 = home + (o as Vector2) * hs
+		if tried == 0:
+			first = start
+		tried += 1
+		var swept := Rect2(start.x - w * 0.5, start.y - rise - asc - out, w, rise + h)
+		if not bounds.encloses(swept):
+			continue
+		var clear := true
+		for ob in obstacles:
+			if (ob as Rect2).intersects(swept):
+				clear = false
+				break
+		if clear:
+			return start
+	return first                                          # nowhere is clear (a very small Stage): the nearest spot
 
 
 ## The colour a style of movement is tinted by (the theme maps style -> colour name; unknown styles are untinted).
@@ -637,6 +699,24 @@ func plate_items() -> Array:
 		for it in pl.items:
 			out.append({"path": tag + "/" + it.what, "what": it.what, "frame": frame, "edge": edge,
 				"rect": Rect2(it.rect.position + origin, it.rect.size)})
+	return out
+
+
+## The floating numbers visible right now, in global coordinates, for the clearance check: {path, text, rect}. The path says
+## which beat is playing.
+func float_items() -> Array:
+	var out: Array = []
+	if not _rich or _model.is_empty():
+		return out
+	var origin := get_global_rect().position + _shake_off
+	var beat := "none"
+	if _timeline != null and not _timeline.finished:
+		beat = str(_timeline.current().get("kind", "none"))
+	var i := 0
+	for b in _pool.text_boxes(get_theme_default_font(), get_theme_default_font_size() + 6):
+		out.append({"path": "%s/float[%d] '%s' during beat '%s'" % [get_path(), i, b.text, beat], "text": b.text,
+			"rect": Rect2(b.rect.position + origin, b.rect.size)})
+		i += 1
 	return out
 
 

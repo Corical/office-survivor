@@ -91,6 +91,39 @@ func test_a_stage_plate_holds_the_longest_name() -> void:
 	check(st._plates["Fig"].rect.size.x >= narrow, "the plate did not shrink for a longer number")
 
 
+func test_floating_numbers_never_touch_a_plate_or_each_other() -> void:
+	Themes.use("flash")
+	in_round(2)
+	var v := round_view(2)
+	fake.server_send(v)
+	fake.server_send({"t": "reveal", "round": 2, "news": [], "private": [{"code": "now_have", "args": {"rations": 8}}],
+		"radio": [], "board": null, "seconds_left": 20})
+	var st := Stage.new()
+	_mount(st)
+	st.size = Vector2(540, 400)
+	st._load()
+	check(st._rich, "the flash theme has the art this test needs")
+	var white := Themes.color("white")
+	var homes: Array = st._pos.keys().filter(func(k): return k != Stage.ME)
+	# the same number twice at my hut, one at each other hut, all at once: the case that used to stack on itself
+	st._float_text("+2", st._pos[Stage.ME], 0.0, white)
+	st._float_text("+2", st._pos[Stage.ME], 0.0, white)
+	st._float_text("-12", st._pos[Stage.ME], 0.0, white)
+	for k in homes:
+		st._float_text("+3", st._pos[k], 0.0, white)
+		st._float_text("-1", st._pos[k], 0.0, white)
+	var boxes: Array = st._pool.text_boxes(st.get_theme_default_font(), st.get_theme_default_font_size() + 6, true)
+	check(boxes.size() >= 5, "the numbers are alive: %d" % boxes.size())
+	for i in boxes.size():
+		var r: Rect2 = boxes[i].rect
+		for a in st._plates:
+			check(not (st._plates[a].rect as Rect2).grow(Stage.FLOAT_CLEAR).intersects(r),
+				"'%s' stays %.0f px clear of the plate of %s" % [boxes[i].text, Stage.FLOAT_CLEAR, a])
+		for j in range(i + 1, boxes.size()):
+			check(not r.intersects(boxes[j].rect), "'%s' and '%s' never share pixels" % [boxes[i].text, boxes[j].text])
+	Themes.use("placeholder")
+
+
 ## Every item on every plate lies inside the plate with at least 4 px to spare on each side.
 func _every_plate_item_is_inside(st: Stage) -> void:
 	for alias in st._plates:
