@@ -81,19 +81,45 @@ func _ready() -> void:
 		_audit("reveal waiting %dx%d" % [s.x, s.y])
 	await _size(PHONE)
 
+	# ---- 4b. reveal -> round (the next night starts), then the same reveal again
+	var next_round: Dictionary = round_msg.duplicate(true)
+	next_round["round"] = int(round_msg.round) + 1
+	await _record("reveal_to_round", func(): fake.server_send(next_round), 40)
+	await _wait(0.5)
+	fake.server_send(_night(next_round, me))
+	await _wait(0.8)
+
 	# ---- 5. reveal -> end
 	var end_row: Dictionary = Fixtures.of_type("end")[0]
 	await _record("reveal_to_end", func(): fake.server_send(_rename(end_row.msg)), 40)
 	await _wait(0.6)
 
-	# ---- 6. wide round (the backdrop): fresh round view at three window sizes
-	fake.server_send(round_msg)
+	# ---- 5b. end -> title, then title -> round (a seat and a round view arriving together)
+	await _record("end_to_title", func(): Intents.leave(), 40)
+	await _wait(0.6)
+	await _record("title_to_round", func():
+		Session.act("create_room")
+		fake.server_send({"t": "seat", "token": "snap-token2", "room_code": "KXQM", "alias": me, "host": true})
+		fake.server_send(round_msg), 40)
 	await _wait(0.8)
+
+	# ---- 6. wide round (the backdrop): fresh round view at three window sizes
 	for s in [Vector2i(540, 960), Vector2i(700, 800), Vector2i(1280, 720), Vector2i(1904, 1001), Vector2i(2560, 1440)]:
 		await _size(s)
 		await _wait(0.5)
 		await _shot("%s_round_%dx%d" % [tag, s.x, s.y])
 		_audit("round %dx%d" % [s.x, s.y])
+	# the wide background alone, layer by layer, at the full-screen size that showed a seam (1920x1082)
+	await _size(Vector2i(1920, 1082))
+	await _wait(0.5)
+	router._slot.visible = false
+	await _wait(0.2)
+	await _shot("%s_bg_all_1920x1082" % tag)
+	router.backdrop._front.visible = false
+	await _wait(0.2)
+	await _shot("%s_bg_far_only_1920x1082" % tag)
+	router.backdrop._front.visible = true
+	router._slot.visible = true
 	await _size(Vector2i(1904, 1001))
 	await _wait(0.3)
 	fake.server_send(_night(round_msg, me))
@@ -102,6 +128,10 @@ func _ready() -> void:
 	tl2.snap_to_end()
 	await _wait(0.5)
 	await _shot("%s_reveal_end_1904x1001" % tag)
+
+	await _size(PHONE)
+	await _wait(0.4)
+	await _record("round_to_title", func(): Intents.leave(), 40)
 
 	var f := FileAccess.open(out_dir.path_join("%s_frame_diffs.csv" % tag), FileAccess.WRITE)
 	f.store_string("\n".join(_csv))
