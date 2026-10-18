@@ -32,7 +32,13 @@ const DISABLED_TEXT := Color("9aa6bf")
 const WOOD_TEXT := Color("2b1608")         # text on the light wood of a primary button
 const CARD_X := 34.0                       # content margins of every card_frame panel (clear of the frame art, see build())
 const CARD_Y := 28.0
-const PLAYER_X := 16.0                     # a person card you can press: the same margins selected or not
+const SHORT_TOP := 34                    # fixed top edge (texture px) of the ordinary, 56 px wood button
+const SHORT_BOTTOM := 20                   # fixed bottom edge: the rim and the lip
+const SHORT_CTOP := 3.0                    # content margins of that button: tuned so the label sits on the lit face
+const SHORT_CBOTTOM := 19.0                # (their SUM stays 22 in both states, so a press never changes the button's height)
+const SHORT_CTOP_DOWN := 6.5
+const SHORT_CBOTTOM_DOWN := 15.5
+const PLAYER_X := 16.0                    # a person card you can press: the same margins selected or not
 const PLAYER_Y := 10.0
 
 const ICONS := {
@@ -117,6 +123,13 @@ static func build() -> ThemeDef:
 	if wood_down != null:
 		# the pressed face spans rows 11..86: centre 0.5 px below the middle, so top - bottom = +1 (5.5 px lower than normal)
 		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 36, 30, 36, 30, 26, 12, 26, 11)
+	if wood != null and wood_down != null:
+		# The ordinary buttons are 56 px high, LESS than the 60 px of fixed edge above (30 + 30): Godot then shrinks both edges and
+		# drops the stretch zone, so the lower, darker plank is drawn right under the label and the word sits low on a face that
+		# looks 20 px high. Short fixed edges (top 34 = the lit face to its seam, bottom 20 = the rim and the lip) leave a stretch
+		# zone at 56 px, so the lit face keeps its proportions. Measured by tests/perf/button_centre.gd.
+		t.nine_patches["button_wood_short"] = _nine(wood, 36, SHORT_TOP, 36, SHORT_BOTTOM, 26, SHORT_CTOP, 26, SHORT_CBOTTOM)
+		t.nine_patches["button_wood_short_pressed"] = _nine(wood_down, 36, SHORT_TOP, 36, SHORT_BOTTOM, 26, SHORT_CTOP_DOWN, 26, SHORT_CBOTTOM_DOWN)
 
 	_labels(th, bold, spaced)
 	_buttons(th, bold, t)
@@ -266,6 +279,8 @@ static func _labels(th: Theme, bold: Font, spaced: Font) -> void:
 static func _buttons(th: Theme, bold: Font, t: ThemeDef) -> void:
 	var wood: StyleBox = t.nine_patches.get("button_wood")
 	var wood_down: StyleBox = t.nine_patches.get("button_wood_pressed")
+	var short_up: StyleBox = t.nine_patches.get("button_wood_short")
+	var short_down: StyleBox = t.nine_patches.get("button_wood_short_pressed")
 
 	# Secondary buttons: dark wood (or raised slate with no art)
 	th.set_font("font", "Button", bold)
@@ -281,11 +296,11 @@ static func _buttons(th: Theme, bold: Font, t: ThemeDef) -> void:
 	th.set_constant("h_separation", "Button", 10)
 	if wood != null:
 		var dark := Color(0.66, 0.6, 0.68)
-		th.set_stylebox("normal", "Button", _tint(wood, dark))
-		th.set_stylebox("hover", "Button", _tint(wood, Color(0.8, 0.74, 0.8)))
-		th.set_stylebox("pressed", "Button", _tint(wood_down, dark))
-		th.set_stylebox("hover_pressed", "Button", _tint(wood_down, Color(0.8, 0.74, 0.8)))
-		th.set_stylebox("disabled", "Button", _tint(wood, Color(0.36, 0.36, 0.44, 0.92)))
+		th.set_stylebox("normal", "Button", _tint(short_up, dark))
+		th.set_stylebox("hover", "Button", _tint(short_up, Color(0.8, 0.74, 0.8)))
+		th.set_stylebox("pressed", "Button", _tint(short_down, dark))
+		th.set_stylebox("hover_pressed", "Button", _tint(short_down, Color(0.8, 0.74, 0.8)))
+		th.set_stylebox("disabled", "Button", _tint(short_up, Color(0.36, 0.36, 0.44, 0.92)))
 	else:
 		th.set_stylebox("normal", "Button", _pad(_flat(RAISED, 14, EDGE, 2, 4, 3), 18, 12))
 		th.set_stylebox("hover", "Button", _pad(_flat(RAISED_HI, 14, EMBER, 2, 6, 4), 18, 12))
