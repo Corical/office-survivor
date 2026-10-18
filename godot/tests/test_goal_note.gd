@@ -32,6 +32,8 @@ func test_the_note_is_shown_under_the_goal_in_the_theme_words() -> void:
 	var s := RoundScreen.new()
 	add_child(s)
 	_mounted.append(s)
+	s._goal_open = true                                   # the note is part of the opened goal
+	s._build()
 	var note := Ui.find(s, "goal_note") as Label
 	check(note != null, "the note is on the goal card")
 	if note == null:
