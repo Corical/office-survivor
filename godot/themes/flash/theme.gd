@@ -214,6 +214,9 @@ static func _labels(th: Theme, bold: Font, spaced: Font) -> void:
 	th.set_font_size("font_size", "StatLabel", 26)
 	th.set_color("font_shadow_color", "StatLabel", Color(0, 0, 0, 0.5))
 	th.set_constant("shadow_offset_y", "StatLabel", 2)
+	# StatLabelHot: the highest number of its column (also bracketed in the text, so colour is never the only sign)
+	th.set_type_variation("StatLabelHot", "StatLabel")
+	th.set_color("font_color", "StatLabelHot", EMBER_HI)
 	# RankLabel: the big numeral on a podium step
 	th.set_type_variation("RankLabel", "Label")
 	th.set_font("font", "RankLabel", bold)

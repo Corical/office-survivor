@@ -111,6 +111,11 @@ OVERRIDES = {
     "ui.server_address": "SERVER ADDRESS",
     "ui.start": "Start the first night",
     "ui.waiting_for_host": "Waiting for the host to begin",
+    # --- end/lobby/title ---
+    "ui.best_legend": "[ ] = the most around the fire",
+    "ui.scroll_more": "Scroll down: all {n} are listed below",
+    "ui.code_caption": "Camp code",
+    "ui.bots_fill": "Empty places by the fire are taken by bots when you start.",
 }
 
 SLOT = re.compile(r"\{(\w+)\}")
