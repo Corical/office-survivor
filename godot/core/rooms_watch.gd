@@ -23,7 +23,9 @@ const MAX_NAME := 24                  # the proposal
 const MAX_CODE := 12                  # chosen: real codes are 4 letters; anything longer is not a code
 const MAX_SEATS := 12                 # chosen: a camp bigger than this is not one this client can draw
 const MAX_AGE_S := 604800             # chosen: a week; "absurd" ages are shown as this
-const VISIBILITIES := ["public", "private"]
+const MAX_GAME_ID := 32               # chosen: real ids are short words
+const MAX_GAMES := 12                 # chosen: a picker longer than this is not one a phone can show
+const VISIBILITIES :=["public", "private"]
 
 var watching := false
 var connected := false
@@ -223,8 +225,55 @@ static func _entry(e: Variant) -> Dictionary:
 	var age: Variant = e.get("age_s")
 	if not (typeof(age) == TYPE_INT or typeof(age) == TYPE_FLOAT) or not is_finite(float(age)) or float(age) < 0.0:
 		return {}
-	return {"code": code, "seats_taken": int(taken), "seats_total": int(total),
+	var out := {"code": code, "seats_taken": int(taken), "seats_total": int(total),
 		"age_s": int(minf(float(age), float(MAX_AGE_S))), "name": clean_name(e.get("name"))}
+	var game := clean_game_id(e.get("game"))
+	if game != "":
+		out["game"] = game                          # appended by the platform server; absent from an older one (then it is Survivors)
+	return out
+
+
+## A game id: letters, digits, underscore and dash, at most MAX_GAME_ID long. "" for anything else (not text, too long, odd characters).
+static func clean_game_id(v: Variant) -> String:
+	if not (v is String):
+		return ""
+	var s: String = v
+	if s.length() < 1 or s.length() > MAX_GAME_ID:
+		return ""
+	for i in s.length():
+		var c := s.unicode_at(i)
+		if not ((c >= 48 and c <= 57) or (c >= 65 and c <= 90) or (c >= 97 and c <= 122) or c == 95 or c == 45):
+			return ""
+	return s
+
+
+## `hello_ok.games` made safe: [{id, name, seats_min, seats_max}], at most MAX_GAMES, bad entries and repeated ids dropped.
+## An absent or non-list value is an EMPTY list, which means "no picker: Survivors only", the same as an old server.
+static func sanitize_games(raw: Variant) -> Array:
+	var out: Array = []
+	if not (raw is Array):
+		return out
+	var seen := {}
+	var looked := 0
+	for e in raw:
+		looked += 1
+		if looked > MAX_RAW:
+			break
+		if not (e is Dictionary):
+			continue
+		var id := clean_game_id(e.get("id"))
+		var lo: Variant = _whole(e.get("seats_min"))
+		var hi: Variant = _whole(e.get("seats_max"))
+		if id == "" or seen.has(id) or lo == null or hi == null:
+			continue
+		if int(lo) < 1 or int(hi) < int(lo) or int(hi) > MAX_SEATS:
+			continue
+		var nm := clean_name(e.get("name"))
+		seen[id] = true
+		out.append({"id": id, "name": nm if nm != "" else id, "seats_min": int(lo), "seats_max": int(hi)})
+		if out.size() >= MAX_GAMES:
+			break
+	return out
 
 
 static func _code(v: Variant) -> String:
