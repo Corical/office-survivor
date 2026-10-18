@@ -95,7 +95,7 @@ UI.update({
     "ui.kick_help": "A seat that dropped off stays taken. Remove it to free the seat.",
     "ui.net.connecting": "Connecting...", "ui.net.online": "Connected", "ui.net.reconnecting": "Reconnecting...",
     "ui.net.unreachable": "Can't reach the server", "ui.net.offline": "Offline", "ui.net.stopped": "Disconnected",
-    "notice.seat_gone": "That game is no longer available.",
+    "notice.seat_gone": "Your seat is gone: the game ended or the host removed you. You can join again with a code.",
     "notice.taken_over": "This game was opened on another device. Resume here to take it back.",
     "notice.too_big": "The server sent something too large.",
     "notice.flapping": "The connection keeps dropping. Another device may have your seat.",
