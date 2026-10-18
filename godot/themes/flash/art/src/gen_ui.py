@@ -100,7 +100,10 @@ def button(pressed):
     # bevel line just inside the face
     s.add(f'<path d="{rrect_d(fx + 2.5, fy + 2.5, fw - 5, fh - 5, R - 2.5)}" fill="none" stroke="#fff0cc" stroke-opacity="{0.25 if pressed else 0.55}" stroke-width="1.4"/>')
     # brass studs on each end (inside the 36 px 9-slice margin), not in the text area
-    cy = fy + fh / 2
+    # The stud must lie ENTIRELY inside the 36 px top margin or it is cut by the stretch seam (the pressed face is 5 px lower,
+    # so its middle, 36, would put the 5.4 px stud across the seam: found by the stud-roundness probe at 64 px). 30 is fixed
+    # for both states, 1 px above the face middle on the normal button and 6 px above it on the pressed one.
+    cy = 30
     for x in (20, W - 20):
         s.add(circle(x + 0.6, cy + 1.2, 5.4, "#000", 'fill-opacity="0.45"'))
         s.add(circle(x, cy, 5.2, s.rad([(0, "#fff3d0"), (0.5, "#c9a252"), (1, "#4a3512")], 0.35, 0.3, 0.8), 'stroke="#1a0c04" stroke-width="1.4"'))

@@ -455,7 +455,7 @@ func _dock(dock: VBoxContainer, open: bool) -> void:
 		var radio := Ui.button(Words.render("ui.radio"), "radio_toggle", func():
 			_radio_open = not _radio_open
 			_radio_phrase = {}
-			_build(), not open, "", "radio")
+			_build(), not open, "SkipPill", "radio")                 # a flat pill: the wood art needs 62 px and this sits in the dock at 48
 		radio.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		radio.custom_minimum_size = Vector2(0, 48)
 		top.add_child(radio)
