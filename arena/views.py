@@ -13,7 +13,14 @@ from bot.core import RADIO_PHRASES
 from engine.finish import goal_progress, objective_text
 from engine.visibility import band_index
 
-from .lines import news_codes
+from .lines import news_codes as _news_codes, render
+
+
+def news_codes(events):
+    """The public news for a night in an order that depends only on the lines themselves. The engine resolves seats in
+    seat order and humans take the low seats, so its order would tell a watcher which seats are people (the same
+    reason the radio is sorted by wording). Wilderness stories first, as in Torch, then everything else by wording."""
+    return sorted(_news_codes(events), key=lambda line: (line["code"] != "event", render(line)))
 
 BANDS = ("well_fed", "getting_by", "starving", "bandit")
 PROTO = 1

@@ -118,6 +118,35 @@ class NonInterference(unittest.TestCase):
         self.assertGreater(diffs, 0)
 
 
+class NewsOrder(unittest.TestCase):
+    def test_public_news_does_not_depend_on_the_order_the_engine_resolved_seats_in(self):
+        """The engine resolves seats in seat order and humans take the low seats, so the order of the public lines would
+        tell a watcher which seats are people. Shuffle each real night's events: the reveal's news must not move."""
+        compared = 0
+        for seed in range(25):
+            rng = random.Random(seed)
+            g, sched = new_room(seed, humans=1 + seed % 3, ranges=True)
+            while not g.finished:
+                if g.phase == "round":
+                    sched.advance(g.deadline)
+                    continue
+                rec = g.night_record(g.closed)
+                if len(views.news_codes(rec["events"])) >= 2:
+                    base = views.reveal_view(g, 0)["news"]
+                    for k in range(4):
+                        events = list(rec["events"])
+                        random.Random(seed * 10 + k).shuffle(events)
+                        original = g.night_record
+                        g.night_record = lambda n, e=events, r=rec: {**r, "events": e}
+                        try:
+                            self.assertEqual(views.reveal_view(g, 0)["news"], base, f"seed {seed} round {g.closed}")
+                        finally:
+                            g.night_record = original
+                        compared += 1
+                sched.advance(g.reveal_until)
+        self.assertGreater(compared, 20, "too few nights with two or more public lines to mean anything")
+
+
 class Shape(unittest.TestCase):
     def test_no_view_carries_internal_ids_or_bot_markers(self):
         bad = {"pid", "sim", "sims", "personality", "arch", "seed", "seed_key", "season", "token", "ref"}

@@ -75,7 +75,10 @@ opens round 1; timers are put back.
 Built field by field in `arena/views.py`. Hidden from a seat during play: the others' picks, goals, private lines and
 exact rations (only the band, when ranges are on), which of them locked (only the count), and which seats are bots.
 `arena/tests/test_views.py` scrambles all of that and requires every view to stay byte-identical. Radio in a reveal
-is listed in alphabetical order of its wording, never in the order it was sent (bots post at the close).
+is listed in alphabetical order of its wording, never in the order it was sent (bots post at the close). The public
+news is ordered the same way (wilderness stories first, then by wording), never in the engine's seat order: humans take
+the low seats, so that order would show which seats are people. (Torch's #news still lists lines in engine order; its
+players have random aliases and no way to see seat numbers, so it is a much weaker hint there.)
 
 Lines are codes plus values (`arena/lines.py`); `arena/lines_en.json` turns them into Torch's exact English.
 
