@@ -10,12 +10,17 @@ const LONG_NAMES := ["Bartholomew_Jr_III", "SaltyPretzelSupreme", "Wolfgang Amad
 	"Juniper", "Marlowe"]
 const PHONE := Vector2i(540, 960)
 const DESKTOP := Vector2i(1280, 720)
+const WIDE_SIZES := [Vector2i(1280, 720), Vector2i(1843, 925), Vector2i(2560, 1440)]    # the owner's window, and a big monitor
 
 var out_dir := ""
 var theme_id := "flash"
 var fake := FakeTransport.new()
 var clock := FakeClock.new()
 var router: Control
+const AUDIT_SIZES := [Vector2i(540, 960), Vector2i(700, 800), Vector2i(1280, 720), Vector2i(1843, 925)]
+var audits := 0
+var violations := 0
+var violation_paths := {}              # distinct offenders, so a repeat at another size is not counted twice
 var _names := {}                       # fixture alias -> the realistic one
 var _rx := RegEx.create_from_string("Alias\\d+")
 
@@ -43,6 +48,7 @@ func _ready() -> void:
 	await _size(PHONE)
 	await _wait(0.9)
 	await _shot("01_title")
+	await _audit_sizes("title")
 	var settings := Ui.find(router.current, "settings_toggle") as Button
 	if settings != null:
 		settings.pressed.emit()
@@ -70,6 +76,8 @@ func _ready() -> void:
 	var base_round: Dictionary = _pick_round()
 	var me: String = _name(base_round.me)
 	var round_msg: Dictionary = _rename(base_round.msg)
+	if NAMES == LONG_NAMES:
+		round_msg.me.rations = 128                       # a three-digit food number: the plate must grow to hold it
 	Net.connect_to("ws://test")
 	fake.server_open()
 	fake.server_send({"t": "hello_ok", "proto": 1})
@@ -78,11 +86,13 @@ func _ready() -> void:
 	fake.server_send({"t": "lobby", "room_code": "KXQM", "seats_taken": 3, "seats_total": 4, "host": true})
 	await _wait(0.9)
 	await _shot("02_lobby_host")
+	await _audit_sizes("lobby")
 
 	round_msg["board"] = _board(round_msg)
 	fake.server_send(round_msg)
 	await _wait(1.0)
 	await _shot("03_round_open")
+	await _audit_sizes("round open")
 	var rs: Control = router.current
 	var steal := Ui.find(rs, "move_steal") as Button
 	if steal != null:
@@ -99,6 +109,7 @@ func _ready() -> void:
 		fake.server_send(v)
 		await _wait(0.6)
 		await _shot("05_round_picked")
+		await _audit_sizes("round picked")
 		var urgent: Dictionary = v.duplicate(true)
 		urgent["seconds_left"] = 7.0
 		fake.server_send(urgent)
@@ -113,6 +124,7 @@ func _ready() -> void:
 		fake.server_send(locked)
 		await _wait(0.4)
 		await _shot("06b_round_locked")
+		await _audit_sizes("round locked")
 	fake.server_close(1006)
 	await _wait(0.5)
 	await _shot("07_round_reconnecting")
@@ -126,13 +138,34 @@ func _ready() -> void:
 	await _size(DESKTOP)
 	await _wait(0.5)
 	await _shot("10_round_desktop")
+	var pick_btn := Ui.find_all(router.current, "target_")
+	if not pick_btn.is_empty():                                   # a selected target card on a wide window
+		var steal_btn := Ui.find(router.current, "move_steal") as Button
+		if steal_btn != null:
+			steal_btn.pressed.emit()
+			await _wait(0.4)
+			var first := Ui.find_all(router.current, "target_")
+			if not first.is_empty():
+				var chosen_view: Dictionary = round_msg.duplicate(true)
+				chosen_view["my_pick"] = {"kind": "steal", "target": (first[0] as Button).get_meta("id").substr(7), "amount": 0}
+				fake.server_send(chosen_view)
+				await _wait(0.5)
+	await _size(Vector2i(1843, 925))
+	await _wait(0.5)
+	await _shot("10_round_1843x925")
 	await _size(PHONE)
 
 	# the reveal: a synthetic night with one of every beat, parked on each in turn
 	fake.server_send(_night(round_msg, me))
 	await _wait(0.9)
 	await _shot("08_reveal_start")
+	await _audit_sizes("reveal start")
 	await _gallery("08", PHONE)
+	await _size(Vector2i(700, 800))                     # audit every beat again in a narrow window and in the owner's
+	await _gallery("a700", PHONE, [], false)
+	await _size(Vector2i(1843, 925))
+	await _gallery("a1843", PHONE, [], false)
+	await _size(PHONE)
 	await _size(DESKTOP)
 	await _wait(0.6)
 	await _gallery("11", DESKTOP, ["blocked", "move_resource"])
@@ -142,9 +175,12 @@ func _ready() -> void:
 	fake.server_send(_rename(end_row.msg))
 	await _wait(1.6)
 	await _shot("09_end")
-	await _size(DESKTOP)
-	await _wait(0.6)
-	await _shot("12_end_desktop")
+	await _audit_sizes("end")
+	for s in WIDE_SIZES:
+		await _size(s)
+		await _wait(0.6)
+		await _shot("12_end_%dx%d" % [s.x, s.y])
+	print("CLEARANCE TOTAL: %d violations in %d audits, %d distinct offenders" % [violations, audits, violation_paths.size()])
 	print("SNAPSHOTS DONE ", out_dir)
 	get_tree().quit(0)
 
@@ -162,7 +198,7 @@ const GALLERY := [
 
 ## Park the timeline on each beat in turn, wait a moment of REAL time so the effects have flown, and take a picture.
 ## `only` limits it to some beat kinds; a beat is photographed at a quarter and at half way.
-func _gallery(prefix: String, _size_hint: Vector2i, only: Array = []) -> void:
+func _gallery(prefix: String, _size_hint: Vector2i, only: Array = [], shots := true) -> void:
 	var tl: Timeline = Feed.player.timeline
 	var beats: Array = Feed.models.reveal.beats
 	var from := 0
@@ -184,9 +220,12 @@ func _gallery(prefix: String, _size_hint: Vector2i, only: Array = []) -> void:
 		tl.elapsed_ms = 0.0
 		var dwell := 0.2 if g[1] == "total" else 0.28
 		await _wait(dwell)
-		await _shot("%s_%02d_%s_a" % [prefix, n, g[0]])
+		if shots:
+			await _shot("%s_%02d_%s_a" % [prefix, n, g[0]])
 		await _wait(dwell)
-		await _shot("%s_%02d_%s_b" % [prefix, n, g[0]])
+		if shots:
+			await _shot("%s_%02d_%s_b" % [prefix, n, g[0]])
+		_audit("beat %s @%s" % [g[0], str(get_window().size)])
 		n += 1
 	# everything played: the written log lit at its last line
 	tl.snap_to_end()
@@ -257,6 +296,27 @@ func _rename(msg: Dictionary) -> Dictionary:
 		text = text.replace('"%s"' % a, '"%s"' % _names[a])
 	var parsed: Variant = SafeJson.parse(text)
 	return Net.normalize(parsed)
+
+
+## Run the clearance check on whatever is on screen now: nothing may sit on a frame. Every offender is printed with its path.
+func _audit(tag: String) -> void:
+	audits += 1
+	var found := Clearance.check(router)
+	for v in found:
+		violations += 1
+		violation_paths[v.get_slice(":", 0) + v.get_slice(":", 1).substr(0, 40)] = true
+		print("CLEARANCE ", tag, ": ", v)
+	print("CLEARANCE ", tag, " violations=", found.size())
+
+
+## The same check at the four window sizes that matter (phone, a narrow window, a desktop, the owner's), then back.
+func _audit_sizes(tag: String) -> void:
+	var back := get_window().size
+	for s in AUDIT_SIZES:
+		await _size(s)
+		await _wait(0.3)
+		_audit("%s @%dx%d" % [tag, s.x, s.y])
+	await _size(back)
 
 
 func _size(s: Vector2i) -> void:

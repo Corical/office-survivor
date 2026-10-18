@@ -15,7 +15,13 @@ extends Control
 
 const ME := "@me"                       # the adapter's markers for "I" and "someone unnamed" (a test keeps these equal)
 const OFFSTAGE := "@offstage"
-const PLATE_H := 52.0
+const PLATE_GAP := 2.0                  # between a hut and its plate
+const PLATE_LINE_GAP := 2.0
+const PLATE_MIN_MARGIN_X := 12.0        # a plate's padding never drops below this, whatever the style says
+const PLATE_MIN_MARGIN_Y := 7.0
+const PLATE_DEFAULT_EDGE := 3.0         # the rim of a plate when the theme does not say (constant plate_edge)
+const ICON_PX := 20.0
+const ICON_GAP := 6.0
 const SHAKE_DECAY := 46.0               # chosen: pixels of shake lost per second
 const FLASH_DECAY := 2.6                # chosen: flash alpha lost per second
 const CAPTION_H := 60.0                # chosen: the strip at the top that holds the line being played
@@ -38,7 +44,7 @@ var _rich := false                      # the theme has art: draw huts, avatars,
 var _tex := {}                          # the art this Stage uses, fetched once
 var _avatars := {}
 var _order: Array = []                  # roster, back to front (by y), for drawing
-var _plate_name := {}                   # alias -> name trimmed to fit its plate
+var _plates := {}                       # alias -> {rect, items, style}: each plate's frame and what sits on it
 var _pool := FxPool.new()
 var _fx: Backdrop.Layer                 # the additive layer: glows, sparks, rings
 var _t := 0.0
@@ -131,7 +137,7 @@ func _layout() -> void:
 	var tall := clampf((size.y - 400.0) / 300.0, 0.0, 1.0)                 # a tall Stage (desktop) can afford bigger huts
 	var hs := clampf(minf(size.x * 0.27, size.y * lerpf(0.2, 0.27, tall)), 64.0, 200.0)
 	_hut_px = hs
-	var plate := PLATE_H + 2.0
+	var plate := _plate_height() + PLATE_GAP
 	var c := Vector2(size.x * 0.5, (size.y + CAPTION_H + 0.06 * hs) * 0.5)
 	var ry := maxf(36.0, minf(size.y - 4.0 - plate - hs * 0.5 - c.y, c.y - CAPTION_H - plate - hs * 0.56))
 	var rx := maxf(40.0, minf(size.x * 0.5 - hs * 0.5 - 10.0, ry * 1.8))
@@ -147,20 +153,77 @@ func _layout() -> void:
 	set_meta("radius", (rx + ry) * 0.5)
 	_order = _roster.duplicate()
 	_order.sort_custom(func(a, b): return _pos[a.alias].y < _pos[b.alias].y)
-	_trim_plates()
+	_build_plates()
 
 
-## Each name, cut with an ellipsis if it would not fit its plate (once per layout, never per frame).
-func _trim_plates() -> void:
-	_plate_name = {}
+## The plates. One layout per home, built once per layout (and again when my food number changes digits), and used by BOTH
+## the drawing and the clearance check, so what is checked is what is drawn. A plate is sized from its content plus the
+## frame style's own content margins, and grows (up to a share of the Stage) rather than let anything touch its rim; a
+## name or word too long for that is cut with an ellipsis.
+func _build_plates() -> void:
+	_plates = {}
+	for e in _roster:
+		_build_plate(e)
+
+
+func _build_plate(e: Dictionary) -> void:
+	var at: Vector2 = _pos[e.alias]
 	var font := get_theme_default_font()
 	var ps := _plate_size()
-	var room := _plate_w() - 28.0
-	for e in _roster:
-		var s: String = e.alias
-		while s.length() > 1 and font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, ps + 1).x > room:
-			s = s.substr(0, s.length() - 1)
-		_plate_name[e.alias] = s if s == e.alias else s.strip_edges() + "..."
+	var sb := get_theme_stylebox("plate_me" if e.is_me else "plate", "Stage")
+	var mx := maxf(sb.get_margin(SIDE_LEFT), PLATE_MIN_MARGIN_X)
+	var my := maxf(sb.get_margin(SIDE_TOP), PLATE_MIN_MARGIN_Y)
+	var room := maxf(size.x * 0.42, 130.0) - mx * 2.0
+	var name_s := _fit(font, e.alias, ps + 1, room)
+	var name_w := font.get_string_size(name_s, HORIZONTAL_ALIGNMENT_LEFT, -1, ps + 1).x
+	var icon: Texture2D = null
+	var text2 := ""
+	if e.is_me:
+		icon = Themes.icon("food")
+		text2 = str(_shown_int)
+	elif e.band != "":
+		icon = Themes.icon(e.band)
+		text2 = Words.render(e.band)
+	var size2 := ps + 8 if e.is_me else ps - 1          # my number is reserved room at the biggest it pops to
+	var icon_room := ICON_PX + ICON_GAP if icon != null else 0.0
+	text2 = _fit(font, text2, size2, room - icon_room)
+	var tw2 := font.get_string_size(text2, HORIZONTAL_ALIGNMENT_LEFT, -1, size2).x if text2 != "" else 0.0
+	var w2 := icon_room + tw2
+	var w := maxf(_hut_px * 0.95, maxf(name_w, w2) + mx * 2.0)
+	var h := _plate_height()
+	var l1h := font.get_height(ps + 1)
+	var l2h := h - my * 2.0 - l1h - PLATE_LINE_GAP
+	var centre: Vector2 = get_meta("centre", size * 0.5)
+	var above: bool = at.y < centre.y - _hut_px * 0.4      # homes in the top half carry their plate above, clear of the fire
+	var py := at.y - _hut_px * 0.56 - h - PLATE_GAP if above else at.y + _hut_px * 0.5 + PLATE_GAP
+	var px := clampf(at.x - w * 0.5, 4.0, maxf(4.0, size.x - w - 4.0))
+	var items: Array = []
+	var nx := px + (w - name_w) * 0.5
+	items.append({"kind": "text", "what": "name", "text": name_s, "size": ps + 1, "tint": "text",
+		"rect": Rect2(nx, py + my, name_w, l1h), "base": Vector2(nx, py + my + font.get_ascent(ps + 1))})
+	var top2 := py + my + l1h + PLATE_LINE_GAP
+	var x := px + (w - w2) * 0.5
+	if icon != null:
+		items.append({"kind": "icon", "what": "icon", "tex": icon,
+			"rect": Rect2(x, top2 + (l2h - ICON_PX) * 0.5, ICON_PX, ICON_PX)})
+		x += icon_room
+	if text2 != "":
+		var th := font.get_height(size2)
+		var ty := top2 + (l2h - th) * 0.5
+		items.append({"kind": "text", "what": "number" if e.is_me else "band", "text": text2, "size": size2,
+			"tint": "gain" if e.is_me else "text", "number": e.is_me,
+			"rect": Rect2(x, ty, tw2, th), "base": Vector2(x, ty + font.get_ascent(size2))})
+	_plates[e.alias] = {"rect": Rect2(px, py, w, h), "items": items, "style": sb}
+
+
+## `s` cut with an ellipsis until it fits `room` pixels at `px` size (unchanged when it already fits).
+static func _fit(font: Font, s: String, px: int, room: float) -> String:
+	if font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x <= room:
+		return s
+	var cut := s
+	while cut.length() > 1 and font.get_string_size(cut + "...", HORIZONTAL_ALIGNMENT_LEFT, -1, px).x > room:
+		cut = cut.substr(0, cut.length() - 1)
+	return cut.strip_edges() + "..."
 
 
 func _plate_size() -> int:
@@ -168,8 +231,13 @@ func _plate_size() -> int:
 	return ps if ps > 0 else maxi(12, get_theme_default_font_size() - 3)
 
 
-func _plate_w() -> float:
-	return clampf(_hut_px * 1.4, 108.0, 190.0)
+## Every plate is as tall as its two lines plus the style's top and bottom margins.
+func _plate_height() -> float:
+	var font := get_theme_default_font()
+	var ps := _plate_size()
+	var sb := get_theme_stylebox("plate", "Stage")
+	var my := maxf(sb.get_margin(SIDE_TOP), PLATE_MIN_MARGIN_Y)
+	return my * 2.0 + font.get_height(ps + 1) + PLATE_LINE_GAP + maxf(font.get_height(ps + 8), ICON_PX)
 
 
 func _process(delta: float) -> void:
@@ -265,6 +333,9 @@ func _animate(dt: float, real: float) -> void:
 	if n != _shown_int:
 		_shown_int = n
 		_food_pop = 1.0
+		for e in _roster:
+			if e.is_me:
+				_build_plate(e)                       # the number may have changed digits: the plate grows or shrinks to hold it
 	_food_pop = maxf(0.0, _food_pop - real * 4.5)
 	if _shake > 0.0:
 		_shake = maxf(0.0, _shake - real * SHAKE_DECAY)
@@ -545,50 +616,51 @@ func _draw_home(e: Dictionary, font: Font, ink: Color) -> void:
 		var asz := hs * 0.44
 		var bob := sin(_t * 2.2 + float(e.alias.hash() % 11)) * 2.0
 		draw_texture_rect(face, Rect2(at + Vector2(hs * 0.42 - asz * 0.5, hs * 0.12 - asz * 0.5 + bob), Vector2(asz, asz)), false)
-	_draw_plate(e, at, font, ink)
+	_draw_plate(e, font, ink)
 
 
-## The name plate under a home: the name, and below it my food (a number) or another player's band (an icon and a word).
-func _draw_plate(e: Dictionary, at: Vector2, font: Font, ink: Color) -> void:
-	var pw := _plate_w()
-	var centre: Vector2 = get_meta("centre", size * 0.5)
-	var above: bool = at.y < centre.y - _hut_px * 0.4          # homes in the top half carry their plate above, clear of the fire
-	var py := at.y - _hut_px * 0.56 - PLATE_H - 2.0 if above else at.y + _hut_px * 0.5 + 2.0
-	var rect := Rect2(clampf(at.x - pw * 0.5, 4.0, maxf(4.0, size.x - pw - 4.0)), py, pw, PLATE_H)
-	var sb := get_theme_stylebox("plate_me" if e.is_me else "plate", "Stage")
-	draw_style_box(sb, rect)
-	var ps := _plate_size()
-	var cx := rect.position.x + pw * 0.5
+## What is drawn on each plate, in global coordinates, for the clearance check: {path, what, rect, frame, edge}.
+func plate_items() -> Array:
+	var out: Array = []
+	if not _rich or _model.is_empty():
+		return out
+	var origin := get_global_rect().position
+	var edge := float(get_theme_constant("plate_edge", "Stage"))
+	if edge <= 0.0:
+		edge = PLATE_DEFAULT_EDGE
+	for e in _roster:
+		var pl: Dictionary = _plates.get(e.alias, {})
+		if pl.is_empty():
+			continue
+		var frame := Rect2(pl.rect.position + origin, pl.rect.size)
+		var tag := "%s/plate:%s" % [get_path(), e.alias]
+		for it in pl.items:
+			out.append({"path": tag + "/" + it.what, "what": it.what, "frame": frame, "edge": edge,
+				"rect": Rect2(it.rect.position + origin, it.rect.size)})
+	return out
+
+
+## The plate under (or over) a home, from its layout: the frame, then each item in place.
+func _draw_plate(e: Dictionary, font: Font, ink: Color) -> void:
+	var pl: Dictionary = _plates.get(e.alias, {})
+	if pl.is_empty():
+		return
+	draw_style_box(pl.style, pl.rect)
 	var col_text := get_theme_color("text", "Stage")
-	var nm: String = _plate_name.get(e.alias, e.alias)
-	_text(font, nm, Vector2(rect.position.x, rect.position.y + 22.0), ps + 1, col_text, ink, pw)
-	var y2 := rect.position.y + 43.0
-	if e.is_me:
-		var icon := Themes.icon("food")
-		var num := str(_shown_int)
-		var nsz := ps + 4 + int(7.0 * _food_pop)
-		var tw := font.get_string_size(num, HORIZONTAL_ALIGNMENT_LEFT, -1, nsz).x
-		var total := tw + (24.0 if icon != null else 0.0)
-		var x := cx - total * 0.5
-		if icon != null:
-			draw_texture_rect(icon, Rect2(x, y2 - 17.0, 21, 21), false)
-			x += 24.0
-		_text(font, num, Vector2(x, y2), nsz, Themes.color("gain"), ink, -1.0, HORIZONTAL_ALIGNMENT_LEFT)
-	elif e.band != "":
-		var icon := Themes.icon(e.band)
-		var word := Words.render(e.band)
-		var tw := font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, ps - 1).x
-		var room := pw - 22.0 - (24.0 if icon != null else 0.0)
-		while word.length() > 3 and tw > room:
-			word = word.substr(0, word.length() - 1)
-			tw = font.get_string_size(word + "...", HORIZONTAL_ALIGNMENT_LEFT, -1, ps - 1).x
-		var total := tw + (24.0 if icon != null else 0.0)
-		var x := cx - total * 0.5
-		if icon != null:
-			draw_texture_rect(icon, Rect2(x, y2 - 16.0, 20, 20), false)
-			x += 24.0
-		_text(font, word if word == Words.render(e.band) else word + "...", Vector2(x, y2), ps - 1, get_theme_color("text", "Stage"),
-			ink, -1.0, HORIZONTAL_ALIGNMENT_LEFT)
+	for it in pl.items:
+		if it.kind == "icon":
+			draw_texture_rect(it.tex, it.rect, false)
+			continue
+		var col := Themes.color("gain") if it.tint == "gain" else col_text
+		if it.get("number", false):
+			# my food pops bigger for a moment; it is centred in the room reserved for its biggest size
+			var dsz := _plate_size() + 3 + int(5.0 * _food_pop)
+			var r: Rect2 = it.rect
+			var tw := font.get_string_size(it.text, HORIZONTAL_ALIGNMENT_LEFT, -1, dsz).x
+			var by := r.position.y + (r.size.y - font.get_height(dsz)) * 0.5 + font.get_ascent(dsz)
+			_text(font, it.text, Vector2(r.position.x + (r.size.x - tw) * 0.5, by), dsz, col, ink, -1.0, HORIZONTAL_ALIGNMENT_LEFT)
+		else:
+			_text(font, it.text, it.base, it.size, col, ink, -1.0, HORIZONTAL_ALIGNMENT_LEFT)
 
 
 func _text(font: Font, s: String, at: Vector2, size_px: int, col: Color, outline: Color, width := -1.0,

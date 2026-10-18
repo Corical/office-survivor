@@ -30,6 +30,10 @@ const ON_EMBER := Color("1c1206")          # text on ember
 const FOCUS := Color("8fe8f7")             # keyboard focus ring
 const DISABLED_TEXT := Color("9aa6bf")
 const WOOD_TEXT := Color("2b1608")         # text on the light wood of a primary button
+const CARD_X := 34.0                       # content margins of every card_frame panel (clear of the frame art, see build())
+const CARD_Y := 28.0
+const PLAYER_X := 16.0                     # a person card you can press: the same margins selected or not
+const PLAYER_Y := 10.0
 
 const ICONS := {
 	"scavenge": preload("res://themes/flash/icons/scavenge.svg"),
@@ -101,7 +105,9 @@ static func build() -> ThemeDef:
 	var wood_down := FlashArt.load_texture("button_wood_pressed")
 	var frame := FlashArt.load_texture("card_frame")
 	if frame != null:
-		t.nine_patches["card_frame"] = _nine(frame, 40, 40, 40, 40, 28, 20, 28, 20)
+		# The frame art is about 23 px thick with brackets reaching further in at the corners. Content must clear all of it,
+		# so every card (normal, lit, a pick) shares these margins: a highlighted row differs by COLOUR only, never by layout.
+		t.nine_patches["card_frame"] = _nine(frame, 40, 40, 40, 40, CARD_X, CARD_Y, CARD_X, CARD_Y)
 	if wood != null:
 		# Measured on the art (tools: see the face rows in the notes): the lit face of the normal button spans rows 6..80 of
 		# the 96 px (1x) texture, so its centre is 5 px ABOVE the texture's middle (the lip is underneath). A label centred
@@ -323,21 +329,18 @@ static func _buttons(th: Theme, bold: Font, t: ThemeDef) -> void:
 	th.set_constant("outline_size", "PlayerCard", 4)
 	th.set_constant("icon_max_width", "PlayerCard", 52)
 	th.set_constant("h_separation", "PlayerCard", 12)
-	var card_n: StyleBox = t.nine_patches.get("card_frame")
-	if card_n != null:
-		th.set_stylebox("normal", "PlayerCard", _tint(card_n, Color(1, 1, 1), 14, 10))
-		th.set_stylebox("hover", "PlayerCard", _tint(card_n, Color(1.35, 1.25, 1.1), 14, 10))
-		th.set_stylebox("pressed", "PlayerCard", _tint(card_n, Color(0.7, 0.7, 0.8), 14, 10))
-		th.set_stylebox("hover_pressed", "PlayerCard", _tint(card_n, Color(0.7, 0.7, 0.8), 14, 10))
-		th.set_stylebox("disabled", "PlayerCard", _tint(card_n, Color(0.55, 0.55, 0.65), 14, 10))
-	else:
-		for s in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-			th.set_stylebox(s, "PlayerCard", th.get_stylebox(s, "Button"))
+	# Flat dark cards with a brass rim, NOT the ornate frame: a compact card cannot hold two lines inside a frame that is 24 px
+	# thick. Normal, hover, pressed and picked share the same padding, so a pick changes colour and rim, never layout.
+	th.set_stylebox("normal", "PlayerCard", _pad(_flat(Color(0.06, 0.09, 0.17, 0.9), 14, Color("a8803a"), 2, 4, 2), PLAYER_X, PLAYER_Y))
+	th.set_stylebox("hover", "PlayerCard", _pad(_flat(Color(0.12, 0.16, 0.28, 0.95), 14, EMBER_HI, 2, 6, 2), PLAYER_X, PLAYER_Y))
+	th.set_stylebox("pressed", "PlayerCard", _pad(_flat(Color(0.03, 0.05, 0.1, 0.95), 14, EMBER, 2, 0, 0), PLAYER_X, PLAYER_Y))
+	th.set_stylebox("hover_pressed", "PlayerCard", _pad(_flat(Color(0.03, 0.05, 0.1, 0.95), 14, EMBER, 2, 0, 0), PLAYER_X, PLAYER_Y))
+	th.set_stylebox("disabled", "PlayerCard", _pad(_flat(Color(0.05, 0.07, 0.12, 0.7), 14, Color("5a4a2a"), 2, 0, 0), PLAYER_X, PLAYER_Y))
 	th.set_stylebox("focus", "PlayerCard", _ring(18))
 	th.set_type_variation("PlayerCardChosen", "PlayerCard")
 	for k in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_disabled_color"]:
 		th.set_color(k, "PlayerCardChosen", EMBER_HI)
-	var picked := _pad(_flat(Color("33281a"), 18, EMBER, 4, 10, 0), 14, 10)
+	var picked := _pad(_flat(Color("33281a"), 18, EMBER, 4, 10, 0), PLAYER_X, PLAYER_Y)
 	picked.shadow_color = Color(EMBER, 0.34)
 	for s in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		th.set_stylebox(s, "PlayerCardChosen", picked)
@@ -423,9 +426,9 @@ static func _cards(th: Theme, t: ThemeDef, _bold: Font) -> void:
 	# CardHot: the line being played right now (a log line): an ember rim around the same card
 	th.set_type_variation("CardHot", "PanelContainer")
 	if frame != null:
-		th.set_stylebox("panel", "CardHot", _tint(frame, Color(1.7, 1.35, 0.95), 22, 16))
+		th.set_stylebox("panel", "CardHot", _tint(frame, Color(1.7, 1.35, 0.95)))          # same margins as Card, by construction
 	else:
-		th.set_stylebox("panel", "CardHot", _pad(_flat(Color("33281a"), 18, EMBER, 3, 10, 4), 18, 16))
+		th.set_stylebox("panel", "CardHot", _pad(_flat(Color("33281a"), 18, EMBER, 3, 10, 4), 18, 16))   # the plain look: border inside the margin
 	# LogLine / LogLineHot: one line of the night's written log: a card, the newest one lit
 	th.set_type_variation("LogLine", "PanelContainer")
 	th.set_type_variation("LogLineHot", "PanelContainer")
@@ -436,12 +439,9 @@ static func _cards(th: Theme, t: ThemeDef, _bold: Font) -> void:
 	# Scrim: a dark plate behind loose text that sits over the scene (a screen title, a clock)
 	th.set_type_variation("Scrim", "PanelContainer")
 	th.set_stylebox("panel", "Scrim", _pad(_flat(Color(0.03, 0.05, 0.1, 0.8), 14, Color(0.66, 0.5, 0.23, 0.6), 1, 0, 0), 14, 7))
-	# Plate: a name plate: the same frame with tighter margins
+	# Plate: a small name plate: flat with a brass rim (the ornate frame is too thick for a plate two lines high)
 	th.set_type_variation("Plate", "PanelContainer")
-	if frame != null:
-		th.set_stylebox("panel", "Plate", _tint(frame, Color(1, 1, 1), 14, 6))
-	else:
-		th.set_stylebox("panel", "Plate", _pad(_flat(SURFACE, 12, Color("33477a"), 2, 4, 2), 12, 6))
+	th.set_stylebox("panel", "Plate", _pad(_flat(Color(0.04, 0.06, 0.12, 0.88), 12, Color("a8803a"), 2, 3, 2), 14, 7))
 	# Plinth: a podium step
 	th.set_type_variation("Plinth", "PanelContainer")
 	var step := _flat(Color("3a2a1e"), 10, Color("1c0f08"), 3, 8, 3)
@@ -491,10 +491,10 @@ static func _stage(th: Theme, t: ThemeDef) -> void:
 	for k in c:
 		th.set_color(k, "Stage", c[k])
 	th.set_font_size("plate_size", "Stage", 17)
-	var plate: StyleBox = t.nine_patches.get("card_frame")
-	if plate != null:
-		th.set_stylebox("plate", "Stage", _tint(plate, Color(1, 1, 1), 10, 4))
-		th.set_stylebox("plate_me", "Stage", _tint(plate, Color(1.55, 1.25, 0.9), 10, 4))
+	# the name plates on the Stage: flat, with a 2-3 px rim; the Stage sizes each one from its content plus these margins
+	th.set_constant("plate_edge", "Stage", 3)
+	th.set_stylebox("plate", "Stage", _pad(_flat(Color(0.04, 0.06, 0.12, 0.9), 12, Color("a8803a"), 2, 3, 2), 14, 7))
+	th.set_stylebox("plate_me", "Stage", _pad(_flat(Color(0.18, 0.12, 0.06, 0.92), 12, EMBER, 3, 4, 2), 14, 7))
 
 
 # ---------------- stylebox helpers ----------------
