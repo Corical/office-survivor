@@ -147,9 +147,20 @@ func _play_round(r: int) -> bool:
 					var others: Array = Feed.models.round.roster.filter(func(e): return not e.is_me)
 					await _tap("about_" + others[0].alias)
 				radios += 1
+	# DIAGNOSTIC ONLY (lost-lock hunt): did the press reach the Lock button, and did the button change under the tap?
+	var lk0 := Ui.find(router.current, "lock") as Button
+	var diag := {"pressed": false, "id0": lk0.get_instance_id() if lk0 else 0, "at0": lk0.get_global_rect().get_center() if lk0 else Vector2(),
+		"state0": Feed.models.round.lock.state, "pick0": Feed.models.round.my_pick != null, "radio_open0": Ui.find(router.current, "phrase_" + str(Feed.models.round.radio.phrases[0].server_id)) != null if Feed.models.round.radio.phrases.size() > 0 else false}
+	if lk0:
+		lk0.pressed.connect(func(): diag.pressed = true)
 	if not await _tap("lock"):
 		return false
+	var lk1 := Ui.find(router.current, "lock") as Button
+	diag["id1"] = lk1.get_instance_id() if lk1 else 0
+	diag["at1"] = lk1.get_global_rect().get_center() if lk1 else Vector2()
+	diag["state1"] = Feed.models.round.lock.state
 	if not await _until(func(): return Feed.models.round.lock.state == "locked" or router.current_name != "round", 10.0):
+		print("DIAG lock lost r=%d %s" % [r, JSON.stringify(diag)])
 		_fail("round %d: the lock was never confirmed" % r)
 		return false
 	await _frames(2)
