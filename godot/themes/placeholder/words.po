@@ -1,0 +1,269 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "band.bandit"
+msgstr "Bandit"
+
+msgid "band.getting_by"
+msgstr "Getting by"
+
+msgid "band.starving"
+msgstr "Starving"
+
+msgid "band.unknown"
+msgstr "Unknown"
+
+msgid "band.well_fed"
+msgstr "Well fed"
+
+msgid "goal.beat"
+msgstr "{text}"
+
+msgid "goal.detective"
+msgstr "{text}"
+
+msgid "goal.give"
+msgstr "{text}"
+
+msgid "goal.grudge"
+msgstr "{text}"
+
+msgid "goal.robbed2_extract"
+msgstr "{text}"
+
+msgid "goal.steal3_clean"
+msgstr "{text}"
+
+msgid "goal.unknown"
+msgstr "{text}"
+
+msgid "line.ate"
+msgstr "You ate {amount}."
+
+msgid "line.became_bandit_me"
+msgstr "You ran out of food. You're a bandit now: steal or investigate until you get back to 3."
+
+msgid "line.caught_thief_broke"
+msgstr "Your guard caught {thief} red-handed, but they had nothing to pay you."
+
+msgid "line.caught_thief_broke_since"
+msgstr "Your guard (still up from night {since}) caught {thief} red-handed, but they had nothing to pay you."
+
+msgid "line.caught_thief_paid"
+msgstr "Your guard caught {thief} red-handed. They paid you {got}."
+
+msgid "line.caught_thief_paid_since"
+msgstr "Your guard (still up from night {since}) caught {thief} red-handed. They paid you {got}."
+
+msgid "line.event"
+msgstr "{line}"
+
+msgid "line.exposed_by_me"
+msgstr "You exposed {thief}; they paid you {paid}."
+
+msgid "line.exposed_me"
+msgstr "EXPOSED: an investigator saw you rob {victim}. You paid them {paid}."
+
+msgid "line.exposed_me_back"
+msgstr "EXPOSED: an investigator saw you rob {victim}. You paid them {paid} and gave back the {back} you stole."
+
+msgid "line.exposed_own_back"
+msgstr "You also got your {back} back from {thief}, who robbed you."
+
+msgid "line.feast"
+msgstr "Feast night: you ate for free."
+
+msgid "line.found_watching_1"
+msgstr "While watching, you found {found} ration."
+
+msgid "line.found_watching_n"
+msgstr "While watching, you found {found} rations."
+
+msgid "line.gave"
+msgstr "You gave {receiver} {amount}."
+
+msgid "line.got_gift"
+msgstr "{giver} secretly gave you {amount}."
+
+msgid "line.got_gift_bonus"
+msgstr "{giver} secretly gave you {amount}, and gifts grow: you got {total}."
+
+msgid "line.guard_up_1"
+msgstr "You're on guard for night {night}."
+
+msgid "line.guard_up_n"
+msgstr "You're on guard for nights {nights}."
+
+msgid "line.idol_blocked"
+msgstr "{target} had a hidden idol. You got nothing."
+
+msgid "line.idol_found"
+msgstr "You found a hidden idol. The next person to rob you gets nothing. Tell no one."
+
+msgid "line.idol_saved"
+msgstr "Your idol saved you: a thief left with nothing. The idol is spent."
+
+msgid "line.news_bandit"
+msgstr "{player} ran out of food. {player} is back... as a bandit."
+
+msgid "line.news_break_in_empty"
+msgstr "Someone broke into {victim}'s place and found nothing."
+
+msgid "line.news_caught"
+msgstr "CAUGHT: {target} was guarding and caught {thief} red-handed. {thief} paid {paid}."
+
+msgid "line.news_exposed"
+msgstr "EXPOSED: an investigator saw {thief} rob {victim}. {thief} pays them {paid}."
+
+msgid "line.news_exposed_back"
+msgstr "EXPOSED: an investigator saw {thief} rob {victim}. {thief} pays them {paid} and gives {victim} back the {back} they stole."
+
+msgid "line.news_hit_1"
+msgstr "Someone hit {victim} overnight. {victim} is down {total}."
+
+msgid "line.news_hit_n"
+msgstr "{count} people hit {victim} overnight. {victim} is down {total}."
+
+msgid "line.news_idol"
+msgstr "Someone tried to rob {player} and left empty-handed: {player} had a hidden idol."
+
+msgid "line.news_quiet"
+msgstr "A quiet night. Nobody lost anything."
+
+msgid "line.news_rejoined"
+msgstr "Bandit {player} has scraped together enough to rejoin the survivors."
+
+msgid "line.now_have"
+msgstr "You now have {rations} rations."
+
+msgid "line.rejoined_me"
+msgstr "You've scraped together enough to rejoin the survivors."
+
+msgid "line.robbed"
+msgstr "Someone stole {amount} from you."
+
+msgid "line.scavenged"
+msgstr "You scavenged and found {found}."
+
+msgid "line.scavenged_auto"
+msgstr "You didn't choose a move, so you scavenged automatically and found {found}."
+
+msgid "line.steal_caught"
+msgstr "{target} was guarding: you were caught and paid {paid}."
+
+msgid "line.steal_empty"
+msgstr "You broke into {target}'s place and found nothing."
+
+msgid "line.steal_split"
+msgstr "You broke into {target}'s place, but someone beat you to it."
+
+msgid "line.stole"
+msgstr "You stole {amount} from {target}."
+
+msgid "line.thief_exposed_for_me"
+msgstr "An investigator caught the thief who robbed you: {thief}. You got your {back} back."
+
+msgid "line.unknown"
+msgstr "Something happened."
+
+msgid "line.watched"
+msgstr "You watched {target}: they chose {saw}."
+
+msgid "line.watched_target"
+msgstr "You watched {target}: they chose {saw} ({saw_target})."
+
+msgid "list.and"
+msgstr "and"
+
+msgid "move.gift"
+msgstr "Gift"
+
+msgid "move.gift.choice"
+msgstr "gift"
+
+msgid "move.gift.help"
+msgstr "Give someone food."
+
+msgid "move.guard"
+msgstr "Guard"
+
+msgid "move.guard.choice"
+msgstr "guard"
+
+msgid "move.guard.help"
+msgstr "Protect yourself for two nights."
+
+msgid "move.investigate"
+msgstr "Investigate"
+
+msgid "move.investigate.choice"
+msgstr "investigate"
+
+msgid "move.investigate.help"
+msgstr "See what someone does tonight."
+
+msgid "move.scavenge"
+msgstr "Scavenge"
+
+msgid "move.scavenge.choice"
+msgstr "scavenge"
+
+msgid "move.scavenge.help"
+msgstr "Look for food."
+
+msgid "move.steal"
+msgstr "Steal"
+
+msgid "move.steal.choice"
+msgstr "steal"
+
+msgid "move.steal.help"
+msgstr "Take food from someone."
+
+msgid "move.unknown"
+msgstr "Other move"
+
+msgid "move.unknown.choice"
+msgstr "something"
+
+msgid "move.unknown.help"
+msgstr "No description."
+
+msgid "radio.easy"
+msgstr "{a} looks like an easy target."
+
+msgid "radio.guarding"
+msgstr "{a} is guarding. Don't waste your night on them."
+
+msgid "radio.innocent"
+msgstr "{a} is innocent. Leave them alone."
+
+msgid "radio.lying"
+msgstr "{a} is lying about their rations."
+
+msgid "radio.me"
+msgstr "I'm innocent. Leave me alone."
+
+msgid "radio.saw"
+msgstr "I saw {a} sneaking around last night."
+
+msgid "radio.trust"
+msgstr "Don't trust {a}."
+
+msgid "radio.unknown"
+msgstr "Unclear message."
+
+msgid "radio.watch"
+msgstr "Someone should watch {a}'s back tonight."
+
+msgid "resource.ration"
+msgstr "Rations"
+
+msgid "status.outcast"
+msgstr "Bandit"
+
+msgid "status.shield"
+msgstr "On guard"
+

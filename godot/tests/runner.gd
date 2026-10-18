@@ -13,11 +13,18 @@ var failed := 0
 
 func _ready() -> void:
 	var only := ""
+	var match_name := ""
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--only="):
-			only = a.substr(7)
+			only = a.substr(7)               # a test file prefix, e.g. test_adapter
+		elif a.begins_with("--match="):
+			match_name = a.substr(8)         # a substring of a test method name
 	await get_tree().process_frame           # autoloads finish _ready before the first test
 	var started := Time.get_ticks_msec()
+	# A script error inside this coroutine would otherwise leave the process alive forever (it did, once).
+	get_tree().create_timer(RUN_TIMEOUT_MS / 1000.0 + 5.0).timeout.connect(func():
+		print("FAIL  runner watchdog: the run did not finish in time")
+		get_tree().quit(1))
 	var files: Array[String] = []
 	var dir := DirAccess.open("res://tests")
 	for f in dir.get_files():
@@ -27,12 +34,15 @@ func _ready() -> void:
 	var log_mark := Log.mark()
 	for f in files:
 		var script: GDScript = load("res://tests/" + f)
+		if script == null or not script.can_instantiate():
+			_fail(f, "(load)", ["the test file does not compile; see [engine] lines in the log"])
+			continue
 		var inst: BaseTest = script.new()
 		inst.name = f
 		add_child(inst)
 		var names: Array[String] = []
 		for m in script.get_script_method_list():
-			if str(m.name).begins_with("test_"):
+			if str(m.name).begins_with("test_") and (match_name == "" or match_name in str(m.name)):
 				names.append(m.name)
 		names.sort()
 		for n in names:

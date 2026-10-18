@@ -32,7 +32,7 @@ WEIGHTS = {"scavenge": 2, "guard": 2, "steal": 5, "investigate": 4, "gift": 3}
 RADIO = ["saw", "trust", "lying", "guarding", "easy", "innocent", "watch", "me"]
 
 
-def play(seed, sink):
+def play(seed, sink0):
     rng = random.Random(seed)
     store, ident, texts = MemoryEventStore(), MemoryIdentityStore(), MemoryTextStore()
     sched = FakeScheduler()
@@ -43,6 +43,11 @@ def play(seed, sink):
         g.add_human(f"u{i}")
         g.connect(i)                  # a real client is connected; early advance only waits for connected humans
     g.start()
+
+    def sink(seed_, pid, msg):
+        """Record a view together with whose it is: `me` and the other aliases, straight from the room's state."""
+        sink0(seed_, pid, msg, g.players[pid].name, sorted(q.name for q in g._active() if q.pid != pid))
+
     sink(seed, 0, views.lobby(g, 0, "HARV", True))
     steps = 0
     while not g.finished and steps < 60:                # 10 rounds x (round + reveal) = 20 expected steps
@@ -90,12 +95,12 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     seen, rows, codes = set(), [], {}
 
-    def sink(seed, pid, msg):
+    def sink(seed, pid, msg, me, others):
         key = json.dumps(msg, sort_keys=True, ensure_ascii=False)
         if key in seen:
             return
         seen.add(key)
-        rows.append({"game": seed, "pid": pid, "msg": msg})
+        rows.append({"game": seed, "pid": pid, "me": me, "others": others, "msg": msg})
         if msg["t"] == "reveal":
             for part in ("news", "private"):
                 for ln in msg[part]:
