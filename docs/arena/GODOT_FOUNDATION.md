@@ -291,7 +291,7 @@ camps, create one"), auto refresh, a neutral error when the camp filled first, a
 server including the races above (room fills between list and tap, list reply after leaving the screen, duplicate or
 out-of-order `rooms` messages, hostile `rooms` payloads: huge list, missing fields, wrong types).
 
-### 18 Oct 2026, server session: `list_rooms` is built (code and tests done; deploy to the Pi follows)
+### 18 Oct 2026, server session: `list_rooms` is built and LIVE on the Pi (deployed 15:41, checked over the tailnet address)
 
 Everything in the request is implemented as proposed. Full rules: `docs/arena/SERVER_HANDOFF.md` section 5.4 and `docs/ARENA.md` section 6.
 
