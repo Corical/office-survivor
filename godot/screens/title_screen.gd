@@ -16,7 +16,8 @@ var _show_advanced := false
 var _intro_played := false
 var _hero_node: Control                       # the logo and its glow, built once
 var _hero_tweens: Array = []
-var _sheet_open := false                      # the "new camp" form
+var _sheet_fresh := false                     # the sheet was just opened: fade it in once, not on every rebuild
+var _sheet_open := false                     # the "new camp" form
 var _vis := "public"
 var _camp_name := ""
 var _vis_buttons := {}
@@ -24,7 +25,7 @@ var _vis_help: Label
 
 
 func _ready() -> void:
-	Feed.status_changed.connect(func(_s): _build())
+	Feed.status_changed.connect(_on_status)
 	Feed.notice_raised.connect(_on_notice)
 	_build()
 	Intents.rooms_watch(true)                 # the open-camps list runs for as long as this screen does (menu rebuilds do not touch it)
@@ -32,6 +33,15 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	Intents.rooms_watch(false)
+
+
+## A tap on Create or Join is on its way into a camp (the seat may already have arrived): the screen is about to change, so
+## nothing here is laid out again until it does or the attempt fails. A relayout at this point showed a "Rejoin camp" button
+## for a few frames and jumped every button.
+func _on_status(st: Dictionary) -> void:
+	if st.get("entering", false):
+		return
+	_build()
 
 
 func _on_notice(n: Dictionary) -> void:
@@ -68,7 +78,7 @@ func _build() -> void:
 		var note := Ui.label(said, "notice")
 		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		menu.add_child(note)
-	if st.has_seat:
+	if st.has_seat and not st.get("entering", false):
 		var code_tag := str(st.room_code).left(MAX_CODE_SHOWN)
 		var resume_label := Words.render("ui.resume_code", {"code": code_tag}) if code_tag != "" else Words.render("ui.resume")
 		var resume := Ui.button(resume_label, "resume", func(): _show(Intents.resume()), false, "PrimaryButton")
@@ -112,7 +122,11 @@ func _build() -> void:
 	if _show_settings:
 		_settings(menu, st)
 	if _sheet_open:
-		add_child(_make_sheet())
+		var sheet := _make_sheet()
+		add_child(sheet)
+		if _sheet_fresh:
+			_sheet_fresh = false
+			_fade_in_sheet(sheet)
 	if not _intro_played:
 		_intro_played = true
 		Ui.intro_all(entries)
@@ -123,6 +137,7 @@ func _build() -> void:
 func _on_create() -> void:
 	if Feed.rooms_model().get("can_list", Feed.rooms_model().supported):
 		_sheet_open = true
+		_sheet_fresh = true
 		_build()
 		return
 	_reason(Intents.create_room())
@@ -166,6 +181,20 @@ func _make_sheet() -> Control:
 		_sheet_open = false
 		_build()))
 	return veil
+
+
+## The sheet comes in over the screen instead of cutting in: the veil fades up in the theme's transition time and the card
+## settles with the usual entrance. Reduced motion keeps the fade and drops the settling. A rebuild never replays it.
+func _fade_in_sheet(veil: Control) -> void:
+	var fx := Themes.fx("transition")
+	if fx.is_empty():
+		return
+	veil.modulate.a = 0.0
+	veil.create_tween().tween_property(veil, "modulate:a", 1.0, float(fx.get("fade", 0.2)))
+	if not Themes.reduced_motion:
+		var holder := veil.get_child(0)
+		if holder != null and holder.get_child_count() > 0:
+			Ui.intro(holder.get_child(0) as Control)
 
 
 func _pick_visibility(v: String) -> void:

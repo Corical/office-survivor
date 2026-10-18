@@ -40,6 +40,9 @@ var pending_intent := {}
 ## True from a (re)connect until the next view: the held view is stale, so the picker stays shut and the timer is
 ## unknown (contract 5.3, and the phone coming back from the background).
 var awaiting_view := false
+## True from the moment the seat of a Create / Join arrives until the first view of that camp: the screen is about to change,
+## so the title must not re-lay itself out (a "Rejoin camp" button flashed in at exactly this point).
+var seat_pending_view := false
 
 ## The open-camps list (see core/rooms_watch.gd). It runs only while a screen has asked for it (rooms_watch) and only on the
 ## title screen, never while an intent is waiting for its answer, and it stops when a game starts.
@@ -80,6 +83,7 @@ func reset(s: SessionStore = null, c: Clock = null) -> void:
 	if c:
 		clock = c
 	ruleset = RulesetRegistry.make()
+	seat_pending_view = false
 	token = ""
 	room_code = ""
 	alias = ""
@@ -189,6 +193,7 @@ func pick(kind: String, target: Variant, amount := 0) -> String:
 
 
 func leave() -> void:
+	seat_pending_view = false
 	if Net.handshake_done:
 		Net.send("leave")
 	forget_seat()
@@ -203,7 +208,16 @@ func leave() -> void:
 
 
 ## Called by "Back to title" after a terminal reason.
+## True while a Create / Join is on its way into a camp: the tap is waiting for the server, or the seat has arrived and the
+## camp's first view has not. The title reads this to stay still (read-only: nothing else changes behaviour on it).
+func entering_camp() -> bool:
+	if _inflight.has("create_room") or _inflight.has("join_room") or seat_pending_view:
+		return true
+	return pending_intent.get("t", "") in ["create_room", "join_room"]
+
+
 func back_to_title() -> void:
+	seat_pending_view = false
 	Net.close()
 	view = {}
 	_inflight = {}
@@ -299,6 +313,7 @@ func apply(msg: Dictionary) -> void:
 			room_code = msg.room_code
 			alias = msg.alias
 			host = msg.host
+			seat_pending_view = _inflight.has("create_room") or _inflight.has("join_room")
 			for k in SEAT_INTENTS:
 				_inflight.erase(k)
 				Net.ack(k)
@@ -344,6 +359,7 @@ func _take_view(msg: Dictionary) -> void:
 		_locked_seen[_round_key("lock")] = true
 	view_msec = clock.now_msec()
 	awaiting_view = false
+	seat_pending_view = false
 	_clear_reply_guards()
 	if new_round or t == "end":
 		_drop_round_guards()
@@ -410,6 +426,7 @@ func _on_error(msg: Dictionary) -> void:
 
 
 func _on_terminal(reason: String) -> void:
+	seat_pending_view = false
 	terminal_reason = reason
 	_inflight = {}
 	pending_intent = {}
@@ -501,6 +518,7 @@ func forget_seat() -> void:
 	alias = ""
 	host = false
 	pending_intent = {}
+	seat_pending_view = false
 	save_store()
 
 

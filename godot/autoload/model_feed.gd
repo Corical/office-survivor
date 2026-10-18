@@ -99,7 +99,7 @@ func status() -> Dictionary:
 	return {"net": Net.state, "net_key": UiKeys.net_key(Net.state), "attempt": Net.attempt,
 		"terminal": Session.terminal_reason, "awaiting_view": Session.awaiting_view, "screen": Session.screen,
 		"has_seat": Session.token != "", "room_code": Session.room_code, "alias": Session.alias,
-		"is_host": Session.host, "server_url": Session.server_url}
+		"is_host": Session.host, "server_url": Session.server_url, "entering": Session.entering_camp()}
 
 
 func _emit_status() -> void:

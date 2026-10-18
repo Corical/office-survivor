@@ -5,7 +5,7 @@ extends Control
 ## sees a clear "waiting for the host" card and no Start.
 
 const LANTERN := Vector2(40, 60)          # chosen: the lantern art has a clear margin, so this shows about 24 x 36 of lantern
-const COPIED_SECONDS := 1.6               # how long the Copy button says it worked
+var copied_seconds := 1.6                 # how long the Copy button says it worked (a test shortens it)
 
 var _sig := ""
 var _intro_played := false
@@ -101,7 +101,7 @@ func _on_copy(text: String) -> void:
 	_copy_button.text = Words.render("ui.copied")
 	_copy_gen += 1
 	var mine := _copy_gen
-	await get_tree().create_timer(COPIED_SECONDS).timeout
+	await get_tree().create_timer(copied_seconds).timeout
 	if mine == _copy_gen and is_instance_valid(_copy_button):
 		_copy_button.text = Words.render("ui.copy")
 

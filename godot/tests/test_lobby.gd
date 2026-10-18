@@ -57,13 +57,14 @@ func test_the_copy_button_copies_the_camp_code() -> void:
 
 func test_a_second_copy_press_is_not_undone_by_the_first_ones_timer() -> void:
 	var s := _lobby(true)
+	s.copied_seconds = 0.4
 	var b := Ui.find(s, "copy_code") as Button
 	b.pressed.emit()
-	await get_tree().create_timer(0.8).timeout
+	await get_tree().create_timer(0.2).timeout
 	b.pressed.emit()
-	await get_tree().create_timer(1.0).timeout          # the first timer (1.6 s) has now fired
+	await get_tree().create_timer(0.3).timeout          # the first timer (0.4 s) has now fired
 	eq(b.text, "Copied", "still showing Copied for the second press")
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(0.3).timeout
 	eq(b.text, "Copy", "back to Copy after the second press's time")
 
 
