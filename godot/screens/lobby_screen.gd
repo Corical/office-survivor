@@ -12,7 +12,8 @@ var _sig := ""
 var _intro_played := false
 var _copy_button: Button
 var _kicking := ""                        # the handle of the seat just sent away, until the next lobby shows it gone
-var _confirming := ""                     # the handle of a seat that is here and is being asked about
+var _confirm_card: Control                # the card showing a question, to scroll into view
+var _confirming := ""                    # the handle of a seat that is here and is being asked about
 var _copy_gen := 0                       # a later press must not be undone by an earlier press's timer
 
 
@@ -58,10 +59,17 @@ func _build() -> void:
 	code.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	inner.add_child(code)
 	inner.add_child(_copy_row(str(m.room_code)))
-	var lit := _lanterns(int(m.seats_total), int(m.seats_taken))
+	# The host knows which of the taken seats have dropped off. Counting them as "taken" said "4 of 4" while one was out in the
+	# dark, so then the header says who is here and who is away, and the dropped seat's lantern is dim. A guest has no seat list
+	# (away = 0), so its header is unchanged.
+	var away := _away_count(m)
+	var taken := int(m.seats_taken)
+	var lit := _lanterns(int(m.seats_total), maxi(0, taken - away))
 	if lit != null:
 		inner.add_child(lit)
-	var seats := Ui.label(Words.render("ui.seats", {"taken": m.seats_taken, "total": m.seats_total}), "seats")
+	var count_text := Words.render("ui.seats", {"taken": m.seats_taken, "total": m.seats_total}) if away == 0 \
+		else Words.render("ui.seats_away", {"here": maxi(0, taken - away), "away": away})
+	var seats := Ui.label(count_text, "seats")
 	seats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	inner.add_child(seats)
 	menu.add_child(sign_card)
@@ -121,6 +129,17 @@ func _seat_list(seats: Array) -> Control:
 	return col
 
 
+## How many of the host's other seats have dropped off, from the latest model (0 for a guest: it has no list).
+func _away_count(m: Dictionary) -> int:
+	if not m.get("is_host", false):
+		return 0
+	var n := 0
+	for s in m.get("seats", []):
+		if not s.connected:
+			n += 1
+	return n
+
+
 func _seat_row(n: int, seat: Dictionary) -> Control:
 	var id: String = seat.id
 	var card := Ui.card("Plate")
@@ -137,8 +156,11 @@ func _seat_row(n: int, seat: Dictionary) -> Control:
 	row.add_child(text)
 	var busy := _kicking == id
 	if _confirming == id and not busy:
-		var ask := Ui.label(Words.render("ui.kick_confirm"), "seat_confirm_%d" % n, "MutedLabel")
-		ask.size_flags_horizontal = Control.SIZE_SHRINK_END
+		# Compact and inline: the seat's own line stays as it is, the question sits under it across the whole card (it wraps
+		# by words there, never by letters), and the two choices side by side under that, each half the card wide.
+		var ask := Ui.label(Words.render("ui.kick_confirm"), "seat_confirm_%d" % n, "NameLabel")
+		ask.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_confirm_card = card
 		var yes := Ui.button(Words.render("ui.kick"), "kick_yes_%d" % n, func(): _send_kick(id))
 		var no := Ui.button(Words.render("ui.cancel"), "kick_no_%d" % n, func():
 			_confirming = ""
@@ -166,8 +188,22 @@ func _on_kick_tap(id: String, connected: bool) -> void:
 	if connected:
 		_confirming = id                                    # a seat that is here: ask first
 		_build()
+		_show_confirm.call_deferred()
 		return
 	_send_kick(id)
+
+
+## Once the question is laid out, scroll the page so the whole question and both choices are in view (on a short window
+## they would otherwise be below the fold, out of reach until the player scrolls).
+func _show_confirm() -> void:
+	await get_tree().process_frame
+	if _confirm_card == null or not is_instance_valid(_confirm_card) or not _confirm_card.is_inside_tree():
+		return
+	var scroll: Node = _confirm_card.get_parent()
+	while scroll != null and not (scroll is ScrollContainer):
+		scroll = scroll.get_parent()
+	if scroll != null:
+		(scroll as ScrollContainer).ensure_control_visible(_confirm_card)
 
 
 func _send_kick(id: String) -> void:

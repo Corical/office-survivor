@@ -106,6 +106,32 @@ func _lobby() -> void:
 			await _size(s)
 			await _wait(0.4)
 			await _shot("lobby_" + st[0], s)
+	# a camp of four: the host, two seats that are here and one that dropped; the host asks about a seat that is here
+	fake.server_send({"t": "lobby", "room_code": "KXQM", "seats_taken": 4, "seats_total": 4, "host": true,
+		"seats": [here, {"id": "h-c", "connected": true}, gone]})
+	await _wait(0.6)
+	for s in [Vector2i(360, 640)] + SIZES:
+		await _size(s)
+		await _wait(0.3)
+		await _shot("lobby_camp4_header", s)
+	for s in [Vector2i(360, 640)] + SIZES:
+		await _size(s)
+		var ask := Ui.find(router.current, "kick_1") as Button
+		if ask != null:
+			ask.pressed.emit()
+		await _wait(0.5)
+		await _shot("lobby_confirm", s)
+		var no := Ui.find(router.current, "kick_no_1") as Button
+		if no != null:
+			no.pressed.emit()
+		await _wait(0.2)
+	# the connection is taken over from another device: the title says it once
+	fake.server_send({"t": "error", "code": "taken_over", "message": "opened elsewhere"})
+	await _wait(0.8)
+	for s in [Vector2i(360, 640)] + SIZES:
+		await _size(s)
+		await _wait(0.3)
+		await _shot("title_takeover", s)
 
 
 ## Scores per player, in the order the server sends them; goal_done and seat follow the first two.

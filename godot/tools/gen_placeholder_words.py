@@ -111,6 +111,8 @@ UI.update({
     "ui.bots_fill": "Empty seats are filled by bots when you start.",
     "ui.advanced": "Advanced", "ui.hide_advanced": "Hide advanced",
     "ui.advanced_hint": "Only change this if you were given an address.",
+    # --- lobby away count ---
+    "ui.seats_away": "{here} here, {away} away",
     # --- reveal/stage ---
     "ui.reveal_waiting": "Waiting for the others, {n} s",
 })
