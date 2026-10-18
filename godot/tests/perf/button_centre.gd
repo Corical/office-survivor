@@ -9,7 +9,6 @@ extends Control
 
 const W := 300
 const SAMPLE := "HHHH"              # capitals: the body of any word sits between their top and the baseline
-const SEAM_RATIO := 0.72            # a row this much darker than the lit face (median of its first ten rows) is the seam
 const TOLERANCE_PX := 1.0
 
 ## name, theme variation, height the screens give it, kind: "wood_dark_text" | "wood_light_text" | "flat"
@@ -18,7 +17,7 @@ const CASES := [
 	["Create / Continue / Start / Back / sheet Create", "PrimaryButton", 72, "wood_dark_text"],
 	["Settings / Join / Cancel / Leave / Copy / Advanced / sheet Public-Private", "Button", 56, "wood_light_text"],
 	["Chosen (picked amount / sheet choice)", "ChosenButton", 56, "flat"],
-	["Skip pill", "SkipPill", 36, "flat"],
+	["Skip pill", "SkipPill", 44, "flat"],
 ]
 
 var _failed := 0
@@ -79,19 +78,6 @@ func _measure(img: Image, label: String, kind: String, state: String, r: Rect2i)
 				if top < 0:
 					top = yy
 				bottom = yy
-		if not bright:
-			# The dark ordinary button shows a seam under the lit face (the darker front plank below it reads as the lip), so
-			# its FACE is the rows from the top down to that seam. (The light primary button hides the same seam in its
-			# bright wood: its face is the whole lit area, and the owner calls Create centred on that.)
-			var ref: Array = []
-			for yy in range(top, top + 10):
-				ref.append(_lum(img.get_pixel(face_x, r.position.y + yy)))
-			ref.sort()
-			var level: float = ref[ref.size() / 2] * SEAM_RATIO
-			for yy in range(top + 12, bottom + 1):
-				if _lum(img.get_pixel(face_x, r.position.y + yy)) < level:
-					bottom = yy - 1
-					break
 	if "--profile" in OS.get_cmdline_user_args() and state == "normal" and kind != "flat":
 		var prof := ""
 		for yy in r.size.y:

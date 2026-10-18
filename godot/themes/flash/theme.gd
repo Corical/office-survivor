@@ -32,12 +32,13 @@ const DISABLED_TEXT := Color("9aa6bf")
 const WOOD_TEXT := Color("2b1608")         # text on the light wood of a primary button
 const CARD_X := 34.0                       # content margins of every card_frame panel (clear of the frame art, see build())
 const CARD_Y := 28.0
-const SHORT_TOP := 34                    # fixed top edge (texture px) of the ordinary, 56 px wood button
-const SHORT_BOTTOM := 20                   # fixed bottom edge: the rim and the lip
-const SHORT_CTOP := 3.0                    # content margins of that button: tuned so the label sits on the lit face
-const SHORT_CBOTTOM := 19.0                # (their SUM stays 22 in both states, so a press never changes the button's height)
-const SHORT_CTOP_DOWN := 6.5
-const SHORT_CBOTTOM_DOWN := 15.5
+const SHORT_SCALE := 0.58                  # the wood art (96 px tall) scaled to ~56 px: the natural size of an ordinary button
+const SHORT_EDGE := 17                     # fixed top and bottom edge (px of the scaled art): 34 in all, far under 56
+const SHORT_SIDE := 21                     # fixed left and right edge: the round end caps at their scaled size
+const SHORT_CTOP := 3.0                   # content margins of that button: tuned so the label sits on the lit face
+const SHORT_CBOTTOM := 9.0               # (their SUM is the same in both states, so a press never changes the button's height)
+const SHORT_CTOP_DOWN := 6.0
+const SHORT_CBOTTOM_DOWN := 6.0
 const PLAYER_X := 16.0                    # a person card you can press: the same margins selected or not
 const PLAYER_Y := 10.0
 
@@ -124,12 +125,17 @@ static func build() -> ThemeDef:
 		# the pressed face spans rows 11..86: centre 0.5 px below the middle, so top - bottom = +1 (5.5 px lower than normal)
 		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 36, 30, 36, 30, 26, 12, 26, 11)
 	if wood != null and wood_down != null:
-		# The ordinary buttons are 56 px high, LESS than the 60 px of fixed edge above (30 + 30): Godot then shrinks both edges and
-		# drops the stretch zone, so the lower, darker plank is drawn right under the label and the word sits low on a face that
-		# looks 20 px high. Short fixed edges (top 34 = the lit face to its seam, bottom 20 = the rim and the lip) leave a stretch
-		# zone at 56 px, so the lit face keeps its proportions. Measured by tests/perf/button_centre.gd.
-		t.nine_patches["button_wood_short"] = _nine(wood, 36, SHORT_TOP, 36, SHORT_BOTTOM, 26, SHORT_CTOP, 26, SHORT_CBOTTOM)
-		t.nine_patches["button_wood_short_pressed"] = _nine(wood_down, 36, SHORT_TOP, 36, SHORT_BOTTOM, 26, SHORT_CTOP_DOWN, 26, SHORT_CBOTTOM_DOWN)
+		# The ordinary buttons are 56 px high, LESS than the 60 px of fixed edge above (30 + 30), and the art is 96 px tall with
+		# round end caps drawn at full height: squeezed into 56 px the caps go square, the rim line runs past the ends and the
+		# lower plank sits under the label (Settings and Join looked wrong: caps, lip and label). The cure is art that is the
+		# right size: a copy of the wood scaled to SHORT_SCALE so its natural height is the button's own 56 px, with edges
+		# (top + bottom 34, left + right 42) that fit inside every button and every state, so nothing is ever squashed.
+		# tests/test_nine_fit.gd proves no control is smaller than its edges; tests/perf/button_centre.gd measures the label.
+		var wood_short := _scaled(wood, SHORT_SCALE)
+		var wood_short_down := _scaled(wood_down, SHORT_SCALE)
+		t.nine_patches["button_wood_short"] = _nine(wood_short, SHORT_SIDE, SHORT_EDGE, SHORT_SIDE, SHORT_EDGE, 20, SHORT_CTOP, 20, SHORT_CBOTTOM)
+		t.nine_patches["button_wood_short_pressed"] = _nine(wood_short_down, SHORT_SIDE, SHORT_EDGE, SHORT_SIDE, SHORT_EDGE, 20,
+			SHORT_CTOP_DOWN, 20, SHORT_CBOTTOM_DOWN)
 
 	_labels(th, bold, spaced)
 	_buttons(th, bold, t)
@@ -461,9 +467,10 @@ static func _inputs(th: Theme) -> void:
 	th.set_color("caret_color", "LineEdit", EMBER)
 	th.set_color("selection_color", "LineEdit", Color(EMBER, 0.4))
 	th.set_constant("caret_width", "LineEdit", 3)
-	th.set_stylebox("normal", "LineEdit", _pad(_flat(Color(0.04, 0.06, 0.12, 0.85), 14, EDGE, 2, 0, 0), 16, 12))
-	th.set_stylebox("focus", "LineEdit", _pad(_flat(Color(0.04, 0.06, 0.12, 0.92), 14, EMBER, 3, 0, 0), 16, 12))
-	th.set_stylebox("read_only", "LineEdit", _pad(_flat(Color("141d33"), 14, Color("26334f"), 2, 0, 0), 16, 12))
+	# 9 px above and below the 22 px text: a box 48 px high, as tall as the visible wood of a button beside it (the title's code row)
+	th.set_stylebox("normal", "LineEdit", _pad(_flat(Color(0.04, 0.06, 0.12, 0.85), 14, EDGE, 2, 0, 0), 16, 9))
+	th.set_stylebox("focus", "LineEdit", _pad(_flat(Color(0.04, 0.06, 0.12, 0.92), 14, EMBER, 3, 0, 0), 16, 9))
+	th.set_stylebox("read_only", "LineEdit", _pad(_flat(Color("141d33"), 14, Color("26334f"), 2, 0, 0), 16, 9))
 
 
 static func _scroll(th: Theme) -> void:
@@ -580,6 +587,15 @@ static func _nine(tex: Texture2D, ml: int, mt: int, mr: int, mb: int, cl: float,
 	s.content_margin_bottom = cb
 	s.draw_center = true
 	return s
+
+
+## A texture scaled by `k` in both directions (smooth), so rounded corners keep their shape at the smaller size.
+static func _scaled(tex: Texture2D, k: float) -> Texture2D:
+	var img: Image = tex.get_image()
+	if img == null:
+		return tex
+	img.resize(maxi(1, roundi(img.get_width() * k)), maxi(1, roundi(img.get_height() * k)), Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(img)
 
 
 ## A copy of a nine-slice, multiplied by a colour; optionally with other content margins.
