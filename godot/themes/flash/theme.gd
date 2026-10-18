@@ -466,8 +466,11 @@ static func _cards(th: Theme, t: ThemeDef, _bold: Font) -> void:
 	dock.content_margin_top = 12
 	dock.content_margin_bottom = 14
 	th.set_stylebox("panel", "Dock", dock)
+	# Banner: a calm notice (still trying to connect): night blue with an amber edge. BannerAlert: something is wrong.
 	th.set_type_variation("Banner", "PanelContainer")
-	th.set_stylebox("panel", "Banner", _pad(_flat(Color("3a1f26"), 14, Color("ff7a6b"), 2, 8, 3), 16, 10))
+	th.set_stylebox("panel", "Banner", _pad(_flat(Color(0.07, 0.1, 0.19, 0.94), 14, Color("e0a24a"), 2, 8, 3), 16, 10))
+	th.set_type_variation("BannerAlert", "PanelContainer")
+	th.set_stylebox("panel", "BannerAlert", _pad(_flat(Color("3a1f26"), 14, Color("ff7a6b"), 2, 8, 3), 16, 10))
 	var tip := _pad(_flat(INK_DEEP, 10, EDGE, 1, 6, 2), 12, 8)
 	th.set_stylebox("panel", "TooltipPanel", tip)
 	th.set_color("font_color", "TooltipLabel", PAPER)
