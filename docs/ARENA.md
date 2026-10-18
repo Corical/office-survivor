@@ -116,8 +116,26 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `MIN_PROTO` | 1 |
 | `MAX_MESSAGE` | 4096 |
 | `TAKEOVERS_PER_MINUTE` | 5 |
+| `CLOSE_UPGRADE_REQUIRED` | 4002 |
+| `CLOSE_TAKEN_OVER` | 4003 |
+| `CLOSE_PAUSE` | 0.25 |
 
-Error codes: `hello_first`, `bad_message`, `refused` (with the message below), `taken_over`, `server_error`.
+<!-- check:error-codes -->
+| `error.code` | Meaning |
+|---|---|
+| `hello_first` | the first message was not `hello` |
+| `bad_message` | not a JSON object with a string `t` |
+| `refused` | a rule said no (the messages are listed below); nothing changed |
+| `seat_gone` | `resume` with a token the server does not know, or whose room is gone: forget the token. The connection stays open, so the client can create or join a room without reconnecting |
+| `room_gone` | `join_room` with a code that matches no room |
+| `taken_over` | the same seat was opened on another device; this connection is about to be closed with code 4003 |
+| `server_error` | an unexpected failure on the server (logged there) |
+
+**Close codes.** Two ends are ours: `upgrade_required` is followed by close code **4002**, and `taken_over` by **4003**.
+Godot's `WebSocketPeer` drops a message that arrives in the same poll as the close frame, so the server sends the
+message, waits `CLOSE_PAUSE` seconds, and only then closes. Code 4001 ("seat gone") is deliberately not used: a dead seat
+is an ordinary error and the connection stays open. From the moment a seat is taken over, anything the old connection
+still sends is ignored.
 
 <!-- check:refusals -->
 | Refusal (`refused` message) | When |

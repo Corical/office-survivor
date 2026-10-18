@@ -6,7 +6,8 @@ Never edit this test to make it pass: fix the doc (or the code). Tables under `<
     client-messages   the message types arena/server.py accepts
     server-messages   the message types arena/server.py and arena/views.py send
     limits            constants in arena/server.py
-    refusals          every GameError text in arena/room.py and arena/server.py
+    refusals          every GameError / Coded text in arena/room.py and arena/server.py
+    error-codes       every `code` an `error` message can carry
 """
 import ast
 import dataclasses
@@ -54,12 +55,15 @@ def string_of(node):
 
 
 def game_errors(rel):
+    """Every refusal text: GameError("text") and Coded("code", "text")."""
     out = set()
     for node in ast.walk(ast.parse(read(rel))):
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "GameError" and node.args:
-            s = string_of(node.args[0])
-            if s is not None:
-                out.add(s)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.args:
+            idx = {"GameError": 0, "Coded": 1}.get(node.func.id)
+            if idx is not None and len(node.args) > idx:
+                s = string_of(node.args[idx])
+                if s is not None:
+                    out.add(s)
     return out
 
 
@@ -104,6 +108,13 @@ class ArenaDoc(unittest.TestCase):
         for r in table("limits"):
             with self.subTest(r[0]):
                 self.assertEqual(consts.get(tick(r[0])), ast.literal_eval(r[1]))
+
+    def test_error_codes(self):
+        """Every error code the server sends is in the doc, and the doc lists no code the server never sends."""
+        src = read("arena/server.py")
+        code = set(re.findall(r'_error\(\w+, "(\w+)"', src)) | set(re.findall(r'Coded\("(\w+)"', src)) | {"refused"}
+        doc = {tick(r[0]) for r in table("error-codes")}
+        self.assertEqual(doc, code)
 
     def test_refusals(self):
         code = game_errors("arena/room.py") | game_errors("arena/server.py")

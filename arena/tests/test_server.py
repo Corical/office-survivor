@@ -221,10 +221,71 @@ class ServerTests(unittest.IsolatedAsyncioTestCase):
         await c2.until("seat")
         self.assertEqual((await c.until("error"))["code"], "taken_over")
 
-    async def test_a_wrong_token_is_refused(self):
+    async def _close_after(self, client):
+        """(seconds from the last message to the close, the close code) for a connection the server ended."""
+        from websockets.exceptions import ConnectionClosed
+        t_msg = asyncio.get_running_loop().time()
+        try:
+            while True:
+                await client.next()
+                t_msg = asyncio.get_running_loop().time()
+        except ConnectionClosed as e:
+            return asyncio.get_running_loop().time() - t_msg, e.rcvd.code if e.rcvd else None
+
+    async def test_a_taken_over_connection_gets_its_message_then_close_code_4003_a_moment_later(self):
+        """Godot drops a message that arrives in the same poll as the close frame, so the close waits a beat."""
+        c, seat = await self._new_room()
+        c2 = await Client.open(self.port)
+        await c2.send({"t": "resume", "token": seat["token"]})
+        await c2.until("seat")
+        gap, code = await self._close_after(c)
+        self.assertEqual(c.seen[-1]["code"], "taken_over")
+        self.assertEqual(code, 4003)
+        self.assertGreaterEqual(gap, 0.15, "the close must not ride in with the message")
+
+    async def test_an_old_client_gets_upgrade_required_then_close_code_4002_a_moment_later(self):
+        c = await Client.open(self.port, hello=False)
+        await c.send({"t": "hello", "proto": 0})
+        gap, code = await self._close_after(c)
+        self.assertEqual(c.seen[-1]["t"], "upgrade_required")
+        self.assertEqual(code, 4002)
+        self.assertGreaterEqual(gap, 0.15)
+
+    async def test_a_displaced_connection_cannot_act_for_the_seat_while_it_is_being_closed(self):
+        c, seat = await self._new_room()
+        c2 = await Client.open(self.port)
+        await c2.send({"t": "resume", "token": seat["token"]})
+        await c2.until("seat")
+        await c.send({"t": "start"})                         # the old connection tries to act in its dying moments
+        await asyncio.sleep(0.5)
+        room = next(iter(self.server.rooms.values()))
+        self.assertFalse(room.game.started, "a displaced connection must not start the game")
+
+    async def test_a_wrong_token_is_seat_gone_and_the_connection_stays_usable(self):
         c = await Client.open(self.port)
         await c.send({"t": "resume", "token": "not-a-token"})
-        self.assertIn("no longer exists", (await c.until("error"))["message"])
+        e = await c.until("error")
+        self.assertEqual(e["code"], "seat_gone")
+        self.assertIn("no longer exists", e["message"])
+        await c.send({"t": "create_room"})                   # no reconnect needed to carry on
+        await c.until("seat")
+
+    async def test_a_token_whose_room_was_deleted_is_seat_gone(self):
+        c, seat = await self._new_room()
+        await c.close()
+        await self._stop()
+        shutil.rmtree(os.path.join(self.data, "rooms", seat["room_code"]))
+        await self._start()
+        c2 = await Client.open(self.port)
+        await c2.send({"t": "resume", "token": seat["token"]})
+        self.assertEqual((await c2.until("error"))["code"], "seat_gone")
+
+    async def test_an_unknown_room_code_is_room_gone(self):
+        c = await Client.open(self.port)
+        await c.send({"t": "join_room", "code": "ZZZZ"})
+        e = await c.until("error")
+        self.assertEqual(e["code"], "room_gone")
+        self.assertIn("no room", e["message"])
 
     async def test_a_server_restart_mid_game_and_the_game_carries_on(self):
         c, seat = await self._new_room()

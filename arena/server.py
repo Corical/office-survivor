@@ -32,6 +32,20 @@ PROTO, MIN_PROTO = 1, 1
 CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ"        # no I or O: read aloud across a room without confusion
 MAX_MESSAGE = 4096                               # bytes; a real message is under 200
 TAKEOVERS_PER_MINUTE = 5                         # chosen default
+# WebSocket close codes the client reads (the 4000s are ours). Godot's WebSocketPeer drops a message that arrives in the
+# same poll as the close frame, so every terminal message is followed by a short pause and only then the close.
+# 4001 (seat gone) is NOT used: a dead seat is a plain error and the connection stays open to create or join a room.
+CLOSE_UPGRADE_REQUIRED = 4002
+CLOSE_TAKEN_OVER = 4003
+CLOSE_PAUSE = 0.25                               # chosen default (seconds)
+
+
+class Coded(GameError):
+    """A refusal with its own error code, so a client can tell "forget your seat" from "that move is not allowed"."""
+
+    def __init__(self, code, message):
+        super().__init__(message)
+        self.code = code
 
 
 def _game():
@@ -160,10 +174,12 @@ class Server:
                 except ValueError:
                     await self._error(ws, "bad_message", "Messages are JSON objects with a \"t\".")
                     continue
+                if seat and seat[0].conns.get(seat[1]) is not ws:
+                    continue            # the seat moved to another device: this connection is only waiting to be closed
                 try:
                     seat = await self._dispatch(ws, msg, seat)
                 except GameError as e:
-                    await self._error(ws, "refused", str(e))
+                    await self._error(ws, getattr(e, "code", "refused"), str(e))
                 except Exception:
                     log.exception("message %s failed", msg.get("t"))
                     await self._error(ws, "server_error", "Something went wrong on the server.")
@@ -192,12 +208,21 @@ class Server:
         if not isinstance(proto, int) or proto < MIN_PROTO:
             await ws.send(json.dumps({"t": "upgrade_required", "min_proto": MIN_PROTO,
                                       "message": "Please update the app to play."}))
+            await self._close_after_pause(ws, CLOSE_UPGRADE_REQUIRED, "upgrade_required")
             return False
         await ws.send(json.dumps({"t": "hello_ok", "proto": PROTO}))
         return True
 
     async def _error(self, ws, code, message):
         await ws.send(json.dumps({"t": "error", "code": code, "message": message}, ensure_ascii=False))
+
+    async def _close_after_pause(self, ws, code, reason):
+        """Close with our code once the client has had a poll or two to read the message sent just before."""
+        try:
+            await asyncio.sleep(CLOSE_PAUSE)
+            await ws.close(code, reason)
+        except Exception:                   # already gone
+            pass
 
     async def _seat(self, ws, room, pid, token):
         old = room.conns.get(pid)
@@ -207,11 +232,12 @@ class Server:
             if len(recent) >= TAKEOVERS_PER_MINUTE:
                 raise GameError("Too many reconnects; wait a minute.")
             room.takeovers[pid] = recent + [now]
+            room.conns[pid] = ws            # from here the old connection no longer holds the seat (see handle)
             try:
                 await self._error(old, "taken_over", "This seat was opened on another device.")
-                await old.close()
             except Exception:
                 pass
+            asyncio.ensure_future(self._close_after_pause(old, CLOSE_TAKEN_OVER, "taken_over"))
         room.conns[pid] = ws
         room.game.connect(pid)
         alias = room.game.joined[pid][1]
@@ -236,15 +262,15 @@ class Server:
                 raise GameError("You're already in a room.")
             room = self.rooms.get(str(msg.get("code", "")).strip().upper())
             if room is None:
-                raise GameError("There's no room with that code.")
+                raise Coded("room_gone", "There's no room with that code.")
             if room.game.started:
                 raise GameError("That game has already started.")
             return await self._join(ws, room)
         if t == "resume":
             key = token_key(str(msg.get("token", "")))
             code = self.by_token.get(key)
-            if code is None:
-                raise GameError("That seat no longer exists.")
+            if code is None or code not in self.rooms:
+                raise Coded("seat_gone", "That seat no longer exists.")
             room = self.rooms[code]
             return await self._seat(ws, room, room.identity.get(key)["pid"], msg["token"])
         if seat is None:
