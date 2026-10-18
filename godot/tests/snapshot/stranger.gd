@@ -4,7 +4,7 @@ extends Control
 ##   godot --path godot res://tests/snapshot/stranger.tscn -- --out=<dir> --log=<file>
 ## Names are the ones the game itself generates (11 and 12 letters).
 
-const SIZES := [Vector2i(450, 800), Vector2i(540, 960), Vector2i(1904, 1001)]
+const SIZES := [Vector2i(360, 640), Vector2i(450, 800), Vector2i(540, 960), Vector2i(1904, 1001)]
 const ME := "QuietBadger"
 const OTHERS := ["IronSpatula", "LuckyLantern", "SoggyBiscuit"]
 const LONG_GOAL := "get robbed at least 1x and still get a seat on the helicopter"
@@ -61,6 +61,18 @@ func _ready() -> void:
 	fake.server_send(picked)
 	await _wait(0.6)
 	await _each_size("round_picked")
+	# Give: the move chosen (amount and target both on offer), then a target chosen (amount still missing)
+	fake.server_send(_round(1, 120.0))
+	await _wait(0.6)
+	var rs: Node = router.current
+	for p in rs._m.pickers:
+		if p.server_id == "gift":
+			rs._choose(p)
+	await _wait(0.4)
+	await _each_size("round_give_move")
+	rs._choose_target(OTHERS[0])
+	await _wait(0.4)
+	await _each_size("round_give_target")
 	# the next night after keeping watch: guard is not offered and the header says so
 	var guarded := _round(2, 150.0)
 	guarded.me.guarded = true

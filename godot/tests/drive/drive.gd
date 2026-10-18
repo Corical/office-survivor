@@ -120,8 +120,13 @@ func _play_round(r: int) -> bool:
 	var usable: Array = m.pickers.filter(func(p): return (not p.takes_target) or not p.targets.is_empty())
 	var p: Dictionary = usable[(r - 1) % usable.size()]
 	moves_used[p.move_id] = moves_used.get(p.move_id, 0) + 1
-	if not await _tap("move_" + p.server_id):
-		return false
+	for attempt in 3:                           # a tap that lands while the screen rebuilds is lost, as for a thumb: tap again
+		if not await _tap("move_" + p.server_id):
+			return false
+		if not p.takes_target or await _until(func(): return Ui.find(router.current, "target_" + p.targets[0]) != null, 1.5):
+			break
+		if Feed.models.round.my_pick != null:
+			break
 	if p.takes_target:
 		if not await _tap("target_" + p.targets[0]):
 			return false
@@ -137,7 +142,15 @@ func _play_round(r: int) -> bool:
 	if r % 2 == 0 and Feed.models.round.radio.available:
 		if await _tap("radio_toggle"):
 			var ph: Dictionary = Feed.models.round.radio.phrases[0]
-			if await _tap("phrase_" + ph.server_id):
+			var tapped := false
+			for attempt in 3:                   # tap again if a rebuild swallowed the tap
+				tapped = await _tap("phrase_" + ph.server_id)
+				if not tapped or not ph.needs_player:
+					break
+				var others0: Array = Feed.models.round.roster.filter(func(e): return not e.is_me)
+				if await _until(func(): return Ui.find(router.current, "about_" + others0[0].alias) != null, 1.5):
+					break
+			if tapped:
 				if ph.needs_player:
 					var others: Array = Feed.models.round.roster.filter(func(e): return not e.is_me)
 					await _tap("about_" + others[0].alias)
@@ -190,6 +203,20 @@ func _tap(id: String) -> bool:
 		b = Ui.find(router.current, id) as Button          # the screen may have rebuilt meanwhile: aim at what is there now
 		if b == null or b.disabled:
 			_fail("'%s' vanished or was disabled while scrolling to it" % id)
+			return false
+	# a screen that is still sliding or fading in has its buttons somewhere else a moment later: tap once it holds still
+	var steady := 0
+	var last := Vector2(-1.0, -1.0)
+	for i in 90:
+		var now := b.get_global_rect().get_center()
+		steady = steady + 1 if now.is_equal_approx(last) else 0
+		last = now
+		if steady >= 6:
+			break
+		await get_tree().process_frame
+		b = Ui.find(router.current, id) as Button
+		if b == null or b.disabled:
+			_fail("'%s' vanished or was disabled while the screen settled" % id)
 			return false
 	var canvas := b.get_global_rect().get_center()
 	var win := get_window().size

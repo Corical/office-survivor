@@ -81,6 +81,11 @@ UI.update({
     "ui.private_help": "Not listed. Only people you give the code to can join.",
     "ui.create_go": "Create", "ui.cancel": "Cancel", "ui.you_are_prefix": "You are", "ui.pick_prompt": "Pick a move!",
     # --- round screen ---
+    # --- round pick hints ---
+    "ui.hint_pick_move": "Pick a move first", "ui.hint_pick_target": "Pick a target first",
+    "ui.hint_pick_amount": "Pick an amount first", "ui.hint_sending": "Sending your pick...",
+    "ui.hint_closed": "Waiting for the next night", "ui.move_off": "Closed",
+    # --- end round pick hints ---
     "ui.goal_tap_more": "Tap for details", "ui.goal_tap_less": "Tap to hide",
     "ui.move_unavailable": "{move} is not available tonight.",
     "ui.goal_seat_note": "A seat is a place on the helicopter. Only a few are free; the players with the most rations at the end get them.",

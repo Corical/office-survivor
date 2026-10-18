@@ -15,6 +15,7 @@ const AVATAR_PX := 76.0
 var _m: Dictionary = {}
 var _move: Dictionary = {}          # the picker being filled in (local, until a pick is sent)
 var _target: Variant = null
+var _amount := 0                    # the amount tapped for a move that has amounts (a pick goes out when move, target and amount are all in)
 var _radio_open := false
 var _goal_open := false             # phone width: the goal card shows the goal; a tap shows how it is going and what a seat is
 var _radio_phrase: Dictionary = {}
@@ -124,7 +125,7 @@ func _tick() -> void:
 		var lock_live: bool = _m.lock.state == "open" and _lock_btn != null and not _lock_btn.disabled
 		_charge.fraction = (1.0 - smooth / total) if lock_live else 0.0       # a greyed-out Lock has no light moving across it
 	var open: bool = _m.lock.picker_open
-	if _prompt != null:                            # under 20 s with nothing picked, the line above the moves turns into a call to act
+	if _prompt != null and _m.my_pick == null:    # under 20 s with nothing picked, the line above the moves turns into a call to act
 		var nag := open and _m.my_pick == null and smooth <= float(tm.get("prompt_s", 20))
 		_set_variation(_prompt, "PromptLabel" if nag else "MutedLabel")
 		var words := Words.render("ui.pick_prompt") if nag else Words.render("ui.pick_a_move")
@@ -215,7 +216,10 @@ func _build() -> void:
 		cols.add_child(right)
 		page.add_child(cols)
 	else:
-		for s in [head, goal, act, roster, radio]:      # the goal sits right under the header: nobody scrolls to find their own goal
+		# the goal sits right under the header (nobody scrolls to find their own goal) -- except while a target or amount is being
+		# picked: then the pickers take that place, so the whole pick is on screen above the dock
+		var order := [head, act, goal, roster, radio] if _picking() else [head, goal, act, roster, radio]
+		for s in order:
 			page.add_child(s)
 	_dock(pg.dock, open)
 	_building = false
@@ -287,7 +291,10 @@ func _head() -> Control:
 ## The moves, their targets and amounts, and my pick. (Lock lives in the dock.)
 func _act(open: bool) -> VBoxContainer:
 	var s := Ui.vbox(10)
-	_prompt = Ui.label(Words.render("ui.pick_a_move"), "pick_prompt", "MutedLabel")
+	# one line above the moves: the quiet label, the call to act when time is short, or the pick once there is one
+	var picked: bool = _m.my_pick != null
+	_prompt = Ui.label(Words.render("ui.your_pick", {"pick": _describe(_m.my_pick)}) if picked else Words.render("ui.pick_a_move"),
+		"my_pick" if picked else "pick_prompt", "NameLabel" if picked else "MutedLabel")
 	_prompt.custom_minimum_size = Vector2(0, 30)       # the same height whether it is the quiet label or the prompt: nothing jumps
 	_prompt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	s.add_child(_prompt)
@@ -297,10 +304,10 @@ func _act(open: bool) -> VBoxContainer:
 		offered[str(p.server_id)] = p
 	for p in _row_moves():
 		var live: bool = offered.has(str(p.server_id))
-		moves.add_child(_move_button(offered[str(p.server_id)] if live else p, live and _is_chosen(p), open and live))
+		moves.add_child(_move_button(offered[str(p.server_id)] if live else p, live and _is_chosen(p), open and live, not live))
 	s.add_child(moves)
 	# the reason a medallion is greyed out; the line is always there so the page does not move when it comes and goes
-	var why := Ui.name_label("", "why_unavailable", "MutedLabel")
+	var why := Ui.name_label("", "why_unavailable", "")
 	why.custom_minimum_size = Vector2(0, 26)
 	var gone: Array = []
 	for p in _row_moves():
@@ -309,6 +316,18 @@ func _act(open: bool) -> VBoxContainer:
 	if not gone.is_empty():
 		why.set_fit_text(Words.render("ui.move_unavailable", {"move": ", ".join(gone)}))
 	s.add_child(why)
+	if not _move.is_empty() and not _move.amounts.is_empty():
+		# the amount sits with the move and the target, never below them: one row, chosen in either order
+		var arow := Ui.hbox(8)
+		var alabel := Ui.label(Words.render("ui.pick_an_amount"), "", "MutedLabel")
+		alabel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		arow.add_child(alabel)
+		for a in _move.amounts:
+			var b := Ui.button(str(a), "amount_%s" % a, func(): _choose_amount(a), not open,
+				"ChosenButton" if _amount == int(a) else "SkipPill")
+			b.custom_minimum_size = Vector2(64, 48)
+			arow.add_child(b)
+		s.add_child(arow)
 	if not _move.is_empty() and _move.takes_target:
 		s.add_child(Ui.label(Words.render("ui.pick_a_target"), "", "MutedLabel"))
 		var targets := GridContainer.new()
@@ -317,21 +336,6 @@ func _act(open: bool) -> VBoxContainer:
 		for t in _move.targets:
 			targets.add_child(_target_button(str(t), _target != null and str(_target) == str(t), open))
 		s.add_child(targets)
-	if not _move.is_empty() and _target != null and not _move.amounts.is_empty():
-		s.add_child(Ui.label(Words.render("ui.pick_an_amount"), "", "MutedLabel"))
-		var amounts := Ui.hbox(10)
-		for a in _move.amounts:
-			var b := Ui.button(str(a), "amount_%s" % a, func(): _send(_move, _target, a), not open)
-			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			amounts.add_child(b)
-		s.add_child(amounts)
-	# "Your pick" always takes its space (invisible until there is a pick) so choosing a move never pushes the page down
-	var pick := Ui.card("LogLine")                      # a compact flat strip: the reserved space stays small
-	var picked: bool = _m.my_pick != null
-	var pick_words := Words.render("ui.your_pick", {"pick": _describe(_m.my_pick) if picked else "..."})
-	pick.add_child(Ui.label(pick_words, "my_pick", "NameLabel"))
-	pick.modulate.a = 1.0 if picked else 0.0
-	s.add_child(pick)
 	return s
 
 
@@ -364,7 +368,7 @@ func _is_chosen(p: Dictionary) -> bool:
 
 ## A move: a medallion with its word underneath (a plain button when the theme has no art for it). The one you picked
 ## glows and lifts.
-func _move_button(p: Dictionary, chosen: bool, open: bool) -> Button:
+func _move_button(p: Dictionary, chosen: bool, open: bool, off := false) -> Button:
 	var word: String = Words.render(p.key)
 	var id := "move_" + str(p.server_id)
 	var art := Themes.texture(id)
@@ -385,11 +389,24 @@ func _move_button(p: Dictionary, chosen: bool, open: bool) -> Button:
 	b.expand_icon = true
 	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	b.custom_minimum_size = Vector2(0, MOVE_MIN_H)
+	var icon_w := clampf((size.x - 32.0 - 24.0) / 5.0, 56.0, 92.0)   # five across: the medallion and its caption fit the width
+	b.custom_minimum_size = Vector2(0, minf(MOVE_MIN_H, icon_w + 36.0))
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if not open:
 		b.modulate.a = 0.6
+	if off:                                       # a tag over the medallion: this is closed tonight, not loading
+		var tag := Ui.card("Banner")
+		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var tl := Ui.label(Words.render("ui.move_off"), "", "MutedLabel")
+		tl.autowrap_mode = TextServer.AUTOWRAP_OFF
+		tag.add_child(tl)
+		tag.anchor_left = 0.5
+		tag.anchor_right = 0.5
+		tag.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		tag.offset_top = 30
+		tag.modulate.a = 1.0 / 0.6                  # undo the button's fade for the tag itself
+		b.add_child(tag)
 	if chosen:
 		_glow_and_lift(b)
 	return b
@@ -469,14 +486,40 @@ func _dock(dock: VBoxContainer, open: bool) -> void:
 	dock.add_child(top)
 	var state: String = _m.lock.state
 	var lock_key := "ui.lock" if state == "open" else ("ui.locking" if state == "sent" else "ui.locked")
-	_lock_btn = Ui.button(Words.render(lock_key), "lock", func(): _lock(), state != "open" or not open or _m.my_pick == null,
-		"PrimaryButton")
+	_lock_btn = Ui.button(Words.render(lock_key), "lock", func(): _lock(), not _lock_ready(open), "PrimaryButton")
 	if _wide:                                   # on a wide window the main action is a button, not a bar across the screen
 		_lock_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		_lock_btn.custom_minimum_size.x = 520.0
 	_charge = ChargeFill.new()
 	_lock_btn.add_child(_charge)
 	dock.add_child(_lock_btn)
+	# why the Lock is grey, in one line under it (the line keeps its height when empty, so the dock never jumps)
+	var hint := Ui.name_label(_lock_hint(open), "lock_hint", "MutedLabel")
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.custom_minimum_size = Vector2(0, 22)
+	dock.add_child(hint)
+
+
+## The Lock works exactly when a pick is in (the server's own view says so) and the night is still open.
+func _lock_ready(open: bool) -> bool:
+	return _m.lock.state == "open" and open and _m.my_pick != null
+
+
+## One line that says what is missing while the Lock is grey ("" when it is live or already used).
+func _lock_hint(open: bool) -> String:
+	if _m.lock.state != "open":
+		return ""
+	if not open:
+		return Words.render("ui.hint_closed")
+	if _m.my_pick != null:
+		return ""
+	if _move.is_empty():
+		return Words.render("ui.hint_pick_move")
+	if _move.takes_target and _target == null:
+		return Words.render("ui.hint_pick_target")
+	if not _move.amounts.is_empty() and _amount == 0:
+		return Words.render("ui.hint_pick_amount")
+	return Words.render("ui.hint_sending")
 
 
 func _goal() -> Control:
@@ -517,32 +560,43 @@ func _goal() -> Control:
 
 ## Everyone around the fire: a face, a name, and the band (never a number) for the others.
 func _roster() -> Control:
-	var card := Ui.card()
+	var card := Ui.card() if _wide else Ui.card("LogLine")        # phone width: a flat card, no thick frame, so the names get the room
 	var s := Ui.vbox(8)
 	card.add_child(s)
 	s.add_child(Ui.label(Words.render("ui.roster"), "", "MutedLabel"))
 	var grid := GridContainer.new()
-	grid.columns = 2                                  # two people a row: a face beside the name and band, wide enough for a long name
+	var one_row: bool = not _wide and size.x >= 420.0       # four across, each a face over its name (a long name shrinks, then wraps)
+	grid.columns = 4 if one_row else 2                # otherwise two a row: a face beside the name and band
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 10)
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for e in _m.roster:
-		var cell := Ui.hbox(10)
+		var cell: BoxContainer = Ui.vbox(2) if one_row else Ui.hbox(10)
 		cell.set_meta("id", "home_" + e.alias)
 		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var face := Ui.avatar(e.alias, _avatars)
 		if face != null:
-			cell.add_child(Ui.picture(face, Vector2(54, 54)))
+			var px := 54.0 if _wide else 40.0
+			var pic := Ui.picture(face, Vector2(px, px))
+			pic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			cell.add_child(pic)
 		var words := Ui.vbox(0)
 		words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		words.add_child(Ui.name_label(e.alias, "", "NameLabel"))
+		words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var nm := Ui.name_label(e.alias, "", "NameLabel")
+		if one_row:
+			nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		words.add_child(nm)
 		var sub := ""
 		if e.is_me:
 			sub = Words.render("ui.you_mark")
 		elif e.band != "":
 			sub = Words.render(e.band)
 		if sub != "":
-			words.add_child(Ui.name_label(sub, "", "MutedLabel"))
+			var sl := Ui.name_label(sub, "", "MutedLabel")
+			if one_row:
+				sl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			words.add_child(sl)
 		cell.add_child(words)
 		grid.add_child(cell)
 	s.add_child(grid)
@@ -569,9 +623,17 @@ func _radio(open: bool) -> VBoxContainer:
 	return s
 
 
+## A move that needs a target (and maybe an amount) is open and not yet complete.
+func _picking() -> bool:
+	if _move.is_empty() or not _move.takes_target:
+		return false
+	return _target == null or (not _move.amounts.is_empty() and _amount == 0)
+
+
 func _choose(p: Dictionary) -> void:
 	_move = p
 	_target = null
+	_amount = 0
 	if not p.takes_target:
 		_send(p, null, 0)          # nothing more to choose: a move with no target goes out at once
 		return
@@ -582,6 +644,17 @@ func _choose_target(t: String) -> void:
 	_target = t
 	if _move.amounts.is_empty():
 		_send(_move, t, 0)
+		return
+	if _amount > 0:
+		_send(_move, t, _amount)
+		return
+	_build()
+
+
+func _choose_amount(a: Variant) -> void:
+	_amount = int(a)
+	if _target != null:
+		_send(_move, _target, _amount)
 		return
 	_build()
 
