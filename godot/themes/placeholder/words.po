@@ -645,6 +645,9 @@ msgstr "Seat {n}"
 msgid "ui.seats"
 msgstr "{taken} of {total} seats taken"
 
+msgid "ui.seats_away"
+msgstr "{here} here, {away} away"
+
 msgid "ui.seconds"
 msgstr "{n} s"
 

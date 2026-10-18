@@ -23,6 +23,8 @@ const ALL: Array[String] = [
 	# --- end/lobby/title ---
 	"ui.best_legend", "ui.code_caption", "ui.copied", "ui.bots_fill", "ui.advanced", "ui.hide_advanced",
 	"ui.advanced_hint",
+	# --- lobby away count ---
+	"ui.seats_away",
 	# --- reveal/stage ---
 	"ui.reveal_waiting",
 ]

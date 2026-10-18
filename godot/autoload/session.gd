@@ -485,8 +485,8 @@ func _on_terminal(reason: String) -> void:
 			last_round_view = {}
 			awaiting_view = false
 			_locked_seen = {}
+			_go("title")                                  # first, so the overlay knows it is on the title and raises no second copy
 			notice.emit("terminal", "kicked", "")
-			_go("title")
 		"upgrade_required":
 			if not locked_out:
 				locked_out = true
@@ -494,10 +494,13 @@ func _on_terminal(reason: String) -> void:
 				_go("upgrade")
 				view_changed.emit(view)
 		_:
-			notice.emit("terminal", reason, "")   # taken_over, too_big, flapping: the seat is kept; Title offers resume
+			# taken_over, too_big, flapping: the seat is kept; Title offers resume. The screen changes BEFORE the notice goes out:
+			# the overlay skips toasts while on the title, and the title says the sentence itself. The other order raised a toast
+			# while the old screen was still current, so the same sentence showed twice (stranger pass 2, N9).
 			view = {}
 			awaiting_view = false
 			_go("title")
+			notice.emit("terminal", reason, "")
 
 
 func _seat_gone(code: String, text: String) -> void:
