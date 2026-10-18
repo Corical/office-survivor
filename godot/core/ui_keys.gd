@@ -11,6 +11,7 @@ const ALL: Array[String] = [
 	"ui.pick_a_move", "ui.pick_a_target", "ui.pick_an_amount", "ui.your_pick", "ui.radio_pick_player", "ui.seconds",
 	"ui.roster", "ui.you_mark", "ui.winner_mark", "ui.seat_mark", "ui.goal_met", "ui.goal_missed", "ui.reveal_title",
 	"ui.radio_heard", "ui.nothing_to_show", "ui.close", "ui.hide_settings", "ui.skip",
+	"ui.reduced_motion", "ui.on", "ui.off", "ui.rank",
 	"ui.net.connecting", "ui.net.online", "ui.net.reconnecting", "ui.net.unreachable", "ui.net.offline", "ui.net.stopped",
 	"notice.seat_gone", "notice.taken_over", "notice.too_big", "notice.flapping", "notice.upgrade_required",
 	"notice.invalid", "notice.unknown", "notice.generic", "notice.no_server_url", "notice.locked", "notice.in_flight",

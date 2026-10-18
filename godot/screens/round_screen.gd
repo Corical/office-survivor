@@ -2,10 +2,14 @@ class_name RoundScreen
 extends Control
 ## The decision screen. From the model alone: who I am, how long is left, my resources and goal, everyone's home, the
 ## moves the server offers (with their targets and amounts), Lock, how many have locked, and the radio.
-## Layout: one column on a phone with what you act on first (who you are, the clock, the moves, Lock); two columns on a
-## wide window (acting on the left, information on the right). The look comes from the theme.
+## Layout: one column on a phone with what you act on first (who you are and the clock, the moves, the targets) and the
+## Lock button fixed at the foot of the screen; two columns on a wide window (acting on the left, information on the
+## right). The look comes from the theme: medallion moves, player cards, a ring clock, lanterns for the locked seats.
 
 const WIDE_PX := 900                # chosen: at this width and above the screen uses two columns
+const RING_PX := 104.0              # chosen: the clock ring, large enough to hold "180 s"
+const MOVE_MIN_H := 142.0
+const AVATAR_PX := 76.0
 
 var _m: Dictionary = {}
 var _move: Dictionary = {}          # the picker being filled in (local, until a pick is sent)
@@ -13,10 +17,19 @@ var _target: Variant = null
 var _radio_open := false
 var _radio_phrase: Dictionary = {}
 var _timer_label: Label
-var _timer_bar: ProgressBar
+var _ring: RingTimer
+var _lock_btn: Button
+var _charge: ChargeFill
+var _lanterns: HBoxContainer
 var _wide := false
 var _sig := ""                      # what the screen currently shows, so an unchanged push does not rebuild it
 var _building := false
+var _avatars := {}                  # alias -> avatar number for this roster
+var _intro_played := false
+var _pulsing := false
+var _pulse_tween: Tween
+var _left_int := -1                 # the whole seconds last shown, and how long ago they changed (to move the ring smoothly)
+var _left_age := 0.0
 
 
 func _ready() -> void:
@@ -59,6 +72,8 @@ func _refresh_live() -> void:
 	var lc := Ui.find(self, "locked_count") as Label
 	if lc != null:
 		lc.text = Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total})
+	if _lanterns != null:
+		Ui.set_lit(_lanterns, int(_m.locked_count))
 	_tick()
 
 
@@ -72,12 +87,58 @@ func _tick() -> void:
 	var t: Dictionary = _m.timer
 	if not t.known:
 		_timer_label.text = Words.render("ui.timer_unknown")
-		_timer_bar.value = 0
+		_set_variation(_timer_label, "MutedLabel")
+		if _ring != null:
+			_ring.value = 0.0
+			_ring.urgent = false
+		_set_pulse(false)
 		return
+	_set_variation(_timer_label, "HeaderLabel")
 	var left := Feed.seconds_left()
 	_timer_label.text = Words.render("ui.seconds", {"n": left})
-	_timer_bar.max_value = maxf(1.0, t.total_s)
-	_timer_bar.value = left
+	# the clock arrives in whole seconds; the ring and the charge glide between them
+	if left != _left_int:
+		_left_int = left
+		_left_age = 0.0
+	else:
+		_left_age = minf(1.0, _left_age + get_process_delta_time())
+	var smooth := maxf(0.0, float(left) - _left_age)
+	var total := maxf(1.0, float(t.total_s))
+	var open: bool = _m.lock.picker_open
+	var last_s := float(Themes.fx("pulse").get("last_s", 10))
+	var urgent := open and smooth <= last_s
+	if _ring != null:
+		_ring.max_value = total
+		_ring.value = smooth
+		_ring.urgent = urgent
+	if _charge != null:
+		_charge.fraction = 1.0 - smooth / total if _m.lock.state == "open" else 1.0
+	_set_pulse(urgent and _lock_btn != null and not _lock_btn.disabled)
+
+
+static func _set_variation(l: Control, variation: String) -> void:
+	if l.theme_type_variation != variation:
+		l.theme_type_variation = variation
+
+
+## The Lock button breathes while there is little time left and a pick waiting to be locked.
+func _set_pulse(on: bool) -> void:
+	if on == _pulsing or _lock_btn == null:
+		return
+	var p := Themes.fx("pulse")
+	if on and p.is_empty():
+		return
+	_pulsing = on
+	if _pulse_tween != null and _pulse_tween.is_valid():
+		_pulse_tween.kill()
+	if not on:
+		_lock_btn.scale = Vector2.ONE
+		return
+	var s := 1.0 + float(p.get("scale", 0.05))
+	var t := float(p.get("time", 0.45))
+	_pulse_tween = _lock_btn.create_tween().set_loops()
+	_pulse_tween.tween_property(_lock_btn, "scale", Vector2(s, s), t).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_pulse_tween.tween_property(_lock_btn, "scale", Vector2.ONE, t).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 func _build() -> void:
@@ -90,12 +151,20 @@ func _build() -> void:
 		remove_child(c)
 		c.queue_free()
 	_timer_label = null
-	_timer_bar = null
-	var page := Ui.page(self)
+	_ring = null
+	_lock_btn = null
+	_charge = null
+	_lanterns = null
+	_pulsing = false
+	_left_int = -1
 	if _m.is_empty():
+		var page := Ui.page(self)
 		page.add_child(Ui.label(Words.render("ui.nothing_to_show"), "empty"))
 		_building = false
 		return
+	_avatars = Ui.avatar_ids(_m.roster.map(func(e): return e.alias))
+	var pg := Ui.page_docked(self)
+	var page: VBoxContainer = pg.col
 	var open: bool = _m.lock.picker_open
 	var head := _head()
 	var act := _act(open)
@@ -110,7 +179,7 @@ func _build() -> void:
 		var right := Ui.vbox(16)
 		for s in [head, act]:
 			left.add_child(s)
-		for s in [goal, roster, radio]:
+		for s in [roster, goal, radio]:
 			right.add_child(s)
 		cols.add_child(left)
 		cols.add_child(right)
@@ -118,7 +187,12 @@ func _build() -> void:
 	else:
 		for s in [head, act, roster, goal, radio]:
 			page.add_child(s)
+	_dock(pg.dock, open)
 	_building = false
+	if not _intro_played:
+		_intro_played = true
+		Ui.intro_all([head, act, roster, goal])
+	_tick()
 	if _radio_open:
 		call_deferred("_show_radio")
 
@@ -135,80 +209,240 @@ func _show_radio() -> void:
 
 
 ## Who I am, the clock, what I have.
-func _head() -> VBoxContainer:
-	var s := Ui.vbox(6)
-	s.add_child(Ui.label(Words.render("ui.you_are", {"alias": _m.me.alias}), "you_are", "BigLabel"))
-	_timer_label = Ui.label("", "timer_label", "HeaderLabel")
-	_timer_bar = ProgressBar.new()
-	_timer_bar.set_meta("id", "timer_bar")
-	_timer_bar.show_percentage = false
-	_timer_bar.custom_minimum_size = Vector2(0, 14)
-	s.add_child(_timer_label)
-	s.add_child(_timer_bar)
-	_tick()
+func _head() -> Control:
+	var card := Ui.card()
+	var row := Ui.hbox(14)
+	card.add_child(row)
+	var face := Ui.avatar(str(_m.me.alias), _avatars)
+	if face != null:
+		row.add_child(Ui.picture(face, Vector2(AVATAR_PX, AVATAR_PX), "me_avatar"))
+	var s := Ui.vbox(4)
+	var you := Ui.label(Words.render("ui.you_are", {"alias": _m.me.alias}), "you_are", "YouLabel")
+	you.autowrap_mode = TextServer.AUTOWRAP_OFF              # a name is one line: trimmed with an ellipsis, never broken mid-word
+	you.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	you.clip_text = true
+	s.add_child(you)
 	s.add_child(Ui.label(Words.render("ui.round_of", {"round": _m.round, "rounds": _m.rounds}), "round_of", "MutedLabel"))
 	for r in _m.me.resources:
-		s.add_child(Ui.label("%s: %s" % [Words.render(r.id), r.amount], "resource", "HeaderLabel"))
+		var line := Ui.hbox(8)
+		var icon := Themes.icon(r.id)
+		if icon != null:
+			line.add_child(Ui.picture(icon, Vector2(30, 30)))
+		line.add_child(Ui.label("%s: %s" % [Words.render(r.id), r.amount], "resource", "HeaderLabel"))
+		s.add_child(line)
 	for st in _m.me.statuses:
 		if st.on:
-			s.add_child(Ui.label(Words.render(st.id), "status"))
-	return s
+			var line := Ui.hbox(8)
+			var icon := Themes.icon(st.id)
+			if icon != null:
+				line.add_child(Ui.picture(icon, Vector2(26, 26)))
+			line.add_child(Ui.label(Words.render(st.id), "status"))
+			s.add_child(line)
+	row.add_child(s)
+	_ring = RingTimer.new()
+	_ring.set_meta("id", "timer_bar")
+	_ring.custom_minimum_size = Vector2(RING_PX, RING_PX)
+	_ring.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_ring.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_timer_label = Ui.label("", "timer_label", "HeaderLabel")
+	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_timer_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ring.add_child(_timer_label)
+	_timer_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_timer_label.offset_left = 14
+	_timer_label.offset_right = -14
+	row.add_child(_ring)
+	return card
 
 
-## The moves, their targets and amounts, my pick, Lock and the locked count.
+## The moves, their targets and amounts, and my pick. (Lock lives in the dock.)
 func _act(open: bool) -> VBoxContainer:
 	var s := Ui.vbox(10)
 	s.add_child(Ui.label(Words.render("ui.pick_a_move"), "", "MutedLabel"))
-	var moves := Ui.flow()
+	var moves := Ui.hbox(6)
 	for p in _m.pickers:
-		var chosen: bool = (not _move.is_empty()) and _move.server_id == p.server_id
-		var txt: String = Words.render(p.key) + (" *" if chosen else "")
-		moves.add_child(Ui.button(txt, "move_" + p.server_id, func(): _choose(p), not open))
+		var chosen := _is_chosen(p)
+		moves.add_child(_move_button(p, chosen, open))
 	s.add_child(moves)
 	if not _move.is_empty() and _move.takes_target:
 		s.add_child(Ui.label(Words.render("ui.pick_a_target"), "", "MutedLabel"))
-		var targets := Ui.flow()
+		var targets := GridContainer.new()
+		targets.columns = 2 if size.x < WIDE_PX else 3
+		targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		for t in _move.targets:
-			targets.add_child(Ui.button(t, "target_" + t, func(): _choose_target(t), not open))
+			targets.add_child(_target_button(str(t), _target != null and str(_target) == str(t), open))
 		s.add_child(targets)
 	if not _move.is_empty() and _target != null and not _move.amounts.is_empty():
 		s.add_child(Ui.label(Words.render("ui.pick_an_amount"), "", "MutedLabel"))
-		var amounts := Ui.flow()
+		var amounts := Ui.hbox(10)
 		for a in _move.amounts:
-			amounts.add_child(Ui.button(str(a), "amount_%s" % a, func(): _send(_move, _target, a), not open))
+			var b := Ui.button(str(a), "amount_%s" % a, func(): _send(_move, _target, a), not open)
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			amounts.add_child(b)
 		s.add_child(amounts)
 	if _m.my_pick != null:
-		s.add_child(Ui.label(Words.render("ui.your_pick", {"pick": _describe(_m.my_pick)}), "my_pick"))
-	var state: String = _m.lock.state
-	var lock_key := "ui.lock" if state == "open" else ("ui.locking" if state == "sent" else "ui.locked")
-	s.add_child(Ui.button(Words.render(lock_key), "lock", func(): _lock(), state != "open" or not open or _m.my_pick == null,
-		"PrimaryButton"))
-	s.add_child(Ui.label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}), "locked_count"))
+		var pick := Ui.card()
+		pick.add_child(Ui.label(Words.render("ui.your_pick", {"pick": _describe(_m.my_pick)}), "my_pick", "NameLabel"))
+		s.add_child(pick)
 	return s
 
 
-func _goal() -> VBoxContainer:
+## Is this the move I have picked? Either what I tapped here, or what the server says I picked (after a reconnect).
+func _is_chosen(p: Dictionary) -> bool:
+	if not _move.is_empty():
+		return _move.server_id == p.server_id
+	if _m.my_pick != null:
+		return str(_m.my_pick.move_id) == str(p.server_id) or str(_m.my_pick.move_id) == str(p.move_id)
+	return false
+
+
+## A move: a medallion with its word underneath (a plain button when the theme has no art for it). The one you picked
+## glows and lifts.
+func _move_button(p: Dictionary, chosen: bool, open: bool) -> Button:
+	var word: String = Words.render(p.key)
+	var id := "move_" + str(p.server_id)
+	var art := Themes.texture(id)
+	var cb := func(): _choose(p)
+	if art == null:
+		return Ui.button(word, id, cb, not open, "ChosenButton" if chosen else "")
+	var b := Ui.button(word, id, cb, not open, "MoveButtonChosen" if chosen else "MoveButton")
+	b.icon = art
+	b.expand_icon = true
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	b.custom_minimum_size = Vector2(0, MOVE_MIN_H)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if not open:
+		b.modulate.a = 0.6
+	if chosen:
+		_glow_and_lift(b)
+	return b
+
+
+func _glow_and_lift(b: Button) -> void:
+	var lift := Themes.fx("lift")
+	var ring_art := Themes.texture("fx_ring")
+	if ring_art != null:
+		var ring := Ui.picture(ring_art, Vector2.ZERO)
+		ring.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		ring.offset_left = -4
+		ring.offset_right = 4
+		ring.offset_top = -10
+		ring.offset_bottom = 110
+		ring.modulate = Themes.color("ember")
+		var add := CanvasItemMaterial.new()
+		add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		ring.material = add
+		b.add_child(ring)
+		if not lift.is_empty() and not Themes.reduced_motion:
+			var tw := ring.create_tween().set_loops()
+			tw.tween_property(ring, "modulate:a", 0.45, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			tw.tween_property(ring, "modulate:a", 1.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if lift.is_empty():
+		return
+	var s := float(lift.get("scale", 1.1))
+	var t := float(lift.get("time", 0.2))
+	b.pivot_offset = Vector2(b.custom_minimum_size.x * 0.5, 50.0)
+	b.create_tween().tween_property(b, "scale", Vector2(s, s), t).from(Vector2.ONE).set_trans(Tween.TRANS_BACK) \
+		.set_ease(Tween.EASE_OUT)
+
+
+## A person I can pick: their face, their name, and their band (the only thing anyone is shown about another's food).
+func _target_button(alias: String, chosen: bool, open: bool) -> Button:
+	var band := ""
+	for e in _m.roster:
+		if e.alias == alias and e.band != "":
+			band = Words.render(e.band)
+	var txt := alias if band == "" else "%s\n%s" % [alias, band]
+	var face := Ui.avatar(alias, _avatars)
+	var variation := ""
+	if face != null:
+		variation = "PlayerCardChosen" if chosen else "PlayerCard"
+	elif chosen:
+		variation = "ChosenButton"
+	var b := Ui.button(txt, "target_" + alias, func(): _choose_target(alias), not open, variation)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if face != null:
+		b.icon = face
+		b.expand_icon = true
+		b.custom_minimum_size = Vector2(0, 76)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		b.clip_text = true
+	return b
+
+
+## The foot of the screen: the lanterns (one per seat, lit when that seat has locked), their count in words, and Lock.
+func _dock(dock: VBoxContainer, open: bool) -> void:
+	var top := Ui.hbox(12)
+	top.alignment = BoxContainer.ALIGNMENT_CENTER
+	_lanterns = Ui.lanterns(int(_m.seats_total), int(_m.locked_count), "lanterns")
+	if _lanterns != null:
+		_lanterns.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		top.add_child(_lanterns)
+	var count := Ui.label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}), "locked_count",
+		"MutedLabel")
+	count.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	count.autowrap_mode = TextServer.AUTOWRAP_OFF            # a shrunk, wrapping label collapses to one letter per line
+	top.add_child(count)
+	dock.add_child(top)
+	var state: String = _m.lock.state
+	var lock_key := "ui.lock" if state == "open" else ("ui.locking" if state == "sent" else "ui.locked")
+	_lock_btn = Ui.button(Words.render(lock_key), "lock", func(): _lock(), state != "open" or not open or _m.my_pick == null,
+		"PrimaryButton")
+	if _wide:                                   # on a wide window the main action is a button, not a bar across the screen
+		_lock_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_lock_btn.custom_minimum_size.x = 520.0
+	_charge = ChargeFill.new()
+	_lock_btn.add_child(_charge)
+	dock.add_child(_lock_btn)
+
+
+func _goal() -> Control:
+	var card := Ui.card()
 	var s := Ui.vbox(4)
+	card.add_child(s)
 	s.add_child(Ui.label(Words.render("ui.goal"), "", "MutedLabel"))
 	s.add_child(Ui.label(Words.render(_m.goal.key, _m.goal.slots), "goal"))
 	var progress: String = Words.render(_m.goal.progress.key, _m.goal.progress.slots)
 	# worded from a code, the progress already says how it stands; otherwise lead with the state word
 	var status: String = progress if _m.goal.progress.from_code else "%s: %s" % [Words.render(_m.goal.state_key), progress]
 	s.add_child(Ui.label(status, "goal_status", "MutedLabel"))
-	return s
+	return card
 
 
-func _roster() -> VBoxContainer:
-	var s := Ui.vbox(4)
+## Everyone around the fire: a face, a name, and the band (never a number) for the others.
+func _roster() -> Control:
+	var card := Ui.card()
+	var s := Ui.vbox(8)
+	card.add_child(s)
 	s.add_child(Ui.label(Words.render("ui.roster"), "", "MutedLabel"))
+	var row := Ui.hbox(8)
 	for e in _m.roster:
-		var line: String = e.alias
+		var cell := Ui.vbox(2)
+		cell.set_meta("id", "home_" + e.alias)
+		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var face := Ui.avatar(e.alias, _avatars)
+		if face != null:
+			var pic := Ui.picture(face, Vector2(0, 56))
+			cell.add_child(pic)
+		cell.add_child(Ui.name_label(e.alias, "", "NameLabel"))
+		var sub := ""
 		if e.is_me:
-			line += " " + Words.render("ui.you_mark")
+			sub = Words.render("ui.you_mark")
 		elif e.band != "":
-			line += ": " + Words.render(e.band)
-		s.add_child(Ui.label(line, "home_" + e.alias))
-	return s
+			sub = Words.render(e.band)
+		if sub != "":
+			var small := Ui.name_label(sub, "", "MutedLabel")
+			cell.add_child(small)
+		for c in cell.get_children():
+			if c is Label:
+				c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		row.add_child(cell)
+	s.add_child(row)
+	return card
 
 
 func _radio(open: bool) -> VBoxContainer:
@@ -218,7 +452,7 @@ func _radio(open: bool) -> VBoxContainer:
 	s.add_child(Ui.button(Words.render("ui.radio"), "radio_toggle", func():
 		_radio_open = not _radio_open
 		_radio_phrase = {}
-		_build(), not open))
+		_build(), not open, "", "radio"))
 	if _radio_open:
 		var phrases := Ui.flow()
 		for ph in _m.radio.phrases:

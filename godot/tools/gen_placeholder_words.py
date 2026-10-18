@@ -71,6 +71,7 @@ UI.update({
     "ui.goal_met": "goal met", "ui.goal_missed": "goal missed", "ui.reveal_title": "What happened",
     "ui.radio_heard": "On the radio", "ui.nothing_to_show": "Nothing yet.", "ui.close": "Close",
     "ui.hide_settings": "Hide settings", "ui.skip": "Skip",
+    "ui.reduced_motion": "Reduced motion", "ui.on": "On", "ui.off": "Off", "ui.rank": "#{n}",
     "ui.net.connecting": "Connecting...", "ui.net.online": "Connected", "ui.net.reconnecting": "Reconnecting...",
     "ui.net.unreachable": "Can't reach the server", "ui.net.offline": "Offline", "ui.net.stopped": "Disconnected",
     "notice.seat_gone": "That game is no longer available.",

@@ -90,6 +90,7 @@ OVERRIDES = {
     "ui.net.unreachable": "No signal: can't reach the server",
     "ui.nothing_to_show": "Quiet out here. Nothing yet.",
     "ui.pick_a_move": "PICK YOUR MOVE FOR TONIGHT",
+    "ui.reduced_motion": "Calm mode (less motion)",
     "ui.pick_a_target": "PICK A TARGET",
     "ui.pick_an_amount": "PICK AN AMOUNT",
     "ui.radio_heard": "ON THE RADIO",
