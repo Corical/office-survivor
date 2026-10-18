@@ -103,9 +103,14 @@ static func build() -> ThemeDef:
 	if frame != null:
 		t.nine_patches["card_frame"] = _nine(frame, 40, 40, 40, 40, 28, 20, 28, 20)
 	if wood != null:
-		t.nine_patches["button_wood"] = _nine(wood, 36, 30, 36, 30, 26, 10, 26, 14)
+		# Measured on the art (tools: see the face rows in the notes): the lit face of the normal button spans rows 6..80 of
+		# the 96 px (1x) texture, so its centre is 5 px ABOVE the texture's middle (the lip is underneath). A label centred
+		# in the content rect lands at h/2 + (top - bottom)/2, so top - bottom = -10 puts it on the face; -12 was the value the
+		# render probe (tests/perf/button_centre.gd) found centres the capitals best (text 2 px low before, <= 1 px now).
+		t.nine_patches["button_wood"] = _nine(wood, 36, 30, 36, 30, 26, 5, 26, 17)
 	if wood_down != null:
-		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 36, 30, 36, 30, 26, 15, 26, 9)   # the face sits lower
+		# the pressed face spans rows 11..86: centre 0.5 px below the middle, so top - bottom = +1 (5.5 px lower than normal)
+		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 36, 30, 36, 30, 26, 12, 26, 11)
 
 	_labels(th, bold, spaced)
 	_buttons(th, bold, t)
