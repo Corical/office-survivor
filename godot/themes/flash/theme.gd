@@ -150,7 +150,7 @@ static func _fx() -> Dictionary:
 		"embers": {"amount": 34, "lifetime": 6.0, "motion": true},
 		"flicker": {"strength": 0.2, "motion": true},
 		# screen-to-screen
-		"transition": {"fade": 0.18, "slide": 24.0},
+		"transition": {"fade": 0.4, "slide": 20.0},
 		# buttons and entrances (screens/ui.gd)
 		"press": {"down": 0.93, "up": 1.07, "time": 0.2},
 		"intro": {"time": 0.38, "rise": 28.0, "stagger": 0.07},
@@ -165,6 +165,8 @@ static func _fx() -> Dictionary:
 		"stage.float": {"rise": 52.0, "time": 1.0},
 		"stage.burst": {"sparks": 12, "speed": 190.0, "motion": true},
 		"stage.pop": {"time": 0.55},
+		# the huts breathe all the time (a fraction of the hut's height, and the seconds one breath takes)
+		"stage.idle": {"breathe": 0.035, "period": 3.4, "motion": true},
 		# which colour a kind of movement is tinted by (the ruleset's style ids -> colour names; the rest is untinted)
 		"stage.style": {"steal": "loss", "robbed": "loss", "hit": "loss", "fine": "mark", "bounty": "mark", "return": "gold",
 			"gift": "gold", "default": "white"},
@@ -378,16 +380,17 @@ static func _buttons(th: Theme, bold: Font, t: ThemeDef) -> void:
 	# SkipPill: small and unobtrusive
 	th.set_type_variation("SkipPill", "Button")
 	th.set_font("font", "SkipPill", bold)
-	th.set_font_size("font_size", "SkipPill", 15)
+	th.set_font_size("font_size", "SkipPill", 19)
 	th.set_constant("outline_size", "SkipPill", 0)
-	th.set_color("font_color", "SkipPill", MUTED)
+	th.set_color("font_color", "SkipPill", PAPER)
 	th.set_color("font_hover_color", "SkipPill", Color.WHITE)
 	th.set_color("font_pressed_color", "SkipPill", EMBER_HI)
-	var pill := _flat(Color(0.04, 0.06, 0.12, 0.62), 22, Color(0.8, 0.85, 0.95, 0.35), 1, 0, 0)
-	pill.content_margin_left = 16
-	pill.content_margin_right = 16
-	pill.content_margin_top = 6
-	pill.content_margin_bottom = 6
+	# obvious without shouting: a solid dark pill with an ember rim, big enough for a thumb (44 px tall)
+	var pill := _flat(Color(0.06, 0.09, 0.17, 0.92), 22, Color(EMBER, 0.85), 2, 4, 2)
+	pill.content_margin_left = 22
+	pill.content_margin_right = 22
+	pill.content_margin_top = 8
+	pill.content_margin_bottom = 8
 	var pill_hi := pill.duplicate() as StyleBoxFlat
 	pill_hi.bg_color = Color(0.1, 0.14, 0.26, 0.85)
 	pill_hi.border_color = EMBER

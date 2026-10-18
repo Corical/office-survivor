@@ -23,6 +23,8 @@ const PLATE_DEFAULT_EDGE := 3.0         # the rim of a plate when the theme does
 const FLOAT_CLEAR := 6.0                # a floating number keeps this far from every plate for its whole rise
 const ICON_PX := 20.0
 const ICON_GAP := 6.0
+const HUT_MAX := 260.0                  # chosen: a wide window gets bigger huts (was 200) and its text scales with them
+const UI_SCALE_FROM := 150.0            # chosen: below this hut size the text is the theme's size; above it grows, up to 1.5x
 const SHAKE_DECAY := 46.0               # chosen: pixels of shake lost per second
 const FLASH_DECAY := 2.6                # chosen: flash alpha lost per second
 const CAPTION_H := 60.0                # chosen: the strip at the top that holds the line being played
@@ -46,6 +48,7 @@ var _tex := {}                          # the art this Stage uses, fetched once
 var _avatars := {}
 var _order: Array = []                  # roster, back to front (by y), for drawing
 var _plates := {}                       # alias -> {rect, items, style}: each plate's frame and what sits on it
+var _band_shown := {}                   # alias -> the band word its plate was built with
 var _pool := FxPool.new()
 var _fx: Backdrop.Layer                 # the additive layer: glows, sparks, rings
 var _t := 0.0
@@ -136,11 +139,12 @@ func _layout() -> void:
 	# vertical room needed is: caption strip + plate + hut at the top, hut + plate at the bottom. The centre is chosen so
 	# both ends have the same room; the radius is whatever is left, so a tall desktop Stage gets a big ring.
 	var tall := clampf((size.y - 400.0) / 300.0, 0.0, 1.0)                 # a tall Stage (desktop) can afford bigger huts
-	var hs := clampf(minf(size.x * 0.27, size.y * lerpf(0.2, 0.27, tall)), 64.0, 200.0)
+	var hs := clampf(minf(size.x * 0.27, size.y * lerpf(0.2, 0.3, tall)), 64.0, HUT_MAX)
 	_hut_px = hs
 	var plate := _plate_height() + PLATE_GAP
-	var c := Vector2(size.x * 0.5, (size.y + CAPTION_H + 0.06 * hs) * 0.5)
-	var ry := maxf(36.0, minf(size.y - 4.0 - plate - hs * 0.5 - c.y, c.y - CAPTION_H - plate - hs * 0.56))
+	var cap_h := CAPTION_H * _ui_scale()
+	var c := Vector2(size.x * 0.5, (size.y + cap_h + 0.06 * hs) * 0.5)
+	var ry := maxf(36.0, minf(size.y - 4.0 - plate - hs * 0.5 - c.y, c.y - cap_h - plate - hs * 0.56))
 	var rx := maxf(40.0, minf(size.x * 0.5 - hs * 0.5 - 10.0, ry * 1.8))
 	var others: Array = _roster.filter(func(e): return not e.is_me)
 	for e in _roster:
@@ -182,11 +186,14 @@ func _build_plate(e: Dictionary) -> void:
 	if e.is_me:
 		icon = Themes.icon("food")
 		text2 = str(_shown_int)
-	elif e.band != "":
-		icon = Themes.icon(e.band)
-		text2 = Words.render(e.band)
+	else:
+		var band := _band_of(e)
+		_band_shown[e.alias] = band
+		if band != "":
+			icon = Themes.icon(band)
+			text2 = Words.render(band)
 	var size2 := ps + 8 if e.is_me else ps - 1          # my number is reserved room at the biggest it pops to
-	var icon_room := ICON_PX + ICON_GAP if icon != null else 0.0
+	var icon_room := _icon_px() + ICON_GAP if icon != null else 0.0
 	text2 = _fit(font, text2, size2, room - icon_room)
 	var tw2 := font.get_string_size(text2, HORIZONTAL_ALIGNMENT_LEFT, -1, size2).x if text2 != "" else 0.0
 	var w2 := icon_room + tw2
@@ -206,7 +213,7 @@ func _build_plate(e: Dictionary) -> void:
 	var x := px + (w - w2) * 0.5
 	if icon != null:
 		items.append({"kind": "icon", "what": "icon", "tex": icon,
-			"rect": Rect2(x, top2 + (l2h - ICON_PX) * 0.5, ICON_PX, ICON_PX)})
+			"rect": Rect2(x, top2 + (l2h - _icon_px()) * 0.5, _icon_px(), _icon_px())})
 		x += icon_room
 	if text2 != "":
 		var th := font.get_height(size2)
@@ -215,6 +222,19 @@ func _build_plate(e: Dictionary) -> void:
 			"tint": "gain" if e.is_me else "text", "number": e.is_me,
 			"rect": Rect2(x, ty, tw2, th), "base": Vector2(x, ty + font.get_ascent(size2))})
 	_plates[e.alias] = {"rect": Rect2(px, py, w, h), "items": items, "style": sb}
+
+
+## The band word a home shows right now. A home whose band changed in the night keeps last morning's band until the animation
+## has played the first thing that happened to it, so the label never changes before the picture explains why.
+func _band_of(e: Dictionary) -> String:
+	var now: String = e.band
+	var before: String = e.get("band_before", "")
+	if now == "" or before == "" or before == now or _timeline == null or _timeline.finished:
+		return now
+	for i in mini(_timeline.index, _beats.size()):
+		if _beats[i].from == e.alias or _beats[i].to == e.alias:
+			return now
+	return before
 
 
 ## `s` cut with an ellipsis until it fits `room` pixels at `px` size (unchanged when it already fits).
@@ -227,9 +247,19 @@ static func _fit(font: Font, s: String, px: int, room: float) -> String:
 	return cut.strip_edges() + "..."
 
 
+## How much bigger than a phone the Stage's writing and icons are: 1 on a phone, up to 1.5 when the huts have grown.
+func _ui_scale() -> float:
+	return clampf(_hut_px / UI_SCALE_FROM, 1.0, 1.5)
+
+
+func _icon_px() -> float:
+	return ICON_PX * _ui_scale()
+
+
 func _plate_size() -> int:
 	var ps := get_theme_font_size("plate_size", "Stage")
-	return ps if ps > 0 else maxi(12, get_theme_default_font_size() - 3)
+	var base := ps if ps > 0 else maxi(12, get_theme_default_font_size() - 3)
+	return roundi(float(base) * _ui_scale())
 
 
 ## Every plate is as tall as its two lines plus the style's top and bottom margins.
@@ -238,7 +268,7 @@ func _plate_height() -> float:
 	var ps := _plate_size()
 	var sb := get_theme_stylebox("plate", "Stage")
 	var my := maxf(sb.get_margin(SIDE_TOP), PLATE_MIN_MARGIN_Y)
-	return my * 2.0 + font.get_height(ps + 1) + PLATE_LINE_GAP + maxf(font.get_height(ps + 8), ICON_PX)
+	return my * 2.0 + font.get_height(ps + 1) + PLATE_LINE_GAP + maxf(font.get_height(ps + 8), _icon_px())
 
 
 func _process(delta: float) -> void:
@@ -316,6 +346,8 @@ func _animate(dt: float, real: float) -> void:
 	_pool.update(dt)
 	for e in _roster:
 		var a: String = e.alias
+		if not e.is_me and _band_shown.get(a, "") != _band_of(e):
+			_build_plate(e)                               # its band label is now explained by what has played
 		_bubble[a] = move_toward(float(_bubble.get(a, 0.0)), 1.0 if _shield_goal(e) else 0.0, dt * 2.6)
 		_dark[a] = move_toward(float(_dark.get(a, 0.0)), 1.0 if _outcast_goal(e) else 0.0, dt * 2.0)
 	var goal := float(_food_mine)
@@ -657,7 +689,13 @@ func _draw_home(e: Dictionary, font: Font, ink: Color) -> void:
 	draw_set_transform(_shake_off + at + Vector2(0, hs * 0.43), 0.0, Vector2(1.0, 0.26))
 	draw_circle(Vector2.ZERO, hs * 0.55, Themes.color("shade"))
 	draw_set_transform(_shake_off, 0.0, Vector2.ONE)
-	draw_texture_rect(tex, Rect2(at + Vector2(-hs * 0.5, -hs * 0.56), Vector2(hs, hs)), false, tint)
+	# a slow idle breath: the hut rises a little off its foot and settles, each home out of step with the next
+	var breath := Themes.fx("stage.idle")
+	var grow := 0.0
+	if not breath.is_empty():
+		grow = float(breath.get("breathe", 0.0)) * (0.5 + 0.5 * sin(_t * TAU / float(breath.get("period", 3.4)) + float(e.alias.hash() % 13)))
+	var hh := hs * (1.0 + grow)
+	draw_texture_rect(tex, Rect2(at + Vector2(-hs * 0.5, hs * 0.44 - hh), Vector2(hs, hh)), false, tint)
 	if dark > 0.6:                                 # eyes in the doorway: they blink now and then
 		if fmod(_t * 1.0 + float(e.alias.hash() % 7), 3.4) < 3.1:
 			var eye := Themes.color("loss")
@@ -791,20 +829,34 @@ static func _ease_back(t: float) -> float:
 
 
 ## The caption: the log line being played, in the theme's words, on a dark strip (leaving room for the Skip pill).
-func _draw_caption(cur: Dictionary, font: Font, fs: int) -> void:
+func _draw_caption(cur: Dictionary, font: Font, fs_base: int) -> void:
+	var fs := roundi(float(fs_base) * _ui_scale())
 	var li: int = int(cur.get("line_index", -1))
-	if li < 0 or li >= _model.lines.size():
+	var w := size.x - 16.0 - SKIP_ROOM * _ui_scale()
+	var text := ""
+	if cur.is_empty():
+		text = _waiting_text()                           # everything has played: say what we are waiting for
+	elif li >= 0 and li < _model.lines.size():
+		if li != _caption_idx:
+			_caption_idx = li
+			var ln: Dictionary = _model.lines[li]
+			_caption = Words.render(ln.key, ln.slots)
+		text = _caption
+	if text == "":
 		return
-	var w := size.x - 16.0 - SKIP_ROOM
-	if li != _caption_idx:
-		_caption_idx = li
-		var ln: Dictionary = _model.lines[li]
-		_caption = Words.render(ln.key, ln.slots)
-		_caption_size = font.get_multiline_string_size(_caption, HORIZONTAL_ALIGNMENT_LEFT, w, fs - 3, 2)
-	var bg := Rect2(6, 4, minf(w + 16.0, _caption_size.x + 20.0), _caption_size.y + 12.0)
+	var tsize := font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, w, fs - 3, 2)
+	var bg := Rect2(6, 4, minf(w + 16.0, tsize.x + 20.0), tsize.y + 12.0)
 	draw_rect(bg, Themes.color("shade"))
-	draw_multiline_string(font, Vector2(14, 6.0 + float(fs)), _caption, HORIZONTAL_ALIGNMENT_LEFT, w, fs - 3, 2,
+	draw_multiline_string(font, Vector2(14, 6.0 + float(fs)), text, HORIZONTAL_ALIGNMENT_LEFT, w, fs - 3, 2,
 		get_theme_color("text", "Stage"))
+
+
+## "Waiting for the others, 14 s", from the same countdown the header shows. Empty when the server has not sent one.
+func _waiting_text() -> String:
+	var n := Feed.seconds_left()
+	if n < 0:
+		return ""
+	return Words.render("ui.reveal_waiting", {"n": n})
 
 
 # ---------------- the plain look (a theme with no art) ----------------
@@ -853,6 +905,7 @@ func _draw_plain() -> void:
 			draw_string(font, at + Vector2(-70, radius_home + 38), line2, HORIZONTAL_ALIGNMENT_CENTER, 140, fs - 4, col_text)
 
 	if cur.is_empty():
+		_draw_caption_plain(cur, font, fs, col_text)
 		return
 	var to_pos := where(cur.to, cur.from)
 	var from_pos := where(cur.from, cur.to)
@@ -903,7 +956,10 @@ func _draw_travelling_food(cur: Dictionary, from_pos: Vector2, to_pos: Vector2, 
 
 func _draw_caption_plain(cur: Dictionary, font: Font, fs: int, col_text: Color) -> void:
 	var li: int = int(cur.get("line_index", -1))
-	if li >= 0 and li < _model.lines.size():
+	if cur.is_empty() and _waiting_text() != "":
+		draw_multiline_string(font, Vector2(8, 20), _waiting_text(), HORIZONTAL_ALIGNMENT_LEFT, size.x - 16 - SKIP_ROOM, fs - 3, 2,
+			col_text)
+	elif li >= 0 and li < _model.lines.size():
 		var ln: Dictionary = _model.lines[li]
 		draw_multiline_string(font, Vector2(8, 20), Words.render(ln.key, ln.slots), HORIZONTAL_ALIGNMENT_LEFT,
 			size.x - 16 - SKIP_ROOM, fs - 3, 2, col_text)
