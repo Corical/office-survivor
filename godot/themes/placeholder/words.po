@@ -612,6 +612,9 @@ msgstr "Winners"
 msgid "ui.you_are"
 msgstr "You are {alias}"
 
+msgid "ui.you_are_prefix"
+msgstr "You are"
+
 msgid "ui.you_mark"
 msgstr "(you)"
 

@@ -217,11 +217,9 @@ func _head() -> Control:
 	if face != null:
 		row.add_child(Ui.picture(face, Vector2(AVATAR_PX, AVATAR_PX), "me_avatar"))
 	var s := Ui.vbox(4)
-	var you := Ui.label(Words.render("ui.you_are", {"alias": _m.me.alias}), "you_are", "YouLabel")
-	you.autowrap_mode = TextServer.AUTOWRAP_OFF              # a name is one line: trimmed with an ellipsis, never broken mid-word
-	you.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	you.clip_text = true
-	s.add_child(you)
+	# "You are" small, the name under it with the whole width: a 12-letter name shrinks a little to fit instead of being cut
+	s.add_child(Ui.label(Words.render("ui.you_are_prefix"), "you_are_prefix", "MutedLabel"))
+	s.add_child(Ui.name_label(str(_m.me.alias), "you_are", "YouLabel"))
 	s.add_child(Ui.label(Words.render("ui.round_of", {"round": _m.round, "rounds": _m.rounds}), "round_of", "MutedLabel"))
 	for r in _m.me.resources:
 		var line := Ui.hbox(8)
@@ -355,22 +353,21 @@ func _target_button(alias: String, chosen: bool, open: bool) -> Button:
 	for e in _m.roster:
 		if e.alias == alias and e.band != "":
 			band = Words.render(e.band)
-	var txt := alias if band == "" else "%s\n%s" % [alias, band]
 	var face := Ui.avatar(alias, _avatars)
 	var variation := ""
 	if face != null:
 		variation = "PlayerCardChosen" if chosen else "PlayerCard"
 	elif chosen:
 		variation = "ChosenButton"
-	var b := Ui.button(txt, "target_" + alias, func(): _choose_target(alias), not open, variation)
+	if face == null:                                   # no art: a plain button with the name and band as its words
+		var plain := Ui.button(alias if band == "" else "%s\n%s" % [alias, band], "target_" + alias,
+			func(): _choose_target(alias), not open, variation)
+		plain.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		return plain
+	var b := Ui.button("", "target_" + alias, func(): _choose_target(alias), not open, variation)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if face != null:
-		b.icon = face
-		b.expand_icon = true
-		b.custom_minimum_size = Vector2(0, 76)
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		b.clip_text = true
+	b.custom_minimum_size = Vector2(0, 76)
+	Ui.fill_person_card(b, face, alias, band)          # the name is fitted to the card, never cut at a phone's width
 	return b
 
 
@@ -408,7 +405,11 @@ func _goal() -> Control:
 	s.add_child(Ui.label(Words.render(_m.goal.key, _m.goal.slots), "goal"))
 	var progress: String = Words.render(_m.goal.progress.key, _m.goal.progress.slots)
 	# worded from a code, the progress already says how it stands; otherwise lead with the state word
-	var status: String = progress if _m.goal.progress.from_code else "%s: %s" % [Words.render(_m.goal.state_key), progress]
+	var status: String = progress
+	if not _m.goal.progress.from_code:
+		# the state word, then the server's own detail if it sent one (the old form said the state word twice)
+		var detail := str(_m.goal.get("progress_text", ""))
+		status = Words.render(_m.goal.state_key) + (": " + detail if detail != "" else "")
 	s.add_child(Ui.label(status, "goal_status", "MutedLabel"))
 	return card
 

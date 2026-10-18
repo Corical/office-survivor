@@ -159,7 +159,8 @@ func _round_screen(n := 1) -> Control:
 func test_round_shows_who_i_am_the_round_the_goal_and_everyone() -> void:
 	var s := _round_screen(3)
 	eq(text_of(s, "round_of"), "Round 3 of 10", "round")
-	eq(text_of(s, "you_are"), "You are Mango", "alias")
+	eq(text_of(s, "you_are_prefix"), "You are", "the small line")
+	eq(text_of(s, "you_are"), "Mango", "my name, with the whole width")
 	eq(text_of(s, "resource"), "Rations: 7", "my exact food")
 	eq(text_of(s, "goal"), "give away 3 rations over the game", "goal worded from the server's text")
 	check(Ui.find(s, "home_Mango") != null and Ui.find(s, "home_Fig") != null and Ui.find(s, "home_Kiwi") != null, "everyone has a home")
@@ -409,7 +410,7 @@ func test_end_shows_the_winner_and_the_results_in_the_servers_order() -> void:
 	eq(text_of(s, "winners"), "Fig", "winner")
 	var order: Array = Ui.find_all(s, "row_").map(func(l): return l.get_meta("id"))
 	eq(order, ["row_Fig", "row_Mango", "row_Kiwi"], "the server's order")
-	check("(you)" in text_of(s, "row_Mango"), "I am marked")
+	check(Ui.find(s, "you_Mango") != null and text_of(s, "you_Mango") == "(you)", "I am marked, beside my name")
 	check("winner" in text_of(s, "marks_Fig") and "seat" in text_of(s, "marks_Fig"), "winner with a seat")
 	check("goal missed" in text_of(s, "marks_Mango"), "goal missed shown")
 

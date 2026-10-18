@@ -14,7 +14,7 @@ const ALL: Array[String] = [
 	"ui.reduced_motion", "ui.on", "ui.off", "ui.rank",
 	"ui.open_camps", "ui.no_open_camps", "ui.camp_just_now", "ui.camp_min_ago", "ui.camp_hours_ago", "ui.camp_days_ago",
 	"ui.camp_seats", "ui.create_sheet_title", "ui.camp_name_hint", "ui.public", "ui.private", "ui.public_help",
-	"ui.private_help", "ui.create_go", "ui.cancel",
+	"ui.private_help", "ui.create_go", "ui.cancel", "ui.you_are_prefix",
 	"ui.net.connecting", "ui.net.online", "ui.net.reconnecting", "ui.net.unreachable", "ui.net.offline", "ui.net.stopped",
 	"notice.seat_gone", "notice.taken_over", "notice.too_big", "notice.flapping", "notice.upgrade_required",
 	"notice.invalid", "notice.unknown", "notice.generic", "notice.no_server_url", "notice.locked", "notice.in_flight",

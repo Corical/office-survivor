@@ -39,12 +39,31 @@ static func _walk(n: Node, out: Array[String]) -> void:
 		var sb := (n as Control).get_theme_stylebox("normal")
 		if _is_frame(sb):
 			_check_margins(n as Control, sb, out)
+	if n is Label and (n as Label).clip_text:
+		_check_trim(n as Label, out)
 	if n.has_method("plate_items"):
 		_check_plates(n, out)
 	if n.has_method("float_items"):
 		_check_floats(n, out)
 	for c in n.get_children():
 		_walk(c, out)
+
+
+## A clipped label (a name, a number) must show ALL of its text: on one line, or on its two lines. If the text is wider than the
+## room it has, it is being cut ("You are Quie...") and that is a defect at any size a player can have.
+static func _check_trim(l: Label, out: Array[String]) -> void:
+	if l.text == "" or l.size.x < 8.0:
+		return
+	var s := l.label_settings.font_size if l.label_settings != null else l.get_theme_font_size("font_size")
+	var font := l.label_settings.font if (l.label_settings != null and l.label_settings.font != null) else l.get_theme_font("font")
+	var w := font.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, s).x
+	var room := l.size.x
+	if l.autowrap_mode == TextServer.AUTOWRAP_OFF:
+		if w > room + TOLERANCE:
+			out.append("%s: label '%s' is cut off: its text is %.0f px wide and it has %.0f px" % [l.get_path(), l.text, w, room])
+	elif l.max_lines_visible > 0 and w > room * float(l.max_lines_visible) - 4.0:
+		out.append("%s: label '%s' does not fit even on %d lines (%.0f px of text, %.0f px a line)" % [l.get_path(), l.text,
+			l.max_lines_visible, w, room])
 
 
 static func _check_margins(c: Control, sb: StyleBox, out: Array[String]) -> void:

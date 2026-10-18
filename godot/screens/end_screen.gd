@@ -183,11 +183,15 @@ func _player_card(m: Dictionary, r: Dictionary, rank: int, best: Dictionary) -> 
 	var face := Ui.avatar(r.alias, _avatars)
 	if face != null:
 		top.add_child(Ui.picture(face, Vector2(56, 56)))
-	var who: String = r.alias
-	if r.is_me:
-		who += " " + Words.render("ui.you_mark")
 	var info := Ui.vbox(0)
-	info.add_child(Ui.name_label(who, "row_" + r.alias, "NameLabel"))
+	var who_row := Ui.hbox(6)                             # the name (fitted), then "(you)" beside it: neither can cut the other
+	who_row.add_child(Ui.name_label(r.alias, "row_" + r.alias, "NameLabel"))
+	if r.is_me:
+		var me := Ui.label(Words.render("ui.you_mark"), "you_" + r.alias, "MutedLabel")
+		me.autowrap_mode = TextServer.AUTOWRAP_OFF
+		me.size_flags_horizontal = Control.SIZE_SHRINK_END
+		who_row.add_child(me)
+	info.add_child(who_row)
 	var marks: Array = []
 	if r.is_winner:
 		marks.append(Words.render("ui.winner_mark"))
