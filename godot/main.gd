@@ -24,8 +24,16 @@ func _ready() -> void:
 	add_child(_slot)
 	add_child(Overlay.new())
 	Feed.status_changed.connect(_route)
+	Themes.theme_changed.connect(_on_theme)
 	_route(Feed.status())
 	Intents.resume()                         # a stored seat resumes on launch
+
+
+## A new theme: restyle the whole window and rebuild the current screen in the new words.
+func _on_theme(_id: String) -> void:
+	theme = Themes.current.godot_theme
+	current_name = ""
+	_route(Feed.status())
 
 
 func _route(st: Dictionary) -> void:

@@ -55,6 +55,10 @@ func _build() -> void:
 		url.text = st.server_url
 		url.text_changed.connect(func(t): Intents.set_server_url(t))
 		col.add_child(url)
+		var ids: Array = Themes.ids()
+		var label := "%s: %s" % [Words.render("ui.theme"), Themes.current.title]
+		col.add_child(Ui.button(label, "theme_toggle", func():
+			Themes.use(ids[(ids.find(Themes.current.id) + 1) % ids.size()])))
 
 
 func _show(started: bool) -> void:

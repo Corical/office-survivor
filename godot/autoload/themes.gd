@@ -22,5 +22,9 @@ func use(id: String) -> bool:
 	return true
 
 
+func ids() -> Array:
+	return ThemeRegistry.ids()
+
+
 func icon(id: String) -> Texture2D:
 	return current.icons.get(id) if current else null
