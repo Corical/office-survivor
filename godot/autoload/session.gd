@@ -35,6 +35,7 @@ var pending_intent := {}
 var awaiting_view := false
 
 var _inflight := {}                   # guard key -> true
+var _locked_seen := {}                # "room|round|lock" -> true once a view said my_locked for that round
 var _last_type := ""                  # the intent most recently sent: the one an `error` is taken to answer
 var _last_key := ""
 
@@ -73,6 +74,7 @@ func reset(s: SessionStore = null, c: Clock = null) -> void:
 	pending_intent = {}
 	awaiting_view = false
 	_inflight = {}
+	_locked_seen = {}
 	_last_type = ""
 	_last_key = ""
 	load_store()
@@ -129,6 +131,8 @@ func act(t: String, fields := {}) -> String:
 		# where pick and radio went out ahead of it)
 		Log.event("session", "intent_refused", {"t": t, "why": "awaiting_view"})
 		return "awaiting_view"
+	if (t == "pick" or t == "lock") and lock_state() == "locked":
+		return "locked_round"                  # the server said this round is locked: nothing more goes out for it
 	if t == "pick" and lock_state() != "open":
 		Log.event("session", "intent_refused", {"t": t, "why": "round_locked"})
 		return "locked_round"              # contract 5.3: after Lock the picker stays shut; never re-enabled locally
@@ -162,6 +166,7 @@ func leave() -> void:
 	last_round_view = {}
 	awaiting_view = false
 	_inflight = {}
+	_locked_seen = {}
 	terminal_reason = ""
 	_go("title")
 
@@ -184,7 +189,9 @@ func back_to_title() -> void:
 func lock_state() -> String:
 	if view.get("t") != "round":
 		return "none"
-	if bool(view.get("my_locked", false)):
+	# once the server has said this round is locked it stays locked here, whatever a later view claims
+	# (contract 5.3: never re-enable the picker locally)
+	if bool(view.get("my_locked", false)) or _locked_seen.has(_round_key("lock")):
 		return "locked"
 	if _inflight.has(_round_key("lock")):
 		return "sent"
@@ -294,6 +301,8 @@ func _take_view(msg: Dictionary) -> void:
 	if t == "round":
 		last_round_view = msg
 	view = msg
+	if t == "round" and bool(msg.my_locked):
+		_locked_seen[_round_key("lock")] = true
 	view_msec = clock.now_msec()
 	awaiting_view = false
 	_clear_reply_guards()

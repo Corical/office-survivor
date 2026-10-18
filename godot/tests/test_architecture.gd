@@ -6,8 +6,9 @@ extends BaseTest
 const A = preload("res://rulesets/survivors/adapter.gd")
 const GUARDED_DIRS := ["res://screens", "res://stage"]
 ## Survivors contract fields and game words: if one appears in a screen, a ruleset detail has leaked upward.
+## (`seconds_left` and `locked_count` are deliberately NOT listed: the neutral models reuse those two names.)
 const CONTRACT_FIELDS := ["gift_amounts", "times_robbed", "gave_away", "guards_left", "goal_progress", "radio_phrases",
-	"my_locked", "locked_count", "seconds_left", "legal"]
+	"my_locked", "legal"]
 const GAME_WORDS := ["ration", "bandit", "helicopter", "scavenge", "steal", "investigate", "gift", "guard", "idol",
 	"survivor"]
 ## Literals that make a screen own its look.

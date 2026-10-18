@@ -85,9 +85,11 @@ func test_lock_double_tap_and_stale_view() -> void:
 	fake.server_send(round_view(3, true, 165))
 	eq(Session.lock_state(), "locked", "locked")
 	fake.server_send(round_view(3, false, 160))        # a buggy server un-locks: we still never re-open locally
-	eq(Session.lock_state(), "sent", "our own guard keeps the picker closed for this round")
+	eq(Session.lock_state(), "locked", "once the server said locked, this round stays locked here")
 	check(not Session.picker_open(), "picker stays closed")
-	eq(Session.act("lock"), "in_flight", "and no second lock goes out")
+	eq(Session.act("lock"), "locked_round", "and no second lock goes out")
+	fake.server_send(round_view(4))
+	eq(Session.lock_state(), "open", "the next round is a fresh round")
 
 
 func test_new_round_reopens_the_picker() -> void:

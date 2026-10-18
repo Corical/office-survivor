@@ -1,22 +1,40 @@
 extends Control
-## Router: one screen at a time, chosen by Session.screen. Step 1 stub: a label per screen until the real screens
-## land in step 4. A stored seat resumes on launch.
+## The router: one screen at a time, chosen by the connection status, plus the overlay. Knows screens, not rules.
 
-var _label: Label
+const SCREENS := {
+	"title": preload("res://screens/title_screen.gd"),
+	"lobby": preload("res://screens/lobby_screen.gd"),
+	"round": preload("res://screens/round_screen.gd"),
+	"reveal": preload("res://screens/reveal_screen.gd"),
+	"end": preload("res://screens/end_screen.gd"),
+	"upgrade": preload("res://screens/upgrade_screen.gd"),
+}
+
+var current_name := ""
+var current: Control
+var _slot: Control
 
 
 func _ready() -> void:
-	_label = Label.new()
-	_label.name = "ScreenLabel"
-	_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	add_child(_label)
-	Session.screen_changed.connect(func(_s): _refresh())
-	Net.state_changed.connect(func(_s): _refresh())
-	_refresh()
-	Session.resume_if_stored()
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+	if Themes.current:
+		theme = Themes.current.godot_theme
+	_slot = Control.new()
+	_slot.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_slot)
+	add_child(Overlay.new())
+	Feed.status_changed.connect(_route)
+	_route(Feed.status())
+	Intents.resume()                         # a stored seat resumes on launch
 
 
-func _refresh() -> void:
-	_label.text = "%s\n(%s)" % [Session.screen, Net.state]
+func _route(st: Dictionary) -> void:
+	var want: String = st.screen if SCREENS.has(st.screen) else "title"
+	if want == current_name:
+		return
+	if current != null:
+		_slot.remove_child(current)
+		current.queue_free()
+	current = SCREENS[want].new()
+	current_name = want
+	_slot.add_child(current)

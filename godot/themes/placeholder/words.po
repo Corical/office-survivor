@@ -399,6 +399,9 @@ msgstr "Arena"
 msgid "ui.back_to_title"
 msgstr "Back to title"
 
+msgid "ui.close"
+msgstr "Close"
+
 msgid "ui.continue"
 msgstr "Continue"
 
@@ -413,6 +416,15 @@ msgstr "Room code"
 
 msgid "ui.goal"
 msgstr "Your goal"
+
+msgid "ui.goal_met"
+msgstr "goal met"
+
+msgid "ui.goal_missed"
+msgstr "goal missed"
+
+msgid "ui.hide_settings"
+msgstr "Hide settings"
 
 msgid "ui.join_room"
 msgstr "Join room"
@@ -453,8 +465,26 @@ msgstr "Can't reach the server"
 msgid "ui.new_game"
 msgstr "New game"
 
+msgid "ui.nothing_to_show"
+msgstr "Nothing yet."
+
+msgid "ui.pick_a_move"
+msgstr "Pick a move"
+
+msgid "ui.pick_a_target"
+msgstr "Pick a target"
+
+msgid "ui.pick_an_amount"
+msgstr "Pick an amount"
+
 msgid "ui.radio"
 msgstr "Radio"
+
+msgid "ui.radio_heard"
+msgstr "On the radio"
+
+msgid "ui.radio_pick_player"
+msgstr "About whom?"
 
 msgid "ui.results"
 msgstr "Results"
@@ -462,14 +492,26 @@ msgstr "Results"
 msgid "ui.resume"
 msgstr "Resume game"
 
+msgid "ui.reveal_title"
+msgstr "What happened"
+
 msgid "ui.room_code"
 msgstr "Room {code}"
+
+msgid "ui.roster"
+msgstr "Everyone"
 
 msgid "ui.round_of"
 msgstr "Round {round} of {rounds}"
 
+msgid "ui.seat_mark"
+msgstr "seat"
+
 msgid "ui.seats"
 msgstr "{taken} of {total} seats taken"
+
+msgid "ui.seconds"
+msgstr "{n} s"
 
 msgid "ui.server_address"
 msgstr "Server address"
@@ -489,9 +531,18 @@ msgstr "Waiting for the server"
 msgid "ui.waiting_for_host"
 msgstr "Waiting for the host to start"
 
+msgid "ui.winner_mark"
+msgstr "winner"
+
 msgid "ui.winners"
 msgstr "Winners"
 
 msgid "ui.you_are"
 msgstr "You are {alias}"
+
+msgid "ui.you_mark"
+msgstr "(you)"
+
+msgid "ui.your_pick"
+msgstr "Your pick: {pick}"
 
