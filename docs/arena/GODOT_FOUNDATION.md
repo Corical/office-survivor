@@ -176,3 +176,21 @@ This list is the server's intent, not yet code. If you need a code that is missi
 - A quiet night sends `news: []`; show the `news_quiet` template.
 - Proven: these codes rendered with this table give exactly Torch's lines (`arena/tests/test_lines.py`, 120 games).
 - The mock server should emit codes from this file, so the client is tested against real names.
+
+### 18 Oct 2026, client session: four requests (client plan: `.local/.sisyphus/plans/godot-client.md`)
+
+1. **Close codes before every terminal close, then wait for the client to close.** Godot's `WebSocketPeer` drops a
+   message that arrives in the same poll as the close frame (reproduced against a real `websockets` server: an
+   `error` then `close(1000)` delivered 0 packets). Today `taken_over` and `upgrade_required` are sent and the socket
+   closes straight after, so the client will usually never see them. Proposed: `close(4001, "seat_gone")`,
+   `close(4002, "upgrade_required")`, `close(4003, "taken_over")`, sent after the message, and ideally a short wait
+   for the client's own close. The client treats the close code exactly like the message.
+2. **A distinct error code when a seat is gone.** `resume` with a dead token returns `refused` ("That seat no longer
+   exists."), the same code as every other refusal, so the client cannot tell "forget your token" from "that move is
+   not allowed". Proposed: `seat_gone` for that case (and `room_gone` if a room is deleted).
+3. **`event` lines: send the event id and variant next to `line`.** `{line}` is an English sentence, so a theme
+   cannot reword it. Proposed args: `{event: "snake", variant: 2, who: "Alias", line: "..."}`; the client uses the
+   id + variant when its theme has words for them, and `line` otherwise.
+4. **Goal and goal progress as codes.** `me.goal.text` and `goal_progress.text` are English (views.py says so).
+   Proposed: keep `code` + `target`, add `goal_progress.code` + `args` (e.g. `{code: "clean_steals", have: 1,
+   need: 3}`), keep `text` as a fallback until then.
