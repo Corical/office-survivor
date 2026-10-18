@@ -18,7 +18,7 @@ const OFFSTAGE := "@offstage"
 const PLATE_H := 52.0
 const SHAKE_DECAY := 46.0               # chosen: pixels of shake lost per second
 const FLASH_DECAY := 2.6                # chosen: flash alpha lost per second
-const CAPTION_H := 46.0                 # chosen: the strip at the top that holds the line being played
+const CAPTION_H := 60.0                # chosen: the strip at the top that holds the line being played
 const SKIP_ROOM := 130.0               # chosen: space kept free at the top right for the Skip pill
 
 var _roster: Array = []
@@ -128,7 +128,8 @@ func _layout() -> void:
 	# The ring fills the Stage. Plates go above the huts in the top half and below them in the bottom half, so the
 	# vertical room needed is: caption strip + plate + hut at the top, hut + plate at the bottom. The centre is chosen so
 	# both ends have the same room; the radius is whatever is left, so a tall desktop Stage gets a big ring.
-	var hs := clampf(minf(size.x * 0.27, size.y * 0.2), 64.0, 190.0)
+	var tall := clampf((size.y - 400.0) / 300.0, 0.0, 1.0)                 # a tall Stage (desktop) can afford bigger huts
+	var hs := clampf(minf(size.x * 0.27, size.y * lerpf(0.2, 0.27, tall)), 64.0, 200.0)
 	_hut_px = hs
 	var plate := PLATE_H + 2.0
 	var c := Vector2(size.x * 0.5, (size.y + CAPTION_H + 0.06 * hs) * 0.5)
