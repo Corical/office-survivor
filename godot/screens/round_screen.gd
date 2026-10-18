@@ -16,6 +16,7 @@ var _m: Dictionary = {}
 var _move: Dictionary = {}          # the picker being filled in (local, until a pick is sent)
 var _target: Variant = null
 var _radio_open := false
+var _goal_open := false             # phone width: the goal card shows the goal; a tap shows how it is going and what a seat is
 var _radio_phrase: Dictionary = {}
 var _timer_label: Label
 var _ring: RingTimer
@@ -200,7 +201,7 @@ func _build() -> void:
 	var goal := _goal()
 	var roster := _roster()
 	var radio := _radio(open)
-	if size.x >= WIDE_PX:
+	if _wide:
 		var cols := HBoxContainer.new()
 		cols.add_theme_constant_override("separation", 32)
 		cols.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -214,7 +215,7 @@ func _build() -> void:
 		cols.add_child(right)
 		page.add_child(cols)
 	else:
-		for s in [head, act, roster, goal, radio]:
+		for s in [head, goal, act, roster, radio]:      # the goal sits right under the header: nobody scrolls to find their own goal
 			page.add_child(s)
 	_dock(pg.dock, open)
 	_building = false
@@ -311,7 +312,7 @@ func _act(open: bool) -> VBoxContainer:
 	if not _move.is_empty() and _move.takes_target:
 		s.add_child(Ui.label(Words.render("ui.pick_a_target"), "", "MutedLabel"))
 		var targets := GridContainer.new()
-		targets.columns = 2 if size.x < WIDE_PX else 3
+		targets.columns = 3 if _wide else 2
 		targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		for t in _move.targets:
 			targets.add_child(_target_button(str(t), _target != null and str(_target) == str(t), open))
@@ -325,7 +326,7 @@ func _act(open: bool) -> VBoxContainer:
 			amounts.add_child(b)
 		s.add_child(amounts)
 	# "Your pick" always takes its space (invisible until there is a pick) so choosing a move never pushes the page down
-	var pick := Ui.card()
+	var pick := Ui.card("LogLine")                      # a compact flat strip: the reserved space stays small
 	var picked: bool = _m.my_pick != null
 	var pick_words := Words.render("ui.your_pick", {"pick": _describe(_m.my_pick) if picked else "..."})
 	pick.add_child(Ui.label(pick_words, "my_pick", "NameLabel"))
@@ -482,8 +483,24 @@ func _goal() -> Control:
 	var card := Ui.card()
 	var s := Ui.vbox(4)
 	card.add_child(s)
-	s.add_child(Ui.label(Words.render("ui.goal"), "", "MutedLabel"))
+	var compact: bool = not _wide
+	var open_now: bool = _goal_open or not compact
+	var top := Ui.hbox(8)
+	var title := Ui.label(Words.render("ui.goal"), "", "MutedLabel")
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(title)
+	if compact:                                       # a tap anywhere on the card opens or closes the detail
+		var hint := Ui.label(Words.render("ui.goal_tap_less" if _goal_open else "ui.goal_tap_more"), "goal_toggle_hint", "MutedLabel")
+		hint.autowrap_mode = TextServer.AUTOWRAP_OFF
+		top.add_child(hint)
+		card.gui_input.connect(func(ev: InputEvent):
+			if ev is InputEventMouseButton and ev.pressed == false and ev.button_index == MOUSE_BUTTON_LEFT:
+				_goal_open = not _goal_open
+				_build())
+	s.add_child(top)
 	s.add_child(Ui.label(Words.render(_m.goal.key, _m.goal.slots), "goal"))
+	if not open_now:
+		return card
 	var progress: String = Words.render(_m.goal.progress.key, _m.goal.progress.slots)
 	# worded from a code, the progress already says how it stands; otherwise lead with the state word
 	var status: String = progress

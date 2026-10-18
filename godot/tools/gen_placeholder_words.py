@@ -81,6 +81,7 @@ UI.update({
     "ui.private_help": "Not listed. Only people you give the code to can join.",
     "ui.create_go": "Create", "ui.cancel": "Cancel", "ui.you_are_prefix": "You are", "ui.pick_prompt": "Pick a move!",
     # --- round screen ---
+    "ui.goal_tap_more": "Tap for details", "ui.goal_tap_less": "Tap to hide",
     "ui.move_unavailable": "{move} is not available tonight.",
     "ui.goal_seat_note": "A seat is a place on the helicopter. Only a few are free; the players with the most rations at the end get them.",
     "notice.camp_unavailable": "That camp filled up or closed first. Here is the fresh list.",
