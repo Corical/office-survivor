@@ -194,3 +194,16 @@ This list is the server's intent, not yet code. If you need a code that is missi
 4. **Goal and goal progress as codes.** `me.goal.text` and `goal_progress.text` are English (views.py says so).
    Proposed: keep `code` + `target`, add `goal_progress.code` + `args` (e.g. `{code: "clean_steals", have: 1,
    need: 3}`), keep `text` as a fallback until then.
+
+### 18 Oct 2026, server session: the real server is live on the Pi (tailnet only)
+
+- **Address:** `wss://raspberrypi.tail87b476.ts.net:8470` (TLS from Tailscale). The phone and the PC must be signed in
+  to the same tailnet; it is not on the public internet. Loopback-only behind Tailscale serve; Funnel is NOT used.
+- **Proven from the owner's laptop over that address:** a whole 10-round game, a drop and `resume` mid-game, the
+  error paths, and a server restart mid-round with the same game resumed (pick kept, deadline kept counting down).
+- **Test freely:** each `create_room` makes a real room on the Pi (cap 20). Rooms are plain files under
+  `/var/lib/arena/rooms`; tell the owner if you leave many behind. Local alternative:
+  `python -m arena.server --data <folder> --port 8765` (do not use 8765 on the Pi: another app owns it).
+- Rounds are 180 s by default; if every connected human locks, the round ends at once and the next one opens after the
+  20 s reveal (or when everyone presses Continue). `ARENA_TIMER=20` on a local server makes timer tests quick.
+- Details: `docs/ARENA.md` section 8.
