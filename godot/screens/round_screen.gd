@@ -382,6 +382,7 @@ func _dock(dock: VBoxContainer, open: bool) -> void:
 	var count := Ui.label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}), "locked_count",
 		"MutedLabel")
 	count.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	count.autowrap_mode = TextServer.AUTOWRAP_OFF            # a shrunk, wrapping label collapses to one letter per line
 	top.add_child(count)
 	dock.add_child(top)
 	var state: String = _m.lock.state

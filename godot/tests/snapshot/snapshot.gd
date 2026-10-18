@@ -44,7 +44,7 @@ func _ready() -> void:
 		settings.pressed.emit()
 		await _wait(0.3)
 		await _shot("01b_title_settings")
-		settings.pressed.emit()
+		(Ui.find(router.current, "settings_toggle") as Button).pressed.emit()      # the screen was rebuilt: find it again
 	await _size(DESKTOP)
 	await _shot("01c_title_desktop")
 	await _size(PHONE)
