@@ -446,6 +446,9 @@ func _goal() -> Control:
 		var detail := str(_m.goal.get("progress_text", ""))
 		status = Words.render(_m.goal.state_key) + (": " + detail if detail != "" else "")
 	s.add_child(Ui.label(status, "goal_status", "MutedLabel"))
+	var note: String = str(_m.goal.get("note_key", ""))
+	if note != "":
+		s.add_child(Ui.label(Words.render(note), "goal_note", "MutedLabel"))
 	return card
 
 

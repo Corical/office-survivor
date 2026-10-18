@@ -79,6 +79,8 @@ UI.update({
     "ui.public_help": "Anyone who opens the app can see this camp and join it.",
     "ui.private_help": "Not listed. Only people you give the code to can join.",
     "ui.create_go": "Create", "ui.cancel": "Cancel", "ui.you_are_prefix": "You are", "ui.pick_prompt": "Pick a move!",
+    # --- round screen ---
+    "ui.goal_seat_note": "A seat is a place on the helicopter. Only a few are free; the players with the most rations at the end get them.",
     "notice.camp_unavailable": "That camp filled up or closed first. Here is the fresh list.",
     "notice.room_full": "That camp is full.", "notice.room_started": "That camp has already started.",
     "notice.room_gone": "No camp with that code. Check it and try again.",

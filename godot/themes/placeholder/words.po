@@ -462,6 +462,9 @@ msgstr "goal met"
 msgid "ui.goal_missed"
 msgstr "goal missed"
 
+msgid "ui.goal_seat_note"
+msgstr "A seat is a place on the helicopter. Only a few are free; the players with the most rations at the end get them."
+
 msgid "ui.hide_settings"
 msgstr "Hide settings"
 
