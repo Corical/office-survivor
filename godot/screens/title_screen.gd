@@ -229,14 +229,19 @@ func _hero() -> Control:
 		add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 		glow.material = add
 		holder.add_child(glow)
-	var pic := Ui.picture(logo, Vector2.ZERO)
+	# The logo is a Sprite2D under a Node2D, NOT a Control: the engine rounds every Control's position to whole pixels, so a
+	# bobbing Control moves in 1 px steps (it holds a few frames, then jumps). A Node2D's position is not rounded, so the bob
+	# is a true sub-pixel glide. Nothing is laid out or resized while it animates, so the image keeps its exact size.
+	var pic := Node2D.new()
 	holder.add_child(pic)
-	# The pictures are NOT anchored and NOT in a container: the holder's size sets their size once (when it changes), and
-	# the bob moves only `position`. Nothing is laid out and nothing is resized while it animates, so the image keeps its
-	# exact size and does not shimmer.
+	var sprite := Sprite2D.new()
+	sprite.texture = logo
+	pic.add_child(sprite)
 	var fit := func():
-		pic.size = holder.size
-		pic.position = Vector2(0.0, pic.position.y)
+		var ts := logo.get_size()
+		var k := minf(holder.size.x / ts.x, holder.size.y / ts.y) if ts.x > 0.0 and ts.y > 0.0 else 1.0
+		sprite.scale = Vector2(k, k)                                  # as a picture kept to its box without distortion
+		sprite.position = holder.size * 0.5
 		if glow != null:
 			glow.size = holder.size + Vector2(180.0, 100.0)
 			glow.position = Vector2(-90.0, -50.0)
@@ -272,7 +277,7 @@ func _drop_hero() -> void:
 		_hero_node = null
 
 
-func _bob(v: float, pic: Control) -> void:
+func _bob(v: float, pic: Node2D) -> void:
 	pic.position.y = v
 
 
