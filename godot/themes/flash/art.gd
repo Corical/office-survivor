@@ -27,9 +27,21 @@ static func path_for(id: String, exists: Callable = Callable()) -> String:
 	return ""
 
 
+## Nine-slice art is delivered at 2x (its margins are quoted at 1x), so it is halved once on load: the corners then
+## draw at the size the margins say.
+const HALVED := ["card_frame", "button_wood", "button_wood_pressed"]
+
+
 static func load_texture(id: String) -> Texture2D:
 	var p := path_for(id)
 	if p == "":
 		return null
 	var t: Variant = load(p)
-	return t if t is Texture2D else null
+	if not (t is Texture2D):
+		return null
+	if id in HALVED and p == REAL % id:
+		var img: Image = (t as Texture2D).get_image()
+		if img != null:
+			img.resize(img.get_width() / 2, img.get_height() / 2, Image.INTERPOLATE_LANCZOS)
+			return ImageTexture.create_from_image(img)
+	return t

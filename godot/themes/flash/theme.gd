@@ -101,11 +101,11 @@ static func build() -> ThemeDef:
 	var wood_down := FlashArt.load_texture("button_wood_pressed")
 	var frame := FlashArt.load_texture("card_frame")
 	if frame != null:
-		t.nine_patches["card_frame"] = _nine(frame, 28, 28, 28, 28, 22, 16, 22, 16)
+		t.nine_patches["card_frame"] = _nine(frame, 40, 40, 40, 40, 28, 20, 28, 20)
 	if wood != null:
-		t.nine_patches["button_wood"] = _nine(wood, 40, 32, 40, 40, 26, 12, 26, 24)
+		t.nine_patches["button_wood"] = _nine(wood, 36, 30, 36, 30, 26, 10, 26, 14)
 	if wood_down != null:
-		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 40, 36, 40, 34, 26, 18, 26, 16)
+		t.nine_patches["button_wood_pressed"] = _nine(wood_down, 36, 30, 36, 30, 26, 15, 26, 9)   # the face sits lower
 
 	_labels(th, bold, spaced)
 	_buttons(th, bold, t)
