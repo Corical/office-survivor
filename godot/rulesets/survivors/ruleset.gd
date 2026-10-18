@@ -24,6 +24,9 @@ const SCHEMAS := {
 	"upgrade_required": {"dict": {}},
 	"error": {"dict": {"code": S, "?message": ANY}},
 	"seat": {"dict": {"token": S, "room_code": S, "alias": S, "host": B}},
+	# the open-camps list: the frame itself only has to be an object; every entry is checked and cleaned one by one by
+	# RoomsWatch.sanitize, so one bad entry (or a hostile list) never costs the whole frame or raises a "bad frame" notice
+	"rooms": {"dict": {"?rooms": ANY}},
 	"lobby": {"dict": {"room_code": S, "seats_taken": I, "seats_total": I, "host": B}},
 	"round": {"dict": {
 		"round": I, "rounds": I, "seconds_left": NUM,

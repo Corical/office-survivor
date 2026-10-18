@@ -72,6 +72,55 @@ func _ready() -> void:
 		await _shot("01e_banner_unreachable")
 		overlay._on_status({"net": "online", "net_key": "ui.net.online", "terminal": ""})
 
+	# the open-camps list in each state, and the new-camp sheet (the title asked for the list when it was built)
+	fake.server_open()
+	fake.server_send({"t": "hello_ok", "proto": 1})
+	await _wait(0.3)
+	fake.server_send({"t": "rooms", "rooms": []})
+	await _wait(0.5)
+	await _shot("01f_camps_empty")
+	await _audit_sizes("camps empty")
+	fake.server_send({"t": "rooms", "rooms": [{"code": "KXQM", "seats_taken": 2, "seats_total": 4, "age_s": 190, "name": "Friday night"}]})
+	await _wait(0.5)
+	await _shot("01g_camps_one")
+	var eight: Array = []
+	var camp_names := ["Friday night", "", "Fig's camp", "Bartholomew's Extremely Long Camp Name", "", "Quiet corner", "Newcomers welcome", ""]
+	var ages := [5, 95, 400, 2400, 3700, 9000, 40000, 100000]
+	for i in 8:
+		eight.append({"code": "C%03d" % (i + 1), "seats_taken": 1 + i % 3, "seats_total": 4, "age_s": ages[i], "name": camp_names[i]})
+	fake.server_send({"t": "rooms", "rooms": eight})
+	await _wait(0.5)
+	await _shot("01h_camps_eight")
+	for s in [Vector2i(700, 800), Vector2i(1843, 925)]:
+		await _size(s)
+		await _wait(0.4)
+		await _shot("01h_camps_eight_%dx%d" % [s.x, s.y])
+	await _size(PHONE)
+	await _audit_sizes("camps eight")
+	var create_btn := Ui.find(router.current, "create") as Button
+	if create_btn != null:
+		create_btn.pressed.emit()
+		await _wait(0.5)
+		await _shot("01i_camp_sheet")
+		await _size(Vector2i(1843, 925))
+		await _wait(0.4)
+		await _shot("01i_camp_sheet_1843x925")
+		await _size(PHONE)
+		await _audit_sizes("camp sheet")
+		var priv := Ui.find(router.current, "vis_private") as Button
+		if priv != null:
+			priv.pressed.emit()
+			var field := Ui.find(router.current, "camp_name") as LineEdit
+			if field != null:
+				field.text = "Bartholomew's Extremely Long Camp"
+				field.text_changed.emit(field.text)
+			await _wait(0.3)
+			await _shot("01j_camp_sheet_private")
+		var cancel := Ui.find(router.current, "sheet_cancel") as Button
+		if cancel != null:
+			cancel.pressed.emit()
+			await _wait(0.3)
+
 	# one consistent night: a busy round view and the reveal that follows it, with the fixtures' aliases renamed
 	var base_round: Dictionary = _pick_round()
 	var me: String = _name(base_round.me)

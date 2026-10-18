@@ -10,12 +10,22 @@ var _show_settings := false
 var _intro_played := false
 var _hero_node: Control                       # the logo and its glow, built once
 var _hero_tweens: Array = []
+var _sheet_open := false                      # the "new camp" form
+var _vis := "public"
+var _camp_name := ""
+var _vis_buttons := {}
+var _vis_help: Label
 
 
 func _ready() -> void:
 	Feed.status_changed.connect(func(_s): _build())
 	Feed.notice_raised.connect(_on_notice)
 	_build()
+	Intents.rooms_watch(true)                 # the open-camps list runs for as long as this screen does (menu rebuilds do not touch it)
+
+
+func _exit_tree() -> void:
+	Intents.rooms_watch(false)
 
 
 func _on_notice(n: Dictionary) -> void:
@@ -51,8 +61,7 @@ func _build() -> void:
 		var resume := Ui.button(Words.render("ui.resume"), "resume", func(): _show(Intents.resume()), false, "PrimaryButton")
 		menu.add_child(resume)
 		entries.append(resume)
-	var create := Ui.button(Words.render("ui.create_room"), "create", func(): _reason(Intents.create_room()), false,
-		"PrimaryButton")
+	var create := Ui.button(Words.render("ui.create_room"), "create", func(): _on_create(), false, "PrimaryButton")
 	menu.add_child(create)
 	entries.append(create)
 	var row := Ui.hbox(10)
@@ -70,6 +79,7 @@ func _build() -> void:
 	row.add_child(join)
 	menu.add_child(row)
 	entries.append(row)
+	menu.add_child(OpenCamps.new())            # shows itself only when the server can list camps
 	var settings := Ui.button(Words.render("ui.hide_settings") if _show_settings else Words.render("ui.settings"),
 		"settings_toggle", func():
 			_show_settings = not _show_settings
@@ -78,9 +88,83 @@ func _build() -> void:
 	entries.append(settings)
 	if _show_settings:
 		_settings(menu, st)
+	if _sheet_open:
+		add_child(_make_sheet())
 	if not _intro_played:
 		_intro_played = true
 		Ui.intro_all(entries)
+
+
+## Create: with a server that can list camps there is something to choose (public or private, a name), so a small sheet
+## opens first; with any other server there is nothing to ask and the camp is created straight away, as it always was.
+func _on_create() -> void:
+	if Feed.rooms_model().supported:
+		_sheet_open = true
+		_build()
+		return
+	_reason(Intents.create_room())
+
+
+## The new-camp form: a veil over the screen and a card with an optional name and a Public / Private choice.
+func _make_sheet() -> Control:
+	var veil := Ui.card("Veil")
+	veil.set_meta("id", "sheet")
+	veil.mouse_filter = Control.MOUSE_FILTER_STOP
+	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var centre := CenterContainer.new()
+	veil.add_child(centre)
+	var card := Ui.card()
+	card.custom_minimum_size = Vector2(minf(500.0, maxf(280.0, size.x - 32.0)), 0)
+	centre.add_child(card)
+	var col := Ui.vbox(12)
+	card.add_child(col)
+	col.add_child(Ui.label(Words.render("ui.create_sheet_title"), "sheet_title", "HeaderLabel"))
+	var field := LineEdit.new()
+	field.set_meta("id", "camp_name")
+	field.placeholder_text = Words.render("ui.camp_name_hint")
+	field.text = _camp_name
+	field.max_length = 24
+	field.custom_minimum_size = Vector2(0, 56)
+	field.text_changed.connect(func(t): _camp_name = t)
+	col.add_child(field)
+	var choice := Ui.hbox(10)
+	_vis_buttons = {}
+	for v in ["public", "private"]:
+		var b := Ui.button(Words.render("ui." + v), "vis_" + v, func(): _pick_visibility(v))
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_vis_buttons[v] = b
+		choice.add_child(b)
+	col.add_child(choice)
+	_vis_help = Ui.label("", "vis_help", "MutedLabel")
+	col.add_child(_vis_help)
+	_show_visibility()
+	col.add_child(Ui.button(Words.render("ui.create_go"), "sheet_create", func(): _confirm_create(), false, "PrimaryButton"))
+	col.add_child(Ui.button(Words.render("ui.cancel"), "sheet_cancel", func():
+		_sheet_open = false
+		_build()))
+	return veil
+
+
+func _pick_visibility(v: String) -> void:
+	_vis = v
+	_show_visibility()
+
+
+## The chosen side wears the pick style and its one-line explanation is shown (no rebuild: the name field keeps its focus).
+func _show_visibility() -> void:
+	for v in _vis_buttons:
+		(_vis_buttons[v] as Button).theme_type_variation = "ChosenButton" if v == _vis else ""
+	if _vis_help != null:
+		_vis_help.text = Words.render("ui." + _vis + "_help")
+
+
+func _confirm_create() -> void:
+	_sheet_open = false
+	var why := Intents.create_room(_vis, _camp_name)
+	if why != "":
+		_reason(why)
+	else:
+		_build()
 
 
 func _settings(menu: VBoxContainer, st: Dictionary) -> void:

@@ -10,6 +10,9 @@ signal terminal(reason: String)
 ## Nothing has arrived for a while on an idle connection: the owner of the seat should probe it (an idle half-open
 ## socket otherwise looks alive for ever, because the server only speaks when something changes).
 signal probe_due
+## After every watchdog pass (every frame; directly by tests with a fake clock). Timers owned elsewhere (the open-camps poll)
+## ride on it so one clock drives everything.
+signal ticked
 
 const PROTO := 1
 const BACKOFF := [1.0, 2.0, 4.0, 8.0]   # seconds; chosen
@@ -25,8 +28,9 @@ const UNREACHABLE_AFTER := 4             # attempts before the banner says "can'
 const CLOSE_CODES := {4001: "seat_gone", 4002: "upgrade_required", 4003: "taken_over", 1009: "too_big"}
 ## The server knows who we are from the connection. An intent that names a seat is a bug, never sent.
 const FORBIDDEN_KEYS := ["seat", "pid", "player", "player_id", "seat_id"]
-## Intents that get no reply (the server answers leave by dropping us).
-const NO_REPLY := ["hello", "leave"]
+## Intents that get no reply (the server answers leave by dropping us). `list_rooms` is here because an old server may
+## never answer it, and a missing answer must not look like a dead socket: the open-camps list has its own 3 s rule.
+const NO_REPLY := ["hello", "leave", "list_rooms"]
 
 var transport: Transport
 var clock: Clock = Clock.new()
@@ -164,6 +168,11 @@ func _process(_delta: float) -> void:
 
 ## Watchdogs and retry timer; called every frame, and directly by tests with a fake clock.
 func tick() -> void:
+	_watchdogs()
+	ticked.emit()
+
+
+func _watchdogs() -> void:
 	var now := clock.now_msec()
 	if _retry_at >= 0 and now >= _retry_at:
 		_retry_at = -1

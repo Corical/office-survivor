@@ -345,6 +345,10 @@ static func _buttons(th: Theme, bold: Font, t: ThemeDef) -> void:
 	for s in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		th.set_stylebox(s, "PlayerCardChosen", picked)
 
+	# CampCard: one open camp in the title screen's list: the same flat card as a person card (its content is laid on top
+	# by screens/open_camps.gd using this style's own margins)
+	th.set_type_variation("CampCard", "PlayerCard")
+
 	# SkipPill: small and unobtrusive
 	th.set_type_variation("SkipPill", "Button")
 	th.set_font("font", "SkipPill", bold)
@@ -439,6 +443,9 @@ static func _cards(th: Theme, t: ThemeDef, _bold: Font) -> void:
 	# Scrim: a dark plate behind loose text that sits over the scene (a screen title, a clock)
 	th.set_type_variation("Scrim", "PanelContainer")
 	th.set_stylebox("panel", "Scrim", _pad(_flat(Color(0.03, 0.05, 0.1, 0.8), 14, Color(0.66, 0.5, 0.23, 0.6), 1, 0, 0), 14, 7))
+	# Veil: the dimmed backdrop behind a sheet (the "new camp" form) so the screen below reads as put aside
+	th.set_type_variation("Veil", "PanelContainer")
+	th.set_stylebox("panel", "Veil", _flat(Color(0.02, 0.03, 0.07, 0.8), 0, Color(0, 0, 0, 0), 0, 0, 0))
 	# Plate: a small name plate: flat with a brass rim (the ornate frame is too thick for a plate two lines high)
 	th.set_type_variation("Plate", "PanelContainer")
 	th.set_stylebox("panel", "Plate", _pad(_flat(Color(0.04, 0.06, 0.12, 0.88), 12, Color("a8803a"), 2, 3, 2), 14, 7))
