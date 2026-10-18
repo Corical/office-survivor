@@ -19,7 +19,7 @@ happened. After 10 nights the end screen ranks the players. It is played over th
 
 | Item | Value |
 |---|---|
-| Windows build | `C:\Personal\office-survivor\godot\build\windows\SurvivorsArena.exe` (there is also `SurvivorsArena.console.exe`, which shows a console with the log) |
+| Windows build | `C:\Personal\office-survivor\godot\build\windows\SurvivorsArena-new.exe` (the newest build; there is also `SurvivorsArena-new.console.exe`, which shows a console with the log; ignore the older `SurvivorsArena.exe`, it is stale) |
 | Server | already set as the default: `wss://raspberrypi.tail87b476.ts.net:8470` (tailnet only; this PC reaches it) |
 | Window | start it full screen (Alt+Enter) AND windowed at roughly phone shape (540x960) |
 | Reset to a first launch | delete the folder `%APPDATA%\Godot\app_userdata\Survivors Arena` before starting |
