@@ -57,7 +57,7 @@ func _header() -> Control:
 	var w: Dictionary = _m.winner
 	var team: String = w.get("team", "unknown")
 	col.add_child(Ui.name_label(Words.render("bang.team." + team), "team", "BigLabel"))
-	if not w.is_empty() and team != "abandoned":
+	if not w.is_empty() and team != "abandoned" and team != "nobody":
 		col.add_child(Ui.label(Words.render("bang.end.win" if w.mine else "bang.end.lose"), "mine", "HeaderLabel"))
 	return card
 
