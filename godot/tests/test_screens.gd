@@ -41,6 +41,13 @@ func text_of(screen: Node, id: String) -> String:
 	return n.text if n != null else "<missing %s>" % id
 
 
+## Every word on a card (a container carrying an id), joined with spaces.
+func card_text(screen: Node, id: String) -> String:
+	var n := Ui.find(screen, id)
+	check(n != null, "no card with id '%s'" % id)
+	return " ".join(Ui.texts(n)) if n != null else ""
+
+
 func btn(screen: Node, id: String) -> Button:
 	return Ui.find(screen, id) as Button
 
@@ -156,7 +163,7 @@ func test_round_shows_who_i_am_the_round_the_goal_and_everyone() -> void:
 	eq(text_of(s, "resource"), "Rations: 7", "my exact food")
 	eq(text_of(s, "goal"), "give away 3 rations over the game", "goal worded from the server's text")
 	check(Ui.find(s, "home_Mango") != null and Ui.find(s, "home_Fig") != null and Ui.find(s, "home_Kiwi") != null, "everyone has a home")
-	check("(you)" in text_of(s, "home_Mango"), "I am marked")
+	check("(you)" in card_text(s, "home_Mango"), "I am marked")
 
 
 func test_round_offers_exactly_the_moves_the_server_listed() -> void:
@@ -252,11 +259,11 @@ func test_other_players_show_only_a_band_never_a_number() -> void:
 		{"alias": "Plum", "band": "bandit"}, {"alias": "Mango", "band": "getting_by"}]
 	fake.server_send(v)
 	var s := mount(RoundScreen)
-	eq(text_of(s, "home_Fig"), "Fig: Well fed", "band word")
-	eq(text_of(s, "home_Plum"), "Plum: Bandit", "bandit is public")
+	eq(card_text(s, "home_Fig"), "Fig Well fed", "name and band word")
+	eq(card_text(s, "home_Plum"), "Plum Bandit", "the outcast is public")
 	for id in ["home_Fig", "home_Kiwi", "home_Plum"]:
-		for ch in text_of(s, id):
-			check(not ch.is_valid_int(), "a digit in another player's line: " + text_of(s, id))
+		for ch in card_text(s, id):
+			check(not ch.is_valid_int(), "a digit in another player's card: " + card_text(s, id))
 
 
 func test_a_push_that_only_moves_the_locked_count_keeps_the_same_buttons() -> void:

@@ -468,6 +468,12 @@ msgstr "New game"
 msgid "ui.nothing_to_show"
 msgstr "Quiet out here. Nothing yet."
 
+msgid "ui.off"
+msgstr "Off"
+
+msgid "ui.on"
+msgstr "On"
+
 msgid "ui.pick_a_move"
 msgstr "PICK YOUR MOVE FOR TONIGHT"
 
@@ -485,6 +491,12 @@ msgstr "ON THE RADIO"
 
 msgid "ui.radio_pick_player"
 msgstr "ABOUT WHOM?"
+
+msgid "ui.rank"
+msgstr "#{n}"
+
+msgid "ui.reduced_motion"
+msgstr "Calm mode (less motion)"
 
 msgid "ui.results"
 msgstr "RESULTS"
