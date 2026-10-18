@@ -219,13 +219,22 @@ func _gallery(prefix: String, _size_hint: Vector2i, only: Array = [], shots := t
 		tl.index = idx
 		tl.elapsed_ms = 0.0
 		var dwell := 0.2 if g[1] == "total" else 0.28
-		await _wait(dwell)
+		# five moments of the beat: the check sees numbers early in their rise and late, and two beats' numbers together
+		var where := "beat %s @%s" % [g[0], str(get_window().size)]
+		await _wait(dwell * 0.5)
+		_audit(where + " t1")
+		await _wait(dwell * 0.5)
 		if shots:
 			await _shot("%s_%02d_%s_a" % [prefix, n, g[0]])
-		await _wait(dwell)
+		_audit(where + " t2")
+		await _wait(dwell * 0.5)
+		_audit(where + " t3")
+		await _wait(dwell * 0.5)
 		if shots:
 			await _shot("%s_%02d_%s_b" % [prefix, n, g[0]])
-		_audit("beat %s @%s" % [g[0], str(get_window().size)])
+		_audit(where + " t4")
+		await _wait(dwell * 0.6)
+		_audit(where + " t5")
 		n += 1
 	# everything played: the written log lit at its last line
 	tl.snap_to_end()

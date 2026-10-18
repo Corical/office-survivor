@@ -11,6 +11,7 @@ enum Kind { FLIGHT, BURST, RING, PUFF, TRAIL, BUBBLE, TEXT }
 
 const CAP := 160                       # chosen: sprites; well under the 200 live-particle budget
 const TEXT_CAP := 12                   # chosen: floating numbers alive at once
+const FLOAT_OUTLINE := 4.0              # the dark edge drawn around a floating number spills this far
 const TRAIL_LIFE := 0.3
 const TRAIL_EVERY := 0.03
 
@@ -216,6 +217,38 @@ func draw_sprites(canvas: CanvasItem, at: Vector2 = Vector2.ZERO) -> void:
 			canvas.draw_set_transform(p, 0.0, Vector2.ONE)
 			canvas.draw_texture_rect(tex, Rect2(Vector2(-s, -s) * 0.5, Vector2(s, s)), false, col)
 	canvas.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## The box each floating text occupies, in the coordinates it is drawn in, with its outline. `swept` = the whole region it
+## passes through on its rise (and including ones still waiting for their delay), for planning where a new one may go;
+## otherwise only what is visible right now, for checking. Each entry is {"text": String, "rect": Rect2}.
+func text_boxes(font: Font, size: int, swept := false) -> Array:
+	var out: Array = []
+	if _live_texts == 0:
+		return out
+	for i in CAP:
+		if _alive[i] == 0 or _kind[i] != Kind.TEXT:
+			continue
+		if not swept and _age[i] < _delay[i]:
+			continue
+		var t := clampf((_age[i] - _delay[i]) / _life[i], 0.0, 1.0)
+		var pop := 1.0 + 0.45 * (1.0 if swept else maxf(0.0, 1.0 - t * 5.0))
+		var fs := int(float(size) * pop)
+		var w := font.get_string_size(_text[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var asc := font.get_ascent(fs)
+		var h := font.get_height(fs)
+		var r: Rect2
+		if swept:
+			var a: Vector2 = _from[i]
+			var b: Vector2 = _to[i]
+			var top := minf(a.y, b.y) - asc
+			var bottom := maxf(a.y, b.y) - asc + h
+			r = Rect2(minf(a.x, b.x) - w * 0.5, top, absf(a.x - b.x) + w, bottom - top)
+		else:
+			var p := _position(i, t)
+			r = Rect2(p.x - w * 0.5, p.y - asc, w, h)
+		out.append({"text": _text[i], "rect": r.grow(FLOAT_OUTLINE)})
+	return out
 
 
 ## Paint the floating texts: a dark outline then the colour.

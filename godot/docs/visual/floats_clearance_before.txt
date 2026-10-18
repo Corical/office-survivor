@@ -1,0 +1,429 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 - Build 32.0.101.7092 - Compatibility - Using Device: Intel - Intel(R) Iris(R) Xe Graphics
+
+2026-10-18T14:13:51.270 INFO [log] start build=0.1.0-foundation debug=true os=Windows path=C:/Users/Corne/AppData/Local/Temp/claude/C--Personal-office-survivor-godot/68235be8-0286-4f42-8bbe-6dc49a4cd2e3/scratchpad/snap12.log
+2026-10-18T14:13:51.719 INFO [themes] use id=flash
+2026-10-18T14:13:51.760 INFO [themes] use id=flash
+tree 01_title: router=(540.0, 960.0) screen=@Control@17 size=(540.0, 960.0) visible=true texts=4 first=["Long Night", "Create camp"]
+shot 01_title (540, 960) err=0
+CLEARANCE title @540x960 violations=0
+CLEARANCE title @700x800 violations=0
+CLEARANCE title @1280x720 violations=0
+CLEARANCE title @1843x925 violations=0
+tree 01b_title_settings: router=(540.0, 960.0) screen=@Control@17 size=(540.0, 960.0) visible=true texts=7 first=["Long Night", "Create camp"]
+shot 01b_title_settings (540, 960) err=0
+tree 01c_title_desktop: router=(1706.0, 960.0) screen=@Control@17 size=(1706.0, 960.0) visible=true texts=4 first=["Long Night", "Create camp"]
+shot 01c_title_desktop (1280, 720) err=0
+tree 01d_banner_connecting: router=(540.0, 960.0) screen=@Control@17 size=(540.0, 960.0) visible=true texts=4 first=["Long Night", "Create camp"]
+shot 01d_banner_connecting (540, 960) err=0
+tree 01e_banner_unreachable: router=(540.0, 960.0) screen=@Control@17 size=(540.0, 960.0) visible=true texts=4 first=["Long Night", "Create camp"]
+shot 01e_banner_unreachable (540, 960) err=0
+2026-10-18T14:13:59.693 INFO [net] state from=offline to=connecting
+2026-10-18T14:13:59.697 INFO [net] open url=ws://test
+2026-10-18T14:13:59.697 INFO [net] tx t=hello
+2026-10-18T14:13:59.697 INFO [net] rx t=hello_ok bytes=26
+2026-10-18T14:13:59.698 INFO [net] rx_payload json="{\"proto\":1,\"t\":\"hello_ok\"}"
+2026-10-18T14:13:59.698 INFO [net] state from=connecting to=online
+2026-10-18T14:13:59.701 INFO [net] tx t=create_room
+2026-10-18T14:13:59.703 INFO [net] rx t=seat bytes=93
+2026-10-18T14:13:59.703 INFO [net] rx_payload json="{\"alias\":\"Bartholomew_Jr_III\",\"host\":true,\"room_code\":\"KXQM\",\"t\":\"seat\",\"token\":\"<redacted>\"}"
+2026-10-18T14:13:59.703 INFO [session] seat room=KXQM host=true
+2026-10-18T14:13:59.704 INFO [net] rx t=lobby bytes=76
+2026-10-18T14:13:59.706 INFO [net] rx_payload json="{\"host\":true,\"room_code\":\"KXQM\",\"seats_taken\":3,\"seats_total\":4,\"t\":\"lobby\"}"
+2026-10-18T14:13:59.706 INFO [session] view t=lobby round=-
+2026-10-18T14:13:59.707 INFO [session] screen from=title to=lobby
+tree 02_lobby_host: router=(540.0, 960.0) screen=@Control@85 size=(540.0, 960.0) visible=true texts=4 first=["Camp KXQM", "3 of 4 places by the fire"]
+shot 02_lobby_host (540, 960) err=0
+CLEARANCE lobby @540x960 violations=0
+CLEARANCE lobby @700x800 violations=0
+CLEARANCE lobby @1280x720 violations=0
+CLEARANCE lobby @1843x925 violations=0
+2026-10-18T14:14:04.269 INFO [net] rx t=round bytes=1411
+2026-10-18T14:14:04.269 INFO [net] rx_payload json="{\"aliases\":[\"SaltyPretzelSupreme\",\"Wolfgang Amadeus\",\"WobblyTableLegsXL\"],\"board\":[{\"alias\":\"Bartholomew_Jr_III\",\"band\":\"well_fed\"},{\"alias\":\"SaltyPretzelSupreme\",\"band\":\"starving\"},{\"alias\":\"WobblyTableLegsXL\",\"band\":\"getting_by\"},{\"alias\":\"Wolfgang Amadeus\",\"band\":\"bandit\"}],\"gift_amounts\":[1,2],\"..."
+2026-10-18T14:14:04.272 INFO [session] view t=round round=3
+2026-10-18T14:14:04.272 INFO [session] screen from=lobby to=round
+tree 03_round_open: router=(540.0, 960.0) screen=@Control@136 size=(540.0, 960.0) visible=true texts=25 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 03_round_open (540, 960) err=0
+CLEARANCE round open @540x960 violations=0
+CLEARANCE round open @700x800 violations=0
+CLEARANCE round open @1280x720 violations=0
+CLEARANCE round open @1843x925 violations=0
+tree 04_round_choosing_a_target: router=(540.0, 960.0) screen=@Control@136 size=(540.0, 960.0) visible=true texts=29 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 04_round_choosing_a_target (540, 960) err=0
+2026-10-18T14:14:09.736 INFO [net] tx t=pick
+2026-10-18T14:14:09.736 INFO [net] rx t=round bytes=1465
+2026-10-18T14:14:09.737 INFO [net] rx_payload json="{\"aliases\":[\"SaltyPretzelSupreme\",\"Wolfgang Amadeus\",\"WobblyTableLegsXL\"],\"board\":[{\"alias\":\"Bartholomew_Jr_III\",\"band\":\"well_fed\"},{\"alias\":\"SaltyPretzelSupreme\",\"band\":\"starving\"},{\"alias\":\"WobblyTableLegsXL\",\"band\":\"getting_by\"},{\"alias\":\"Wolfgang Amadeus\",\"band\":\"bandit\"}],\"gift_amounts\":[1,2],\"..."
+2026-10-18T14:14:09.739 INFO [session] view t=round round=3
+tree 05_round_picked: router=(540.0, 960.0) screen=@Control@136 size=(540.0, 960.0) visible=true texts=30 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 05_round_picked (540, 960) err=0
+CLEARANCE round picked @540x960 violations=0
+CLEARANCE round picked @700x800 violations=0
+CLEARANCE round picked @1280x720 violations=0
+CLEARANCE round picked @1843x925 violations=0
+2026-10-18T14:14:14.003 INFO [net] rx t=round bytes=1465
+2026-10-18T14:14:14.005 INFO [net] rx_payload json="{\"aliases\":[\"SaltyPretzelSupreme\",\"Wolfgang Amadeus\",\"WobblyTableLegsXL\"],\"board\":[{\"alias\":\"Bartholomew_Jr_III\",\"band\":\"well_fed\"},{\"alias\":\"SaltyPretzelSupreme\",\"band\":\"starving\"},{\"alias\":\"WobblyTableLegsXL\",\"band\":\"getting_by\"},{\"alias\":\"Wolfgang Amadeus\",\"band\":\"bandit\"}],\"gift_amounts\":[1,2],\"..."
+2026-10-18T14:14:14.006 INFO [session] view t=round round=3
+tree 05b_round_last_seconds: router=(540.0, 960.0) screen=@Control@136 size=(540.0, 960.0) visible=true texts=30 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 05b_round_last_seconds (540, 960) err=0
+2026-10-18T14:14:14.851 INFO [net] tx t=lock
+tree 06_round_locking: router=(540.0, 960.0) screen=@Control@136 size=(540.0, 960.0) visible=true texts=30 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 06_round_locking (540, 960) err=0
+2026-10-18T14:14:15.256 INFO [net] rx t=round bytes=1464
+2026-10-18T14:14:15.256 INFO [net] rx_payload json="{\"aliases\":[\"SaltyPretzelSupreme\",\"Wolfgang Amadeus\",\"WobblyTableLegsXL\"],\"board\":[{\"alias\":\"Bartholomew_Jr_III\",\"band\":\"well_fed\"},{\"alias\":\"SaltyPretzelSupreme\",\"band\":\"starving\"},{\"alias\":\"WobblyTableLegsXL\",\"band\":\"getting_by\"},{\"alias\":\"Wolfgang Amadeus\",\"band\":\"bandit\"}],\"gift_amounts\":[1,2],\"..."
+2026-10-18T14:14:15.257 INFO [session] view t=round round=3
+tree 06b_round_locked: router=(540.0, 960.0) screen=@Control@136 size=(540.0, 960.0) visible=true texts=30 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 06b_round_locked (540, 960) err=0
+CLEARANCE round locked @540x960 violations=0
+CLEARANCE round locked @700x800 violations=0
+CLEARANCE round locked @1280x720 violations=0
+CLEARANCE round locked @1843x925 violations=0
+2026-10-18T14:14:19.335 WARN [net] lost code=1006 reason=
+2026-10-18T14:14:19.336 INFO [net] state from=online to=reconnecting
+2026-10-18T14:14:19.344 INFO [net] retry_scheduled attempt=1 in_s=1.0
+tree 07_round_reconnecting: router=(540.0, 960.0) screen=@Control@136 size=(540.0, 960.0) visible=true texts=30 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 07_round_reconnecting (540, 960) err=0
+2026-10-18T14:14:19.983 INFO [net] open url=ws://test
+2026-10-18T14:14:19.983 INFO [net] tx t=hello
+2026-10-18T14:14:19.983 INFO [net] rx t=hello_ok bytes=26
+2026-10-18T14:14:19.983 INFO [net] rx_payload json="{\"proto\":1,\"t\":\"hello_ok\"}"
+2026-10-18T14:14:19.984 INFO [net] state from=reconnecting to=online
+2026-10-18T14:14:19.986 INFO [net] tx t=resume
+2026-10-18T14:14:19.987 INFO [net] rx t=seat bytes=93
+2026-10-18T14:14:19.987 INFO [net] rx_payload json="{\"alias\":\"Bartholomew_Jr_III\",\"host\":true,\"room_code\":\"KXQM\",\"t\":\"seat\",\"token\":\"<redacted>\"}"
+2026-10-18T14:14:19.989 INFO [session] seat room=KXQM host=true
+2026-10-18T14:14:19.990 INFO [net] rx t=round bytes=1411
+2026-10-18T14:14:19.990 INFO [net] rx_payload json="{\"aliases\":[\"SaltyPretzelSupreme\",\"Wolfgang Amadeus\",\"WobblyTableLegsXL\"],\"board\":[{\"alias\":\"Bartholomew_Jr_III\",\"band\":\"well_fed\"},{\"alias\":\"SaltyPretzelSupreme\",\"band\":\"starving\"},{\"alias\":\"WobblyTableLegsXL\",\"band\":\"getting_by\"},{\"alias\":\"Wolfgang Amadeus\",\"band\":\"bandit\"}],\"gift_amounts\":[1,2],\"..."
+2026-10-18T14:14:19.992 INFO [session] view t=round round=3
+tree 10_round_desktop: router=(1706.0, 960.0) screen=@Control@136 size=(1706.0, 960.0) visible=true texts=29 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 10_round_desktop (1280, 720) err=0
+2026-10-18T14:14:21.802 INFO [net] rx t=round bytes=1465
+2026-10-18T14:14:21.811 INFO [net] rx_payload json="{\"aliases\":[\"SaltyPretzelSupreme\",\"Wolfgang Amadeus\",\"WobblyTableLegsXL\"],\"board\":[{\"alias\":\"Bartholomew_Jr_III\",\"band\":\"well_fed\"},{\"alias\":\"SaltyPretzelSupreme\",\"band\":\"starving\"},{\"alias\":\"WobblyTableLegsXL\",\"band\":\"getting_by\"},{\"alias\":\"Wolfgang Amadeus\",\"band\":\"bandit\"}],\"gift_amounts\":[1,2],\"..."
+2026-10-18T14:14:21.812 INFO [session] view t=round round=3
+tree 10_round_1843x925: router=(1912.0, 960.0) screen=@Control@136 size=(1912.0, 960.0) visible=true texts=30 first=["You are Bartholomew_Jr_III", "Night 3 of 10"]
+shot 10_round_1843x925 (1843, 925) err=0
+2026-10-18T14:14:23.986 INFO [net] rx t=reveal bytes=1197
+2026-10-18T14:14:23.993 INFO [net] rx_payload json="{\"board\":[{\"alias\":\"Bartholomew_Jr_III\",\"band\":\"well_fed\"},{\"alias\":\"SaltyPretzelSupreme\",\"band\":\"starving\"},{\"alias\":\"WobblyTableLegsXL\",\"band\":\"getting_by\"},{\"alias\":\"Wolfgang Amadeus\",\"band\":\"bandit\"}],\"news\":[{\"args\":{\"player\":\"SaltyPretzelSupreme\"},\"code\":\"news_bandit\"},{\"args\":{\"total\":2,\"vict..."
+2026-10-18T14:14:23.994 INFO [session] view t=reveal round=3
+2026-10-18T14:14:23.996 INFO [session] screen from=round to=reveal
+tree 08_reveal_start: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_reveal_start (540, 960) err=0
+CLEARANCE reveal start @540x960 violations=0
+CLEARANCE reveal start @700x800: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1411/@VBoxContainer@1456/@Control@1453/@Control@1412/float[0] '-2' during beat 'move_resource': rect [P: (334.284, 186.3235), S: (30.0, 42.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE reveal start @700x800 violations=1
+CLEARANCE reveal start @1280x720 violations=0
+CLEARANCE reveal start @1843x925 violations=0
+CLEARANCE beat scavenge @(540, 960) t1 violations=0
+tree 08_00_scavenge_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_00_scavenge_a (540, 960) err=0
+CLEARANCE beat scavenge @(540, 960) t2 violations=0
+CLEARANCE beat scavenge @(540, 960) t3 violations=0
+tree 08_00_scavenge_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_00_scavenge_b (540, 960) err=0
+CLEARANCE beat scavenge @(540, 960) t4 violations=0
+CLEARANCE beat scavenge @(540, 960) t5: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[1] '+2' during beat 'move_resource': rect [P: (180.284, 369.6348), S: (38.0, 44.0)] is within 6 px of a plate [P: (20.91144, 418.9508), S: (210.0, 77.0)]
+CLEARANCE beat scavenge @(540, 960) t5 violations=1
+CLEARANCE beat shield_on @(540, 960) t1 violations=0
+tree 08_01_shield_on_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_01_shield_on_a (540, 960) err=0
+CLEARANCE beat shield_on @(540, 960) t2 violations=0
+CLEARANCE beat shield_on @(540, 960) t3 violations=0
+tree 08_01_shield_on_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_01_shield_on_b (540, 960) err=0
+CLEARANCE beat shield_on @(540, 960) t4 violations=0
+CLEARANCE beat shield_on @(540, 960) t5 violations=0
+CLEARANCE beat steal @(540, 960) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (183.784, 210.631), S: (31.0, 44.0)] is within 6 px of a plate [P: (169.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(540, 960) t1 violations=1
+tree 08_02_steal_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_02_steal_a (540, 960) err=0
+CLEARANCE beat steal @(540, 960) t2: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (184.284, 200.5409), S: (30.0, 42.0)] is within 6 px of a plate [P: (169.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(540, 960) t2 violations=1
+CLEARANCE beat steal @(540, 960) t3: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (184.284, 190.7909), S: (30.0, 42.0)] is within 6 px of a plate [P: (169.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(540, 960) t3 violations=1
+tree 08_02_steal_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_02_steal_b (540, 960) err=0
+CLEARANCE beat steal @(540, 960) t4: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (184.284, 183.381), S: (30.0, 42.0)] is within 6 px of a plate [P: (169.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(540, 960) t4 violations=1
+CLEARANCE beat steal @(540, 960) t5: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '+2' during beat 'move_resource': rect [P: (180.284, 369.647), S: (38.0, 44.0)] is within 6 px of a plate [P: (20.91144, 418.9508), S: (210.0, 77.0)]
+CLEARANCE beat steal @(540, 960) t5: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[1] '-2' during beat 'move_resource': rect [P: (184.284, 177.5021), S: (30.0, 42.0)] is within 6 px of a plate [P: (169.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(540, 960) t5 violations=2
+CLEARANCE beat blocked @(540, 960) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[1] '-2' during beat 'blocked': rect [P: (189.3806, 180.6244), S: (30.0, 42.0)] is within 6 px of a plate [P: (169.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat blocked @(540, 960) t1 violations=1
+tree 08_03_blocked_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_03_blocked_a (540, 960) err=0
+CLEARANCE beat blocked @(540, 960) t2: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[1] '-2' during beat 'blocked': rect [P: (184.284, 175.0609), S: (30.0, 42.0)] is within 6 px of a plate [P: (169.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat blocked @(540, 960) t2 violations=1
+CLEARANCE beat blocked @(540, 960) t3 violations=0
+tree 08_03_blocked_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_03_blocked_b (540, 960) err=0
+CLEARANCE beat blocked @(540, 960) t4 violations=0
+CLEARANCE beat blocked @(540, 960) t5 violations=0
+CLEARANCE beat empty @(540, 960) t1 violations=0
+tree 08_04_empty_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_04_empty_a (540, 960) err=0
+CLEARANCE beat empty @(540, 960) t2 violations=0
+CLEARANCE beat empty @(540, 960) t3 violations=0
+tree 08_04_empty_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_04_empty_b (540, 960) err=0
+CLEARANCE beat empty @(540, 960) t4 violations=0
+CLEARANCE beat empty @(540, 960) t5 violations=0
+CLEARANCE beat learn @(540, 960) t1 violations=0
+tree 08_05_learn_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_05_learn_a (540, 960) err=0
+CLEARANCE beat learn @(540, 960) t2 violations=0
+CLEARANCE beat learn @(540, 960) t3 violations=0
+tree 08_05_learn_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_05_learn_b (540, 960) err=0
+CLEARANCE beat learn @(540, 960) t4 violations=0
+CLEARANCE beat learn @(540, 960) t5 violations=0
+CLEARANCE beat marked @(540, 960) t1 violations=0
+tree 08_06_marked_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_06_marked_a (540, 960) err=0
+CLEARANCE beat marked @(540, 960) t2 violations=0
+CLEARANCE beat marked @(540, 960) t3 violations=0
+tree 08_06_marked_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_06_marked_b (540, 960) err=0
+CLEARANCE beat marked @(540, 960) t4 violations=0
+CLEARANCE beat marked @(540, 960) t5 violations=0
+CLEARANCE beat gift @(540, 960) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-1' during beat 'move_resource': rect [P: (183.784, 370.7293), S: (31.0, 44.0)] is within 6 px of a plate [P: (20.91144, 418.9508), S: (210.0, 77.0)]
+CLEARANCE beat gift @(540, 960) t1 violations=1
+tree 08_07_gift_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_07_gift_a (540, 960) err=0
+CLEARANCE beat gift @(540, 960) t2 violations=0
+CLEARANCE beat gift @(540, 960) t3 violations=0
+tree 08_07_gift_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_07_gift_b (540, 960) err=0
+CLEARANCE beat gift @(540, 960) t4 violations=0
+CLEARANCE beat gift @(540, 960) t5 violations=0
+CLEARANCE beat charm @(540, 960) t1 violations=0
+tree 08_08_charm_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_08_charm_a (540, 960) err=0
+CLEARANCE beat charm @(540, 960) t2 violations=0
+CLEARANCE beat charm @(540, 960) t3 violations=0
+tree 08_08_charm_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_08_charm_b (540, 960) err=0
+CLEARANCE beat charm @(540, 960) t4 violations=0
+CLEARANCE beat charm @(540, 960) t5 violations=0
+CLEARANCE beat camp @(540, 960) t1 violations=0
+tree 08_09_camp_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_09_camp_a (540, 960) err=0
+CLEARANCE beat camp @(540, 960) t2 violations=0
+CLEARANCE beat camp @(540, 960) t3 violations=0
+tree 08_09_camp_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_09_camp_b (540, 960) err=0
+CLEARANCE beat camp @(540, 960) t4 violations=0
+CLEARANCE beat camp @(540, 960) t5 violations=0
+CLEARANCE beat status @(540, 960) t1 violations=0
+tree 08_10_status_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_10_status_a (540, 960) err=0
+CLEARANCE beat status @(540, 960) t2 violations=0
+CLEARANCE beat status @(540, 960) t3 violations=0
+tree 08_10_status_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_10_status_b (540, 960) err=0
+CLEARANCE beat status @(540, 960) t4 violations=0
+CLEARANCE beat status @(540, 960) t5 violations=0
+CLEARANCE beat total @(540, 960) t1 violations=0
+tree 08_11_total_a: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_11_total_a (540, 960) err=0
+CLEARANCE beat total @(540, 960) t2 violations=0
+CLEARANCE beat total @(540, 960) t3 violations=0
+tree 08_11_total_b: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_11_total_b (540, 960) err=0
+CLEARANCE beat total @(540, 960) t4 violations=0
+CLEARANCE beat total @(540, 960) t5 violations=0
+tree 08_99_after: router=(540.0, 960.0) screen=@Control@1404 size=(540.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot 08_99_after (540, 960) err=0
+CLEARANCE beat scavenge @(700, 800) t1 violations=0
+CLEARANCE beat scavenge @(700, 800) t2 violations=0
+CLEARANCE beat scavenge @(700, 800) t3 violations=0
+CLEARANCE beat scavenge @(700, 800) t4 violations=0
+CLEARANCE beat scavenge @(700, 800) t5: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '+2' during beat 'move_resource': rect [P: (330.784, 370.5673), S: (37.0, 43.0)] is within 6 px of a plate [P: (170.9114, 418.9508), S: (210.0, 77.0)]
+CLEARANCE beat scavenge @(700, 800) t5 violations=1
+CLEARANCE beat shield_on @(700, 800) t1 violations=0
+CLEARANCE beat shield_on @(700, 800) t2 violations=0
+CLEARANCE beat shield_on @(700, 800) t3 violations=0
+CLEARANCE beat shield_on @(700, 800) t4 violations=0
+CLEARANCE beat shield_on @(700, 800) t5 violations=0
+CLEARANCE beat steal @(700, 800) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (333.784, 210.631), S: (31.0, 44.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(700, 800) t1 violations=1
+CLEARANCE beat steal @(700, 800) t2: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (334.284, 200.5409), S: (30.0, 42.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(700, 800) t2 violations=1
+CLEARANCE beat steal @(700, 800) t3: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (334.284, 190.7909), S: (30.0, 42.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(700, 800) t3 violations=1
+CLEARANCE beat steal @(700, 800) t4: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-2' during beat 'move_resource': rect [P: (334.284, 183.3809), S: (30.0, 42.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(700, 800) t4 violations=1
+CLEARANCE beat steal @(700, 800) t5: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '+2' during beat 'move_resource': rect [P: (330.284, 369.647), S: (38.0, 44.0)] is within 6 px of a plate [P: (170.9114, 418.9508), S: (210.0, 77.0)]
+CLEARANCE beat steal @(700, 800) t5: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[1] '-2' during beat 'move_resource': rect [P: (334.284, 177.5021), S: (30.0, 42.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat steal @(700, 800) t5 violations=2
+CLEARANCE beat blocked @(700, 800) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[1] '-2' during beat 'blocked': rect [P: (329.3602, 180.9822), S: (30.0, 42.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat blocked @(700, 800) t1 violations=1
+CLEARANCE beat blocked @(700, 800) t2: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[1] '-2' during beat 'blocked': rect [P: (334.284, 175.0609), S: (30.0, 42.0)] is within 6 px of a plate [P: (319.0, 137.0), S: (202.0, 77.0)]
+CLEARANCE beat blocked @(700, 800) t2 violations=1
+CLEARANCE beat blocked @(700, 800) t3 violations=0
+CLEARANCE beat blocked @(700, 800) t4 violations=0
+CLEARANCE beat blocked @(700, 800) t5 violations=0
+CLEARANCE beat empty @(700, 800) t1 violations=0
+CLEARANCE beat empty @(700, 800) t2 violations=0
+CLEARANCE beat empty @(700, 800) t3 violations=0
+CLEARANCE beat empty @(700, 800) t4 violations=0
+CLEARANCE beat empty @(700, 800) t5 violations=0
+CLEARANCE beat learn @(700, 800) t1 violations=0
+CLEARANCE beat learn @(700, 800) t2 violations=0
+CLEARANCE beat learn @(700, 800) t3 violations=0
+CLEARANCE beat learn @(700, 800) t4 violations=0
+CLEARANCE beat learn @(700, 800) t5 violations=0
+CLEARANCE beat marked @(700, 800) t1 violations=0
+CLEARANCE beat marked @(700, 800) t2 violations=0
+CLEARANCE beat marked @(700, 800) t3 violations=0
+CLEARANCE beat marked @(700, 800) t4 violations=0
+CLEARANCE beat marked @(700, 800) t5 violations=0
+CLEARANCE beat gift @(700, 800) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1506/@VBoxContainer@1551/@Control@1548/@Control@1507/float[0] '-1' during beat 'move_resource': rect [P: (333.784, 370.7293), S: (31.0, 44.0)] is within 6 px of a plate [P: (170.9114, 418.9508), S: (210.0, 77.0)]
+CLEARANCE beat gift @(700, 800) t1 violations=1
+CLEARANCE beat gift @(700, 800) t2 violations=0
+CLEARANCE beat gift @(700, 800) t3 violations=0
+CLEARANCE beat gift @(700, 800) t4 violations=0
+CLEARANCE beat gift @(700, 800) t5 violations=0
+CLEARANCE beat charm @(700, 800) t1 violations=0
+CLEARANCE beat charm @(700, 800) t2 violations=0
+CLEARANCE beat charm @(700, 800) t3 violations=0
+CLEARANCE beat charm @(700, 800) t4 violations=0
+CLEARANCE beat charm @(700, 800) t5 violations=0
+CLEARANCE beat camp @(700, 800) t1 violations=0
+CLEARANCE beat camp @(700, 800) t2 violations=0
+CLEARANCE beat camp @(700, 800) t3 violations=0
+CLEARANCE beat camp @(700, 800) t4 violations=0
+CLEARANCE beat camp @(700, 800) t5 violations=0
+CLEARANCE beat status @(700, 800) t1 violations=0
+CLEARANCE beat status @(700, 800) t2 violations=0
+CLEARANCE beat status @(700, 800) t3 violations=0
+CLEARANCE beat status @(700, 800) t4 violations=0
+CLEARANCE beat status @(700, 800) t5 violations=0
+CLEARANCE beat total @(700, 800) t1 violations=0
+CLEARANCE beat total @(700, 800) t2 violations=0
+CLEARANCE beat total @(700, 800) t3 violations=0
+CLEARANCE beat total @(700, 800) t4 violations=0
+CLEARANCE beat total @(700, 800) t5 violations=0
+tree a700_99_after: router=(840.0, 960.0) screen=@Control@1404 size=(840.0, 960.0) visible=true texts=20 first=["What happened in the night", "40 s"]
+shot a700_99_after (700, 800) err=0
+CLEARANCE beat scavenge @(1843, 925) t1 violations=0
+CLEARANCE beat scavenge @(1843, 925) t2 violations=0
+CLEARANCE beat scavenge @(1843, 925) t3 violations=0
+CLEARANCE beat scavenge @(1843, 925) t4 violations=0
+CLEARANCE beat scavenge @(1843, 925) t5 violations=0
+CLEARANCE beat shield_on @(1843, 925) t1 violations=0
+CLEARANCE beat shield_on @(1843, 925) t2 violations=0
+CLEARANCE beat shield_on @(1843, 925) t3 violations=0
+CLEARANCE beat shield_on @(1843, 925) t4 violations=0
+CLEARANCE beat shield_on @(1843, 925) t5 violations=0
+CLEARANCE beat steal @(1843, 925) t1 violations=0
+CLEARANCE beat steal @(1843, 925) t2 violations=0
+CLEARANCE beat steal @(1843, 925) t3 violations=0
+CLEARANCE beat steal @(1843, 925) t4 violations=0
+CLEARANCE beat steal @(1843, 925) t5 violations=0
+CLEARANCE beat blocked @(1843, 925) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1553/@HBoxContainer@1599/@Control@1594/@Control@1554/float[1] '-2' during beat 'blocked': rect [P: (436.0649, 151.207), S: (30.0, 42.0)] is within 6 px of a plate [P: (470.0, 76.0), S: (202.0, 77.0)]
+CLEARANCE beat blocked @(1843, 925) t1 violations=1
+CLEARANCE beat blocked @(1843, 925) t2 violations=0
+CLEARANCE beat blocked @(1843, 925) t3 violations=0
+CLEARANCE beat blocked @(1843, 925) t4 violations=0
+CLEARANCE beat blocked @(1843, 925) t5 violations=0
+CLEARANCE beat empty @(1843, 925) t1 violations=0
+CLEARANCE beat empty @(1843, 925) t2 violations=0
+CLEARANCE beat empty @(1843, 925) t3 violations=0
+CLEARANCE beat empty @(1843, 925) t4 violations=0
+CLEARANCE beat empty @(1843, 925) t5 violations=0
+CLEARANCE beat learn @(1843, 925) t1 violations=0
+CLEARANCE beat learn @(1843, 925) t2 violations=0
+CLEARANCE beat learn @(1843, 925) t3 violations=0
+CLEARANCE beat learn @(1843, 925) t4 violations=0
+CLEARANCE beat learn @(1843, 925) t5 violations=0
+CLEARANCE beat marked @(1843, 925) t1 violations=0
+CLEARANCE beat marked @(1843, 925) t2 violations=0
+CLEARANCE beat marked @(1843, 925) t3 violations=0
+CLEARANCE beat marked @(1843, 925) t4 violations=0
+CLEARANCE beat marked @(1843, 925) t5 violations=0
+CLEARANCE beat gift @(1843, 925) t1 violations=0
+CLEARANCE beat gift @(1843, 925) t2 violations=0
+CLEARANCE beat gift @(1843, 925) t3 violations=0
+CLEARANCE beat gift @(1843, 925) t4 violations=0
+CLEARANCE beat gift @(1843, 925) t5 violations=0
+CLEARANCE beat charm @(1843, 925) t1 violations=0
+CLEARANCE beat charm @(1843, 925) t2 violations=0
+CLEARANCE beat charm @(1843, 925) t3 violations=0
+CLEARANCE beat charm @(1843, 925) t4 violations=0
+CLEARANCE beat charm @(1843, 925) t5 violations=0
+CLEARANCE beat camp @(1843, 925) t1 violations=0
+CLEARANCE beat camp @(1843, 925) t2 violations=0
+CLEARANCE beat camp @(1843, 925) t3 violations=0
+CLEARANCE beat camp @(1843, 925) t4 violations=0
+CLEARANCE beat camp @(1843, 925) t5 violations=0
+CLEARANCE beat status @(1843, 925) t1 violations=0
+CLEARANCE beat status @(1843, 925) t2 violations=0
+CLEARANCE beat status @(1843, 925) t3 violations=0
+CLEARANCE beat status @(1843, 925) t4 violations=0
+CLEARANCE beat status @(1843, 925) t5 violations=0
+CLEARANCE beat total @(1843, 925) t1 violations=0
+CLEARANCE beat total @(1843, 925) t2 violations=0
+CLEARANCE beat total @(1843, 925) t3 violations=0
+CLEARANCE beat total @(1843, 925) t4 violations=0
+CLEARANCE beat total @(1843, 925) t5 violations=0
+tree a1843_99_after: router=(1912.0, 960.0) screen=@Control@1404 size=(1912.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot a1843_99_after (1843, 925) err=0
+CLEARANCE beat scavenge @(1280, 720) t1 violations=0
+tree 11_00_scavenge_a: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_00_scavenge_a (1280, 720) err=0
+CLEARANCE beat scavenge @(1280, 720) t2 violations=0
+CLEARANCE beat scavenge @(1280, 720) t3 violations=0
+tree 11_00_scavenge_b: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_00_scavenge_b (1280, 720) err=0
+CLEARANCE beat scavenge @(1280, 720) t4 violations=0
+CLEARANCE beat scavenge @(1280, 720) t5 violations=0
+CLEARANCE beat steal @(1280, 720) t1 violations=0
+tree 11_01_steal_a: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_01_steal_a (1280, 720) err=0
+CLEARANCE beat steal @(1280, 720) t2 violations=0
+CLEARANCE beat steal @(1280, 720) t3 violations=0
+tree 11_01_steal_b: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_01_steal_b (1280, 720) err=0
+CLEARANCE beat steal @(1280, 720) t4 violations=0
+CLEARANCE beat steal @(1280, 720) t5: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1648/@HBoxContainer@1694/@Control@1689/@Control@1649/float[0] '+2' during beat 'move_resource': rect [P: (367.0, 643.4002), S: (36.0, 42.0)] overlaps another floating number /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1648/@HBoxContainer@1694/@Control@1689/@Control@1649/float[1] '+2' during beat 'move_resource'
+CLEARANCE beat steal @(1280, 720) t5 violations=1
+CLEARANCE beat blocked @(1280, 720) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1648/@HBoxContainer@1694/@Control@1689/@Control@1649/float[0] '+2' during beat 'blocked': rect [P: (369.2094, 639.6725), S: (36.0, 42.0)] overlaps another floating number /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1648/@HBoxContainer@1694/@Control@1689/@Control@1649/float[1] '+2' during beat 'blocked'
+CLEARANCE beat blocked @(1280, 720) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1648/@HBoxContainer@1694/@Control@1689/@Control@1649/float[2] '-2' during beat 'blocked': rect [P: (372.2094, 143.0997), S: (30.0, 42.0)] is within 6 px of a plate [P: (408.0, 76.0), S: (202.0, 77.0)]
+CLEARANCE beat blocked @(1280, 720) t1 violations=2
+tree 11_02_blocked_a: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_02_blocked_a (1280, 720) err=0
+CLEARANCE beat blocked @(1280, 720) t2 violations=0
+CLEARANCE beat blocked @(1280, 720) t3 violations=0
+tree 11_02_blocked_b: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_02_blocked_b (1280, 720) err=0
+CLEARANCE beat blocked @(1280, 720) t4 violations=0
+CLEARANCE beat blocked @(1280, 720) t5 violations=0
+CLEARANCE beat gift @(1280, 720) t1: /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1648/@HBoxContainer@1694/@Control@1689/@Control@1649/float[0] '-1' during beat 'move_resource': rect [P: (369.5, 678.5804), S: (31.0, 44.0)] overlaps another floating number /root/Snapshot/Main/@Control@7/@Control@1404/@MarginContainer@1648/@HBoxContainer@1694/@Control@1689/@Control@1649/float[1] '+2' during beat 'move_resource'
+CLEARANCE beat gift @(1280, 720) t1 violations=1
+tree 11_03_gift_a: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_03_gift_a (1280, 720) err=0
+CLEARANCE beat gift @(1280, 720) t2 violations=0
+CLEARANCE beat gift @(1280, 720) t3 violations=0
+tree 11_03_gift_b: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_03_gift_b (1280, 720) err=0
+CLEARANCE beat gift @(1280, 720) t4 violations=0
+CLEARANCE beat gift @(1280, 720) t5 violations=0
+tree 11_99_after: router=(1706.0, 960.0) screen=@Control@1404 size=(1706.0, 960.0) visible=true texts=20 first=["Skip", "What happened in the night"]
+shot 11_99_after (1280, 720) err=0
+2026-10-18T14:15:06.305 INFO [net] rx t=end bytes=1165
+2026-10-18T14:15:06.312 INFO [net] rx_payload json="{\"extracted\":[\"Wolfgang Amadeus\"],\"results\":[{\"alias\":\"SaltyPretzelSupreme\",\"gave_away\":4,\"goal\":{\"code\":\"give\",\"line\":{\"args\":{\"n\":3},\"code\":\"goal_give\"},\"target\":null,\"text\":\"give away 3 rations over the game\"},\"goal_done\":true,\"rations\":1,\"score\":3,\"seat\":false,\"stole\":6,\"times_robbed\":1},{\"alias..."
+2026-10-18T14:15:06.312 INFO [session] view t=end round=-
+2026-10-18T14:15:06.313 INFO [session] screen from=reveal to=end
+tree 09_end: router=(540.0, 960.0) screen=@Control@1743 size=(540.0, 960.0) visible=true texts=62 first=["Winners", "Wolfgang Amadeus"]
+shot 09_end (540, 960) err=0
+CLEARANCE end @540x960 violations=0
+CLEARANCE end @700x800 violations=0
+CLEARANCE end @1280x720 violations=0
+CLEARANCE end @1843x925 violations=0
+tree 12_end_1280x720: router=(1706.0, 960.0) screen=@Control@1743 size=(1706.0, 960.0) visible=true texts=62 first=["Winners", "Wolfgang Amadeus"]
+shot 12_end_1280x720 (1280, 720) err=0
+tree 12_end_1843x925: router=(1912.0, 960.0) screen=@Control@1743 size=(1912.0, 960.0) visible=true texts=62 first=["Winners", "Wolfgang Amadeus"]
+shot 12_end_1843x925 (1843, 925) err=0
+tree 12_end_2560x1440: router=(1706.0, 960.0) screen=@Control@1743 size=(1706.0, 960.0) visible=true texts=62 first=["Winners", "Wolfgang Amadeus"]
+shot 12_end_2560x1440 (2560, 1440) err=0
+CLEARANCE TOTAL: 26 violations in 228 audits, 12 distinct offenders
+SNAPSHOTS DONE C:/Users/Corne/AppData/Local/Temp/claude/C--Personal-office-survivor-godot/68235be8-0286-4f42-8bbe-6dc49a4cd2e3/scratchpad/s12

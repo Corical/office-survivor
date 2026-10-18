@@ -12,6 +12,7 @@ const FRAME_ART_SIZE := Vector2(128, 128)      # card_frame after FlashArt halve
 const FRAME_PX := 24.0                          # measured: the visible border of card_frame is about 23 px at 1x
 const CLEARANCE := 4.0                          # chosen: the least gap that reads as "inside"
 const TOLERANCE := 0.5
+const FLOAT_CLEARANCE := 6.0                    # a floating number keeps this far from every plate
 
 
 static func check(root: Node) -> Array[String]:
@@ -40,6 +41,8 @@ static func _walk(n: Node, out: Array[String]) -> void:
 			_check_margins(n as Control, sb, out)
 	if n.has_method("plate_items"):
 		_check_plates(n, out)
+	if n.has_method("float_items"):
+		_check_floats(n, out)
 	for c in n.get_children():
 		_walk(c, out)
 
@@ -81,6 +84,27 @@ static func _check_plates(stage: Node, out: Array[String]) -> void:
 		var inner: Rect2 = (it.frame as Rect2).grow(-(float(it.edge) + CLEARANCE))
 		if not inner.grow(TOLERANCE).encloses(it.rect):
 			out.append("%s: %s rect %s is outside the plate's inner rect %s" % [it.path, it.what, it.rect, inner])
+
+
+## Floating numbers (+N / -N) must never touch a plate (6 px clear) nor another number.
+static func _check_floats(stage: Node, out: Array[String]) -> void:
+	var floats: Array = stage.float_items()
+	if floats.is_empty():
+		return
+	var plates: Array = []
+	for it in stage.plate_items():
+		var f: Rect2 = it.frame
+		if not plates.has(f):
+			plates.append(f)
+	for i in floats.size():
+		var r: Rect2 = floats[i].rect
+		for p in plates:
+			if (p as Rect2).grow(FLOAT_CLEARANCE).intersects(r):
+				out.append("%s: rect %s is within %.0f px of a plate %s" % [floats[i].path, r, FLOAT_CLEARANCE, p])
+				break
+		for j in range(i + 1, floats.size()):
+			if r.intersects(floats[j].rect):
+				out.append("%s: rect %s overlaps another floating number %s" % [floats[i].path, r, floats[j].path])
 
 
 static func _side(side: int) -> String:
