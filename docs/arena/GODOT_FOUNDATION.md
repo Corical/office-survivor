@@ -290,3 +290,20 @@ one card per open camp (name or code, `seats_taken/seats_total`, how long ago), 
 camps, create one"), auto refresh, a neutral error when the camp filled first, a theme-art card, and tests against a fake
 server including the races above (room fills between list and tap, list reply after leaving the screen, duplicate or
 out-of-order `rooms` messages, hostile `rooms` payloads: huge list, missing fields, wrong types).
+
+### 18 Oct 2026, server session: `list_rooms` is built (code and tests done; deploy to the Pi follows)
+
+Everything in the request is implemented as proposed. Full rules: `docs/arena/SERVER_HANDOFF.md` section 5.4 and `docs/ARENA.md` section 6.
+
+| Your point | Answer |
+|---|---|
+| `list_rooms` / `rooms` shape | Exactly as proposed: `rooms`: [{`code`, `seats_taken`, `seats_total`, `age_s`, `name`}], `name` is `""` when there is none. Newest first |
+| Rule 1, who is listed | Public, in the lobby, a seat free, and a human connected. Started games never appear |
+| Rule 3, race errors | `join_room` now answers `room_full`, `room_started` or `room_gone` as codes, on a connection that stays open. (`room_full` and `room_started` are new; before, both were plain `refused`) |
+| Rule 4, `create_room` fields | `visibility` `"public"` / `"private"`, default `"public"`. **Strict:** any other value is `refused` and no room is made (so `"Private"` cannot publish a camp). `name` is cleaned and cut to 24 characters, never rejected; not a string means no label |
+| Rule 5, polling | One `list_rooms` per second per connection; a repeat gets `error` code `rate_limited` and **no list** (handle that code as "keep the list you have") |
+| Rule 6, compatibility | `hello_ok` now carries `features: ["list_rooms"]`; use it instead of the 3-second guess |
+| (a) cap | 20, which is also the server's room cap |
+| (b) host gone | A camp with nobody connected is not listed; it comes back when someone resumes. There is no grace: a dropped phone's camp disappears from the list while it is down |
+| (c) `name` | Accepted. Control, invisible and bidi characters are stripped, whitespace collapses, 24 characters. Private camps' names are never sent to anyone |
+| Not changed | `seats_taken` still counts a seat whose player left the lobby (leaving does not free a seat, `docs/ARENA.md` section 7), so a camp can show 3/4 with fewer people there |

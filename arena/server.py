@@ -18,6 +18,7 @@ import logging
 import os
 import secrets
 import time
+import unicodedata
 
 from bot.core import GameError
 from bot.store import IdentityStore, JsonlEventStore, TextStore
@@ -32,6 +33,9 @@ PROTO, MIN_PROTO = 1, 1
 CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ"        # no I or O: read aloud across a room without confusion
 MAX_MESSAGE = 4096                               # bytes; a real message is under 200
 TAKEOVERS_PER_MINUTE = 5                         # chosen default
+NAME_MAX = 24                                    # characters of a camp's label (the client's request)
+LIST_INTERVAL = 1.0                              # seconds between list_rooms from one connection (the client's suggestion)
+FEATURES = ["list_rooms"]                        # advertised in hello_ok so a client need not guess
 # WebSocket close codes the client reads (the 4000s are ours). Godot's WebSocketPeer drops a message that arrives in the
 # same poll as the close frame, so every terminal message is followed by a short pause and only then the close.
 # 4001 (seat gone) is NOT used: a dead seat is a plain error and the connection stays open to create or join a room.
@@ -76,20 +80,34 @@ def token_key(token):
     return "t:" + hashlib.sha256(token.encode()).hexdigest()
 
 
+def clean_name(raw):
+    """A camp label that is safe to show: text only, no control or invisible characters, one line, NAME_MAX long.
+    Anything that is not a string becomes empty (no label). Lone surrogates are dropped too: they cannot be sent."""
+    if not isinstance(raw, str):
+        return ""
+    spaced = "".join(" " if c.isspace() else c for c in raw)
+    kept = "".join(c for c in spaced if unicodedata.category(c)[0] != "C")
+    return " ".join(kept.split())[:NAME_MAX].strip()
+
+
 class Room:
     """One room on disk plus its live connections."""
 
-    def __init__(self, code, path, scheduler, settings, salt=None):
+    def __init__(self, code, path, scheduler, settings, salt=None, visibility="public", name=""):
         self.code, self.path = code, path
         os.makedirs(path, exist_ok=True)
         meta = os.path.join(path, "room.json")
         if os.path.exists(meta):
             with open(meta, encoding="utf-8") as f:
-                salt = json.load(f)["salt"]
+                info = json.load(f)
+            salt, self.created = info["salt"], info.get("created", os.path.getmtime(meta))
+            self.visibility, self.name = info.get("visibility", "public"), clean_name(info.get("name", ""))
         else:
             salt = salt or secrets.token_hex(16)
+            self.created, self.visibility, self.name = time.time(), visibility, name
             with open(meta, "w", encoding="utf-8") as f:
-                json.dump({"code": code, "salt": salt, "created": time.time()}, f)
+                json.dump({"code": code, "salt": salt, "created": self.created, "visibility": visibility,
+                           "name": name}, f)
             try:
                 os.chmod(meta, 0o600)
             except OSError:
@@ -138,6 +156,23 @@ class Server:
         self.sched = scheduler or AsyncioScheduler()
         self.rooms = {}                 # code -> Room
         self.by_token = {}              # token key -> code
+        self.list_at = {}               # connection -> when it last asked for the room list
+
+    def open_rooms(self):
+        """Camps a stranger could still join: public, still in the lobby, a seat free, someone connected. Newest first.
+        No aliases, no seat order: the same rule as the lobby message."""
+        now = time.time()
+        found = []
+        for room in self.rooms.values():
+            g = room.game
+            if (room.visibility != "public" or g.started or room.host_pid() is None
+                    or len(g.joined) >= g.settings.seats):
+                continue
+            found.append((room.created, room.code, {"code": room.code, "seats_taken": len(g.joined),
+                                                    "seats_total": g.settings.seats,
+                                                    "age_s": max(0, int(now - room.created)), "name": room.name}))
+        found.sort(key=lambda f: (-f[0], f[1]))
+        return [f[2] for f in found[:self.max_rooms]]
 
     def load(self):
         base = os.path.join(self.data, "rooms")
@@ -189,6 +224,7 @@ class Server:
                 raise
             log.info("connection closed: %s", e)            # a dropped phone, or a frame over the size limit
         finally:
+            self.list_at.pop(ws, None)
             if seat:
                 room, pid = seat
                 if room.conns.get(pid) is ws:
@@ -210,7 +246,7 @@ class Server:
                                       "message": "Please update the app to play."}))
             await self._close_after_pause(ws, CLOSE_UPGRADE_REQUIRED, "upgrade_required")
             return False
-        await ws.send(json.dumps({"t": "hello_ok", "proto": PROTO}))
+        await ws.send(json.dumps({"t": "hello_ok", "proto": PROTO, "features": FEATURES}))
         return True
 
     async def _error(self, ws, code, message):
@@ -248,13 +284,24 @@ class Server:
 
     async def _dispatch(self, ws, msg, seat):
         t = msg["t"]
+        if t == "list_rooms":
+            now = time.time()
+            if now - self.list_at.get(ws, -LIST_INTERVAL) < LIST_INTERVAL:
+                raise Coded("rate_limited", "Too many room lists; wait a second.")
+            self.list_at[ws] = now
+            await ws.send(json.dumps({"t": "rooms", "rooms": self.open_rooms()}, ensure_ascii=False))
+            return seat
         if t == "create_room":
             if seat:
                 raise GameError("You're already in a room.")
+            visibility = msg.get("visibility", "public")
+            if visibility not in ("public", "private"):         # strict: a typo must not publish a private camp
+                raise GameError("Visibility must be public or private.")
             if len(self.rooms) >= self.max_rooms:
                 raise GameError("The server is full; try again later.")
             code = self._new_code()
-            room = Room(code, os.path.join(self.data, "rooms", code), self.sched, self.settings)
+            room = Room(code, os.path.join(self.data, "rooms", code), self.sched, self.settings,
+                        visibility=visibility, name=clean_name(msg.get("name")))
             self.rooms[code] = room
             return await self._join(ws, room)
         if t == "join_room":
@@ -264,7 +311,9 @@ class Server:
             if room is None:
                 raise Coded("room_gone", "There's no room with that code.")
             if room.game.started:
-                raise GameError("That game has already started.")
+                raise Coded("room_started", "That game has already started.")
+            if len(room.game.joined) >= room.game.settings.seats:
+                raise Coded("room_full", "The room is full.")
             return await self._join(ws, room)
         if t == "resume":
             key = token_key(str(msg.get("token", "")))

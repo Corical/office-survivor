@@ -84,8 +84,9 @@ object with `"t"`.
 | `t` | Fields | Notes |
 |---|---|---|
 | `hello` | `proto` (1), `client_build` | Must be first. Any other first message gets `error hello_first` and the connection is dropped |
-| `create_room` | none | You become host. Replies: `seat`, then `lobby` |
-| `join_room` | `code` | Not case sensitive. Refused once the game has started |
+| `create_room` | optional `visibility` (`"public"` default, or `"private"`; anything else is refused) and `name` (the camp's label, see 5.4) | You become host. Replies: `seat`, then `lobby` |
+| `join_room` | `code` | Not case sensitive. Errors `room_gone`, `room_started`, `room_full` (see 5.3) |
+| `list_rooms` | none | Allowed any time after `hello`, seated or not. Reply: `rooms` (see 5.4). One per second per connection |
 | `resume` | `token` | Replies: `seat`, then your current screen |
 | `start` | none | Host only. Bots fill the empty seats |
 | `pick` | `kind`, `target` (alias or null), `amount` (int) | May repeat until you lock |
@@ -104,7 +105,8 @@ new view.
 
 | `t` | Fields |
 |---|---|
-| `hello_ok` | `proto` |
+| `hello_ok` | `proto`, `features` (`["list_rooms"]`: use it instead of guessing) |
+| `rooms` | `rooms`: [{`code`, `seats_taken`, `seats_total`, `age_s`, `name`}] (see 5.4) |
 | `upgrade_required` | `min_proto`, `message` (connection then closes) |
 | `seat` | `token` (store it; hashed on the server), `room_code`, `alias` (secret, yours), `host` |
 | `lobby` | `room_code`, `seats_taken`, `seats_total` (4), `host` (this can change if the host drops) |
@@ -145,6 +147,9 @@ close). Phrase texts are in `bot/core.py` `RADIO_PHRASES`.
 | `refused` | a rule said no; `message` is safe to show | show it; the state did not change |
 | `seat_gone` | `resume` with a token the server does not know, or whose room is gone | forget the token; **the connection stays open**, so `create_room` or `join_room` works on it |
 | `room_gone` | `join_room` with a code that matches no room | tell the player; the connection stays open |
+| `room_started` | `join_room` for a game that has already started | neutral message, refresh the list; the connection stays open |
+| `room_full` | `join_room` for a room with all 4 seats taken | neutral message, refresh the list; the connection stays open |
+| `rate_limited` | a second `list_rooms` inside one second on this connection | no list was sent; ask again later |
 | `taken_over` | the same token connected elsewhere; **you are about to be disconnected** | stop; the close follows |
 | `server_error` | an unexpected failure on the server (logged there) | retry once, then tell the owner |
 
@@ -153,6 +158,20 @@ about **0.25 s after the message** so your poll sees the message first (live-che
 connection (a dropped network, a frame over 4096 bytes) is an ordinary close with no code of ours. **4001 is not used**:
 `seat_gone` is an error on a connection that stays open (say so if you would rather it closed). From the moment a seat
 moves to another device, whatever the old connection still sends is ignored.
+
+### 5.4 Open camps (`list_rooms`), built 18 Oct 2026
+
+| Rule | Detail |
+|---|---|
+| Who is listed | `visibility` is `public`, still in the lobby, a seat free, and at least one human connected. A started game never appears. A camp nobody is in drops off the list until someone resumes |
+| Entry fields | `code`, `seats_taken`, `seats_total`, `age_s` (whole seconds since the room was made), `name` (string, `""` when none). No alias, seat number or join order |
+| Order and size | Newest first; at most 20 (the server's room cap) |
+| Not a reservation | `join_room` with the `code`; a camp that filled, started or vanished answers `room_full`, `room_started` or `room_gone` on a connection that stays open |
+| `visibility` | Exactly `"public"` or `"private"`; absent = public. Anything else (wrong case, `null`, a number...) is `refused` and no room is made. Private camps are joined by code as before |
+| `name` | Control, invisible (bidi, zero-width) and unsendable characters removed, whitespace runs collapsed to one space, cut to 24 characters, trimmed. Not a string = no label. The server never rejects a name, it cleans it |
+| Rate limit | One `list_rooms` per second per connection. A repeat inside the second gets `rate_limited` and no list; the refusal does not restart the clock |
+| Restart | `visibility`, `name` and age are in `room.json`; a room from before this feature loads as public, unnamed |
+| Seats of people who left | Unchanged: leaving the lobby does not free the seat (section 6), so `seats_taken` can overstate who is still there |
 
 ## 6. Behaviour that is easy to get wrong
 

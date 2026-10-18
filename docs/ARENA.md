@@ -94,8 +94,9 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | Client sends | Meaning |
 |---|---|
 | `hello` | must be first; carries `proto` |
-| `create_room` | make a room and take its first seat |
+| `create_room` | make a room and take its first seat; optional `visibility` (`public` default, or `private`) and `name` (see below) |
 | `join_room` | take a seat by code |
+| `list_rooms` | ask for the open camps (see below); allowed with or without a seat |
 | `resume` | come back to a seat with its token |
 | `start` | host only, in the lobby |
 | `pick` | choose (or change) tonight's move |
@@ -107,7 +108,8 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 <!-- check:server-messages -->
 | Server sends | Meaning |
 |---|---|
-| `hello_ok` | protocol accepted |
+| `hello_ok` | protocol accepted; `features` lists optional messages the server knows (`list_rooms`) |
+| `rooms` | the open camps: `rooms` = [{`code`, `seats_taken`, `seats_total`, `age_s`, `name`}] |
 | `upgrade_required` | the app is too old |
 | `seat` | your token, room code, alias and whether you are host |
 | `lobby` | seats taken of 4, room code |
@@ -123,6 +125,9 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `MIN_PROTO` | 1 |
 | `MAX_MESSAGE` | 4096 |
 | `TAKEOVERS_PER_MINUTE` | 5 |
+| `NAME_MAX` | 24 |
+| `LIST_INTERVAL` | 1.0 |
+| `FEATURES` | ['list_rooms'] |
 | `CLOSE_UPGRADE_REQUIRED` | 4002 |
 | `CLOSE_TAKEN_OVER` | 4003 |
 | `CLOSE_PAUSE` | 0.25 |
@@ -135,6 +140,9 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `refused` | a rule said no (the messages are listed below); nothing changed |
 | `seat_gone` | `resume` with a token the server does not know, or whose room is gone: forget the token. The connection stays open, so the client can create or join a room without reconnecting |
 | `room_gone` | `join_room` with a code that matches no room |
+| `room_started` | `join_room` for a game that has already started |
+| `room_full` | `join_room` for a room with all 4 seats taken |
+| `rate_limited` | `list_rooms` again within `LIST_INTERVAL` seconds on the same connection; nothing was sent, ask again later |
 | `taken_over` | the same seat was opened on another device; this connection is about to be closed with code 4003 |
 | `server_error` | an unexpected failure on the server (logged there) |
 
@@ -143,6 +151,18 @@ Godot's `WebSocketPeer` drops a message that arrives in the same poll as the clo
 message, waits `CLOSE_PAUSE` seconds, and only then closes. Code 4001 ("seat gone") is deliberately not used: a dead seat
 is an ordinary error and the connection stays open. From the moment a seat is taken over, anything the old connection
 still sends is ignored.
+
+**Open camps (`list_rooms`).** The client asks, the server answers with one `rooms` message. A room is listed only when
+all of these hold: its `visibility` is `public`, it is still in the lobby, a seat is free, and at least one human is
+connected (a camp nobody is in is not listed until someone is back). A started game never appears. Entries carry the
+code, the seat count, `age_s` since the room was made, and `name`; never an alias, a seat number or a join order. Newest
+first, at most the server's room cap (20). The list is a hint, not a reservation: the client then sends `join_room`, and
+a camp that filled or started in between answers `room_full` or `room_started` (or `room_gone` if it vanished).
+`create_room` may carry `visibility` (exactly `public` or `private`; absent means `public`; anything else is refused, so a
+typo cannot publish a private camp) and `name` (the host's own label: control, invisible and unsendable characters are
+removed, whitespace collapses to single spaces, cut to `NAME_MAX`; not a string means no label). A private camp is joined
+by code as before. One `list_rooms` per `LIST_INTERVAL` per connection; an earlier repeat gets `rate_limited` and no list.
+`visibility` and `name` live in the room's `room.json`, so they survive a restart.
 
 <!-- check:refusals -->
 | Refusal (`refused` message) | When |
@@ -167,6 +187,8 @@ still sends is ignored.
 | `Only the host can start.` | start by a non-host |
 | `Amount must be a whole number.` | a gift amount that is not an integer |
 | `Unknown message type '{t}'.` | any other `t` |
+| `Visibility must be public or private.` | `create_room` with any other `visibility` (a typo must not publish a private camp) |
+| `Too many room lists; wait a second.` | a second `list_rooms` within `LIST_INTERVAL` on one connection |
 
 Game refusals from the core and the engine (an illegal move, the radio rules) come through unchanged as `refused`;
 they are listed in MECHANICS.md section 9.
@@ -203,5 +225,6 @@ Update between games where you can: a restart does not lose a game, but players 
 
 | Date | Change |
 |---|---|
+| 18 October 2026 | Open camps: `list_rooms` / `rooms`, `create_room` `visibility` and `name`, `features` in `hello_ok`, error codes `room_full`, `room_started`, `rate_limited`. Code and tests done; not yet deployed to the Pi. |
 | 18 October 2026 | The Arena service on the Pi (tailnet-only, loopback behind Tailscale serve, resource ceilings). |
 | 18 October 2026 | This file created with the first Arena server: rooms, timed rounds, lock-in, early advance, bots that lock, resume and restart. |
