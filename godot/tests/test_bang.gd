@@ -591,6 +591,20 @@ func test_the_end_screen_for_a_side_that_lost_and_for_a_table_everyone_left() ->
 	check(Words.render("bang.team.unknown") in " ".join(Ui.texts(screen)), "an unknown side never renders as a hole")
 
 
+func test_the_end_screen_when_nobody_wins_has_no_winners_list_and_claims_no_win_or_loss() -> void:
+	_room()
+	_send({"n": 3, "phase": "over", "turn": null, "dead": [0, 1, 2], "winner": {"team": "nobody", "ats": []}})
+	eq(_model().winner.team, "nobody", "the team is kept, not turned into unknown")
+	var screen := BangEndScreen.new()
+	_mount(screen, SIZES[1])
+	await _settle()
+	var all := " ".join(Ui.texts(screen))
+	check(Words.render("bang.team.nobody") in all, "Nobody wins")
+	check(Ui.find(screen, "winners_title") == null, "no winners list")
+	check(not (Words.render("bang.end.win") in all), "no win claimed")
+	check(not (Words.render("bang.end.lose") in all), "no loss claimed either: nobody's side lost")
+
+
 func test_the_end_screen_fits_3_and_8_seats() -> void:
 	for n in [3, 8]:
 		setup()

@@ -28,7 +28,7 @@ const SEAT_GONE_TEXTS := ["That seat no longer exists."]
 
 const ROLES := ["sheriff", "deputy", "outlaw", "renegade"]
 const FACES := ["arrow", "dynamite", "shoot1", "shoot2", "beer", "gatling"]
-const TEAMS := ["sheriff", "outlaws", "renegade", "deputy", "outlaw", "abandoned"]
+const TEAMS := ["sheriff", "outlaws", "renegade", "deputy", "outlaw", "abandoned", "nobody"]
 const MAX_SEATS := 8
 const DICE := 5
 const ALL_KEPT := 31
@@ -72,7 +72,7 @@ const KEYS: Array[String] = [
 	"bang.log.shot", "bang.log.beer", "bang.log.gatling", "bang.log.out", "bang.log.turn", "bang.log.over",
 	"bang.end.win", "bang.end.lose", "bang.end.roles", "bang.end.winners",
 	"bang.team.sheriff", "bang.team.outlaws", "bang.team.renegade", "bang.team.deputy", "bang.team.outlaw",
-	"bang.team.abandoned", "bang.team.unknown",
+	"bang.team.abandoned", "bang.team.nobody", "bang.team.unknown",
 ]
 
 

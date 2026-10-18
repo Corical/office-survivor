@@ -192,5 +192,8 @@ msgstr "The Outlaw wins"
 msgid "bang.team.abandoned"
 msgstr "Everyone left the table"
 
+msgid "bang.team.nobody"
+msgstr "Nobody wins"
+
 msgid "bang.team.unknown"
 msgstr "The game is over"
