@@ -1,0 +1,551 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "band.bandit"
+msgstr "Bandit"
+
+msgid "band.getting_by"
+msgstr "Getting by"
+
+msgid "band.starving"
+msgstr "Starving"
+
+msgid "band.unknown"
+msgstr "Unknown"
+
+msgid "band.well_fed"
+msgstr "Well fed"
+
+msgid "column.gave_away"
+msgstr "Gave away"
+
+msgid "column.rations"
+msgstr "Rations"
+
+msgid "column.score"
+msgstr "Points"
+
+msgid "column.stole"
+msgstr "Stole"
+
+msgid "column.times_robbed"
+msgstr "Robbed"
+
+msgid "goal.beat"
+msgstr "{text}"
+
+msgid "goal.detective"
+msgstr "{text}"
+
+msgid "goal.give"
+msgstr "{text}"
+
+msgid "goal.grudge"
+msgstr "{text}"
+
+msgid "goal.robbed2_extract"
+msgstr "{text}"
+
+msgid "goal.state.done"
+msgstr "Done"
+
+msgid "goal.state.end"
+msgstr "Settled when the helicopter comes"
+
+msgid "goal.state.failed"
+msgstr "Lost"
+
+msgid "goal.state.open"
+msgstr "Still on"
+
+msgid "goal.state.unknown"
+msgstr "Unknown"
+
+msgid "goal.steal3_clean"
+msgstr "{text}"
+
+msgid "goal.unknown"
+msgstr "{text}"
+
+msgid "line.ate"
+msgstr "You ate {amount}. One more night survived."
+
+msgid "line.became_bandit_me"
+msgstr "The stores are empty. You're a bandit now: steal or stake out until you're back up to 3."
+
+msgid "line.caught_thief_broke"
+msgstr "Your watch caught {thief} red-handed, but they had nothing to pay you."
+
+msgid "line.caught_thief_broke_since"
+msgstr "Your watch (still up from night {since}) caught {thief} red-handed, but they had nothing to pay you."
+
+msgid "line.caught_thief_paid"
+msgstr "Your watch caught {thief} red-handed. They paid you {got}."
+
+msgid "line.caught_thief_paid_since"
+msgstr "Your watch (still up from night {since}) caught {thief} red-handed. They paid you {got}."
+
+msgid "line.event"
+msgstr "{line}"
+
+msgid "line.exposed_by_me"
+msgstr "Your stake-out exposed {thief}; they paid you {paid}."
+
+msgid "line.exposed_me"
+msgstr "EXPOSED: someone was watching in the dark. They saw you rob {victim}. You paid them {paid}."
+
+msgid "line.exposed_me_back"
+msgstr "EXPOSED: someone was watching in the dark. They saw you rob {victim}. You paid them {paid} and gave back the {back} you stole."
+
+msgid "line.exposed_own_back"
+msgstr "You also got your {back} back from {thief}, who robbed you."
+
+msgid "line.feast"
+msgstr "Feast night: you ate for free."
+
+msgid "line.found_watching_1"
+msgstr "While staking out, you found {found} ration."
+
+msgid "line.found_watching_n"
+msgstr "While staking out, you found {found} rations."
+
+msgid "line.gave"
+msgstr "You gave {receiver} {amount}."
+
+msgid "line.goal_beat"
+msgstr "finish with more rations than {target}"
+
+msgid "line.goal_detective"
+msgstr "expose a thief red-handed by staking out at least once"
+
+msgid "line.goal_give"
+msgstr "give away {n} rations over the game"
+
+msgid "line.goal_grudge_deny"
+msgstr "make sure {target} doesn't get a seat on the helicopter"
+
+msgid "line.goal_grudge_rob"
+msgstr "successfully rob {target} at least {n}x"
+
+msgid "line.goal_robbed2_extract"
+msgstr "get robbed at least {n}x and still get a seat on the helicopter"
+
+msgid "line.goal_steal3_clean"
+msgstr "steal 3 times before you're ever caught"
+
+msgid "line.got_gift"
+msgstr "{giver} slipped you {amount} in secret."
+
+msgid "line.got_gift_bonus"
+msgstr "{giver} slipped you {amount} in secret, and gifts grow: you got {total}."
+
+msgid "line.guard_up_1"
+msgstr "You're on guard for night {night}."
+
+msgid "line.guard_up_n"
+msgstr "You're on guard for nights {nights}."
+
+msgid "line.idol_blocked"
+msgstr "{target} had a hidden idol. You got nothing."
+
+msgid "line.idol_found"
+msgstr "You found a hidden idol. The next person to rob you gets nothing. Tell no one."
+
+msgid "line.idol_saved"
+msgstr "Your idol saved you: a thief left with nothing. The idol is spent."
+
+msgid "line.news_bandit"
+msgstr "{player} ran out of food and has turned bandit."
+
+msgid "line.news_break_in_empty"
+msgstr "Someone broke into {victim}'s shelter and found nothing."
+
+msgid "line.news_caught"
+msgstr "CAUGHT: {target} was on guard and caught {thief} red-handed. {thief} paid {paid}."
+
+msgid "line.news_exposed"
+msgstr "EXPOSED: someone was watching and saw {thief} rob {victim}. {thief} pays them {paid}."
+
+msgid "line.news_exposed_back"
+msgstr "EXPOSED: someone was watching and saw {thief} rob {victim}. {thief} pays them {paid} and gives {victim} back the {back} they stole."
+
+msgid "line.news_hit_1"
+msgstr "Someone hit {victim} in the dark. {victim} is down {total}."
+
+msgid "line.news_hit_n"
+msgstr "{count} people hit {victim} in the dark. {victim} is down {total}."
+
+msgid "line.news_idol"
+msgstr "Someone tried to rob {player} in the dark and left empty-handed: {player} had a hidden idol."
+
+msgid "line.news_quiet"
+msgstr "A quiet night. Nobody lost anything."
+
+msgid "line.news_rejoined"
+msgstr "Bandit {player} has scraped together enough to rejoin the survivors."
+
+msgid "line.now_have"
+msgstr "You now have {rations} rations."
+
+msgid "line.now_have.one"
+msgstr "You now have {rations} ration."
+
+msgid "line.progress_beat"
+msgstr "decided at the end: you have {rations}, {target}'s stash is secret."
+
+msgid "line.progress_beat_band"
+msgstr "decided at the end: you have {rations}, {target}'s stash is secret. They look {band} this morning."
+
+msgid "line.progress_clean_done"
+msgstr "3/3 clean steals before you were ever caught"
+
+msgid "line.progress_clean_failed"
+msgstr "you were caught before your 3rd clean steal ({have}/3)"
+
+msgid "line.progress_clean_open"
+msgstr "{have}/3 clean steals, never caught so far"
+
+msgid "line.progress_detective_done"
+msgstr "thief exposed"
+
+msgid "line.progress_detective_open"
+msgstr "0/1 thieves exposed"
+
+msgid "line.progress_give"
+msgstr "{have}/{need} given"
+
+msgid "line.progress_grudge_deny"
+msgstr "decided at the end: who gets a seat is only known when the helicopter comes"
+
+msgid "line.progress_grudge_rob"
+msgstr "robbed {target} {have}/{need}"
+
+msgid "line.progress_robbed_end"
+msgstr "robbed {have}/{need} (done). Now hold a seat on the helicopter"
+
+msgid "line.progress_robbed_open"
+msgstr "robbed {have}/{need} so far, and you'll need a seat at the end"
+
+msgid "line.progress_target_left"
+msgstr "your target left the game, so this goal no longer counts"
+
+msgid "line.rejoined_me"
+msgstr "You've scraped together enough to rejoin the survivors."
+
+msgid "line.robbed"
+msgstr "Someone took {amount} from you in the dark."
+
+msgid "line.scavenged"
+msgstr "You foraged in the dark and found {found}."
+
+msgid "line.scavenged_auto"
+msgstr "You didn't choose a move, so you foraged automatically and found {found}."
+
+msgid "line.steal_caught"
+msgstr "{target} was on guard: you were caught and paid {paid}."
+
+msgid "line.steal_empty"
+msgstr "You crept into {target}'s shelter and found nothing."
+
+msgid "line.steal_split"
+msgstr "You crept into {target}'s shelter, but someone beat you to it."
+
+msgid "line.stole"
+msgstr "You stole {amount} from {target}."
+
+msgid "line.thief_exposed_for_me"
+msgstr "Someone was watching and caught the thief who robbed you: {thief}. You got your {back} back."
+
+msgid "line.unknown"
+msgstr "Something happened."
+
+msgid "line.watched"
+msgstr "You staked out {target}: they chose {saw}."
+
+msgid "line.watched_target"
+msgstr "You staked out {target}: they chose {saw} ({saw_target})."
+
+msgid "list.and"
+msgstr "and"
+
+msgid "move.gift"
+msgstr "Give"
+
+msgid "move.gift.choice"
+msgstr "give"
+
+msgid "move.gift.help"
+msgstr "Give someone food, quietly."
+
+msgid "move.guard"
+msgstr "Keep watch"
+
+msgid "move.guard.choice"
+msgstr "keep watch"
+
+msgid "move.guard.help"
+msgstr "Shield yourself for two nights."
+
+msgid "move.investigate"
+msgstr "Stake out"
+
+msgid "move.investigate.choice"
+msgstr "stake out"
+
+msgid "move.investigate.help"
+msgstr "Find out what someone does tonight."
+
+msgid "move.scavenge"
+msgstr "Forage"
+
+msgid "move.scavenge.choice"
+msgstr "forage"
+
+msgid "move.scavenge.help"
+msgstr "Search the dark for food."
+
+msgid "move.steal"
+msgstr "Steal"
+
+msgid "move.steal.choice"
+msgstr "steal"
+
+msgid "move.steal.help"
+msgstr "Take food from someone's stash."
+
+msgid "move.unknown"
+msgstr "Other move"
+
+msgid "move.unknown.choice"
+msgstr "something"
+
+msgid "move.unknown.help"
+msgstr "No description."
+
+msgid "notice.flapping"
+msgstr "The line keeps dropping. Another device may have your seat."
+
+msgid "notice.generic"
+msgstr "{text}"
+
+msgid "notice.in_flight"
+msgstr "Already sent."
+
+msgid "notice.invalid"
+msgstr "The server sent something this app could not read."
+
+msgid "notice.locked"
+msgstr "Your move is locked in."
+
+msgid "notice.no_server_url"
+msgstr "Enter the server address first."
+
+msgid "notice.seat_gone"
+msgstr "That game is no longer available."
+
+msgid "notice.taken_over"
+msgstr "This seat was opened on another device."
+
+msgid "notice.too_big"
+msgstr "The server sent something too large."
+
+msgid "notice.unknown"
+msgstr "The server sent something this app doesn't know."
+
+msgid "notice.upgrade_required"
+msgstr "Please update the app to play."
+
+msgid "radio.easy"
+msgstr "{a} looks like an easy mark."
+
+msgid "radio.guarding"
+msgstr "{a} is on guard. Don't waste your night on them."
+
+msgid "radio.innocent"
+msgstr "{a} is innocent. Leave them alone."
+
+msgid "radio.lying"
+msgstr "{a} is lying about their rations."
+
+msgid "radio.me"
+msgstr "I'm innocent. Leave me alone."
+
+msgid "radio.saw"
+msgstr "I saw {a} creeping around last night."
+
+msgid "radio.trust"
+msgstr "Don't trust {a}."
+
+msgid "radio.unknown"
+msgstr "Unclear message."
+
+msgid "radio.watch"
+msgstr "Someone should watch {a}'s back tonight."
+
+msgid "resource.ration"
+msgstr "Rations"
+
+msgid "status.outcast"
+msgstr "Bandit"
+
+msgid "status.shield"
+msgstr "On guard"
+
+msgid "ui.app_name"
+msgstr "Long Night"
+
+msgid "ui.back_to_title"
+msgstr "Back to the fire"
+
+msgid "ui.close"
+msgstr "Close"
+
+msgid "ui.continue"
+msgstr "Continue"
+
+msgid "ui.copy"
+msgstr "Copy"
+
+msgid "ui.create_room"
+msgstr "Create camp"
+
+msgid "ui.enter_code"
+msgstr "Camp code"
+
+msgid "ui.goal"
+msgstr "YOUR SECRET GOAL"
+
+msgid "ui.goal_met"
+msgstr "goal met"
+
+msgid "ui.goal_missed"
+msgstr "goal missed"
+
+msgid "ui.hide_settings"
+msgstr "Hide settings"
+
+msgid "ui.join_room"
+msgstr "Join camp"
+
+msgid "ui.leave"
+msgstr "Leave camp"
+
+msgid "ui.lock"
+msgstr "Lock in for the night"
+
+msgid "ui.locked"
+msgstr "Locked in"
+
+msgid "ui.locked_count"
+msgstr "{locked} of {total} locked in"
+
+msgid "ui.locking"
+msgstr "Locking in..."
+
+msgid "ui.net.connecting"
+msgstr "Connecting..."
+
+msgid "ui.net.offline"
+msgstr "Offline"
+
+msgid "ui.net.online"
+msgstr "Connected"
+
+msgid "ui.net.reconnecting"
+msgstr "Signal lost. Reconnecting..."
+
+msgid "ui.net.stopped"
+msgstr "Disconnected"
+
+msgid "ui.net.unreachable"
+msgstr "No signal: can't reach the server"
+
+msgid "ui.new_game"
+msgstr "New game"
+
+msgid "ui.nothing_to_show"
+msgstr "Quiet out here. Nothing yet."
+
+msgid "ui.pick_a_move"
+msgstr "PICK YOUR MOVE FOR TONIGHT"
+
+msgid "ui.pick_a_target"
+msgstr "PICK A TARGET"
+
+msgid "ui.pick_an_amount"
+msgstr "PICK AN AMOUNT"
+
+msgid "ui.radio"
+msgstr "Radio"
+
+msgid "ui.radio_heard"
+msgstr "ON THE RADIO"
+
+msgid "ui.radio_pick_player"
+msgstr "ABOUT WHOM?"
+
+msgid "ui.results"
+msgstr "RESULTS"
+
+msgid "ui.resume"
+msgstr "Rejoin camp"
+
+msgid "ui.reveal_title"
+msgstr "What happened in the night"
+
+msgid "ui.room_code"
+msgstr "Camp {code}"
+
+msgid "ui.roster"
+msgstr "AROUND THE FIRE"
+
+msgid "ui.round_of"
+msgstr "Night {round} of {rounds}"
+
+msgid "ui.seat_mark"
+msgstr "seat"
+
+msgid "ui.seats"
+msgstr "{taken} of {total} places by the fire"
+
+msgid "ui.seconds"
+msgstr "{n} s"
+
+msgid "ui.server_address"
+msgstr "SERVER ADDRESS"
+
+msgid "ui.settings"
+msgstr "Settings"
+
+msgid "ui.skip"
+msgstr "Skip"
+
+msgid "ui.start"
+msgstr "Start the first night"
+
+msgid "ui.theme"
+msgstr "Theme"
+
+msgid "ui.timer_unknown"
+msgstr "Waiting for the server"
+
+msgid "ui.waiting_for_host"
+msgstr "Waiting for the host to begin"
+
+msgid "ui.winner_mark"
+msgstr "winner"
+
+msgid "ui.winners"
+msgstr "Winners"
+
+msgid "ui.you_are"
+msgstr "You are {alias}"
+
+msgid "ui.you_mark"
+msgstr "(you)"
+
+msgid "ui.your_pick"
+msgstr "Your pick: {pick}"
+
