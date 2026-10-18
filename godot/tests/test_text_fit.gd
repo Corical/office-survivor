@@ -76,14 +76,25 @@ func test_a_stage_plate_holds_the_longest_name() -> void:
 	_mount(st)
 	st.size = Vector2(540, 400)
 	st._load()
-	var font := st.get_theme_default_font()
-	var room: float = st._plate_w() - 28.0
-	st._roster = [{"alias": LONG, "is_me": false, "band": "", "band_before": ""},
+	st._roster = [{"alias": LONG, "is_me": false, "band": "well_fed", "band_before": ""},
 		{"alias": "Fig", "is_me": true, "band": "", "band_before": ""}]
-	st._trim_plates()
-	for alias in st._plate_name:
-		var shown: String = st._plate_name[alias]
-		check(font.get_string_size(shown.trim_suffix("..."), HORIZONTAL_ALIGNMENT_LEFT, -1, st._plate_size() + 1).x <= room,
-			"the plate text for '%s' fits: %s" % [alias, shown])
-	check(st._plate_name[LONG].ends_with("..."), "a name too long is cut with an ellipsis")
-	eq(st._plate_name["Fig"], "Fig", "a short name is left alone")
+	st._layout()
+	_every_plate_item_is_inside(st)
+	var long_name: String = (st._plates[LONG].items[0] as Dictionary).text
+	check(long_name.ends_with("..."), "a name too long is cut with an ellipsis: " + long_name)
+	eq((st._plates["Fig"].items[0] as Dictionary).text, "Fig", "a short name is left alone")
+	# my food growing to three digits: the plate grows to hold it, nothing touches the rim
+	var narrow: float = st._plates["Fig"].rect.size.x
+	st._shown_int = 128
+	st._build_plate(st._roster[1])
+	_every_plate_item_is_inside(st)
+	check(st._plates["Fig"].rect.size.x >= narrow, "the plate did not shrink for a longer number")
+
+
+## Every item on every plate lies inside the plate with at least 4 px to spare on each side.
+func _every_plate_item_is_inside(st: Stage) -> void:
+	for alias in st._plates:
+		var pl: Dictionary = st._plates[alias]
+		var inner: Rect2 = (pl.rect as Rect2).grow(-4.0)
+		for it in pl.items:
+			check(inner.encloses(it.rect), "%s / %s %s is inside its plate %s" % [alias, it.what, it.rect, pl.rect])
