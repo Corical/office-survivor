@@ -7,7 +7,8 @@ extends Control
 ## right). The look comes from the theme: medallion moves, player cards, a ring clock, lanterns for the locked seats.
 
 const WIDE_PX := 900                # chosen: at this width and above the screen uses two columns
-const RING_PX := 104.0              # chosen: the clock ring, large enough to hold "180 s"
+const RING_PX := 112.0              # chosen: the clock ring, large enough to hold "180 s" with room round it
+const TIMER_VARIATIONS := ["HeaderLabel", "TimerWarn", "TimerUrgent"]       # calm, under 30 s, under 10 s (the theme owns the colours)
 const MOVE_MIN_H := 142.0
 const AVATAR_PX := 76.0
 
@@ -28,8 +29,11 @@ var _avatars := {}                  # alias -> avatar number for this roster
 var _intro_played := false
 var _pulsing := false
 var _pulse_tween: Tween
-var _left_int := -1                 # the whole seconds last shown, and how long ago they changed (to move the ring smoothly)
-var _left_age := 0.0
+var _left_int := -1                 # the whole seconds last shown, and when they changed (to move the ring smoothly)
+var _left_changed_ms := 0
+static var _seen_moves: Array = []         # every move offered so far this game, in the order first seen (keeps the row stable)
+static var _seen_round := 0
+var _prompt: Label                  # the line above the moves; it becomes "Pick a move!" when time is short and nothing is picked
 
 
 func _ready() -> void:
@@ -71,7 +75,11 @@ func _signature(m: Dictionary) -> String:
 func _refresh_live() -> void:
 	var lc := Ui.find(self, "locked_count") as Label
 	if lc != null:
-		lc.text = Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total})
+		var words := Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total})
+		if lc is FitLabel:
+			(lc as FitLabel).set_fit_text(words)
+		else:
+			lc.text = words
 	if _lanterns != null:
 		Ui.set_lit(_lanterns, int(_m.locked_count))
 	_tick()
@@ -86,39 +94,59 @@ func _tick() -> void:
 		return
 	var t: Dictionary = _m.timer
 	if not t.known:
-		_timer_label.text = Words.render("ui.timer_unknown")
+		_say(_timer_label, Words.render("ui.timer_unknown"))
 		_set_variation(_timer_label, "MutedLabel")
 		if _ring != null:
 			_ring.value = 0.0
-			_ring.urgent = false
+			_ring.state = 0
 		_set_pulse(false)
 		return
-	_set_variation(_timer_label, "HeaderLabel")
 	var left := Feed.seconds_left()
-	_timer_label.text = Words.render("ui.seconds", {"n": left})
-	# the clock arrives in whole seconds; the ring and the charge glide between them
+	_say(_timer_label, Words.render("ui.seconds", {"n": left}))
+	# The server's clock reaches us in whole seconds. The ring and the charge are drawn from the milliseconds since the last
+	# change (read from the engine's own clock, so a slow frame cannot stall them): they drain a little every frame.
+	var now_ms := Time.get_ticks_msec()
 	if left != _left_int:
 		_left_int = left
-		_left_age = 0.0
-	else:
-		_left_age = minf(1.0, _left_age + get_process_delta_time())
-	var smooth := maxf(0.0, float(left) - _left_age)
+		_left_changed_ms = now_ms
+	var age := clampf(float(now_ms - _left_changed_ms) / 1000.0, 0.0, 1.0)
+	var smooth := maxf(0.0, float(left) - age)
 	var total := maxf(1.0, float(t.total_s))
-	var open: bool = _m.lock.picker_open
-	var last_s := float(Themes.fx("pulse").get("last_s", 10))
-	var urgent := open and smooth <= last_s
+	var tm := Themes.fx("timer")
+	var stage := 2 if smooth <= float(tm.get("urgent_s", 10)) else (1 if smooth <= float(tm.get("warn_s", 30)) else 0)
+	_set_variation(_timer_label, TIMER_VARIATIONS[stage])
 	if _ring != null:
 		_ring.max_value = total
 		_ring.value = smooth
-		_ring.urgent = urgent
+		_ring.state = stage
 	if _charge != null:
-		_charge.fraction = 1.0 - smooth / total if _m.lock.state == "open" else 1.0
-	_set_pulse(urgent and _lock_btn != null and not _lock_btn.disabled)
+		var lock_live: bool = _m.lock.state == "open" and _lock_btn != null and not _lock_btn.disabled
+		_charge.fraction = (1.0 - smooth / total) if lock_live else 0.0       # a greyed-out Lock has no light moving across it
+	var open: bool = _m.lock.picker_open
+	if _prompt != null:                            # under 20 s with nothing picked, the line above the moves turns into a call to act
+		var nag := open and _m.my_pick == null and smooth <= float(tm.get("prompt_s", 20))
+		_set_variation(_prompt, "PromptLabel" if nag else "MutedLabel")
+		var words := Words.render("ui.pick_prompt") if nag else Words.render("ui.pick_a_move")
+		if _prompt.text != words:
+			_prompt.text = words
+	_set_pulse(stage == 2 and open and _lock_btn != null and not _lock_btn.disabled)
+
+
+## Set a label's words; a fitted label is refitted at once.
+static func _say(l: Label, words: String) -> void:
+	if l.text == words:
+		return
+	if l is FitLabel:
+		(l as FitLabel).set_fit_text(words)
+	else:
+		l.text = words
 
 
 static func _set_variation(l: Control, variation: String) -> void:
 	if l.theme_type_variation != variation:
 		l.theme_type_variation = variation
+		if l is FitLabel:
+			(l as FitLabel).restyle()                  # its font size is part of the variation: fit again from the new one
 
 
 ## The Lock button breathes while there is little time left and a pick waiting to be locked.
@@ -152,6 +180,7 @@ func _build() -> void:
 		c.queue_free()
 	_timer_label = null
 	_ring = null
+	_prompt = null
 	_lock_btn = null
 	_charge = null
 	_lanterns = null
@@ -217,11 +246,9 @@ func _head() -> Control:
 	if face != null:
 		row.add_child(Ui.picture(face, Vector2(AVATAR_PX, AVATAR_PX), "me_avatar"))
 	var s := Ui.vbox(4)
-	var you := Ui.label(Words.render("ui.you_are", {"alias": _m.me.alias}), "you_are", "YouLabel")
-	you.autowrap_mode = TextServer.AUTOWRAP_OFF              # a name is one line: trimmed with an ellipsis, never broken mid-word
-	you.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	you.clip_text = true
-	s.add_child(you)
+	# "You are" small, the name under it with the whole width: a 12-letter name shrinks a little to fit instead of being cut
+	s.add_child(Ui.label(Words.render("ui.you_are_prefix"), "you_are_prefix", "MutedLabel"))
+	s.add_child(Ui.name_label(str(_m.me.alias), "you_are", "YouLabel"))
 	s.add_child(Ui.label(Words.render("ui.round_of", {"round": _m.round, "rounds": _m.rounds}), "round_of", "MutedLabel"))
 	for r in _m.me.resources:
 		var line := Ui.hbox(8)
@@ -244,14 +271,14 @@ func _head() -> Control:
 	_ring.custom_minimum_size = Vector2(RING_PX, RING_PX)
 	_ring.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_ring.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_timer_label = Ui.label("", "timer_label", "HeaderLabel")
+	_timer_label = Ui.name_label("", "timer_label", "HeaderLabel")
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_timer_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ring.add_child(_timer_label)
 	_timer_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_timer_label.offset_left = 14
-	_timer_label.offset_right = -14
+	_timer_label.offset_left = 22                       # clear of the ring's stroke on both sides
+	_timer_label.offset_right = -22
 	row.add_child(_ring)
 	return card
 
@@ -259,12 +286,28 @@ func _head() -> Control:
 ## The moves, their targets and amounts, and my pick. (Lock lives in the dock.)
 func _act(open: bool) -> VBoxContainer:
 	var s := Ui.vbox(10)
-	s.add_child(Ui.label(Words.render("ui.pick_a_move"), "", "MutedLabel"))
+	_prompt = Ui.label(Words.render("ui.pick_a_move"), "pick_prompt", "MutedLabel")
+	_prompt.custom_minimum_size = Vector2(0, 30)       # the same height whether it is the quiet label or the prompt: nothing jumps
+	_prompt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	s.add_child(_prompt)
 	var moves := Ui.hbox(6)
+	var offered := {}
 	for p in _m.pickers:
-		var chosen := _is_chosen(p)
-		moves.add_child(_move_button(p, chosen, open))
+		offered[str(p.server_id)] = p
+	for p in _row_moves():
+		var live: bool = offered.has(str(p.server_id))
+		moves.add_child(_move_button(offered[str(p.server_id)] if live else p, live and _is_chosen(p), open and live))
 	s.add_child(moves)
+	# the reason a medallion is greyed out; the line is always there so the page does not move when it comes and goes
+	var why := Ui.name_label("", "why_unavailable", "MutedLabel")
+	why.custom_minimum_size = Vector2(0, 26)
+	var gone: Array = []
+	for p in _row_moves():
+		if not offered.has(str(p.server_id)):
+			gone.append(Words.render(str(p.key)))
+	if not gone.is_empty():
+		why.set_fit_text(Words.render("ui.move_unavailable", {"move": ", ".join(gone)}))
+	s.add_child(why)
 	if not _move.is_empty() and _move.takes_target:
 		s.add_child(Ui.label(Words.render("ui.pick_a_target"), "", "MutedLabel"))
 		var targets := GridContainer.new()
@@ -281,11 +324,32 @@ func _act(open: bool) -> VBoxContainer:
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			amounts.add_child(b)
 		s.add_child(amounts)
-	if _m.my_pick != null:
-		var pick := Ui.card()
-		pick.add_child(Ui.label(Words.render("ui.your_pick", {"pick": _describe(_m.my_pick)}), "my_pick", "NameLabel"))
-		s.add_child(pick)
+	# "Your pick" always takes its space (invisible until there is a pick) so choosing a move never pushes the page down
+	var pick := Ui.card()
+	var picked: bool = _m.my_pick != null
+	var pick_words := Words.render("ui.your_pick", {"pick": _describe(_m.my_pick) if picked else "..."})
+	pick.add_child(Ui.label(pick_words, "my_pick", "NameLabel"))
+	pick.modulate.a = 1.0 if picked else 0.0
+	s.add_child(pick)
 	return s
+
+
+## Every move that has been on offer this game, in the order first seen, plus any on offer now. A move that is not on offer
+## tonight stays in the row (greyed out, with the reason below) so the row never changes shape from one night to the next.
+func _row_moves() -> Array:
+	var round_no := int(_m.round)
+	if round_no < _seen_round or round_no <= 1:
+		_seen_moves = []                                   # a new game
+	_seen_round = round_no
+	for p in _m.pickers:
+		var known := false
+		for q in _seen_moves:
+			if str(q.server_id) == str(p.server_id):
+				known = true
+				break
+		if not known:
+			_seen_moves.append(p)
+	return _seen_moves
 
 
 ## Is this the move I have picked? Either what I tapped here, or what the server says I picked (after a reconnect).
@@ -306,7 +370,16 @@ func _move_button(p: Dictionary, chosen: bool, open: bool) -> Button:
 	var cb := func(): _choose(p)
 	if art == null:
 		return Ui.button(word, id, cb, not open, "ChosenButton" if chosen else "")
-	var b := Ui.button(word, id, cb, not open, "MoveButtonChosen" if chosen else "MoveButton")
+	var b := Ui.button("", id, cb, not open, "MoveButton")
+	b.tooltip_text = word
+	b.set_meta("caption", word)
+	var cap := Ui.name_label(word, "", "MoveCaptionChosen" if chosen else "MoveCaption")
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cap.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	cap.offset_top = -30
+	cap.offset_bottom = -4
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(cap)
 	b.icon = art
 	b.expand_icon = true
 	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -355,22 +428,21 @@ func _target_button(alias: String, chosen: bool, open: bool) -> Button:
 	for e in _m.roster:
 		if e.alias == alias and e.band != "":
 			band = Words.render(e.band)
-	var txt := alias if band == "" else "%s\n%s" % [alias, band]
 	var face := Ui.avatar(alias, _avatars)
 	var variation := ""
 	if face != null:
 		variation = "PlayerCardChosen" if chosen else "PlayerCard"
 	elif chosen:
 		variation = "ChosenButton"
-	var b := Ui.button(txt, "target_" + alias, func(): _choose_target(alias), not open, variation)
+	if face == null:                                   # no art: a plain button with the name and band as its words
+		var plain := Ui.button(alias if band == "" else "%s\n%s" % [alias, band], "target_" + alias,
+			func(): _choose_target(alias), not open, variation)
+		plain.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		return plain
+	var b := Ui.button("", "target_" + alias, func(): _choose_target(alias), not open, variation)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if face != null:
-		b.icon = face
-		b.expand_icon = true
-		b.custom_minimum_size = Vector2(0, 76)
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		b.clip_text = true
+	b.custom_minimum_size = Vector2(0, 76)
+	Ui.fill_person_card(b, face, alias, band)          # the name is fitted to the card, never cut at a phone's width
 	return b
 
 
@@ -378,14 +450,20 @@ func _target_button(alias: String, chosen: bool, open: bool) -> Button:
 func _dock(dock: VBoxContainer, open: bool) -> void:
 	var top := Ui.hbox(12)
 	top.alignment = BoxContainer.ALIGNMENT_CENTER
+	if _m.radio.available:
+		var radio := Ui.button(Words.render("ui.radio"), "radio_toggle", func():
+			_radio_open = not _radio_open
+			_radio_phrase = {}
+			_build(), not open, "", "radio")
+		radio.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		radio.custom_minimum_size = Vector2(0, 48)
+		top.add_child(radio)
 	_lanterns = Ui.lanterns(int(_m.seats_total), int(_m.locked_count), "lanterns")
 	if _lanterns != null:
 		_lanterns.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		top.add_child(_lanterns)
-	var count := Ui.label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}), "locked_count",
-		"MutedLabel")
-	count.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	count.autowrap_mode = TextServer.AUTOWRAP_OFF            # a shrunk, wrapping label collapses to one letter per line
+	var count := Ui.name_label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}),
+		"locked_count", "MutedLabel")
 	top.add_child(count)
 	dock.add_child(top)
 	var state: String = _m.lock.state
@@ -408,8 +486,15 @@ func _goal() -> Control:
 	s.add_child(Ui.label(Words.render(_m.goal.key, _m.goal.slots), "goal"))
 	var progress: String = Words.render(_m.goal.progress.key, _m.goal.progress.slots)
 	# worded from a code, the progress already says how it stands; otherwise lead with the state word
-	var status: String = progress if _m.goal.progress.from_code else "%s: %s" % [Words.render(_m.goal.state_key), progress]
+	var status: String = progress
+	if not _m.goal.progress.from_code:
+		# the state word, then the server's own detail if it sent one (the old form said the state word twice)
+		var detail := str(_m.goal.get("progress_text", ""))
+		status = Words.render(_m.goal.state_key) + (": " + detail if detail != "" else "")
 	s.add_child(Ui.label(status, "goal_status", "MutedLabel"))
+	var note: String = str(_m.goal.get("note_key", ""))
+	if note != "":
+		s.add_child(Ui.label(Words.render(note), "goal_note", "MutedLabel"))
 	return card
 
 
@@ -451,11 +536,7 @@ func _radio(open: bool) -> VBoxContainer:
 	var s := Ui.vbox(8)
 	if not _m.radio.available:
 		return s
-	s.add_child(Ui.button(Words.render("ui.radio"), "radio_toggle", func():
-		_radio_open = not _radio_open
-		_radio_phrase = {}
-		_build(), not open, "", "radio"))
-	if _radio_open:
+	if _radio_open:                                    # (the Radio button itself lives in the dock, where it cannot be hidden)
 		var phrases := Ui.flow()
 		for ph in _m.radio.phrases:
 			phrases.add_child(Ui.button(Words.render(ph.key, {"a": "..."}), "phrase_" + ph.server_id,

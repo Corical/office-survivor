@@ -401,6 +401,10 @@ static func roster(me: String, others: Array, board: Variant, board_before: Vari
 	return out
 
 
+## Goal lines that depend on who holds a seat at the end: the card explains what a seat is.
+const SEAT_GOAL_LINES := ["goal_robbed2_extract", "goal_grudge_deny"]
+
+
 static func _goal_slots(goal: Dictionary) -> Dictionary:
 	return {"text": str(goal.get("text", "")), "target": str(goal.get("target") if goal.get("target") != null else "")}
 
@@ -411,11 +415,14 @@ static func goal_card(goal: Dictionary, gcode: String, progress: Dictionary, gst
 	var fallback_key := ("goal." + gcode) if gcode in GOALS else "goal.unknown"
 	var text := _goal_text(goal.get("line"), fallback_key, _goal_slots(goal))
 	var state_key := ("goal.state." + gstate) if gstate in GOAL_STATES else "goal.state.unknown"
+	var line_code := str(goal.get("line").get("code", "")) if goal.get("line") is Dictionary else ""
+	var needs_seat := gcode == "robbed2_extract" or line_code in SEAT_GOAL_LINES
 	var prog := _goal_text(progress.get("line"), state_key, {"text": str(progress.get("text", ""))})
 	return {"key": text.key, "slots": text.slots, "from_code": text.from_code,
 		"state": gstate if gstate in GOAL_STATES else "unknown", "state_key": state_key,
 		"progress": {"key": prog.key, "slots": prog.slots, "from_code": prog.from_code},
-		"progress_text": str(progress.get("text", ""))}
+		"progress_text": str(progress.get("text", "")),
+		"note_key": "ui.goal_seat_note" if needs_seat else ""}
 
 
 static func round_model(view: Dictionary) -> Dictionary:

@@ -110,46 +110,80 @@ func _header(m: Dictionary) -> Control:
 	return card
 
 
-## The top places as steps: face above, name, then the step with its number.
+## The places, grouped: everyone level on a place is ONE group (a three-way tie for second is one group of three), groups
+## in order of place. Public so a test can check that however the ties fall, every player is in exactly one group.
+## Each group is {"place": int, "members": [row index, ...]} with members in the server's order.
+func place_groups(m: Dictionary, ranks: Array) -> Array:
+	var by_place := {}
+	var places: Array = []
+	for i in m.rows.size():
+		var p: int = ranks[i]
+		if not by_place.has(p):
+			by_place[p] = []
+			places.append(p)
+		by_place[p].append(i)
+	places.sort()
+	return places.map(func(p): return {"place": p, "members": by_place[p]})
+
+
+## The podium: one step for each of the first three PLACES (not three players), so a tie never drops anyone and never shows a
+## place twice. Whoever stands level on a step stands on that step together; a lone player is shown large, a group as a short
+## list of faces and names. Anyone beyond the third place is in the ordered list below, once.
 func _podium(m: Dictionary, ranks: Array) -> HBoxContainer:
 	var row := Ui.hbox(10)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.set_meta("id", "podium")
-	var shown := mini(3, m.rows.size())
-	var by_place: Array = []                        # winners take the top steps; the server's order decides within each group
-	for i in m.rows.size():
-		if m.rows[i].is_winner:
-			by_place.append(i)
-	for i in m.rows.size():
-		if not m.rows[i].is_winner:
-			by_place.append(i)
-	for slot in PODIUM_ORDER:
-		if slot >= shown:
+	var groups := place_groups(m, ranks).slice(0, 3)
+	for tier in PODIUM_ORDER:
+		if tier >= groups.size():
 			continue
-		var r: Dictionary = m.rows[by_place[slot]]
+		var g: Dictionary = groups[tier]
+		var members: Array = g.members
 		var column := Ui.vbox(6)
 		column.size_flags_vertical = Control.SIZE_SHRINK_END
-		column.set_meta("id", "podium_" + r.alias)
-		if r.is_winner:
-			var crown := Themes.texture("crown")
-			if crown != null:
-				column.add_child(Ui.picture(crown, Vector2(0, 40)))
-		var place: int = int(ranks[by_place[slot]])          # steps are built from the place, so rows level on points stand level
-		var tier := clampi(place - 1, 0, 2)
-		var face := Ui.avatar(r.alias, _avatars)
-		if face != null:
-			column.add_child(Ui.picture(face, Vector2(0, 96 if tier == 0 else 76)))
-		var who := Ui.name_label(r.alias, "", "NameLabel")
-		who.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		column.add_child(who)
+		column.size_flags_stretch_ratio = 1.0 + 0.7 * float(members.size() - 1)
+		column.set_meta("id", "podium_place_%d" % g.place)
+		if members.size() == 1:
+			var r: Dictionary = m.rows[members[0]]
+			column.set_meta("id", "podium_" + r.alias)
+			if r.is_winner:
+				var crown := Themes.texture("crown")
+				if crown != null:
+					column.add_child(Ui.picture(crown, Vector2(0, 40)))
+			var face := Ui.avatar(r.alias, _avatars)
+			if face != null:
+				column.add_child(Ui.picture(face, Vector2(0, 96 if tier == 0 else 76)))
+			var who := Ui.name_label(r.alias, "podium_name_" + r.alias, "NameLabel")
+			who.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			column.add_child(who)
+		else:
+			for i in members:
+				column.add_child(_podium_member(m.rows[i]))
 		var step := Ui.card("PlinthFirst" if tier == 0 else "Plinth")
 		step.custom_minimum_size = Vector2(0, STEP_MIN_H[tier])
-		var rank := Ui.label(Words.render("ui.rank", {"n": ranks[by_place[slot]]}), "", "RankLabel")
+		var rank := Ui.label(Words.render("ui.rank", {"n": g.place}), "", "RankLabel")
 		rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		step.add_child(rank)
 		column.add_child(step)
 		row.add_child(column)
 	return row
+
+
+## One of several people on the same step: a small face, the name (fitted), a small crown if they won.
+func _podium_member(r: Dictionary) -> Control:
+	var line := Ui.hbox(8)
+	line.set_meta("id", "podium_" + r.alias)
+	var face := Ui.avatar(r.alias, _avatars)
+	if face != null:
+		line.add_child(Ui.picture(face, Vector2(44, 44)))
+	line.add_child(Ui.name_label(r.alias, "podium_name_" + r.alias, "NameLabel"))
+	if r.is_winner:
+		var crown := Themes.texture("crown")
+		if crown != null:
+			var c := Ui.picture(crown, Vector2(28, 22))
+			c.size_flags_horizontal = Control.SIZE_SHRINK_END
+			line.add_child(c)
+	return line
 
 
 ## One card per player, in the server's order: place, face, name, marks, and the numbers.
@@ -183,11 +217,15 @@ func _player_card(m: Dictionary, r: Dictionary, rank: int, best: Dictionary) -> 
 	var face := Ui.avatar(r.alias, _avatars)
 	if face != null:
 		top.add_child(Ui.picture(face, Vector2(56, 56)))
-	var who: String = r.alias
-	if r.is_me:
-		who += " " + Words.render("ui.you_mark")
 	var info := Ui.vbox(0)
-	info.add_child(Ui.name_label(who, "row_" + r.alias, "NameLabel"))
+	var who_row := Ui.hbox(6)                             # the name (fitted), then "(you)" beside it: neither can cut the other
+	who_row.add_child(Ui.name_label(r.alias, "row_" + r.alias, "NameLabel"))
+	if r.is_me:
+		var me := Ui.label(Words.render("ui.you_mark"), "you_" + r.alias, "MutedLabel")
+		me.autowrap_mode = TextServer.AUTOWRAP_OFF
+		me.size_flags_horizontal = Control.SIZE_SHRINK_END
+		who_row.add_child(me)
+	info.add_child(who_row)
 	var marks: Array = []
 	if r.is_winner:
 		marks.append(Words.render("ui.winner_mark"))

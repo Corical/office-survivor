@@ -136,7 +136,7 @@ static func _colors() -> Dictionary:
 		"warm": Color("ff9a3c"), "cold": Color("5a8cff"), "hit": Color("ff3b3b"), "glow": Color("ffb45a"),
 		"star": Color("dfe8ff"), "ember": EMBER, "fog": Color("b8c4ee"), "gold": Color("ffd56b"),
 		"gain": Color("ffe27a"), "loss": Color("ff7466"), "shield": Color("6fdcf0"), "mark": Color("d9a8ff"),
-		"ring_track": Color("0a0f1c", 0.78), "ring_fill": EMBER, "ring_urgent": Color("ff7466"),
+		"ring_track": Color("0a0f1c", 0.78), "ring_fill": Color("bfe6ff"), "ring_warn": EMBER, "ring_urgent": Color("ff5a4a"),
 		"lock_fill": Color(1.0, 0.93, 0.7, 0.32),
 	}
 
@@ -156,6 +156,8 @@ static func _fx() -> Dictionary:
 		"intro": {"time": 0.38, "rise": 28.0, "stagger": 0.07},
 		"logo": {"bob_px": 7.0, "bob_s": 2.8, "glow_s": 1.9, "has_title": true},
 		"pulse": {"scale": 0.05, "time": 0.45, "last_s": 10},
+		# the clock's stages (seconds left): running short, urgent; and when an unpicked player is called to act
+		"timer": {"warn_s": 30, "urgent_s": 10, "prompt_s": 20},
 		"lift": {"scale": 1.12, "time": 0.24},
 		# the reveal (stage/stage.gd)
 		"stage.crumbs": {"max": 8, "flight": 0.62, "stagger": 0.07, "arc": 0.3, "size": 24.0, "trail_every": 0.03,
@@ -202,6 +204,21 @@ static func _labels(th: Theme, bold: Font, spaced: Font) -> void:
 	th.set_constant("shadow_offset_y", "YouLabel", 3)
 	th.set_constant("outline_size", "YouLabel", 5)
 	th.set_color("font_outline_color", "YouLabel", Color("1c0f08"))
+	# TimerWarn / TimerUrgent: the clock's number as time runs short: amber, then bigger and red (never colour alone)
+	th.set_type_variation("TimerWarn", "HeaderLabel")
+	th.set_color("font_color", "TimerWarn", EMBER)
+	th.set_type_variation("TimerUrgent", "HeaderLabel")
+	th.set_font_size("font_size", "TimerUrgent", 34)
+	th.set_color("font_color", "TimerUrgent", Color("ff8a7a"))
+	th.set_constant("outline_size", "TimerUrgent", 6)
+	th.set_color("font_outline_color", "TimerUrgent", Color("3a0f0c"))
+	# PromptLabel: the line above the moves when time is short and nothing is picked: a call to act
+	th.set_type_variation("PromptLabel", "Label")
+	th.set_font("font", "PromptLabel", bold)
+	th.set_font_size("font_size", "PromptLabel", 24)
+	th.set_color("font_color", "PromptLabel", EMBER_HI)
+	th.set_constant("outline_size", "PromptLabel", 6)
+	th.set_color("font_outline_color", "PromptLabel", Color("2a1206"))
 	# NameLabel: a player's name on a card: one line, never broken mid-word
 	th.set_type_variation("NameLabel", "Label")
 	th.set_font("font", "NameLabel", bold)
@@ -313,10 +330,19 @@ static func _buttons(th: Theme, bold: Font, t: ThemeDef) -> void:
 	empty.content_margin_left = 2
 	empty.content_margin_right = 2
 	empty.content_margin_top = 4
-	empty.content_margin_bottom = 4
+	empty.content_margin_bottom = 32                   # room for the caption (a label laid over the foot of the button)
 	for s in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		th.set_stylebox(s, "MoveButton", empty)
 	th.set_stylebox("focus", "MoveButton", _ring(20))
+	# MoveCaption: the word under a medallion; one line, shrunk to fit by the screen (FitLabel)
+	th.set_type_variation("MoveCaption", "Label")
+	th.set_font("font", "MoveCaption", bold)
+	th.set_font_size("font_size", "MoveCaption", 17)
+	th.set_constant("outline_size", "MoveCaption", 5)
+	th.set_color("font_color", "MoveCaption", PAPER)
+	th.set_color("font_outline_color", "MoveCaption", Color("0a0f1c"))
+	th.set_type_variation("MoveCaptionChosen", "MoveCaption")
+	th.set_color("font_color", "MoveCaptionChosen", EMBER_HI)
 	# MoveButtonChosen: the medallion you picked (its glow ring and lift are the screen's; this adds the word)
 	th.set_type_variation("MoveButtonChosen", "MoveButton")
 	for k in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_disabled_color"]:
