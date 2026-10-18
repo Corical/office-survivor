@@ -94,19 +94,22 @@ func _cross_fade(old: Control, now: Control, fade: Dictionary) -> void:
 	now.offset_top = slide
 	now.offset_bottom = slide
 	var tw := create_tween().set_parallel(true)
-	# the old screen is nearly gone before the new one shows (only the content fades; the backdrop never does), so the two
-	# are never both half-visible for long
-	var lead := t * 0.4 if old != null else 0.0
-	tw.tween_property(now, "modulate:a", 1.0, t * 0.6).set_delay(lead).set_trans(Tween.TRANS_SINE)
-	tw.tween_property(now, "offset_top", 0.0, t * 0.6).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(now, "offset_bottom", 0.0, t * 0.6).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	# Only the content fades; the backdrop never does. The two screens overlap: the old one is gone in the first 45% of the
+	# time and the new one rises from 15% to the end, so the change is spread over many frames and never a single cut.
+	var lead := t * 0.15 if old != null else 0.0
+	var rise := t - lead
+	tw.tween_property(now, "modulate:a", 1.0, rise).set_delay(lead).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw.tween_property(now, "offset_top", 0.0, rise).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(now, "offset_bottom", 0.0, rise).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	if old == null:
 		return
 	old.process_mode = Node.PROCESS_MODE_DISABLED
 	old.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tw.tween_property(old, "modulate:a", 0.0, lead)
-	tw.tween_property(old, "offset_top", -slide * 0.5, lead)
-	tw.tween_property(old, "offset_bottom", -slide * 0.5, lead)
+	Ui.freeze(old, [Feed, Themes, Intents])          # no relayout while it fades out
+	var out_t := t * 0.45
+	tw.tween_property(old, "modulate:a", 0.0, out_t).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tw.tween_property(old, "offset_top", -slide * 0.5, out_t)
+	tw.tween_property(old, "offset_bottom", -slide * 0.5, out_t)
 	tw.chain().tween_callback(func():
 		if is_instance_valid(old):
 			_slot.remove_child(old)

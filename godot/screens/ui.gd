@@ -162,6 +162,22 @@ static func menu_column(col: VBoxContainer, width := 500.0) -> VBoxContainer:
 
 # ---------------- motion ----------------
 
+## Stop a screen reacting to the game's signals. Used on a screen that is fading out: it keeps exactly the layout it had when the
+## fade began, instead of rebuilding itself (a button appearing, everything jumping) while it disappears. `sources` are the
+## objects whose signals the screen may be connected to. Returns how many connections were cut.
+static func freeze(n: Node, sources: Array) -> int:
+	var cut := 0
+	for src in sources:
+		for sig in src.get_signal_list():
+			for c in src.get_signal_connection_list(sig.name):
+				var callable: Callable = c.callable
+				var o: Object = callable.get_object()
+				if o is Node and (o == n or n.is_ancestor_of(o)):
+					src.disconnect(sig.name, callable)
+					cut += 1
+	return cut
+
+
 ## Press feedback: squash on touch-down, bounce back on release. A theme with no "press" settings gets none.
 static func juice(b: Control) -> void:
 	var p := Themes.fx("press")
