@@ -162,6 +162,16 @@ static func menu_column(col: VBoxContainer, width := 500.0) -> VBoxContainer:
 
 # ---------------- motion ----------------
 
+## Nothing below `n` takes a click, a tap or keyboard focus any more (a screen that is fading out must not steal the first tap
+## meant for the one that replaced it).
+static func inert(n: Node) -> void:
+	if n is Control:
+		(n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+		(n as Control).focus_mode = Control.FOCUS_NONE
+	for c in n.get_children(true):                    # (the scroll bars are internal children)
+		inert(c)
+
+
 ## Stop a screen reacting to the game's signals. Used on a screen that is fading out: it keeps exactly the layout it had when the
 ## fade began, instead of rebuilding itself (a button appearing, everything jumping) while it disappears. `sources` are the
 ## objects whose signals the screen may be connected to. Returns how many connections were cut.

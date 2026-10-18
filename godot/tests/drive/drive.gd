@@ -48,6 +48,12 @@ func _play() -> void:
 	if not await _tap("settings_toggle"):
 		return
 	var le := Ui.find(router.current, "server_url") as LineEdit
+	var tries := 0
+	while le == null and tries < 3:                  # the open-camps list arriving moves the button under the first tap
+		tries += 1
+		if not await _tap("settings_toggle"):
+			return
+		le = Ui.find(router.current, "server_url") as LineEdit
 	if le == null:
 		return _fail("no server address field after opening settings")
 	le.text = url
@@ -56,6 +62,9 @@ func _play() -> void:
 	await _tap("settings_toggle")
 	if not await _tap("create"):
 		return
+	if await _until(func(): return Ui.find(router.current, "sheet_create") != null, 1.0):
+		if not await _tap("sheet_create"):                 # the new-camp sheet opens first on a server that lists camps
+			return
 	if not await _until(func(): return router.current_name == "lobby", 12.0):
 		return _fail("never reached the lobby after Create room (screen=%s net=%s)" % [router.current_name, Net.state])
 	await _frames(3)

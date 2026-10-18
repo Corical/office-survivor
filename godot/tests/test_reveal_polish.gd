@@ -89,6 +89,20 @@ func test_a_screen_that_is_fading_out_stops_reacting_but_its_neighbour_does_not(
 	eq(Ui.freeze(gone, [Feed, Themes, Intents]), 0, "freezing twice is harmless")
 
 
+func test_an_inert_screen_has_no_control_left_that_takes_a_tap() -> void:
+	var s := TitleScreen.new()
+	add_child(s)
+	_mounted.append(s)
+	var buttons := 0
+	for c in s.find_children("*", "Button", true, false):
+		buttons += 1
+	check(buttons > 0, "the title has buttons to be stolen")
+	Ui.inert(s)
+	for c in s.find_children("*", "Control", true, false):
+		eq((c as Control).mouse_filter, Control.MOUSE_FILTER_IGNORE, "%s ignores the mouse" % c.name)
+		eq((c as Control).focus_mode, Control.FOCUS_NONE, "%s takes no focus" % c.name)
+
+
 func _connections_to(n: Node) -> int:
 	var count := 0
 	for src in [Feed, Themes, Intents]:
