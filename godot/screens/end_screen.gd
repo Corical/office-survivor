@@ -118,14 +118,16 @@ func _podium(m: Dictionary, ranks: Array) -> HBoxContainer:
 			var crown := Themes.texture("crown")
 			if crown != null:
 				column.add_child(Ui.picture(crown, Vector2(0, 40)))
+		var place: int = int(ranks[by_place[slot]])          # steps are built from the place, so rows level on points stand level
+		var tier := clampi(place - 1, 0, 2)
 		var face := Ui.avatar(r.alias, _avatars)
 		if face != null:
-			column.add_child(Ui.picture(face, Vector2(0, 96 if slot == 0 else 76)))
+			column.add_child(Ui.picture(face, Vector2(0, 96 if tier == 0 else 76)))
 		var who := Ui.name_label(r.alias, "", "NameLabel")
 		who.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		column.add_child(who)
-		var step := Ui.card("PlinthFirst" if slot == 0 else "Plinth")
-		step.custom_minimum_size = Vector2(0, STEP_MIN_H[slot])
+		var step := Ui.card("PlinthFirst" if tier == 0 else "Plinth")
+		step.custom_minimum_size = Vector2(0, STEP_MIN_H[tier])
 		var rank := Ui.label(Words.render("ui.rank", {"n": ranks[by_place[slot]]}), "", "RankLabel")
 		rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		step.add_child(rank)
@@ -192,7 +194,10 @@ func _player_card(m: Dictionary, r: Dictionary, rank: int, best: Dictionary) -> 
 		var v: int = int(r.cells[c.id])
 		var is_top: bool = c.highlight and best.get(c.id, -1) == v and v > 0
 		var cell := Ui.vbox(0)
-		cell.add_child(Ui.label(Words.render(c.key), "head_" + c.id, "MutedLabel"))
+		var head := Ui.label(Words.render(c.key), "head_" + c.id, "MutedLabel")
+		head.custom_minimum_size = Vector2(0, 42)           # room for two lines in every column, so the numbers line up
+		head.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		cell.add_child(head)
 		var value := Ui.name_label(("[%d]" % v) if is_top else str(v), "cell_%s_%s" % [r.alias, c.id], "StatLabel")
 		cell.add_child(value)
 		stats.add_child(cell)

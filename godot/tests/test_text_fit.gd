@@ -41,10 +41,11 @@ func test_the_round_screen_never_breaks_my_own_name_across_lines() -> void:
 	var s := _mount(RoundScreen.new())
 	var you := Ui.find(s, "you_are") as Label
 	check(you != null and _is_one_line(you), "the 'You are <name>' line is one line")
-	for e in Ui.find_all(s, "home_"):
-		for n in e.get_children():
-			if n is Label:
-				check(_is_one_line(n), "roster cell labels are one line: " + n.text)
+	var cells := Ui.find_all(s, "home_")
+	check(cells.size() >= 3, "the roster has its cells")
+	for e in cells:
+		for n in e.find_children("*", "Label", true, false):
+			check(_is_one_line(n), "roster cell labels are one line: " + n.text)
 
 
 func test_the_end_screen_keeps_every_name_on_one_line() -> void:

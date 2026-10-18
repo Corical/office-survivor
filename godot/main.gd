@@ -85,16 +85,19 @@ func _cross_fade(old: Control, now: Control, fade: Dictionary) -> void:
 	now.offset_top = slide
 	now.offset_bottom = slide
 	var tw := create_tween().set_parallel(true)
-	tw.tween_property(now, "modulate:a", 1.0, t).set_trans(Tween.TRANS_SINE)
-	tw.tween_property(now, "offset_top", 0.0, t).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(now, "offset_bottom", 0.0, t).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	# the old screen is nearly gone before the new one shows (only the content fades; the backdrop never does), so the two
+	# are never both half-visible for long
+	var lead := t * 0.4 if old != null else 0.0
+	tw.tween_property(now, "modulate:a", 1.0, t * 0.6).set_delay(lead).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(now, "offset_top", 0.0, t * 0.6).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(now, "offset_bottom", 0.0, t * 0.6).set_delay(lead).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	if old == null:
 		return
 	old.process_mode = Node.PROCESS_MODE_DISABLED
 	old.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tw.tween_property(old, "modulate:a", 0.0, t * 0.7)
-	tw.tween_property(old, "offset_top", -slide * 0.5, t)
-	tw.tween_property(old, "offset_bottom", -slide * 0.5, t)
+	tw.tween_property(old, "modulate:a", 0.0, lead)
+	tw.tween_property(old, "offset_top", -slide * 0.5, lead)
+	tw.tween_property(old, "offset_bottom", -slide * 0.5, lead)
 	tw.chain().tween_callback(func():
 		if is_instance_valid(old):
 			_slot.remove_child(old)
