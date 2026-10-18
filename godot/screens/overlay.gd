@@ -57,18 +57,33 @@ static func variation_for(st: Dictionary) -> String:
 	return "Banner"
 
 
+## What the connection banner says and how it looks, from the connection state, the reason the connection ended (if any) and
+## the screen. Rules: a reason that ended the connection is worded as that reason, never as the connection's own state (a
+## red box saying "Connected" was a lie); the title screen already says the reason in its page, so the banner hides there
+## instead of repeating it; with no reason, only trouble (not "online", not a plain "offline") is shown.
+## Returns {"show": bool, "key": translation key, "variation": "Banner" | "BannerAlert"}.
+static func banner_for(st: Dictionary) -> Dictionary:
+	var terminal: String = st.terminal
+	if terminal != "":
+		var key := "notice." + terminal if terminal in UiKeys.NOTICE_CODES else "ui.net.stopped"
+		return {"show": st.get("screen", "") != "title", "key": key, "variation": "BannerAlert"}
+	var quiet: bool = st.net in ["online", "offline"]
+	return {"show": not quiet, "key": st.net_key, "variation": variation_for(st)}
+
+
 ## For tests: the variation the connection banner currently wears.
 func banner_variation() -> String:
 	return _banner_panel.theme_type_variation
 
 
 func _on_status(st: Dictionary) -> void:
-	var quiet: bool = st.net in ["online", "offline"] and st.terminal == ""
+	var b := banner_for(st)
+	var quiet: bool = not b.show
 	var was_quiet := not _banner.visible
 	_banner.visible = not quiet
 	_banner_panel.visible = not quiet
-	_banner.text = Words.render(st.net_key)
-	var variation := variation_for(st)
+	_banner.text = Words.render(b.key, {"text": ""})
+	var variation: String = b.variation
 	if _banner_panel.theme_type_variation != variation:
 		_banner_panel.theme_type_variation = variation
 	_dot.visible = variation == "Banner"                     # the breathing dot says "still trying"; an alert has no dot
