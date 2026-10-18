@@ -1,0 +1,5126 @@
+{
+"identity": {
+"h0": {
+"alias": "Alias12",
+"pid": 0,
+"sim": false
+},
+"h1": {
+"alias": "Alias08",
+"pid": 1,
+"sim": false
+},
+"h2": {
+"alias": "Alias05",
+"pid": 2,
+"sim": false
+},
+"h3": {
+"alias": "Alias11",
+"pid": 3,
+"sim": false
+}
+},
+"log": [
+{
+"alias": "Alias12",
+"pid": 0,
+"sim": false,
+"type": "join"
+},
+{
+"alias": "Alias08",
+"pid": 1,
+"sim": false,
+"type": "join"
+},
+{
+"alias": "Alias05",
+"pid": 2,
+"sim": false,
+"type": "join"
+},
+{
+"alias": "Alias11",
+"pid": 3,
+"sim": false,
+"type": "join"
+},
+{
+"day_seconds": 300,
+"engine_version": "1",
+"events": "off",
+"news_delay": 5,
+"outbox": [
+{
+"id": "o1",
+"text": "🔥 The game has begun: 4 survivors, 10 rounds. Check /status for your secret goal. Choose a move before each deadline.",
+"to": "news"
+},
+{
+"id": "o2",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:0"
+},
+{
+"id": "o3",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:1"
+},
+{
+"id": "o4",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:2"
+},
+{
+"id": "o5",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:3"
+}
+],
+"ranges": false,
+"roster": [
+{
+"alias": "Alias12",
+"objective": "steal3_clean",
+"pid": 0,
+"target": -1
+},
+{
+"alias": "Alias08",
+"objective": "give",
+"pid": 1,
+"target": -1
+},
+{
+"alias": "Alias05",
+"objective": "robbed2_extract",
+"pid": 2,
+"target": -1
+},
+{
+"alias": "Alias11",
+"objective": "beat",
+"pid": 3,
+"target": 1
+}
+],
+"rules": {
+"bandit_can_extract": false,
+"bandit_rejoin": 3,
+"bandit_steal_amount": 1,
+"caught_penalty": 2,
+"eat": 1,
+"events_bias": "random",
+"events_per_night": 0.0,
+"events_raid": 0.0,
+"events_rats_relative": false,
+"exposure_undo": "none",
+"gift_bonus": 0,
+"give_goal": 3,
+"grudge_goal": "rob",
+"grudge_robs": 1,
+"guard_cooldown": 0,
+"guard_income_max": 0,
+"guard_limit": 3,
+"guard_nights": 2,
+"guard_reward": 2,
+"investigate_bounty": 1,
+"investigate_find": 0,
+"miss_scale": 1.0,
+"missed_scavenge_max": -1,
+"players": 4,
+"pts_extract": 3,
+"pts_objective": 2,
+"pts_survive": 1,
+"robbed_goal": 1,
+"rounds": 10,
+"scavenge_max": 2,
+"scavenge_min": 0,
+"seat_ratio": 0.3333333333333333,
+"start_rations": 7,
+"steal_amount": 2,
+"tiebreak": "kindness",
+"winner_tiebreak": "kindness"
+},
+"season": "fixture-humans4_default_rules_no_sims",
+"start_ts": 0,
+"type": "start"
+},
+{
+"at": 280,
+"move": [
+"gift",
+3,
+1,
+false
+],
+"night": 1,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 281,
+"move": [
+"gift",
+2,
+2,
+false
+],
+"night": 1,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 280,
+"move": [
+"investigate",
+3,
+0,
+false
+],
+"night": 1,
+"pid": 1,
+"type": "move"
+},
+{
+"at": 280,
+"move": [
+"gift",
+0,
+1,
+false
+],
+"night": 1,
+"pid": 2,
+"type": "move"
+},
+{
+"at": 281,
+"move": [
+"investigate",
+3,
+0,
+false
+],
+"night": 1,
+"pid": 2,
+"type": "move"
+},
+{
+"at": 280,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 1,
+"pid": 3,
+"type": "move"
+},
+{
+"at": 281,
+"move": [
+"gift",
+1,
+2,
+false
+],
+"night": 1,
+"pid": 3,
+"type": "move"
+},
+{
+"night": 1,
+"ref": "r1-3-0",
+"type": "radio"
+},
+{
+"events": [
+{
+"amount": 2,
+"giver": "Alias12",
+"receiver": "Alias05",
+"type": "gift",
+"visibility": "giver_and_receiver"
+},
+{
+"balance": 5,
+"delta": -2,
+"detail": "Alias05",
+"player": "Alias12",
+"reason": "gift_out",
+"type": "ration"
+},
+{
+"balance": 9,
+"delta": 2,
+"detail": "Alias12",
+"player": "Alias05",
+"reason": "gift_in",
+"type": "ration"
+},
+{
+"amount": 2,
+"giver": "Alias11",
+"receiver": "Alias08",
+"type": "gift",
+"visibility": "giver_and_receiver"
+},
+{
+"balance": 5,
+"delta": -2,
+"detail": "Alias08",
+"player": "Alias11",
+"reason": "gift_out",
+"type": "ration"
+},
+{
+"balance": 9,
+"delta": 2,
+"detail": "Alias11",
+"player": "Alias08",
+"reason": "gift_in",
+"type": "ration"
+},
+{
+"investigator": "Alias08",
+"saw_action": "gift",
+"saw_target": "Alias08",
+"target": "Alias11",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"investigator": "Alias05",
+"saw_action": "gift",
+"saw_target": "Alias08",
+"target": "Alias11",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"balance": 4,
+"delta": -1,
+"player": "Alias12",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 8,
+"delta": -1,
+"player": "Alias08",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 8,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 4,
+"delta": -1,
+"player": "Alias11",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"gift",
+2,
+2,
+false
+],
+"1": [
+"investigate",
+3,
+0,
+false
+],
+"2": [
+"investigate",
+3,
+0,
+false
+],
+"3": [
+"gift",
+1,
+2,
+false
+]
+},
+"night": 1,
+"private": {
+"0": [
+"🎁 You gave Alias05 2.",
+"🍽️ You ate 1.",
+"🥫 You now have 4 rations."
+],
+"1": [
+"🎁 Alias11 secretly gave you 2.",
+"🔍 You watched Alias11: they chose gift (Alias08).",
+"🍽️ You ate 1.",
+"🥫 You now have 8 rations."
+],
+"2": [
+"🎁 Alias12 secretly gave you 2.",
+"🔍 You watched Alias11: they chose gift (Alias08).",
+"🍽️ You ate 1.",
+"🥫 You now have 8 rations."
+],
+"3": [
+"🎁 You gave Alias08 2.",
+"🍽️ You ate 1.",
+"🥫 You now have 4 rations."
+]
+},
+"seed": 17718061055744145569,
+"type": "night"
+},
+{
+"at": 301,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 2,
+"pid": 0,
+"type": "move"
+},
+{
+"night": 1,
+"outbox": [
+{
+"id": "o6",
+"text": "📰 **News: Night 1 (closed 02:05)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+{
+"id": "o7",
+"ref": "r1-3-0",
+"to": "radio"
+},
+{
+"id": "o8",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 You gave Alias05 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:0"
+},
+{
+"id": "o9",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 Alias11 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations.",
+"to": "dm:1"
+},
+{
+"id": "o10",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 Alias12 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations.",
+"to": "dm:2"
+},
+{
+"id": "o11",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 You gave Alias08 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:3"
+}
+],
+"type": "news"
+},
+{
+"id": "o1",
+"type": "sent"
+},
+{
+"id": "o2",
+"type": "sent"
+},
+{
+"id": "o3",
+"type": "sent"
+},
+{
+"id": "o4",
+"type": "sent"
+},
+{
+"id": "o5",
+"type": "sent"
+},
+{
+"id": "o6",
+"type": "sent"
+},
+{
+"id": "o7",
+"ref": "r1-3-0",
+"type": "sent"
+},
+{
+"id": "o8",
+"type": "sent"
+},
+{
+"id": "o9",
+"type": "sent"
+},
+{
+"id": "o10",
+"type": "sent"
+},
+{
+"id": "o11",
+"type": "sent"
+},
+{
+"at": 580,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 2,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 581,
+"move": [
+"gift",
+3,
+2,
+false
+],
+"night": 2,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 580,
+"move": [
+"guard",
+null,
+0,
+false
+],
+"night": 2,
+"pid": 1,
+"type": "move"
+},
+{
+"at": 580,
+"move": [
+"investigate",
+0,
+0,
+false
+],
+"night": 2,
+"pid": 2,
+"type": "move"
+},
+{
+"events": [
+{
+"guards_used": 1,
+"player": "Alias08",
+"type": "guard_up",
+"until_night": 3,
+"visibility": "private"
+},
+{
+"auto": true,
+"found": 0,
+"player": "Alias11",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"amount": 2,
+"giver": "Alias12",
+"receiver": "Alias11",
+"type": "gift",
+"visibility": "giver_and_receiver"
+},
+{
+"balance": 2,
+"delta": -2,
+"detail": "Alias11",
+"player": "Alias12",
+"reason": "gift_out",
+"type": "ration"
+},
+{
+"balance": 6,
+"delta": 2,
+"detail": "Alias12",
+"player": "Alias11",
+"reason": "gift_in",
+"type": "ration"
+},
+{
+"investigator": "Alias05",
+"saw_action": "gift",
+"saw_target": "Alias11",
+"target": "Alias12",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"balance": 1,
+"delta": -1,
+"player": "Alias12",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 7,
+"delta": -1,
+"player": "Alias08",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 7,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 5,
+"delta": -1,
+"player": "Alias11",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"gift",
+3,
+2,
+false
+],
+"1": [
+"guard",
+null,
+0,
+false
+],
+"2": [
+"investigate",
+0,
+0,
+false
+],
+"3": [
+"scavenge",
+null,
+0,
+true
+]
+},
+"night": 2,
+"private": {
+"0": [
+"🎁 You gave Alias11 2.",
+"🍽️ You ate 1.",
+"🥫 You now have 1 rations."
+],
+"1": [
+"🛡️ You're on guard for nights 2 and 3.",
+"🍽️ You ate 1.",
+"🥫 You now have 7 rations."
+],
+"2": [
+"🔍 You watched Alias12: they chose gift (Alias11).",
+"🍽️ You ate 1.",
+"🥫 You now have 7 rations."
+],
+"3": [
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.",
+"🎁 Alias12 secretly gave you 2.",
+"🍽️ You ate 1.",
+"🥫 You now have 5 rations."
+]
+},
+"seed": 11592979571645621748,
+"type": "night"
+},
+{
+"at": 601,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 3,
+"pid": 0,
+"type": "move"
+},
+{
+"night": 2,
+"outbox": [
+{
+"id": "o12",
+"text": "📰 **News: Night 2 (closed 02:10)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+{
+"id": "o13",
+"text": "🌙 **Night 2 (closed 02:10)**\n🎁 You gave Alias11 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+{
+"id": "o14",
+"text": "🌙 **Night 2 (closed 02:10)**\n🛡️ You're on guard for nights 2 and 3.\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:1"
+},
+{
+"id": "o15",
+"text": "🌙 **Night 2 (closed 02:10)**\n🔍 You watched Alias12: they chose gift (Alias11).\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:2"
+},
+{
+"id": "o16",
+"text": "🌙 **Night 2 (closed 02:10)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🎁 Alias12 secretly gave you 2.\n🍽️ You ate 1.\n🥫 You now have 5 rations.",
+"to": "dm:3"
+}
+],
+"type": "news"
+},
+{
+"id": "o12",
+"type": "sent"
+},
+{
+"id": "o13",
+"type": "sent"
+},
+{
+"id": "o14",
+"type": "sent"
+},
+{
+"id": "o15",
+"type": "sent"
+},
+{
+"id": "o16",
+"type": "sent"
+},
+{
+"at": 880,
+"move": [
+"guard",
+null,
+0,
+false
+],
+"night": 3,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 881,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 3,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 880,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 3,
+"pid": 1,
+"type": "move"
+},
+{
+"at": 881,
+"move": [
+"gift",
+2,
+1,
+false
+],
+"night": 3,
+"pid": 1,
+"type": "move"
+},
+{
+"at": 880,
+"move": [
+"guard",
+null,
+0,
+false
+],
+"night": 3,
+"pid": 2,
+"type": "move"
+},
+{
+"at": 880,
+"move": [
+"investigate",
+0,
+0,
+false
+],
+"night": 3,
+"pid": 3,
+"type": "move"
+},
+{
+"night": 3,
+"ref": "r3-3-0",
+"type": "radio"
+},
+{
+"events": [
+{
+"guards_used": 1,
+"player": "Alias05",
+"type": "guard_up",
+"until_night": 4,
+"visibility": "private"
+},
+{
+"auto": false,
+"found": 1,
+"player": "Alias12",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"balance": 2,
+"delta": 1,
+"detail": "",
+"player": "Alias12",
+"reason": "scavenge",
+"type": "ration"
+},
+{
+"amount": 1,
+"giver": "Alias08",
+"receiver": "Alias05",
+"type": "gift",
+"visibility": "giver_and_receiver"
+},
+{
+"balance": 6,
+"delta": -1,
+"detail": "Alias05",
+"player": "Alias08",
+"reason": "gift_out",
+"type": "ration"
+},
+{
+"balance": 8,
+"delta": 1,
+"detail": "Alias08",
+"player": "Alias05",
+"reason": "gift_in",
+"type": "ration"
+},
+{
+"investigator": "Alias11",
+"saw_action": "scavenge",
+"saw_target": null,
+"target": "Alias12",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"balance": 1,
+"delta": -1,
+"player": "Alias12",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 5,
+"delta": -1,
+"player": "Alias08",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 7,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 4,
+"delta": -1,
+"player": "Alias11",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"scavenge",
+null,
+0,
+false
+],
+"1": [
+"gift",
+2,
+1,
+false
+],
+"2": [
+"guard",
+null,
+0,
+false
+],
+"3": [
+"investigate",
+0,
+0,
+false
+]
+},
+"night": 3,
+"private": {
+"0": [
+"🥫 You scavenged and found 1.",
+"🍽️ You ate 1.",
+"🥫 You now have 1 rations."
+],
+"1": [
+"🎁 You gave Alias05 1.",
+"🍽️ You ate 1.",
+"🥫 You now have 5 rations."
+],
+"2": [
+"🛡️ You're on guard for nights 3 and 4.",
+"🎁 Alias08 secretly gave you 1.",
+"🍽️ You ate 1.",
+"🥫 You now have 7 rations."
+],
+"3": [
+"🔍 You watched Alias12: they chose scavenge.",
+"🍽️ You ate 1.",
+"🥫 You now have 4 rations."
+]
+},
+"seed": 7655315163278875429,
+"type": "night"
+},
+{
+"at": 901,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 4,
+"pid": 0,
+"type": "move"
+},
+{
+"night": 3,
+"outbox": [
+{
+"id": "o17",
+"text": "📰 **News: Night 3 (closed 02:15)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+{
+"id": "o18",
+"ref": "r3-3-0",
+"to": "radio"
+},
+{
+"id": "o19",
+"text": "🌙 **Night 3 (closed 02:15)**\n🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+{
+"id": "o20",
+"text": "🌙 **Night 3 (closed 02:15)**\n🎁 You gave Alias05 1.\n🍽️ You ate 1.\n🥫 You now have 5 rations.",
+"to": "dm:1"
+},
+{
+"id": "o21",
+"text": "🌙 **Night 3 (closed 02:15)**\n🛡️ You're on guard for nights 3 and 4.\n🎁 Alias08 secretly gave you 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:2"
+},
+{
+"id": "o22",
+"text": "🌙 **Night 3 (closed 02:15)**\n🔍 You watched Alias12: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:3"
+}
+],
+"type": "news"
+},
+{
+"id": "o17",
+"type": "sent"
+},
+{
+"id": "o18",
+"ref": "r3-3-0",
+"type": "sent"
+},
+{
+"id": "o19",
+"type": "sent"
+},
+{
+"id": "o20",
+"type": "sent"
+},
+{
+"id": "o21",
+"type": "sent"
+},
+{
+"id": "o22",
+"type": "sent"
+},
+{
+"at": 1180,
+"move": [
+"investigate",
+2,
+0,
+false
+],
+"night": 4,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 1180,
+"move": [
+"steal",
+0,
+0,
+false
+],
+"night": 4,
+"pid": 1,
+"type": "move"
+},
+{
+"at": 1181,
+"move": [
+"investigate",
+0,
+0,
+false
+],
+"night": 4,
+"pid": 1,
+"type": "move"
+},
+{
+"night": 4,
+"ref": "r4-1-0",
+"type": "radio"
+},
+{
+"at": 1180,
+"move": [
+"steal",
+1,
+0,
+false
+],
+"night": 4,
+"pid": 2,
+"type": "move"
+},
+{
+"night": 4,
+"ref": "r4-2-1",
+"type": "radio"
+},
+{
+"events": [
+{
+"balance": 3,
+"delta": -2,
+"detail": "Alias05",
+"player": "Alias08",
+"reason": "robbed",
+"type": "ration"
+},
+{
+"balance": 9,
+"delta": 2,
+"detail": "Alias08",
+"player": "Alias05",
+"reason": "stole",
+"type": "ration"
+},
+{
+"amount": 2,
+"outcome": "success",
+"split_with": 0,
+"target": "Alias08",
+"thief": "Alias05",
+"type": "steal",
+"visibility": "victim_sees_amount_only"
+},
+{
+"auto": true,
+"found": 0,
+"player": "Alias11",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"investigator": "Alias12",
+"saw_action": "steal",
+"saw_target": "Alias08",
+"target": "Alias05",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"investigator": "Alias12",
+"paid": 1,
+"thief": "Alias05",
+"type": "exposed",
+"victim": "Alias08",
+"visibility": "public_without_investigator"
+},
+{
+"balance": 8,
+"delta": -1,
+"detail": "Alias12",
+"player": "Alias05",
+"reason": "bounty_paid",
+"type": "ration"
+},
+{
+"balance": 2,
+"delta": 1,
+"detail": "Alias05",
+"player": "Alias12",
+"reason": "bounty_received",
+"type": "ration"
+},
+{
+"investigator": "Alias08",
+"saw_action": "investigate",
+"saw_target": "Alias05",
+"target": "Alias12",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"balance": 1,
+"delta": -1,
+"player": "Alias12",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 2,
+"delta": -1,
+"player": "Alias08",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 7,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 3,
+"delta": -1,
+"player": "Alias11",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"investigate",
+2,
+0,
+false
+],
+"1": [
+"investigate",
+0,
+0,
+false
+],
+"2": [
+"steal",
+1,
+0,
+false
+],
+"3": [
+"scavenge",
+null,
+0,
+true
+]
+},
+"night": 4,
+"private": {
+"0": [
+"🔍 You watched Alias05: they chose steal (Alias08).",
+"🕵️ You exposed Alias05; they paid you 1.",
+"🍽️ You ate 1.",
+"🥫 You now have 1 rations."
+],
+"1": [
+"🥷 Someone stole 2 from you.",
+"🔍 You watched Alias12: they chose investigate (Alias05).",
+"🍽️ You ate 1.",
+"🥫 You now have 2 rations."
+],
+"2": [
+"🥷 You stole 2 from Alias08.",
+"🕵️ EXPOSED: an investigator saw you rob Alias08. You paid them 1.",
+"🍽️ You ate 1.",
+"🥫 You now have 7 rations."
+],
+"3": [
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.",
+"🍽️ You ate 1.",
+"🥫 You now have 3 rations."
+]
+},
+"seed": 2856669883247693188,
+"type": "night"
+},
+{
+"at": 1201,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 5,
+"pid": 0,
+"type": "move"
+},
+{
+"night": 4,
+"outbox": [
+{
+"id": "o23",
+"text": "📰 **News: Night 4 (closed 02:20)**\n- 🥷 Someone hit Alias08 overnight. Alias08 is down 2.\n- 🕵️ EXPOSED: an investigator saw Alias05 rob Alias08. Alias05 pays them 1.",
+"to": "news"
+},
+{
+"id": "o24",
+"ref": "r4-1-0",
+"to": "radio"
+},
+{
+"id": "o25",
+"ref": "r4-2-1",
+"to": "radio"
+},
+{
+"id": "o26",
+"text": "🌙 **Night 4 (closed 02:20)**\n🔍 You watched Alias05: they chose steal (Alias08).\n🕵️ You exposed Alias05; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+{
+"id": "o27",
+"text": "🌙 **Night 4 (closed 02:20)**\n🥷 Someone stole 2 from you.\n🔍 You watched Alias12: they chose investigate (Alias05).\n🍽️ You ate 1.\n🥫 You now have 2 rations.",
+"to": "dm:1"
+},
+{
+"id": "o28",
+"text": "🌙 **Night 4 (closed 02:20)**\n🥷 You stole 2 from Alias08.\n🕵️ EXPOSED: an investigator saw you rob Alias08. You paid them 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:2"
+},
+{
+"id": "o29",
+"text": "🌙 **Night 4 (closed 02:20)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 3 rations.",
+"to": "dm:3"
+}
+],
+"type": "news"
+},
+{
+"id": "o23",
+"type": "sent"
+},
+{
+"id": "o24",
+"ref": "r4-1-0",
+"type": "sent"
+},
+{
+"id": "o25",
+"ref": "r4-2-1",
+"type": "sent"
+},
+{
+"id": "o26",
+"type": "sent"
+},
+{
+"id": "o27",
+"type": "sent"
+},
+{
+"id": "o28",
+"type": "sent"
+},
+{
+"id": "o29",
+"type": "sent"
+},
+{
+"at": 1480,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 5,
+"pid": 0,
+"type": "move"
+},
+{
+"night": 5,
+"ref": "r5-0-0",
+"type": "radio"
+},
+{
+"at": 1480,
+"move": [
+"investigate",
+2,
+0,
+false
+],
+"night": 5,
+"pid": 1,
+"type": "move"
+},
+{
+"night": 5,
+"ref": "r5-1-1",
+"type": "radio"
+},
+{
+"at": 1480,
+"move": [
+"guard",
+null,
+0,
+false
+],
+"night": 5,
+"pid": 3,
+"type": "move"
+},
+{
+"events": [
+{
+"guards_used": 1,
+"player": "Alias11",
+"type": "guard_up",
+"until_night": 6,
+"visibility": "private"
+},
+{
+"auto": false,
+"found": 1,
+"player": "Alias12",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"balance": 2,
+"delta": 1,
+"detail": "",
+"player": "Alias12",
+"reason": "scavenge",
+"type": "ration"
+},
+{
+"auto": true,
+"found": 0,
+"player": "Alias05",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"investigator": "Alias08",
+"saw_action": "scavenge",
+"saw_target": null,
+"target": "Alias05",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"balance": 1,
+"delta": -1,
+"player": "Alias12",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 1,
+"delta": -1,
+"player": "Alias08",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 6,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 2,
+"delta": -1,
+"player": "Alias11",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"scavenge",
+null,
+0,
+false
+],
+"1": [
+"investigate",
+2,
+0,
+false
+],
+"2": [
+"scavenge",
+null,
+0,
+true
+],
+"3": [
+"guard",
+null,
+0,
+false
+]
+},
+"night": 5,
+"private": {
+"0": [
+"🥫 You scavenged and found 1.",
+"🍽️ You ate 1.",
+"🥫 You now have 1 rations."
+],
+"1": [
+"🔍 You watched Alias05: they chose scavenge.",
+"🍽️ You ate 1.",
+"🥫 You now have 1 rations."
+],
+"2": [
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.",
+"🍽️ You ate 1.",
+"🥫 You now have 6 rations."
+],
+"3": [
+"🛡️ You're on guard for nights 5 and 6.",
+"🍽️ You ate 1.",
+"🥫 You now have 2 rations."
+]
+},
+"seed": 13868474590918908736,
+"type": "night"
+},
+{
+"at": 1501,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 6,
+"pid": 0,
+"type": "move"
+},
+{
+"night": 5,
+"outbox": [
+{
+"id": "o30",
+"text": "📰 **News: Night 5 (closed 02:25)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+{
+"id": "o31",
+"ref": "r5-0-0",
+"to": "radio"
+},
+{
+"id": "o32",
+"ref": "r5-1-1",
+"to": "radio"
+},
+{
+"id": "o33",
+"text": "🌙 **Night 5 (closed 02:25)**\n🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+{
+"id": "o34",
+"text": "🌙 **Night 5 (closed 02:25)**\n🔍 You watched Alias05: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:1"
+},
+{
+"id": "o35",
+"text": "🌙 **Night 5 (closed 02:25)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 6 rations.",
+"to": "dm:2"
+},
+{
+"id": "o36",
+"text": "🌙 **Night 5 (closed 02:25)**\n🛡️ You're on guard for nights 5 and 6.\n🍽️ You ate 1.\n🥫 You now have 2 rations.",
+"to": "dm:3"
+}
+],
+"type": "news"
+},
+{
+"id": "o30",
+"type": "sent"
+},
+{
+"id": "o31",
+"ref": "r5-0-0",
+"type": "sent"
+},
+{
+"id": "o32",
+"ref": "r5-1-1",
+"type": "sent"
+},
+{
+"id": "o33",
+"type": "sent"
+},
+{
+"id": "o34",
+"type": "sent"
+},
+{
+"id": "o35",
+"type": "sent"
+},
+{
+"id": "o36",
+"type": "sent"
+},
+{
+"at": 1780,
+"move": [
+"guard",
+null,
+0,
+false
+],
+"night": 6,
+"pid": 1,
+"type": "move"
+},
+{
+"night": 6,
+"ref": "r6-1-0",
+"type": "radio"
+},
+{
+"events": [
+{
+"guards_used": 2,
+"player": "Alias08",
+"type": "guard_up",
+"until_night": 7,
+"visibility": "private"
+},
+{
+"auto": false,
+"found": 0,
+"player": "Alias12",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"auto": true,
+"found": 0,
+"player": "Alias05",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"auto": true,
+"found": 2,
+"player": "Alias11",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"balance": 4,
+"delta": 2,
+"detail": "auto",
+"player": "Alias11",
+"reason": "scavenge",
+"type": "ration"
+},
+{
+"balance": 0,
+"delta": -1,
+"player": "Alias12",
+"reason": "eat",
+"type": "ration"
+},
+{
+"player": "Alias12",
+"type": "became_bandit",
+"visibility": "public"
+},
+{
+"balance": 0,
+"delta": -1,
+"player": "Alias08",
+"reason": "eat",
+"type": "ration"
+},
+{
+"player": "Alias08",
+"type": "became_bandit",
+"visibility": "public"
+},
+{
+"balance": 5,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+},
+{
+"balance": 3,
+"delta": -1,
+"player": "Alias11",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"scavenge",
+null,
+0,
+false
+],
+"1": [
+"guard",
+null,
+0,
+false
+],
+"2": [
+"scavenge",
+null,
+0,
+true
+],
+"3": [
+"scavenge",
+null,
+0,
+true
+]
+},
+"night": 6,
+"private": {
+"0": [
+"🥫 You scavenged and found 0.",
+"🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.",
+"🍽️ You ate 1.",
+"🥫 You now have 0 rations."
+],
+"1": [
+"🛡️ You're on guard for nights 6 and 7.",
+"🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.",
+"🍽️ You ate 1.",
+"🥫 You now have 0 rations."
+],
+"2": [
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.",
+"🍽️ You ate 1.",
+"🥫 You now have 5 rations."
+],
+"3": [
+"🥫 You didn't choose a move, so you scavenged automatically and found 2.",
+"🍽️ You ate 1.",
+"🥫 You now have 3 rations."
+]
+},
+"seed": 9691237579851547987,
+"type": "night"
+},
+{
+"night": 6,
+"outbox": [
+{
+"id": "o37",
+"text": "📰 **News: Night 6 (closed 02:30)**\n- 🏴‍☠️ Alias12 ran out of food. Alias12 is back... as a bandit.\n- 🏴‍☠️ Alias08 ran out of food. Alias08 is back... as a bandit.",
+"to": "news"
+},
+{
+"id": "o38",
+"ref": "r6-1-0",
+"to": "radio"
+},
+{
+"id": "o39",
+"text": "🌙 **Night 6 (closed 02:30)**\n🥫 You scavenged and found 0.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations.",
+"to": "dm:0"
+},
+{
+"id": "o40",
+"text": "🌙 **Night 6 (closed 02:30)**\n🛡️ You're on guard for nights 6 and 7.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+{
+"id": "o41",
+"text": "🌙 **Night 6 (closed 02:30)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 5 rations.",
+"to": "dm:2"
+},
+{
+"id": "o42",
+"text": "🌙 **Night 6 (closed 02:30)**\n🥫 You didn't choose a move, so you scavenged automatically and found 2.\n🍽️ You ate 1.\n🥫 You now have 3 rations.",
+"to": "dm:3"
+}
+],
+"type": "news"
+},
+{
+"id": "o37",
+"type": "sent"
+},
+{
+"id": "o38",
+"ref": "r6-1-0",
+"type": "sent"
+},
+{
+"id": "o39",
+"type": "sent"
+},
+{
+"id": "o40",
+"type": "sent"
+},
+{
+"id": "o41",
+"type": "sent"
+},
+{
+"id": "o42",
+"type": "sent"
+},
+{
+"at": 2080,
+"move": [
+"steal",
+1,
+0,
+false
+],
+"night": 7,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 2080,
+"move": [
+"investigate",
+2,
+0,
+false
+],
+"night": 7,
+"pid": 1,
+"type": "move"
+},
+{
+"night": 7,
+"ref": "r7-1-0",
+"type": "radio"
+},
+{
+"at": 2080,
+"move": [
+"guard",
+null,
+0,
+false
+],
+"night": 7,
+"pid": 2,
+"type": "move"
+},
+{
+"night": 7,
+"ref": "r7-2-1",
+"type": "radio"
+},
+{
+"night": 7,
+"outbox": [
+{
+"id": "o43",
+"text": "Alias11 has left the game. Their food goes with them.",
+"to": "news"
+}
+],
+"pid": 3,
+"type": "quit"
+},
+{
+"events": [
+{
+"guards_used": 2,
+"player": "Alias05",
+"type": "guard_up",
+"until_night": 8,
+"visibility": "private"
+},
+{
+"amount": 0,
+"outcome": "empty",
+"split_with": 0,
+"target": "Alias08",
+"thief": "Alias12",
+"type": "steal",
+"visibility": "victim_sees_amount_only"
+},
+{
+"investigator": "Alias08",
+"saw_action": "guard",
+"saw_target": null,
+"target": "Alias05",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"balance": 4,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"steal",
+1,
+0,
+false
+],
+"1": [
+"investigate",
+2,
+0,
+false
+],
+"2": [
+"guard",
+null,
+0,
+false
+]
+},
+"night": 7,
+"private": {
+"0": [
+"🥷 You broke into Alias08's place and found nothing.",
+"🥫 You now have 0 rations."
+],
+"1": [
+"🔍 You watched Alias05: they chose guard.",
+"🥫 You now have 0 rations."
+],
+"2": [
+"🛡️ You're on guard for nights 7 and 8.",
+"🍽️ You ate 1.",
+"🥫 You now have 4 rations."
+]
+},
+"seed": 3946588278418927876,
+"type": "night"
+},
+{
+"night": 7,
+"outbox": [
+{
+"id": "o44",
+"text": "📰 **News: Night 7 (closed 02:35)**\n- 🥷 Someone broke into Alias08's place and found nothing.\n\n⏳ **3 nights left**, then the helicopter.",
+"to": "news"
+},
+{
+"id": "o45",
+"ref": "r7-1-0",
+"to": "radio"
+},
+{
+"id": "o46",
+"ref": "r7-2-1",
+"to": "radio"
+},
+{
+"id": "o47",
+"text": "🌙 **Night 7 (closed 02:35)**\n🥷 You broke into Alias08's place and found nothing.\n🥫 You now have 0 rations.",
+"to": "dm:0"
+},
+{
+"id": "o48",
+"text": "🌙 **Night 7 (closed 02:35)**\n🔍 You watched Alias05: they chose guard.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+{
+"id": "o49",
+"text": "🌙 **Night 7 (closed 02:35)**\n🛡️ You're on guard for nights 7 and 8.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:2"
+}
+],
+"type": "news"
+},
+{
+"id": "o43",
+"type": "sent"
+},
+{
+"id": "o44",
+"type": "sent"
+},
+{
+"id": "o45",
+"ref": "r7-1-0",
+"type": "sent"
+},
+{
+"id": "o46",
+"ref": "r7-2-1",
+"type": "sent"
+},
+{
+"id": "o47",
+"type": "sent"
+},
+{
+"id": "o48",
+"type": "sent"
+},
+{
+"id": "o49",
+"type": "sent"
+},
+{
+"at": 2380,
+"move": [
+"steal",
+0,
+0,
+false
+],
+"night": 8,
+"pid": 1,
+"type": "move"
+},
+{
+"at": 2380,
+"move": [
+"gift",
+0,
+2,
+false
+],
+"night": 8,
+"pid": 2,
+"type": "move"
+},
+{
+"events": [
+{
+"amount": 0,
+"outcome": "empty",
+"split_with": 0,
+"target": "Alias12",
+"thief": "Alias08",
+"type": "steal",
+"visibility": "victim_sees_amount_only"
+},
+{
+"amount": 2,
+"giver": "Alias05",
+"receiver": "Alias12",
+"type": "gift",
+"visibility": "giver_and_receiver"
+},
+{
+"balance": 2,
+"delta": -2,
+"detail": "Alias12",
+"player": "Alias05",
+"reason": "gift_out",
+"type": "ration"
+},
+{
+"balance": 2,
+"delta": 2,
+"detail": "Alias05",
+"player": "Alias12",
+"reason": "gift_in",
+"type": "ration"
+},
+{
+"balance": 1,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"scavenge",
+null,
+0,
+true
+],
+"1": [
+"steal",
+0,
+0,
+false
+],
+"2": [
+"gift",
+0,
+2,
+false
+]
+},
+"night": 8,
+"private": {
+"0": [
+"🎁 Alias05 secretly gave you 2.",
+"🥫 You now have 2 rations."
+],
+"1": [
+"🥷 You broke into Alias12's place and found nothing.",
+"🥫 You now have 0 rations."
+],
+"2": [
+"🎁 You gave Alias12 2.",
+"🍽️ You ate 1.",
+"🥫 You now have 1 rations."
+]
+},
+"seed": 16550414408814122409,
+"type": "night"
+},
+{
+"night": 8,
+"outbox": [
+{
+"id": "o50",
+"text": "📰 **News: Night 8 (closed 02:40)**\n- 🥷 Someone broke into Alias12's place and found nothing.\n\n⏳ **2 nights left**, then the helicopter.",
+"to": "news"
+},
+{
+"id": "o51",
+"text": "🌙 **Night 8 (closed 02:40)**\n🎁 Alias05 secretly gave you 2.\n🥫 You now have 2 rations.",
+"to": "dm:0"
+},
+{
+"id": "o52",
+"text": "🌙 **Night 8 (closed 02:40)**\n🥷 You broke into Alias12's place and found nothing.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+{
+"id": "o53",
+"text": "🌙 **Night 8 (closed 02:40)**\n🎁 You gave Alias12 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:2"
+}
+],
+"type": "news"
+},
+{
+"id": "o50",
+"type": "sent"
+},
+{
+"id": "o51",
+"type": "sent"
+},
+{
+"id": "o52",
+"type": "sent"
+},
+{
+"id": "o53",
+"type": "sent"
+},
+{
+"at": 2680,
+"move": [
+"investigate",
+2,
+0,
+false
+],
+"night": 9,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 2681,
+"move": [
+"investigate",
+2,
+0,
+false
+],
+"night": 9,
+"pid": 0,
+"type": "move"
+},
+{
+"night": 9,
+"ref": "r9-0-0",
+"type": "radio"
+},
+{
+"at": 2680,
+"move": [
+"steal",
+0,
+0,
+false
+],
+"night": 9,
+"pid": 1,
+"type": "move"
+},
+{
+"night": 9,
+"ref": "r9-1-1",
+"type": "radio"
+},
+{
+"at": 2680,
+"move": [
+"investigate",
+1,
+0,
+false
+],
+"night": 9,
+"pid": 2,
+"type": "move"
+},
+{
+"night": 9,
+"ref": "r9-2-2",
+"type": "radio"
+},
+{
+"events": [
+{
+"balance": 1,
+"delta": -1,
+"detail": "Alias08",
+"player": "Alias12",
+"reason": "robbed",
+"type": "ration"
+},
+{
+"balance": 1,
+"delta": 1,
+"detail": "Alias12",
+"player": "Alias08",
+"reason": "stole",
+"type": "ration"
+},
+{
+"amount": 1,
+"outcome": "success",
+"split_with": 0,
+"target": "Alias12",
+"thief": "Alias08",
+"type": "steal",
+"visibility": "victim_sees_amount_only"
+},
+{
+"investigator": "Alias12",
+"saw_action": "investigate",
+"saw_target": "Alias08",
+"target": "Alias05",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"investigator": "Alias05",
+"saw_action": "steal",
+"saw_target": "Alias12",
+"target": "Alias08",
+"type": "investigate",
+"visibility": "private"
+},
+{
+"investigator": "Alias05",
+"paid": 1,
+"thief": "Alias08",
+"type": "exposed",
+"victim": "Alias12",
+"visibility": "public_without_investigator"
+},
+{
+"balance": 0,
+"delta": -1,
+"detail": "Alias05",
+"player": "Alias08",
+"reason": "bounty_paid",
+"type": "ration"
+},
+{
+"balance": 2,
+"delta": 1,
+"detail": "Alias08",
+"player": "Alias05",
+"reason": "bounty_received",
+"type": "ration"
+},
+{
+"balance": 1,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"investigate",
+2,
+0,
+false
+],
+"1": [
+"steal",
+0,
+0,
+false
+],
+"2": [
+"investigate",
+1,
+0,
+false
+]
+},
+"night": 9,
+"private": {
+"0": [
+"🥷 Someone stole 1 from you.",
+"🔍 You watched Alias05: they chose investigate (Alias08).",
+"🥫 You now have 1 rations."
+],
+"1": [
+"🥷 You stole 1 from Alias12.",
+"🕵️ EXPOSED: an investigator saw you rob Alias12. You paid them 1.",
+"🥫 You now have 0 rations."
+],
+"2": [
+"🔍 You watched Alias08: they chose steal (Alias12).",
+"🕵️ You exposed Alias08; they paid you 1.",
+"🍽️ You ate 1.",
+"🥫 You now have 1 rations."
+]
+},
+"seed": 18137109646905197040,
+"type": "night"
+},
+{
+"night": 9,
+"outbox": [
+{
+"id": "o54",
+"text": "📰 **News: Night 9 (closed 02:45)**\n- 🥷 Someone hit Alias12 overnight. Alias12 is down 1.\n- 🕵️ EXPOSED: an investigator saw Alias08 rob Alias12. Alias08 pays them 1.\n\n🚁 **Tonight is the LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes.",
+"to": "news"
+},
+{
+"id": "o55",
+"ref": "r9-0-0",
+"to": "radio"
+},
+{
+"id": "o56",
+"ref": "r9-1-1",
+"to": "radio"
+},
+{
+"id": "o57",
+"ref": "r9-2-2",
+"to": "radio"
+},
+{
+"id": "o58",
+"text": "🌙 **Night 9 (closed 02:45)**\n🥷 Someone stole 1 from you.\n🔍 You watched Alias05: they chose investigate (Alias08).\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+{
+"id": "o59",
+"text": "🌙 **Night 9 (closed 02:45)**\n🥷 You stole 1 from Alias12.\n🕵️ EXPOSED: an investigator saw you rob Alias12. You paid them 1.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+{
+"id": "o60",
+"text": "🌙 **Night 9 (closed 02:45)**\n🔍 You watched Alias08: they chose steal (Alias12).\n🕵️ You exposed Alias08; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:2"
+}
+],
+"type": "news"
+},
+{
+"id": "o54",
+"type": "sent"
+},
+{
+"id": "o55",
+"ref": "r9-0-0",
+"type": "sent"
+},
+{
+"id": "o56",
+"ref": "r9-1-1",
+"type": "sent"
+},
+{
+"id": "o57",
+"ref": "r9-2-2",
+"type": "sent"
+},
+{
+"id": "o58",
+"type": "sent"
+},
+{
+"id": "o59",
+"type": "sent"
+},
+{
+"id": "o60",
+"type": "sent"
+},
+{
+"at": 2980,
+"move": [
+"steal",
+1,
+0,
+false
+],
+"night": 10,
+"pid": 0,
+"type": "move"
+},
+{
+"at": 2980,
+"move": [
+"scavenge",
+null,
+0,
+false
+],
+"night": 10,
+"pid": 2,
+"type": "move"
+},
+{
+"events": [
+{
+"amount": 0,
+"outcome": "empty",
+"split_with": 0,
+"target": "Alias08",
+"thief": "Alias12",
+"type": "steal",
+"visibility": "victim_sees_amount_only"
+},
+{
+"auto": false,
+"found": 2,
+"player": "Alias05",
+"type": "scavenge",
+"visibility": "private"
+},
+{
+"balance": 3,
+"delta": 2,
+"detail": "",
+"player": "Alias05",
+"reason": "scavenge",
+"type": "ration"
+},
+{
+"balance": 2,
+"delta": -1,
+"player": "Alias05",
+"reason": "eat",
+"type": "ration"
+}
+],
+"moves": {
+"0": [
+"steal",
+1,
+0,
+false
+],
+"1": [
+"scavenge",
+null,
+0,
+true
+],
+"2": [
+"scavenge",
+null,
+0,
+false
+]
+},
+"night": 10,
+"private": {
+"0": [
+"🥷 You broke into Alias08's place and found nothing.",
+"🥫 You now have 1 rations."
+],
+"1": [
+"🥫 You now have 0 rations."
+],
+"2": [
+"🥫 You scavenged and found 2.",
+"🍽️ You ate 1.",
+"🥫 You now have 2 rations."
+]
+},
+"seed": 474463599524202993,
+"type": "night"
+},
+{
+"night": 10,
+"outbox": [
+{
+"id": "o61",
+"text": "📰 **News: Night 10 (closed 02:50)**\n- 🥷 Someone broke into Alias08's place and found nothing.",
+"to": "news"
+},
+{
+"id": "o62",
+"text": "🌙 **Night 10 (closed 02:50)**\n🥷 You broke into Alias08's place and found nothing.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+{
+"id": "o63",
+"text": "🌙 **Night 10 (closed 02:50)**\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+{
+"id": "o64",
+"text": "🌙 **Night 10 (closed 02:50)**\n🥫 You scavenged and found 2.\n🍽️ You ate 1.\n🥫 You now have 2 rations.",
+"to": "dm:2"
+}
+],
+"type": "news"
+},
+{
+"events": [
+{
+"decided_by_coin_flip": false,
+"extracted": [
+"Alias05"
+],
+"ranking": [
+{
+"gave_away": 2,
+"player": "Alias05",
+"rations": 2
+}
+],
+"seats": 1,
+"tiebreak": "kindness",
+"type": "extraction",
+"visibility": "public"
+},
+{
+"extracted": false,
+"gave_away": 4,
+"objective": "steal 3 times before you're ever caught",
+"objective_done": false,
+"player": "Alias12",
+"rations": 1,
+"score": 0,
+"steals_caught": 0,
+"steals_ok": 0,
+"stole": 0,
+"survived": false,
+"times_robbed": 1,
+"type": "result",
+"visibility": "public_at_reveal"
+},
+{
+"extracted": false,
+"gave_away": 1,
+"objective": "give away 3 rations over the game",
+"objective_done": false,
+"player": "Alias08",
+"rations": 0,
+"score": 0,
+"steals_caught": 0,
+"steals_ok": 1,
+"stole": 1,
+"survived": false,
+"times_robbed": 1,
+"type": "result",
+"visibility": "public_at_reveal"
+},
+{
+"extracted": true,
+"gave_away": 2,
+"objective": "get robbed at least 1x and still extract",
+"objective_done": false,
+"player": "Alias05",
+"rations": 2,
+"score": 3,
+"steals_caught": 0,
+"steals_ok": 1,
+"stole": 2,
+"survived": true,
+"times_robbed": 0,
+"type": "result",
+"visibility": "public_at_reveal"
+},
+{
+"extracted": false,
+"gave_away": 2,
+"objective": "finish with more rations than Alias08",
+"objective_done": false,
+"player": "Alias11",
+"rations": 0,
+"score": 0,
+"steals_caught": 0,
+"steals_ok": 0,
+"stole": 0,
+"survived": false,
+"times_robbed": 0,
+"type": "result",
+"visibility": "public_at_reveal"
+},
+{
+"type": "game_end",
+"visibility": "public",
+"winner_tiebreak": "kindness",
+"winners": [
+"Alias05"
+]
+}
+],
+"outbox": [
+{
+"id": "o65",
+"image": "reveal",
+"text": "🚁 The helicopter takes Alias05.\n🏆 Winner: Alias05.\n\n**The reveal**\n- Alias05: 3 pts, 2 rations, goal: get robbed at least 1x and still extract (missed); stole 2, robbed 0x, gave away 2\n- Alias12: 0 pts, 1 rations, goal: steal 3 times before you're ever caught (missed); stole 0, robbed 1x, gave away 4\n- Alias08: 0 pts, 0 rations, goal: give away 3 rations over the game (missed); stole 1, robbed 1x, gave away 1\n- Alias11: 0 pts, 0 rations, goal: finish with more rations than Alias08 (missed); stole 0, robbed 0x, gave away 2",
+"to": "news"
+}
+],
+"type": "finish"
+},
+{
+"id": "o61",
+"type": "sent"
+},
+{
+"id": "o62",
+"type": "sent"
+},
+{
+"id": "o63",
+"type": "sent"
+},
+{
+"id": "o64",
+"type": "sent"
+},
+{
+"id": "o65",
+"type": "sent"
+}
+],
+"texts": {
+"r1-3-0": "Alias12 looks like an easy target.",
+"r3-3-0": "Someone should watch Alias08's back tonight.",
+"r4-1-0": "I'm innocent. Leave me alone.",
+"r4-2-1": "Alias12 is lying about their rations.",
+"r5-0-0": "Alias08 is lying about their rations.",
+"r5-1-1": "I'm innocent. Leave me alone.",
+"r6-1-0": "I'm innocent. Leave me alone.",
+"r7-1-0": "I saw Alias11 sneaking around last night.",
+"r7-2-1": "I saw Alias08 sneaking around last night.",
+"r9-0-0": "Don't trust Alias05.",
+"r9-1-1": "Alias05 looks like an easy target.",
+"r9-2-2": "I'm innocent. Leave me alone."
+},
+"transcript": [
+[
+"join h0",
+"You're in. Your secret alias is **Alias12**. Tell no one."
+],
+[
+"join h1",
+"You're in. Your secret alias is **Alias08**. Tell no one."
+],
+[
+"join h2",
+"You're in. Your secret alias is **Alias05**. Tell no one."
+],
+[
+"join h3",
+"You're in. Your secret alias is **Alias11**. Tell no one."
+],
+[
+"join again",
+"You're already in as **Alias12**."
+],
+[
+"status before start",
+"You're **Alias12**. The game hasn't started yet."
+],
+[
+"board before start",
+[
+[
+"waiting",
+4
+],
+"🔥 **Survivors** · 4 players\n⏳ Waiting for the Game Master to start. /join to play."
+]
+],
+[
+"start",
+null
+],
+[
+"start twice",
+"GameError",
+"Already started."
+],
+[
+"n1 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+0,
+0,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 1 of 10** · moves close <t:300:R> (<t:300:t>) · tap 🎮 Play\n✅ Nights done: none"
+]
+],
+[
+"n1 h0 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 1 (closes 02:05)**: Alias12, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias11"
+]
+},
+"radio": true
+}
+],
+[
+"n1 h0 status",
+"**Alias12**: 🥫 7 rations, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n1 h0 results",
+"Nothing to report yet."
+],
+[
+"n1 h0 submit0",
+"Night 1 (closes 02:05): you'll 🎁 give Alias11 1. You can change your mind until the deadline."
+],
+[
+"n1 h0 submit1",
+"Night 1 (closes 02:05): you'll 🎁 give Alias05 2. You can change your mind until the deadline."
+],
+[
+"n1 h1 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 1 (closes 02:05)**: Alias08, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n1 h1 status",
+"**Alias08**: 🥫 7 rations, 🛡️ 3 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 0/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n1 h1 results",
+"Nothing to report yet."
+],
+[
+"n1 h1 submit0",
+"Night 1 (closes 02:05): you'll 🔍 investigate Alias11. You can change your mind until the deadline."
+],
+[
+"n1 h1 steal self",
+"GameError",
+"You can't target yourself."
+],
+[
+"n1 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 1 (closes 02:05)**: Alias05, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n1 h2 status",
+"**Alias05**: 🥫 7 rations, 🛡️ 3 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n1 h2 results",
+"Nothing to report yet."
+],
+[
+"n1 h2 submit0",
+"Night 1 (closes 02:05): you'll 🎁 give Alias12 1. You can change your mind until the deadline."
+],
+[
+"n1 h2 submit1",
+"Night 1 (closes 02:05): you'll 🔍 investigate Alias11. You can change your mind until the deadline."
+],
+[
+"n1 h3 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 1 (closes 02:05)**: Alias11, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n1 h3 status",
+"**Alias11**: 🥫 7 rations, 🛡️ 3 guards left.\nSecret goal: finish with more rations than Alias08.\n⏳ **Progress:** decided at the end: you have 7, Alias08's stash is secret..\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n1 h3 results",
+"Nothing to report yet."
+],
+[
+"n1 h3 submit0",
+"Night 1 (closes 02:05): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n1 h3 submit1",
+"Night 1 (closes 02:05): you'll 🎁 give Alias08 2. You can change your mind until the deadline."
+],
+[
+"n1 h3 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n1 h3 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n1 who moved",
+[
+[
+"Alias12",
+"Alias08",
+"Alias05",
+"Alias11"
+],
+[]
+]
+],
+[
+"n1 late submit",
+"Night 2 (closes 02:10): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n1 outbox",
+{
+"id": "o1",
+"text": "🔥 The game has begun: 4 survivors, 10 rounds. Check /status for your secret goal. Choose a move before each deadline.",
+"to": "news"
+},
+"🔥 The game has begun: 4 survivors, 10 rounds. Check /status for your secret goal. Choose a move before each deadline."
+],
+[
+"n1 outbox",
+{
+"id": "o2",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:0"
+},
+"🔥 The game has begun. Use /status any time to see your rations and your secret goal."
+],
+[
+"n1 outbox",
+{
+"id": "o3",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:1"
+},
+"🔥 The game has begun. Use /status any time to see your rations and your secret goal."
+],
+[
+"n1 outbox",
+{
+"id": "o4",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:2"
+},
+"🔥 The game has begun. Use /status any time to see your rations and your secret goal."
+],
+[
+"n1 outbox",
+{
+"id": "o5",
+"text": "🔥 The game has begun. Use /status any time to see your rations and your secret goal.",
+"to": "dm:3"
+},
+"🔥 The game has begun. Use /status any time to see your rations and your secret goal."
+],
+[
+"n1 outbox",
+{
+"id": "o6",
+"text": "📰 **News: Night 1 (closed 02:05)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+"📰 **News: Night 1 (closed 02:05)**\n- 🌙 A quiet night. Nobody lost anything."
+],
+[
+"n1 outbox",
+{
+"id": "o7",
+"ref": "r1-3-0",
+"to": "radio"
+},
+"Alias12 looks like an easy target."
+],
+[
+"n1 outbox",
+{
+"id": "o8",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 You gave Alias05 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 1 (closed 02:05)**\n🎁 You gave Alias05 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n1 outbox",
+{
+"id": "o9",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 Alias11 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 1 (closed 02:05)**\n🎁 Alias11 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations."
+],
+[
+"n1 outbox",
+{
+"id": "o10",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 Alias12 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 1 (closed 02:05)**\n🎁 Alias12 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations."
+],
+[
+"n1 outbox",
+{
+"id": "o11",
+"text": "🌙 **Night 1 (closed 02:05)**\n🎁 You gave Alias08 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:3"
+},
+"🌙 **Night 1 (closed 02:05)**\n🎁 You gave Alias08 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n2 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+1,
+1,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 2 of 10** · moves close <t:600:R> (<t:600:t>) · tap 🎮 Play\n✅ Nights done: 1"
+]
+],
+[
+"n2 h0 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 2 (closes 02:10)**: Alias12, 🥫 4 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias11"
+]
+},
+"radio": true
+}
+],
+[
+"n2 h0 status",
+"**Alias12**: 🥫 4 rations, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: scavenge."
+],
+[
+"n2 h0 results",
+"🎁 You gave Alias05 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n2 h0 submit0",
+"Night 2 (closes 02:10): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n2 h0 submit1",
+"Night 2 (closes 02:10): you'll 🎁 give Alias11 2. You can change your mind until the deadline."
+],
+[
+"n2 h1 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 2 (closes 02:10)**: Alias08, 🥫 8 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n2 h1 status",
+"**Alias08**: 🥫 8 rations, 🛡️ 3 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 0/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n2 h1 results",
+"🎁 Alias11 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations."
+],
+[
+"n2 h1 submit0",
+"Night 2 (closes 02:10): you'll 🛡️ guard. You can change your mind until the deadline."
+],
+[
+"n2 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 2 (closes 02:10)**: Alias05, 🥫 8 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n2 h2 status",
+"**Alias05**: 🥫 8 rations, 🛡️ 3 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n2 h2 results",
+"🎁 Alias12 secretly gave you 2.\n🔍 You watched Alias11: they chose gift (Alias08).\n🍽️ You ate 1.\n🥫 You now have 8 rations."
+],
+[
+"n2 h2 submit0",
+"Night 2 (closes 02:10): you'll 🔍 investigate Alias12. You can change your mind until the deadline."
+],
+[
+"n2 h3 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 2 (closes 02:10)**: Alias11, 🥫 4 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n2 h3 status",
+"**Alias11**: 🥫 4 rations, 🛡️ 3 guards left.\nSecret goal: finish with more rations than Alias08.\n⏳ **Progress:** decided at the end: you have 4, Alias08's stash is secret..\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n2 h3 results",
+"🎁 You gave Alias08 2.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n2 who moved",
+[
+[
+"Alias12",
+"Alias08",
+"Alias05"
+],
+[
+"Alias11"
+]
+]
+],
+[
+"n2 late submit",
+"Night 3 (closes 02:15): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n2 outbox",
+{
+"id": "o12",
+"text": "📰 **News: Night 2 (closed 02:10)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+"📰 **News: Night 2 (closed 02:10)**\n- 🌙 A quiet night. Nobody lost anything."
+],
+[
+"n2 outbox",
+{
+"id": "o13",
+"text": "🌙 **Night 2 (closed 02:10)**\n🎁 You gave Alias11 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 2 (closed 02:10)**\n🎁 You gave Alias11 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n2 outbox",
+{
+"id": "o14",
+"text": "🌙 **Night 2 (closed 02:10)**\n🛡️ You're on guard for nights 2 and 3.\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 2 (closed 02:10)**\n🛡️ You're on guard for nights 2 and 3.\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n2 outbox",
+{
+"id": "o15",
+"text": "🌙 **Night 2 (closed 02:10)**\n🔍 You watched Alias12: they chose gift (Alias11).\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 2 (closed 02:10)**\n🔍 You watched Alias12: they chose gift (Alias11).\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n2 outbox",
+{
+"id": "o16",
+"text": "🌙 **Night 2 (closed 02:10)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🎁 Alias12 secretly gave you 2.\n🍽️ You ate 1.\n🥫 You now have 5 rations.",
+"to": "dm:3"
+},
+"🌙 **Night 2 (closed 02:10)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🎁 Alias12 secretly gave you 2.\n🍽️ You ate 1.\n🥫 You now have 5 rations."
+],
+[
+"n3 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+2,
+2,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 3 of 10** · moves close <t:900:R> (<t:900:t>) · tap 🎮 Play\n✅ Nights done: 1 2"
+]
+],
+[
+"n3 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 3 (closes 02:15)**: Alias12, 🥫 1 rations. What will you do tonight?",
+"moves": {
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias11"
+]
+},
+"radio": true
+}
+],
+[
+"n3 h0 status",
+"**Alias12**: 🥫 1 rations, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: scavenge."
+],
+[
+"n3 h0 results",
+"🎁 You gave Alias11 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n3 h0 submit0",
+"Night 3 (closes 02:15): you'll 🛡️ guard. You can change your mind until the deadline."
+],
+[
+"n3 h0 submit1",
+"Night 3 (closes 02:15): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n3 h1 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 3 (closes 02:15)**: Alias08, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"investigate": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n3 h1 status",
+"**Alias08**: 🥫 7 rations, 🛡️ 2 guards left, guarded tonight.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 0/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n3 h1 results",
+"🛡️ You're on guard for nights 2 and 3.\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n3 h1 submit0",
+"Night 3 (closes 02:15): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n3 h1 submit1",
+"Night 3 (closes 02:15): you'll 🎁 give Alias05 1. You can change your mind until the deadline."
+],
+[
+"n3 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 3 (closes 02:15)**: Alias05, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n3 h2 status",
+"**Alias05**: 🥫 7 rations, 🛡️ 3 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n3 h2 results",
+"🔍 You watched Alias12: they chose gift (Alias11).\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n3 h2 submit0",
+"Night 3 (closes 02:15): you'll 🛡️ guard. You can change your mind until the deadline."
+],
+[
+"n3 h3 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 3 (closes 02:15)**: Alias11, 🥫 5 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n3 h3 status",
+"**Alias11**: 🥫 5 rations, 🛡️ 3 guards left.\nSecret goal: finish with more rations than Alias08.\n⏳ **Progress:** decided at the end: you have 5, Alias08's stash is secret..\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n3 h3 results",
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🎁 Alias12 secretly gave you 2.\n🍽️ You ate 1.\n🥫 You now have 5 rations."
+],
+[
+"n3 h3 submit0",
+"Night 3 (closes 02:15): you'll 🔍 investigate Alias12. You can change your mind until the deadline."
+],
+[
+"n3 h3 steal self",
+"GameError",
+"You can't target yourself."
+],
+[
+"n3 h3 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n3 h3 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n3 who moved",
+[
+[
+"Alias12",
+"Alias08",
+"Alias05",
+"Alias11"
+],
+[]
+]
+],
+[
+"n3 late submit",
+"Night 4 (closes 02:20): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n3 outbox",
+{
+"id": "o17",
+"text": "📰 **News: Night 3 (closed 02:15)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+"📰 **News: Night 3 (closed 02:15)**\n- 🌙 A quiet night. Nobody lost anything."
+],
+[
+"n3 outbox",
+{
+"id": "o18",
+"ref": "r3-3-0",
+"to": "radio"
+},
+"Someone should watch Alias08's back tonight."
+],
+[
+"n3 outbox",
+{
+"id": "o19",
+"text": "🌙 **Night 3 (closed 02:15)**\n🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 3 (closed 02:15)**\n🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n3 outbox",
+{
+"id": "o20",
+"text": "🌙 **Night 3 (closed 02:15)**\n🎁 You gave Alias05 1.\n🍽️ You ate 1.\n🥫 You now have 5 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 3 (closed 02:15)**\n🎁 You gave Alias05 1.\n🍽️ You ate 1.\n🥫 You now have 5 rations."
+],
+[
+"n3 outbox",
+{
+"id": "o21",
+"text": "🌙 **Night 3 (closed 02:15)**\n🛡️ You're on guard for nights 3 and 4.\n🎁 Alias08 secretly gave you 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 3 (closed 02:15)**\n🛡️ You're on guard for nights 3 and 4.\n🎁 Alias08 secretly gave you 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n3 outbox",
+{
+"id": "o22",
+"text": "🌙 **Night 3 (closed 02:15)**\n🔍 You watched Alias12: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:3"
+},
+"🌙 **Night 3 (closed 02:15)**\n🔍 You watched Alias12: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n4 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+3,
+3,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 4 of 10** · moves close <t:1200:R> (<t:1200:t>) · tap 🎮 Play\n✅ Nights done: 1 2 3"
+]
+],
+[
+"n4 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 4 (closes 02:20)**: Alias12, 🥫 1 rations. What will you do tonight?",
+"moves": {
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias11"
+]
+},
+"radio": true
+}
+],
+[
+"n4 h0 status",
+"**Alias12**: 🥫 1 rations, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: scavenge."
+],
+[
+"n4 h0 results",
+"🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n4 h0 submit0",
+"Night 4 (closes 02:20): you'll 🔍 investigate Alias05. You can change your mind until the deadline."
+],
+[
+"n4 h1 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 4 (closes 02:20)**: Alias08, 🥫 5 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n4 h1 status",
+"**Alias08**: 🥫 5 rations, 🛡️ 2 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 1/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n4 h1 results",
+"🎁 You gave Alias05 1.\n🍽️ You ate 1.\n🥫 You now have 5 rations."
+],
+[
+"n4 h1 submit0",
+"Night 4 (closes 02:20): you'll 🥷 steal from Alias12. You can change your mind until the deadline."
+],
+[
+"n4 h1 submit1",
+"Night 4 (closes 02:20): you'll 🔍 investigate Alias12. You can change your mind until the deadline."
+],
+[
+"n4 h1 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n4 h1 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n4 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 4 (closes 02:20)**: Alias05, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"investigate": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n4 h2 status",
+"**Alias05**: 🥫 7 rations, 🛡️ 2 guards left, guarded tonight.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n4 h2 results",
+"🛡️ You're on guard for nights 3 and 4.\n🎁 Alias08 secretly gave you 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n4 h2 submit0",
+"Night 4 (closes 02:20): you'll 🥷 steal from Alias08. You can change your mind until the deadline."
+],
+[
+"n4 h2 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n4 h2 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n4 h3 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 4 (closes 02:20)**: Alias11, 🥫 4 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n4 h3 status",
+"**Alias11**: 🥫 4 rations, 🛡️ 3 guards left.\nSecret goal: finish with more rations than Alias08.\n⏳ **Progress:** decided at the end: you have 4, Alias08's stash is secret..\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n4 h3 results",
+"🔍 You watched Alias12: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n4 who moved",
+[
+[
+"Alias12",
+"Alias08",
+"Alias05"
+],
+[
+"Alias11"
+]
+]
+],
+[
+"n4 late submit",
+"Night 5 (closes 02:25): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n4 outbox",
+{
+"id": "o23",
+"text": "📰 **News: Night 4 (closed 02:20)**\n- 🥷 Someone hit Alias08 overnight. Alias08 is down 2.\n- 🕵️ EXPOSED: an investigator saw Alias05 rob Alias08. Alias05 pays them 1.",
+"to": "news"
+},
+"📰 **News: Night 4 (closed 02:20)**\n- 🥷 Someone hit Alias08 overnight. Alias08 is down 2.\n- 🕵️ EXPOSED: an investigator saw Alias05 rob Alias08. Alias05 pays them 1."
+],
+[
+"n4 outbox",
+{
+"id": "o24",
+"ref": "r4-1-0",
+"to": "radio"
+},
+"I'm innocent. Leave me alone."
+],
+[
+"n4 outbox",
+{
+"id": "o25",
+"ref": "r4-2-1",
+"to": "radio"
+},
+"Alias12 is lying about their rations."
+],
+[
+"n4 outbox",
+{
+"id": "o26",
+"text": "🌙 **Night 4 (closed 02:20)**\n🔍 You watched Alias05: they chose steal (Alias08).\n🕵️ You exposed Alias05; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 4 (closed 02:20)**\n🔍 You watched Alias05: they chose steal (Alias08).\n🕵️ You exposed Alias05; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n4 outbox",
+{
+"id": "o27",
+"text": "🌙 **Night 4 (closed 02:20)**\n🥷 Someone stole 2 from you.\n🔍 You watched Alias12: they chose investigate (Alias05).\n🍽️ You ate 1.\n🥫 You now have 2 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 4 (closed 02:20)**\n🥷 Someone stole 2 from you.\n🔍 You watched Alias12: they chose investigate (Alias05).\n🍽️ You ate 1.\n🥫 You now have 2 rations."
+],
+[
+"n4 outbox",
+{
+"id": "o28",
+"text": "🌙 **Night 4 (closed 02:20)**\n🥷 You stole 2 from Alias08.\n🕵️ EXPOSED: an investigator saw you rob Alias08. You paid them 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 4 (closed 02:20)**\n🥷 You stole 2 from Alias08.\n🕵️ EXPOSED: an investigator saw you rob Alias08. You paid them 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n4 outbox",
+{
+"id": "o29",
+"text": "🌙 **Night 4 (closed 02:20)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 3 rations.",
+"to": "dm:3"
+},
+"🌙 **Night 4 (closed 02:20)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 3 rations."
+],
+[
+"n5 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+4,
+4,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 5 of 10** · moves close <t:1500:R> (<t:1500:t>) · tap 🎮 Play\n✅ Nights done: 1 2 3 4"
+]
+],
+[
+"n5 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 5 (closes 02:25)**: Alias12, 🥫 1 rations. What will you do tonight?",
+"moves": {
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias11"
+]
+},
+"radio": true
+}
+],
+[
+"n5 h0 status",
+"**Alias12**: 🥫 1 rations, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: scavenge."
+],
+[
+"n5 h0 results",
+"🔍 You watched Alias05: they chose steal (Alias08).\n🕵️ You exposed Alias05; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n5 h0 submit0",
+"Night 5 (closes 02:25): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n5 h0 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n5 h0 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n5 h1 menu",
+{
+"gift_amounts": [
+1
+],
+"header": "**Night 5 (closes 02:25)**: Alias08, 🥫 2 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n5 h1 status",
+"**Alias08**: 🥫 2 rations, 🛡️ 2 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 1/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n5 h1 results",
+"🥷 Someone stole 2 from you.\n🔍 You watched Alias12: they chose investigate (Alias05).\n🍽️ You ate 1.\n🥫 You now have 2 rations."
+],
+[
+"n5 h1 submit0",
+"Night 5 (closes 02:25): you'll 🔍 investigate Alias05. You can change your mind until the deadline."
+],
+[
+"n5 h1 steal self",
+"GameError",
+"You can't target yourself."
+],
+[
+"n5 h1 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n5 h1 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n5 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 5 (closes 02:25)**: Alias05, 🥫 7 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n5 h2 status",
+"**Alias05**: 🥫 7 rations, 🛡️ 2 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n5 h2 results",
+"🥷 You stole 2 from Alias08.\n🕵️ EXPOSED: an investigator saw you rob Alias08. You paid them 1.\n🍽️ You ate 1.\n🥫 You now have 7 rations."
+],
+[
+"n5 h3 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 5 (closes 02:25)**: Alias11, 🥫 3 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n5 h3 status",
+"**Alias11**: 🥫 3 rations, 🛡️ 3 guards left.\nSecret goal: finish with more rations than Alias08.\n⏳ **Progress:** decided at the end: you have 3, Alias08's stash is secret..\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n5 h3 results",
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 3 rations."
+],
+[
+"n5 h3 submit0",
+"Night 5 (closes 02:25): you'll 🛡️ guard. You can change your mind until the deadline."
+],
+[
+"n5 who moved",
+[
+[
+"Alias12",
+"Alias08",
+"Alias11"
+],
+[
+"Alias05"
+]
+]
+],
+[
+"n5 late submit",
+"Night 6 (closes 02:30): you'll 🥫 scavenge. You can change your mind until the deadline."
+],
+[
+"n5 outbox",
+{
+"id": "o30",
+"text": "📰 **News: Night 5 (closed 02:25)**\n- 🌙 A quiet night. Nobody lost anything.",
+"to": "news"
+},
+"📰 **News: Night 5 (closed 02:25)**\n- 🌙 A quiet night. Nobody lost anything."
+],
+[
+"n5 outbox",
+{
+"id": "o31",
+"ref": "r5-0-0",
+"to": "radio"
+},
+"Alias08 is lying about their rations."
+],
+[
+"n5 outbox",
+{
+"id": "o32",
+"ref": "r5-1-1",
+"to": "radio"
+},
+"I'm innocent. Leave me alone."
+],
+[
+"n5 outbox",
+{
+"id": "o33",
+"text": "🌙 **Night 5 (closed 02:25)**\n🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 5 (closed 02:25)**\n🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n5 outbox",
+{
+"id": "o34",
+"text": "🌙 **Night 5 (closed 02:25)**\n🔍 You watched Alias05: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 5 (closed 02:25)**\n🔍 You watched Alias05: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n5 outbox",
+{
+"id": "o35",
+"text": "🌙 **Night 5 (closed 02:25)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 6 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 5 (closed 02:25)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 6 rations."
+],
+[
+"n5 outbox",
+{
+"id": "o36",
+"text": "🌙 **Night 5 (closed 02:25)**\n🛡️ You're on guard for nights 5 and 6.\n🍽️ You ate 1.\n🥫 You now have 2 rations.",
+"to": "dm:3"
+},
+"🌙 **Night 5 (closed 02:25)**\n🛡️ You're on guard for nights 5 and 6.\n🍽️ You ate 1.\n🥫 You now have 2 rations."
+],
+[
+"n6 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+5,
+5,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 6 of 10** · moves close <t:1800:R> (<t:1800:t>) · tap 🎮 Play\n✅ Nights done: 1 2 3 4 5"
+]
+],
+[
+"n6 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 6 (closes 02:30)**: Alias12, 🥫 1 rations. What will you do tonight?",
+"moves": {
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias11"
+]
+},
+"radio": true
+}
+],
+[
+"n6 h0 status",
+"**Alias12**: 🥫 1 rations, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: scavenge."
+],
+[
+"n6 h0 results",
+"🥫 You scavenged and found 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n6 h1 menu",
+{
+"gift_amounts": [],
+"header": "**Night 6 (closes 02:30)**: Alias08, 🥫 1 rations. What will you do tonight?",
+"moves": {
+"guard": [],
+"investigate": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n6 h1 status",
+"**Alias08**: 🥫 1 rations, 🛡️ 2 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 1/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n6 h1 results",
+"🔍 You watched Alias05: they chose scavenge.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n6 h1 submit0",
+"Night 6 (closes 02:30): you'll 🛡️ guard. You can change your mind until the deadline."
+],
+[
+"n6 h1 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n6 h1 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n6 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 6 (closes 02:30)**: Alias05, 🥫 6 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n6 h2 status",
+"**Alias05**: 🥫 6 rations, 🛡️ 2 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n6 h2 results",
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 6 rations."
+],
+[
+"n6 h3 menu",
+{
+"gift_amounts": [
+1
+],
+"header": "**Night 6 (closes 02:30)**: Alias11, 🥫 2 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n6 h3 status",
+"**Alias11**: 🥫 2 rations, 🛡️ 2 guards left, guarded tonight.\nSecret goal: finish with more rations than Alias08.\n⏳ **Progress:** decided at the end: you have 2, Alias08's stash is secret..\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n6 h3 results",
+"🛡️ You're on guard for nights 5 and 6.\n🍽️ You ate 1.\n🥫 You now have 2 rations."
+],
+[
+"n6 who moved",
+[
+[
+"Alias12",
+"Alias08"
+],
+[
+"Alias05",
+"Alias11"
+]
+]
+],
+[
+"n6 late submit",
+"GameError",
+"Bandits can only steal or investigate."
+],
+[
+"n6 outbox",
+{
+"id": "o37",
+"text": "📰 **News: Night 6 (closed 02:30)**\n- 🏴‍☠️ Alias12 ran out of food. Alias12 is back... as a bandit.\n- 🏴‍☠️ Alias08 ran out of food. Alias08 is back... as a bandit.",
+"to": "news"
+},
+"📰 **News: Night 6 (closed 02:30)**\n- 🏴‍☠️ Alias12 ran out of food. Alias12 is back... as a bandit.\n- 🏴‍☠️ Alias08 ran out of food. Alias08 is back... as a bandit."
+],
+[
+"n6 outbox",
+{
+"id": "o38",
+"ref": "r6-1-0",
+"to": "radio"
+},
+"I'm innocent. Leave me alone."
+],
+[
+"n6 outbox",
+{
+"id": "o39",
+"text": "🌙 **Night 6 (closed 02:30)**\n🥫 You scavenged and found 0.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 6 (closed 02:30)**\n🥫 You scavenged and found 0.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations."
+],
+[
+"n6 outbox",
+{
+"id": "o40",
+"text": "🌙 **Night 6 (closed 02:30)**\n🛡️ You're on guard for nights 6 and 7.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 6 (closed 02:30)**\n🛡️ You're on guard for nights 6 and 7.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations."
+],
+[
+"n6 outbox",
+{
+"id": "o41",
+"text": "🌙 **Night 6 (closed 02:30)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 5 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 6 (closed 02:30)**\n🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 5 rations."
+],
+[
+"n6 outbox",
+{
+"id": "o42",
+"text": "🌙 **Night 6 (closed 02:30)**\n🥫 You didn't choose a move, so you scavenged automatically and found 2.\n🍽️ You ate 1.\n🥫 You now have 3 rations.",
+"to": "dm:3"
+},
+"🌙 **Night 6 (closed 02:30)**\n🥫 You didn't choose a move, so you scavenged automatically and found 2.\n🍽️ You ate 1.\n🥫 You now have 3 rations."
+],
+[
+"n7 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+6,
+6,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 7 of 10** · moves close <t:2100:R> (<t:2100:t>) · tap 🎮 Play\n✅ Nights done: 1 2 3 4 5 6"
+]
+],
+[
+"n7 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 7 (closes 02:35)**: Alias12, 🏴‍☠️ bandit. What will you do tonight?",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias08",
+"Alias11"
+],
+"steal": [
+"Alias05",
+"Alias08",
+"Alias11"
+]
+},
+"radio": true
+}
+],
+[
+"n7 h0 status",
+"**Alias12**: 🥫 0 rations 🏴‍☠️ BANDIT, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n7 h0 results",
+"🥫 You scavenged and found 0.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations."
+],
+[
+"n7 h0 submit0",
+"Night 7 (closes 02:35): you'll 🥷 steal from Alias08. You can change your mind until the deadline."
+],
+[
+"n7 h1 menu",
+{
+"gift_amounts": [],
+"header": "**Night 7 (closes 02:35)**: Alias08, 🏴‍☠️ bandit. What will you do tonight?",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias11",
+"Alias12"
+],
+"steal": [
+"Alias05",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n7 h1 status",
+"**Alias08**: 🥫 0 rations 🏴‍☠️ BANDIT, 🛡️ 1 guards left, guarded tonight.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 1/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n7 h1 results",
+"🛡️ You're on guard for nights 6 and 7.\n🏴‍☠️ You ran out of food. You're a bandit now: steal or investigate until you get back to 3.\n🍽️ You ate 1.\n🥫 You now have 0 rations."
+],
+[
+"n7 h1 submit0",
+"Night 7 (closes 02:35): you'll 🔍 investigate Alias05. You can change your mind until the deadline."
+],
+[
+"n7 h1 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n7 h1 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n7 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 7 (closes 02:35)**: Alias05, 🥫 5 rations. What will you do tonight?",
+"moves": {
+"gift": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias11",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias11",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n7 h2 status",
+"**Alias05**: 🥫 5 rations, 🛡️ 2 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n7 h2 results",
+"🥫 You didn't choose a move, so you scavenged automatically and found 0.\n🍽️ You ate 1.\n🥫 You now have 5 rations."
+],
+[
+"n7 h2 submit0",
+"Night 7 (closes 02:35): you'll 🛡️ guard. You can change your mind until the deadline."
+],
+[
+"n7 h2 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n7 h2 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n7 h3 quit",
+"You've left the game. Thanks for playing."
+],
+[
+"n7 h3 quit again",
+"You've already left."
+],
+[
+"n7 h3 menu after quit",
+"GameError",
+"You're not in this game."
+],
+[
+"n7 who moved",
+[
+[
+"Alias12",
+"Alias08",
+"Alias05"
+],
+[]
+]
+],
+[
+"n7 late submit",
+"GameError",
+"Bandits can only steal or investigate."
+],
+[
+"n7 outbox",
+{
+"id": "o43",
+"text": "Alias11 has left the game. Their food goes with them.",
+"to": "news"
+},
+"Alias11 has left the game. Their food goes with them."
+],
+[
+"n7 outbox",
+{
+"id": "o44",
+"text": "📰 **News: Night 7 (closed 02:35)**\n- 🥷 Someone broke into Alias08's place and found nothing.\n\n⏳ **3 nights left**, then the helicopter.",
+"to": "news"
+},
+"📰 **News: Night 7 (closed 02:35)**\n- 🥷 Someone broke into Alias08's place and found nothing.\n\n⏳ **3 nights left**, then the helicopter."
+],
+[
+"n7 outbox",
+{
+"id": "o45",
+"ref": "r7-1-0",
+"to": "radio"
+},
+"I saw Alias11 sneaking around last night."
+],
+[
+"n7 outbox",
+{
+"id": "o46",
+"ref": "r7-2-1",
+"to": "radio"
+},
+"I saw Alias08 sneaking around last night."
+],
+[
+"n7 outbox",
+{
+"id": "o47",
+"text": "🌙 **Night 7 (closed 02:35)**\n🥷 You broke into Alias08's place and found nothing.\n🥫 You now have 0 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 7 (closed 02:35)**\n🥷 You broke into Alias08's place and found nothing.\n🥫 You now have 0 rations."
+],
+[
+"n7 outbox",
+{
+"id": "o48",
+"text": "🌙 **Night 7 (closed 02:35)**\n🔍 You watched Alias05: they chose guard.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 7 (closed 02:35)**\n🔍 You watched Alias05: they chose guard.\n🥫 You now have 0 rations."
+],
+[
+"n7 outbox",
+{
+"id": "o49",
+"text": "🌙 **Night 7 (closed 02:35)**\n🛡️ You're on guard for nights 7 and 8.\n🍽️ You ate 1.\n🥫 You now have 4 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 7 (closed 02:35)**\n🛡️ You're on guard for nights 7 and 8.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n8 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+7,
+7,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 8 of 10** · moves close <t:2400:R> (<t:2400:t>) · tap 🎮 Play\n⏳ **3 nights left**, then the helicopter.\n✅ Nights done: 1 2 3 4 5 6 7"
+]
+],
+[
+"n8 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 8 (closes 02:40)**: Alias12, 🏴‍☠️ bandit. What will you do tonight?\n⏳ **3 nights left**, then the helicopter.",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias08"
+],
+"steal": [
+"Alias05",
+"Alias08"
+]
+},
+"radio": true
+}
+],
+[
+"n8 h0 status",
+"**Alias12**: 🥫 0 rations 🏴‍☠️ BANDIT, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n8 h0 results",
+"🥷 You broke into Alias08's place and found nothing.\n🥫 You now have 0 rations."
+],
+[
+"n8 h1 menu",
+{
+"gift_amounts": [],
+"header": "**Night 8 (closes 02:40)**: Alias08, 🏴‍☠️ bandit. What will you do tonight?\n⏳ **3 nights left**, then the helicopter.",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias12"
+],
+"steal": [
+"Alias05",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n8 h1 status",
+"**Alias08**: 🥫 0 rations 🏴‍☠️ BANDIT, 🛡️ 1 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 1/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n8 h1 results",
+"🔍 You watched Alias05: they chose guard.\n🥫 You now have 0 rations."
+],
+[
+"n8 h1 submit0",
+"Night 8 (closes 02:40): you'll 🥷 steal from Alias12. You can change your mind until the deadline.\n⏳ **3 nights left**, then the helicopter."
+],
+[
+"n8 h2 menu",
+{
+"gift_amounts": [
+1,
+2
+],
+"header": "**Night 8 (closes 02:40)**: Alias05, 🥫 4 rations. What will you do tonight?\n⏳ **3 nights left**, then the helicopter.",
+"moves": {
+"gift": [
+"Alias08",
+"Alias12"
+],
+"investigate": [
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n8 h2 status",
+"**Alias05**: 🥫 4 rations, 🛡️ 1 guards left, guarded tonight.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n8 h2 results",
+"🛡️ You're on guard for nights 7 and 8.\n🍽️ You ate 1.\n🥫 You now have 4 rations."
+],
+[
+"n8 h2 submit0",
+"Night 8 (closes 02:40): you'll 🎁 give Alias12 2. You can change your mind until the deadline.\n⏳ **3 nights left**, then the helicopter."
+],
+[
+"n8 h3 menu after quit",
+"GameError",
+"You're not in this game."
+],
+[
+"n8 who moved",
+[
+[
+"Alias08",
+"Alias05"
+],
+[
+"Alias12"
+]
+]
+],
+[
+"n8 late submit",
+"GameError",
+"Bandits can only steal or investigate."
+],
+[
+"n8 outbox",
+{
+"id": "o50",
+"text": "📰 **News: Night 8 (closed 02:40)**\n- 🥷 Someone broke into Alias12's place and found nothing.\n\n⏳ **2 nights left**, then the helicopter.",
+"to": "news"
+},
+"📰 **News: Night 8 (closed 02:40)**\n- 🥷 Someone broke into Alias12's place and found nothing.\n\n⏳ **2 nights left**, then the helicopter."
+],
+[
+"n8 outbox",
+{
+"id": "o51",
+"text": "🌙 **Night 8 (closed 02:40)**\n🎁 Alias05 secretly gave you 2.\n🥫 You now have 2 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 8 (closed 02:40)**\n🎁 Alias05 secretly gave you 2.\n🥫 You now have 2 rations."
+],
+[
+"n8 outbox",
+{
+"id": "o52",
+"text": "🌙 **Night 8 (closed 02:40)**\n🥷 You broke into Alias12's place and found nothing.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 8 (closed 02:40)**\n🥷 You broke into Alias12's place and found nothing.\n🥫 You now have 0 rations."
+],
+[
+"n8 outbox",
+{
+"id": "o53",
+"text": "🌙 **Night 8 (closed 02:40)**\n🎁 You gave Alias12 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 8 (closed 02:40)**\n🎁 You gave Alias12 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n9 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+8,
+8,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 9 of 10** · moves close <t:2700:R> (<t:2700:t>) · tap 🎮 Play\n⏳ **2 nights left**, then the helicopter.\n✅ Nights done: 1 2 3 4 5 6 7 8"
+]
+],
+[
+"n9 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 9 (closes 02:45)**: Alias12, 🏴‍☠️ bandit. What will you do tonight?\n⏳ **2 nights left**, then the helicopter.",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias08"
+],
+"steal": [
+"Alias05",
+"Alias08"
+]
+},
+"radio": true
+}
+],
+[
+"n9 h0 status",
+"**Alias12**: 🥫 2 rations 🏴‍☠️ BANDIT, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n9 h0 results",
+"🎁 Alias05 secretly gave you 2.\n🥫 You now have 2 rations."
+],
+[
+"n9 h0 submit0",
+"Night 9 (closes 02:45): you'll 🔍 investigate Alias05. You can change your mind until the deadline.\n⏳ **2 nights left**, then the helicopter."
+],
+[
+"n9 h0 submit1",
+"Night 9 (closes 02:45): you'll 🔍 investigate Alias05. You can change your mind until the deadline.\n⏳ **2 nights left**, then the helicopter."
+],
+[
+"n9 h0 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n9 h0 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n9 h1 menu",
+{
+"gift_amounts": [],
+"header": "**Night 9 (closes 02:45)**: Alias08, 🏴‍☠️ bandit. What will you do tonight?\n⏳ **2 nights left**, then the helicopter.",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias12"
+],
+"steal": [
+"Alias05",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n9 h1 status",
+"**Alias08**: 🥫 0 rations 🏴‍☠️ BANDIT, 🛡️ 1 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 1/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n9 h1 results",
+"🥷 You broke into Alias12's place and found nothing.\n🥫 You now have 0 rations."
+],
+[
+"n9 h1 submit0",
+"Night 9 (closes 02:45): you'll 🥷 steal from Alias12. You can change your mind until the deadline.\n⏳ **2 nights left**, then the helicopter."
+],
+[
+"n9 h1 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n9 h1 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n9 h2 menu",
+{
+"gift_amounts": [],
+"header": "**Night 9 (closes 02:45)**: Alias05, 🥫 1 rations. What will you do tonight?\n⏳ **2 nights left**, then the helicopter.",
+"moves": {
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n9 h2 status",
+"**Alias05**: 🥫 1 rations, 🛡️ 1 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n9 h2 results",
+"🎁 You gave Alias12 2.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n9 h2 submit0",
+"Night 9 (closes 02:45): you'll 🔍 investigate Alias08. You can change your mind until the deadline.\n⏳ **2 nights left**, then the helicopter."
+],
+[
+"n9 h2 radio",
+"Your anonymous message goes out with the morning news."
+],
+[
+"n9 h2 radio twice",
+"GameError",
+"One radio message a day. Yours goes out with the morning news."
+],
+[
+"n9 h3 menu after quit",
+"GameError",
+"You're not in this game."
+],
+[
+"n9 who moved",
+[
+[
+"Alias12",
+"Alias08",
+"Alias05"
+],
+[]
+]
+],
+[
+"n9 late submit",
+"GameError",
+"Bandits can only steal or investigate."
+],
+[
+"n9 outbox",
+{
+"id": "o54",
+"text": "📰 **News: Night 9 (closed 02:45)**\n- 🥷 Someone hit Alias12 overnight. Alias12 is down 1.\n- 🕵️ EXPOSED: an investigator saw Alias08 rob Alias12. Alias08 pays them 1.\n\n🚁 **Tonight is the LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes.",
+"to": "news"
+},
+"📰 **News: Night 9 (closed 02:45)**\n- 🥷 Someone hit Alias12 overnight. Alias12 is down 1.\n- 🕵️ EXPOSED: an investigator saw Alias08 rob Alias12. Alias08 pays them 1.\n\n🚁 **Tonight is the LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes."
+],
+[
+"n9 outbox",
+{
+"id": "o55",
+"ref": "r9-0-0",
+"to": "radio"
+},
+"Don't trust Alias05."
+],
+[
+"n9 outbox",
+{
+"id": "o56",
+"ref": "r9-1-1",
+"to": "radio"
+},
+"Alias05 looks like an easy target."
+],
+[
+"n9 outbox",
+{
+"id": "o57",
+"ref": "r9-2-2",
+"to": "radio"
+},
+"I'm innocent. Leave me alone."
+],
+[
+"n9 outbox",
+{
+"id": "o58",
+"text": "🌙 **Night 9 (closed 02:45)**\n🥷 Someone stole 1 from you.\n🔍 You watched Alias05: they chose investigate (Alias08).\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 9 (closed 02:45)**\n🥷 Someone stole 1 from you.\n🔍 You watched Alias05: they chose investigate (Alias08).\n🥫 You now have 1 rations."
+],
+[
+"n9 outbox",
+{
+"id": "o59",
+"text": "🌙 **Night 9 (closed 02:45)**\n🥷 You stole 1 from Alias12.\n🕵️ EXPOSED: an investigator saw you rob Alias12. You paid them 1.\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 9 (closed 02:45)**\n🥷 You stole 1 from Alias12.\n🕵️ EXPOSED: an investigator saw you rob Alias12. You paid them 1.\n🥫 You now have 0 rations."
+],
+[
+"n9 outbox",
+{
+"id": "o60",
+"text": "🌙 **Night 9 (closed 02:45)**\n🔍 You watched Alias08: they chose steal (Alias12).\n🕵️ You exposed Alias08; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 9 (closed 02:45)**\n🔍 You watched Alias08: they chose steal (Alias12).\n🕵️ You exposed Alias08; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n10 board",
+[
+[
+"fixture-humans4_default_rules_no_sims",
+9,
+9,
+false
+],
+"🔥 **Survivors** · 4 players\n🌙 **Night 10 of 10** · moves close <t:3000:R> (<t:3000:t>) · tap 🎮 Play\n🚁 **LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes.\n✅ Nights done: 1 2 3 4 5 6 7 8 9"
+]
+],
+[
+"n10 h0 menu",
+{
+"gift_amounts": [],
+"header": "**Night 10 (closes 02:50)**: Alias12, 🏴‍☠️ bandit. What will you do tonight?\n🚁 **LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes.",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias08"
+],
+"steal": [
+"Alias05",
+"Alias08"
+]
+},
+"radio": true
+}
+],
+[
+"n10 h0 status",
+"**Alias12**: 🥫 1 rations 🏴‍☠️ BANDIT, 🛡️ 3 guards left.\nSecret goal: steal 3 times before you're ever caught.\n🎯 **Progress:** 0/3 clean steals, never caught so far.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n10 h0 results",
+"🥷 Someone stole 1 from you.\n🔍 You watched Alias05: they chose investigate (Alias08).\n🥫 You now have 1 rations."
+],
+[
+"n10 h0 submit0",
+"Night 10 (closes 02:50): you'll 🥷 steal from Alias08. You can change your mind until the deadline.\n🚁 **LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes."
+],
+[
+"n10 h1 menu",
+{
+"gift_amounts": [],
+"header": "**Night 10 (closes 02:50)**: Alias08, 🏴‍☠️ bandit. What will you do tonight?\n🚁 **LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes.",
+"moves": {
+"investigate": [
+"Alias05",
+"Alias12"
+],
+"steal": [
+"Alias05",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n10 h1 status",
+"**Alias08**: 🥫 0 rations 🏴‍☠️ BANDIT, 🛡️ 1 guards left.\nSecret goal: give away 3 rations over the game.\n🎯 **Progress:** 1/3 given.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n10 h1 results",
+"🥷 You stole 1 from Alias12.\n🕵️ EXPOSED: an investigator saw you rob Alias12. You paid them 1.\n🥫 You now have 0 rations."
+],
+[
+"n10 h2 menu",
+{
+"gift_amounts": [],
+"header": "**Night 10 (closes 02:50)**: Alias05, 🥫 1 rations. What will you do tonight?\n🚁 **LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes.",
+"moves": {
+"guard": [],
+"investigate": [
+"Alias08",
+"Alias12"
+],
+"scavenge": [],
+"steal": [
+"Alias08",
+"Alias12"
+]
+},
+"radio": true
+}
+],
+[
+"n10 h2 status",
+"**Alias05**: 🥫 1 rations, 🛡️ 1 guards left.\nSecret goal: get robbed at least 1x and still extract.\n🎯 **Progress:** robbed 0/1 so far, and you'll need a seat at the end.\nTonight: not chosen yet (you'll scavenge if you forget)."
+],
+[
+"n10 h2 results",
+"🔍 You watched Alias08: they chose steal (Alias12).\n🕵️ You exposed Alias08; they paid you 1.\n🍽️ You ate 1.\n🥫 You now have 1 rations."
+],
+[
+"n10 h2 submit0",
+"Night 10 (closes 02:50): you'll 🥫 scavenge. You can change your mind until the deadline.\n🚁 **LAST NIGHT:** the helicopter comes after this. Seats go to the biggest stashes."
+],
+[
+"n10 h3 menu after quit",
+"GameError",
+"You're not in this game."
+],
+[
+"n10 who moved",
+[
+[
+"Alias12",
+"Alias05"
+],
+[
+"Alias08"
+]
+]
+],
+[
+"n10 late submit",
+"GameError",
+"Bandits can only steal or investigate."
+],
+[
+"n10 outbox",
+{
+"id": "o61",
+"text": "📰 **News: Night 10 (closed 02:50)**\n- 🥷 Someone broke into Alias08's place and found nothing.",
+"to": "news"
+},
+"📰 **News: Night 10 (closed 02:50)**\n- 🥷 Someone broke into Alias08's place and found nothing."
+],
+[
+"n10 outbox",
+{
+"id": "o62",
+"text": "🌙 **Night 10 (closed 02:50)**\n🥷 You broke into Alias08's place and found nothing.\n🥫 You now have 1 rations.",
+"to": "dm:0"
+},
+"🌙 **Night 10 (closed 02:50)**\n🥷 You broke into Alias08's place and found nothing.\n🥫 You now have 1 rations."
+],
+[
+"n10 outbox",
+{
+"id": "o63",
+"text": "🌙 **Night 10 (closed 02:50)**\n🥫 You now have 0 rations.",
+"to": "dm:1"
+},
+"🌙 **Night 10 (closed 02:50)**\n🥫 You now have 0 rations."
+],
+[
+"n10 outbox",
+{
+"id": "o64",
+"text": "🌙 **Night 10 (closed 02:50)**\n🥫 You scavenged and found 2.\n🍽️ You ate 1.\n🥫 You now have 2 rations.",
+"to": "dm:2"
+},
+"🌙 **Night 10 (closed 02:50)**\n🥫 You scavenged and found 2.\n🍽️ You ate 1.\n🥫 You now have 2 rations."
+],
+[
+"n10 outbox",
+{
+"id": "o65",
+"image": "reveal",
+"text": "🚁 The helicopter takes Alias05.\n🏆 Winner: Alias05.\n\n**The reveal**\n- Alias05: 3 pts, 2 rations, goal: get robbed at least 1x and still extract (missed); stole 2, robbed 0x, gave away 2\n- Alias12: 0 pts, 1 rations, goal: steal 3 times before you're ever caught (missed); stole 0, robbed 1x, gave away 4\n- Alias08: 0 pts, 0 rations, goal: give away 3 rations over the game (missed); stole 1, robbed 1x, gave away 1\n- Alias11: 0 pts, 0 rations, goal: finish with more rations than Alias08 (missed); stole 0, robbed 0x, gave away 2",
+"to": "news"
+},
+"🚁 The helicopter takes Alias05.\n🏆 Winner: Alias05.\n\n**The reveal**\n- Alias05: 3 pts, 2 rations, goal: get robbed at least 1x and still extract (missed); stole 2, robbed 0x, gave away 2\n- Alias12: 0 pts, 1 rations, goal: steal 3 times before you're ever caught (missed); stole 0, robbed 1x, gave away 4\n- Alias08: 0 pts, 0 rations, goal: give away 3 rations over the game (missed); stole 1, robbed 1x, gave away 1\n- Alias11: 0 pts, 0 rations, goal: finish with more rations than Alias08 (missed); stole 0, robbed 0x, gave away 2"
+],
+[
+"finished",
+true
+],
+[
+"reveal",
+[
+[
+{
+"gave_away": 2,
+"goal": "get robbed at least 1x and still extract",
+"goal_done": false,
+"player": "Alias05",
+"rank": 1,
+"rations": 2,
+"score": 3,
+"seat": true,
+"stole": 2,
+"times_robbed": 0
+},
+{
+"gave_away": 4,
+"goal": "steal 3 times before you're ever caught",
+"goal_done": false,
+"player": "Alias12",
+"rank": 2,
+"rations": 1,
+"score": 0,
+"seat": false,
+"stole": 0,
+"times_robbed": 1
+},
+{
+"gave_away": 1,
+"goal": "give away 3 rations over the game",
+"goal_done": false,
+"player": "Alias08",
+"rank": 3,
+"rations": 0,
+"score": 0,
+"seat": false,
+"stole": 1,
+"times_robbed": 1
+},
+{
+"gave_away": 2,
+"goal": "finish with more rations than Alias08",
+"goal_done": false,
+"player": "Alias11",
+"rank": 4,
+"rations": 0,
+"score": 0,
+"seat": false,
+"stole": 0,
+"times_robbed": 0
+}
+],
+[
+"Alias05"
+]
+]
+],
+[
+"menu after end",
+"GameError",
+"There's no round open right now."
+],
+[
+"replayed state",
+{
+"0": [
+1,
+true
+],
+"1": [
+0,
+true
+],
+"2": [
+2,
+false
+],
+"3": [
+0,
+false
+]
+}
+]
+]
+}
