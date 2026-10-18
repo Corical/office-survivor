@@ -2,7 +2,10 @@ class_name RoundScreen
 extends Control
 ## The decision screen. From the model alone: who I am, how long is left, my resources and goal, everyone's home, the
 ## moves the server offers (with their targets and amounts), Lock, how many have locked, and the radio.
-## Layout is a neutral placeholder; the look comes from the theme.
+## Layout: one column on a phone with what you act on first (who you are, the clock, the moves, Lock); two columns on a
+## wide window (acting on the left, information on the right). The look comes from the theme.
+
+const WIDE_PX := 900                # chosen: at this width and above the screen uses two columns
 
 var _m: Dictionary = {}
 var _move: Dictionary = {}          # the picker being filled in (local, until a pick is sent)
@@ -11,13 +14,22 @@ var _radio_open := false
 var _radio_phrase: Dictionary = {}
 var _timer_label: Label
 var _timer_bar: ProgressBar
+var _wide := false
+var _building := false
 
 
 func _ready() -> void:
 	Feed.model_changed.connect(_on_model)
+	resized.connect(_on_resized)
 	if Feed.models.has("round"):
 		_m = Feed.models.round
 	_build()
+
+
+## Only a change between the phone layout and the wide one needs a rebuild (and never while one is running).
+func _on_resized() -> void:
+	if not _building and (size.x >= WIDE_PX) != _wide:
+		_build()
 
 
 func _on_model(kind: String, m: Dictionary) -> void:
@@ -51,104 +63,142 @@ func _tick() -> void:
 
 
 func _build() -> void:
+	if _building:
+		return
+	_building = true
+	_wide = size.x >= WIDE_PX
 	for c in get_children():
 		remove_child(c)
 		c.queue_free()
 	_timer_label = null
 	_timer_bar = null
-	var col := Ui.page(self)
+	var page := Ui.page(self)
 	if _m.is_empty():
-		col.add_child(Ui.label(Words.render("ui.nothing_to_show"), "empty"))
+		page.add_child(Ui.label(Words.render("ui.nothing_to_show"), "empty"))
+		_building = false
 		return
 	var open: bool = _m.lock.picker_open
+	var head := _head()
+	var act := _act(open)
+	var goal := _goal()
+	var roster := _roster()
+	var radio := _radio(open)
+	if size.x >= WIDE_PX:
+		var cols := HBoxContainer.new()
+		cols.add_theme_constant_override("separation", 32)
+		cols.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var left := Ui.vbox(16)
+		var right := Ui.vbox(16)
+		for s in [head, act]:
+			left.add_child(s)
+		for s in [goal, roster, radio]:
+			right.add_child(s)
+		cols.add_child(left)
+		cols.add_child(right)
+		page.add_child(cols)
+	else:
+		for s in [head, act, roster, goal, radio]:
+			page.add_child(s)
+	_building = false
 
-	# header: where we are in the game, and the clock
-	col.add_child(Ui.label(Words.render("ui.round_of", {"round": _m.round, "rounds": _m.rounds}), "round_of", "HeaderLabel"))
+
+## Who I am, the clock, what I have.
+func _head() -> VBoxContainer:
+	var s := Ui.vbox(6)
+	s.add_child(Ui.label(Words.render("ui.you_are", {"alias": _m.me.alias}), "you_are", "BigLabel"))
 	_timer_label = Ui.label("", "timer_label", "HeaderLabel")
 	_timer_bar = ProgressBar.new()
 	_timer_bar.set_meta("id", "timer_bar")
 	_timer_bar.show_percentage = false
 	_timer_bar.custom_minimum_size = Vector2(0, 14)
-	col.add_child(_timer_label)
-	col.add_child(_timer_bar)
+	s.add_child(_timer_label)
+	s.add_child(_timer_bar)
 	_tick()
-
-	# me
-	col.add_child(Ui.label(Words.render("ui.you_are", {"alias": _m.me.alias}), "you_are", "HeaderLabel"))
+	s.add_child(Ui.label(Words.render("ui.round_of", {"round": _m.round, "rounds": _m.rounds}), "round_of", "MutedLabel"))
 	for r in _m.me.resources:
-		col.add_child(Ui.label("%s: %s" % [Words.render(r.id), r.amount], "resource"))
-	for s in _m.me.statuses:
-		if s.on:
-			col.add_child(Ui.label(Words.render(s.id), "status"))
+		s.add_child(Ui.label("%s: %s" % [Words.render(r.id), r.amount], "resource", "HeaderLabel"))
+	for st in _m.me.statuses:
+		if st.on:
+			s.add_child(Ui.label(Words.render(st.id), "status"))
+	return s
 
-	# goal
-	col.add_child(Ui.label(Words.render("ui.goal"), "", "MutedLabel"))
-	col.add_child(Ui.label(Words.render(_m.goal.key, _m.goal.slots), "goal"))
-	col.add_child(Ui.label("%s: %s" % [Words.render(_m.goal.state_key), Words.render(_m.goal.progress.key,
+
+## The moves, their targets and amounts, my pick, Lock and the locked count.
+func _act(open: bool) -> VBoxContainer:
+	var s := Ui.vbox(10)
+	s.add_child(Ui.label(Words.render("ui.pick_a_move"), "", "MutedLabel"))
+	var moves := Ui.flow()
+	for p in _m.pickers:
+		var chosen: bool = (not _move.is_empty()) and _move.server_id == p.server_id
+		var txt: String = Words.render(p.key) + (" *" if chosen else "")
+		moves.add_child(Ui.button(txt, "move_" + p.server_id, func(): _choose(p), not open))
+	s.add_child(moves)
+	if not _move.is_empty() and _move.takes_target:
+		s.add_child(Ui.label(Words.render("ui.pick_a_target"), "", "MutedLabel"))
+		var targets := Ui.flow()
+		for t in _move.targets:
+			targets.add_child(Ui.button(t, "target_" + t, func(): _choose_target(t), not open))
+		s.add_child(targets)
+	if not _move.is_empty() and _target != null and not _move.amounts.is_empty():
+		s.add_child(Ui.label(Words.render("ui.pick_an_amount"), "", "MutedLabel"))
+		var amounts := Ui.flow()
+		for a in _move.amounts:
+			amounts.add_child(Ui.button(str(a), "amount_%s" % a, func(): _send(_move, _target, a), not open))
+		s.add_child(amounts)
+	if _m.my_pick != null:
+		s.add_child(Ui.label(Words.render("ui.your_pick", {"pick": _describe(_m.my_pick)}), "my_pick"))
+	var state: String = _m.lock.state
+	var lock_key := "ui.lock" if state == "open" else ("ui.locking" if state == "sent" else "ui.locked")
+	s.add_child(Ui.button(Words.render(lock_key), "lock", func(): _lock(), state != "open" or not open or _m.my_pick == null,
+		"PrimaryButton"))
+	s.add_child(Ui.label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}), "locked_count"))
+	return s
+
+
+func _goal() -> VBoxContainer:
+	var s := Ui.vbox(4)
+	s.add_child(Ui.label(Words.render("ui.goal"), "", "MutedLabel"))
+	s.add_child(Ui.label(Words.render(_m.goal.key, _m.goal.slots), "goal"))
+	s.add_child(Ui.label("%s: %s" % [Words.render(_m.goal.state_key), Words.render(_m.goal.progress.key,
 		_m.goal.progress.slots)], "goal_status", "MutedLabel"))
+	return s
 
-	# everyone
-	col.add_child(Ui.label(Words.render("ui.roster"), "", "MutedLabel"))
+
+func _roster() -> VBoxContainer:
+	var s := Ui.vbox(4)
+	s.add_child(Ui.label(Words.render("ui.roster"), "", "MutedLabel"))
 	for e in _m.roster:
 		var line: String = e.alias
 		if e.is_me:
 			line += " " + Words.render("ui.you_mark")
 		elif e.band != "":
 			line += ": " + Words.render(e.band)
-		col.add_child(Ui.label(line, "home_" + e.alias))
-
-	# the moves
-	col.add_child(Ui.label(Words.render("ui.pick_a_move"), "", "MutedLabel"))
-	var moves := Ui.flow()
-	for p in _m.pickers:
-		var chosen: bool = (not _move.is_empty()) and _move.server_id == p.server_id
-		var txt: String = Words.render(p.key) + (" *" if chosen else "")
-		moves.add_child(Ui.button(txt, "move_" + p.server_id, func(): _choose(p), not open))
-	col.add_child(moves)
-	if not _move.is_empty() and _move.takes_target:
-		col.add_child(Ui.label(Words.render("ui.pick_a_target"), "", "MutedLabel"))
-		var targets := Ui.flow()
-		for t in _move.targets:
-			targets.add_child(Ui.button(t, "target_" + t, func(): _choose_target(t), not open))
-		col.add_child(targets)
-	if not _move.is_empty() and _target != null and not _move.amounts.is_empty():
-		col.add_child(Ui.label(Words.render("ui.pick_an_amount"), "", "MutedLabel"))
-		var amounts := Ui.flow()
-		for a in _move.amounts:
-			amounts.add_child(Ui.button(str(a), "amount_%s" % a, func(): _send(_move, _target, a), not open))
-		col.add_child(amounts)
-	if _m.my_pick != null:
-		col.add_child(Ui.label(Words.render("ui.your_pick", {"pick": _describe(_m.my_pick)}), "my_pick"))
-
-	# lock
-	var state: String = _m.lock.state
-	var lock_key := "ui.lock" if state == "open" else ("ui.locking" if state == "sent" else "ui.locked")
-	col.add_child(Ui.button(Words.render(lock_key), "lock", func(): _lock(), state != "open" or not open or _m.my_pick == null,
-		"PrimaryButton"))
-	col.add_child(Ui.label(Words.render("ui.locked_count", {"locked": _m.locked_count, "total": _m.seats_total}), "locked_count"))
-
-	# radio
-	if _m.radio.available:
-		col.add_child(Ui.button(Words.render("ui.radio"), "radio_toggle", func():
-			_radio_open = not _radio_open
-			_radio_phrase = {}
-			_build(), not open))
-		if _radio_open:
-			_build_radio(col, open)
+		s.add_child(Ui.label(line, "home_" + e.alias))
+	return s
 
 
-func _build_radio(col: VBoxContainer, open: bool) -> void:
-	var phrases := Ui.flow()
-	for ph in _m.radio.phrases:
-		phrases.add_child(Ui.button(Words.render(ph.key, {"a": "..."}), "phrase_" + ph.server_id, func(): _choose_phrase(ph), not open))
-	col.add_child(phrases)
-	if not _radio_phrase.is_empty() and _radio_phrase.needs_player:
-		col.add_child(Ui.label(Words.render("ui.radio_pick_player"), "", "MutedLabel"))
-		var who := Ui.flow()
-		for e in _m.roster:
-			if not e.is_me:
-				who.add_child(Ui.button(e.alias, "about_" + e.alias, func(): _send_radio(_radio_phrase, e.alias), not open))
-		col.add_child(who)
+func _radio(open: bool) -> VBoxContainer:
+	var s := Ui.vbox(8)
+	if not _m.radio.available:
+		return s
+	s.add_child(Ui.button(Words.render("ui.radio"), "radio_toggle", func():
+		_radio_open = not _radio_open
+		_radio_phrase = {}
+		_build(), not open))
+	if _radio_open:
+		var phrases := Ui.flow()
+		for ph in _m.radio.phrases:
+			phrases.add_child(Ui.button(Words.render(ph.key, {"a": "..."}), "phrase_" + ph.server_id,
+				func(): _choose_phrase(ph), not open))
+		s.add_child(phrases)
+		if not _radio_phrase.is_empty() and _radio_phrase.needs_player:
+			s.add_child(Ui.label(Words.render("ui.radio_pick_player"), "", "MutedLabel"))
+			var who := Ui.flow()
+			for e in _m.roster:
+				if not e.is_me:
+					who.add_child(Ui.button(e.alias, "about_" + e.alias, func(): _send_radio(_radio_phrase, e.alias), not open))
+			s.add_child(who)
+	return s
 
 
 func _choose(p: Dictionary) -> void:
