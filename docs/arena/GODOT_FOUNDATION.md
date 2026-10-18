@@ -245,3 +245,48 @@ Full table in `docs/arena/SERVER_HANDOFF.md` section 7. In short:
 4. **Goal / progress as codes: done.** `me.goal.line`, `me.goal_progress.line`, `end.results[].goal.line` = `{code, args}`; 20 new templates in `arena/lines_en.json` (`goal_*`, `progress_*`). `text` is kept.
 5. **Public news is now sorted by content on the server** (it was a real bot hint).
 6. **A 4-seat room deals only 4 of the 6 goal types** (no grudge, no detective).
+
+### 18 Oct 2026 13:59, client session: request, a list of open camps so nobody has to send join codes around
+
+Asked by the owner while playing the exported build. Today a player must be told a 4-letter code. They want to open the
+app, see the camps waiting for players, and tap one. This is additive: nothing existing changes.
+
+**What the client needs (smallest version):**
+
+| Direction | Message | Fields |
+|---|---|---|
+| client -> server | `list_rooms` | none. Allowed any time after `hello`, with or without a seat. |
+| server -> client | `rooms` | `rooms`: [ {`code`, `seats_taken`, `seats_total`, `age_s`, `name` (optional string, may be empty)} ], newest first, at most `max_rooms` entries |
+
+**Rules we propose (server decides the details; say so if you disagree):**
+
+1. **Only rooms that can still be joined are listed:** still in the lobby (not started), not full, host connected. A started
+   game never appears (nothing about a game in progress leaks). A room that fills or starts drops out of the next list.
+2. **No aliases, no seat numbers, no join order**, same rule as `lobby`. `name` is the host's own optional label (see 4);
+   nothing else identifies a person.
+3. **Joining stays exactly as it is:** the client sends `join_room` with the `code` from the list. A room that became
+   full, started or vanished between the list and the tap answers with the errors you already have (`room_full` or
+   `room_gone` or similar); the client shows a neutral message and refreshes the list. The list is a hint, not a
+   reservation.
+4. **Optional, host-chosen visibility and label on create:** `create_room` may carry `visibility` (`"public"` listed,
+   `"private"` not listed, join by code still works) and `name` (at most 24 characters, trimmed; the server strips
+   control characters and may reject or blank anything else). **Default when the field is absent: `"public"`** on this
+   tailnet-only server, so an old client's rooms are listed too. If you would rather default to private, say so and the
+   client will always send `visibility` explicitly.
+5. **Polling, not push, for now:** the client asks `list_rooms` when the list screen opens, then about every 3 seconds
+   while it is showing, and stops when it is closed. Please rate-limit per connection (for example 1 per second; extra
+   requests answered with the current list or an `error` with code `rate_limited`, your choice, the client handles both).
+6. **Old server compatibility:** a server that does not know `list_rooms` answers with an `error` (unknown type) or says
+   nothing. The client hides the list after 3 seconds without a `rooms` reply and falls back to code entry only. This
+   needs no protocol bump from your side; if you prefer to advertise it, add `features: ["list_rooms"]` to `hello_ok`
+   and the client will use that instead of guessing.
+
+**Questions for you:** (a) is `max_rooms` (20) the right cap on the list, (b) should a room whose host has been gone for a
+few minutes stay listed (we suggest no), (c) is `name` acceptable to you privacy-wise, or do you want a fixed
+server-generated label (for example "Camp K7QF") instead.
+
+**What the client will do once you have answered (nothing is built until then):** a list under Join on the title screen with
+one card per open camp (name or code, `seats_taken/seats_total`, how long ago), tap to join, an empty state ("no open
+camps, create one"), auto refresh, a neutral error when the camp filled first, a theme-art card, and tests against a fake
+server including the races above (room fills between list and tap, list reply after leaving the screen, duplicate or
+out-of-order `rooms` messages, hostile `rooms` payloads: huge list, missing fields, wrong types).
