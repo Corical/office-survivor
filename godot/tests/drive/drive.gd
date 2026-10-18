@@ -30,7 +30,7 @@ func _ready() -> void:
 	await _frames(2)
 	Session.reset(MemorySessionStore.new())
 	Feed.reset()
-	Themes.use("placeholder")
+	Themes.use("flash")                                   # the default look, as the owner sees it
 	_mark = Log.mark()
 	_t0 = Time.get_ticks_msec()
 	router = (load("res://main.tscn") as PackedScene).instantiate()

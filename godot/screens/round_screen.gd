@@ -392,6 +392,9 @@ func _dock(dock: VBoxContainer, open: bool) -> void:
 	var lock_key := "ui.lock" if state == "open" else ("ui.locking" if state == "sent" else "ui.locked")
 	_lock_btn = Ui.button(Words.render(lock_key), "lock", func(): _lock(), state != "open" or not open or _m.my_pick == null,
 		"PrimaryButton")
+	if _wide:                                   # on a wide window the main action is a button, not a bar across the screen
+		_lock_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_lock_btn.custom_minimum_size.x = 520.0
 	_charge = ChargeFill.new()
 	_lock_btn.add_child(_charge)
 	dock.add_child(_lock_btn)
