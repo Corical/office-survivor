@@ -80,14 +80,35 @@ def run_varied(tmp):
         srv.terminate()
 
 
+def run_rooms(tmp):
+    """The open-camps list against a real arena server. A server that cannot list camps makes the scene print SKIP and
+    still pass (the old-server promise); one that can must give a clean list and accept a named public create."""
+    port = free_port()
+    env = dict(os.environ, ARENA_TIMER="20")
+    srv = subprocess.Popen([sys.executable, "-m", "arena.server", "--data", os.path.join(tmp, "data3"), "--port",
+                            str(port)], cwd=ROOT, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        if not wait_port(port):
+            print("LIVE3 FAIL: the arena server did not start")
+            return 1
+        code, out = godot("res://tests/live/live_rooms.tscn", ["--server=ws://127.0.0.1:%d" % port],
+                          os.path.join(tmp, "rooms.log"))
+        print("\n".join(l for l in out.splitlines() if l.startswith(("LIVE3", "  "))))
+        return 0 if code == 0 else 1
+    finally:
+        srv.terminate()
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["game", "faults", "varied"])
+    ap.add_argument("--only", choices=["game", "faults", "varied", "rooms"])
     only = ap.parse_args().only
     tmp = tempfile.mkdtemp(prefix="live-")
     failed = 0
     if only in (None, "varied"):
         failed += run_varied(tmp)
+    if only in (None, "rooms"):
+        failed += run_rooms(tmp)
     if only in (None, "game"):
         port = free_port()
         env = dict(os.environ, ARENA_TIMER="20")
