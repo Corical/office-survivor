@@ -80,6 +80,8 @@ UI.update({
     "ui.private_help": "Not listed. Only people you give the code to can join.",
     "ui.create_go": "Create", "ui.cancel": "Cancel",
     "notice.camp_unavailable": "That camp filled up or closed first. Here is the fresh list.",
+    "notice.room_full": "That camp is full.", "notice.room_started": "That camp has already started.",
+    "notice.room_gone": "No camp with that code. Check it and try again.",
     "ui.net.connecting": "Connecting...", "ui.net.online": "Connected", "ui.net.reconnecting": "Reconnecting...",
     "ui.net.unreachable": "Can't reach the server", "ui.net.offline": "Offline", "ui.net.stopped": "Disconnected",
     "notice.seat_gone": "That game is no longer available.",

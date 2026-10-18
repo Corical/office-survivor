@@ -189,6 +189,46 @@ func test_n16_a_bad_server_address_is_refused_before_anything_happens() -> void:
 	check(Session.valid_url("wss://pi.example.ts.net:8470"), "wss is fine")
 
 
+## The server now answers a join of a camp that is full, started or gone with room_full / room_started / room_gone. For a
+## typed code those are refusals of THAT join. room_gone used to hit the seat-gone path (written for a refused resume), so a
+## mistyped code showed the terminal "your seat no longer exists" screen: the wrong message. (Starting a join forgets the old
+## seat by design, review B1-2, so no seat is lost HERE; the point is the wording and the screen.)
+func test_a_refused_typed_join_is_worded_as_that_join_not_as_a_lost_seat() -> void:
+	for code in ["room_gone", "room_full", "room_started"]:
+		setup()
+		go_online()
+		eq(Session.begin("join_room", {"code": "WXYZ"}), "", "the join goes out")
+		fake.server_send({"t": "error", "code": code, "message": "x"})
+		check(not notices.is_empty(), "%s: the player is told, in words" % code)
+		eq(notices.back().code, code, "%s: with its own code so the theme can word it" % code)
+		check(notices.back().kind != "terminal", "%s: not the seat-gone terminal screen" % code)
+		eq(Feed.status().screen, "title", "%s: still on the title screen, free to try another code" % code)
+		eq(Session.expecting_seat(), false, "%s: nothing is waiting for a seat any more" % code)
+
+
+## A refused RESUME with room_gone is still the end of that seat (the camp is gone, the seat with it), and it must not be
+## mistaken for a join refusal just because both use the same code.
+func test_a_resume_that_hears_room_gone_still_ends_the_seat() -> void:
+	setup()
+	store.data = {"token": "old-seat", "room_code": "ABCD", "alias": "Mango", "server_url": Session.server_url}
+	Session.load_store()
+	go_online()
+	Session.resume_if_stored()
+	fake.server_send({"t": "error", "code": "room_gone", "message": "x"})
+	eq(Session.token, "", "the seat is forgotten when RESUME hears room_gone")
+	eq(notices.back().kind, "terminal", "and the player is told it is over")
+
+
+## A mistyped join code, then a good one: the second attempt must not be swallowed by the first one's leftovers.
+func test_after_a_refused_typed_join_the_next_join_goes_out() -> void:
+	setup()
+	go_online()
+	Session.begin("join_room", {"code": "WXYZ"})
+	fake.server_send({"t": "error", "code": "room_gone", "message": "x"})
+	eq(Session.begin("join_room", {"code": "ABCD"}), "", "second join accepted")
+	eq(fake.count("join_room"), 2, "both joins went out, each once")
+
+
 ## The owner's PC kept showing the retired localhost default because earlier builds SAVED it to disk and a saved address
 ## beats the default. A saved copy of the retired default is not a choice and must give way; a typed address must not.
 func test_a_saved_retired_default_gives_way_but_a_typed_address_survives() -> void:

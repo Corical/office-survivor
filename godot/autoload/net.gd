@@ -38,6 +38,9 @@ var url := ""
 ## offline | connecting | online | reconnecting | unreachable | stopped (terminal)
 var state := "offline"
 var handshake_done := false
+## `features` from the latest hello_ok (null when the server sent none). Set right before `handshaken` fires, so whoever
+## handles that signal reads this connection's value, never a previous connection's.
+var server_features: Variant = null
 var attempt := 0
 var probe_ms := PROBE_MS
 var log_payloads := OS.is_debug_build()
@@ -310,6 +313,7 @@ func _on_text(text: String) -> void:
 				Log.event("net", "duplicate_hello_ok", {}, "WARN")      # review N06: never re-fire the handshake
 				return
 			handshake_done = true
+			server_features = msg.get("features")
 			_hello_deadline = -1
 			_up_since = clock.now_msec()      # attempt is NOT reset here: only a connection that stays up earns that
 			_set_state("online")

@@ -345,6 +345,15 @@ msgstr "Your move is locked in."
 msgid "notice.no_server_url"
 msgstr "Enter the server address first."
 
+msgid "notice.room_full"
+msgstr "That camp is full."
+
+msgid "notice.room_gone"
+msgstr "No camp with that code. Check it and try again."
+
+msgid "notice.room_started"
+msgstr "That camp has already started."
+
 msgid "notice.seat_gone"
 msgstr "That game is no longer available."
 

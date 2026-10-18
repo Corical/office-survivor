@@ -23,6 +23,8 @@ var server_url := "wss://raspberrypi.tail87b476.ts.net:8470"      # the arena se
 ## Old defaults that earlier builds saved to disk as if the player had chosen them. A saved copy of one of these is not a
 ## choice, so it is dropped on load and the current default applies (an address the player typed is always kept).
 const RETIRED_DEFAULT_URLS: Array[String] = ["ws://127.0.0.1:8765"]
+## What the server answers a join_room with when the camp cannot be joined (rooms listing and typed codes alike).
+const JOIN_REFUSAL_CODES: Array[String] = ["room_full", "room_started", "room_gone"]
 var token := ""
 var room_code := ""
 var alias := ""
@@ -272,7 +274,7 @@ func apply(msg: Dictionary) -> void:
 		return
 	match t:
 		"hello_ok":
-			pass
+			pass                      # features are read in _on_handshaken, before the first list request
 		"upgrade_required":
 			locked_out = true
 			terminal_reason = "upgrade_required"
@@ -372,6 +374,15 @@ func _on_error(msg: Dictionary) -> void:
 		notice.emit("error", "camp_unavailable", text)
 		rooms.refresh_now(clock.now_msec())
 		return
+	# A typed join that was refused because the camp is full, started or gone: that is about THIS join, not about a seat we
+	# hold (room_gone is also a seat-gone code, but only for a refused resume). Say so in its own words and stay on the title.
+	if _last_key == "join_room" and _inflight.has("join_room") and code in JOIN_REFUSAL_CODES:
+		_inflight.erase("join_room")
+		pending_intent = {}
+		Net.ack("join_room")
+		Log.event("session", "join_refused", {"code": code, "message": text}, "WARN")
+		notice.emit("error", code, text)
+		return
 	var was_resume := _inflight.has("resume")
 	Log.event("session", "server_error", {"code": code, "resume": was_resume, "message": text}, "WARN")
 	if code in ruleset.seat_gone_codes() or (code == "refused" and text in ruleset.seat_gone_texts()):
@@ -424,6 +435,7 @@ func _seat_gone(code: String, text: String) -> void:
 
 func _on_handshaken() -> void:
 	_inflight = {}                    # after a reconnect the fresh view decides; keep nothing else
+	rooms.on_features(Net.server_features)          # before the first list_rooms: a server that said no is never asked
 	rooms.on_connected(clock.now_msec())
 	rooms_changed.emit(rooms.model())
 	_rooms_tick()                     # (re)connected with the list showing: ask for it now, do not wait for the next beat
@@ -635,7 +647,7 @@ func _on_rooms(msg: Dictionary) -> void:
 ## server knows them: an old server might reject unknown fields. Returns "" or a reason, like begin().
 func create_camp(visibility := "", camp_name := "") -> String:
 	var fields := {}
-	if rooms.supported:
+	if rooms.create_fields_ok():
 		var vis := RoomsWatch.clean_visibility(visibility)
 		if vis != "":
 			fields["visibility"] = vis

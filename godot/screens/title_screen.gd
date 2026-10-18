@@ -98,7 +98,7 @@ func _build() -> void:
 ## Create: with a server that can list camps there is something to choose (public or private, a name), so a small sheet
 ## opens first; with any other server there is nothing to ask and the camp is created straight away, as it always was.
 func _on_create() -> void:
-	if Feed.rooms_model().supported:
+	if Feed.rooms_model().get("can_list", Feed.rooms_model().supported):
 		_sheet_open = true
 		_build()
 		return

@@ -34,13 +34,46 @@ var loading := false                  # asked, never answered yet (the list show
 var requests := 0                     # how many list_rooms went out (tests)
 var replies := 0                      # how many were taken in (tests)
 
+var advertised := false               # hello_ok.features listed "list_rooms": trust it before the first reply
+var denied := false                   # hello_ok.features was a list and "list_rooms" was not in it: never ask this server
+
 var _next_poll_ms := 0
 var _awaiting_since := -1
 var _hidden := false                  # we gave up on this server: poll slowly
 
 
 func model() -> Dictionary:
-	return {"supported": supported, "rooms": rooms.duplicate(true), "stale": stale, "loading": loading}
+	return {"supported": supported, "rooms": rooms.duplicate(true), "stale": stale, "loading": loading,
+		"can_list": supported or advertised}
+
+
+## `hello_ok.features`, when the server sends one (the server session's reply to the proposal). A list that names
+## "list_rooms" is trusted at once (the create sheet and the extra create_room fields need no first reply). A list that
+## does not name it is a plain "no": never ask, never wait for the silence rule. No `features` at all (an older server)
+## changes nothing: the probe and the silence rule decide, as before. Anything that is not a list of strings is "absent".
+func on_features(raw: Variant) -> void:
+	if not (raw is Array):
+		return
+	var names: Array = []
+	for f in raw:
+		if f is String and names.size() < 64:                # bounded: a hostile handshake costs a bounded time
+			names.append(f)
+	if "list_rooms" in names:
+		advertised = true
+		denied = false
+	else:
+		advertised = false
+		denied = true
+		supported = false
+		rooms = []
+		stale = false
+		loading = false
+		_awaiting_since = -1
+
+
+## True when create_room may carry visibility and name.
+func create_fields_ok() -> bool:
+	return supported or advertised
 
 
 func awaiting() -> bool:
@@ -70,12 +103,14 @@ func on_connected(now: int) -> void:
 	_hidden = false
 	_awaiting_since = -1
 	_next_poll_ms = now
-	loading = watching
+	loading = watching and not denied
 	stale = false
 
 
 func on_disconnected() -> void:
 	connected = false
+	advertised = false                    # what hello_ok said belongs to that connection; the next hello_ok says it again
+	denied = false
 	_awaiting_since = -1
 	loading = false
 	stale = not rooms.is_empty()
@@ -87,7 +122,7 @@ func refresh_now(now: int) -> void:
 
 
 func poll_due(now: int) -> bool:
-	return watching and connected and now >= _next_poll_ms
+	return watching and connected and not denied and now >= _next_poll_ms
 
 
 ## A list_rooms went out.

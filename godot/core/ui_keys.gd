@@ -18,13 +18,13 @@ const ALL: Array[String] = [
 	"ui.net.connecting", "ui.net.online", "ui.net.reconnecting", "ui.net.unreachable", "ui.net.offline", "ui.net.stopped",
 	"notice.seat_gone", "notice.taken_over", "notice.too_big", "notice.flapping", "notice.upgrade_required",
 	"notice.invalid", "notice.unknown", "notice.generic", "notice.no_server_url", "notice.locked", "notice.in_flight",
-	"notice.camp_unavailable",
+	"notice.camp_unavailable", "notice.room_full", "notice.room_started", "notice.room_gone",
 ]
 
 ## Notice codes the client itself raises that have a word of their own; everything else uses `notice.generic` with the
 ## server's own text as a fallback.
 const NOTICE_CODES := ["seat_gone", "taken_over", "too_big", "flapping", "upgrade_required", "no_server_url", "locked",
-	"in_flight", "camp_unavailable"]
+	"in_flight", "camp_unavailable", "room_full", "room_started", "room_gone"]
 
 
 ## The translation key for a notice (kind, code): a specific one when we have it.
