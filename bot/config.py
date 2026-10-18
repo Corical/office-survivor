@@ -37,8 +37,9 @@ class Config:
     category: str = "Survivors"
 
 
-def load():
-    env = read_env(os.environ.get("TORCH_ENV", os.path.join(ROOT, ".secrets", "discord.env")))
+def game_settings():
+    """(rules, aliases, presentation) from game.json: everything about the game, nothing about Discord. Torch and the
+    Arena server both read the game this way."""
     game = json.load(open(os.environ.get("TORCH_GAME", os.path.join(ROOT, "docs", "game.json")), encoding="utf-8"))
     known = {f.name for f in fields(Rules)}
     rules = Rules(**{k: v for k, v in game.get("rules", {}).items() if k in known})
@@ -50,6 +51,12 @@ def load():
         sys.path.insert(0, os.path.join(ROOT, "docs", "sim"))
         from survivors_sim import NAMES
         aliases = list(dict.fromkeys(list(aliases) + NAMES))
+    return rules, aliases, pres
+
+
+def load():
+    env = read_env(os.environ.get("TORCH_ENV", os.path.join(ROOT, ".secrets", "discord.env")))
+    rules, aliases, pres = game_settings()
     return Config(token=env["DISCORD_BOT_TOKEN"], guild_id=int(env["DISCORD_GUILD_ID"]),
                   gm_ids={int(x) for x in env.get("TORCH_GM_IDS", "").split(",") if x.strip()},
                   data_dir=os.environ.get("TORCH_DATA", os.path.join(ROOT, "bot", "data")),
