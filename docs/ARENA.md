@@ -65,7 +65,7 @@ quit, radio, night, finish), a room writes:
 | `lock` | round, pid | a player or a bot locks |
 | `round_closed` | round, reason, reveal_until | a round closes; reason is `all_locked` or `timeout` |
 | `continue` | round, pid | a human presses Continue in the reveal |
-| `left_lobby` | pid | a human gives their seat back in the lobby (`leave` before the start); the seat is free again and its pid goes to the next person who joins (pids stay 0..3, which the engine needs) |
+| `left_lobby` | pid, kicked (only when the host removed them) | a human gives their seat back (or the host removes them) in the lobby (`leave` before the start); the seat is free again and its pid goes to the next person who joins (pids stay 0..3, which the engine needs) |
 
 On restart every room is loaded from disk: a round whose deadline passed while the server was down closes at once;
 a round closed but not yet resolved is resolved (identically, from its moves and seed); a start with no round 1
@@ -98,6 +98,7 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `create_room` | make a room and take its first seat; optional `visibility` (`public` default, or `private`) and `name` (see below) |
 | `join_room` | take a seat by code |
 | `list_rooms` | ask for the open camps (see below); allowed with or without a seat |
+| `kick` | host only, in the lobby: remove another seat, named by the opaque `seat` handle from the host's `lobby` message |
 | `resume` | come back to a seat with its token |
 | `start` | host only, in the lobby |
 | `pick` | choose (or change) tonight's move |
@@ -113,7 +114,7 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `rooms` | the open camps: `rooms` = [{`code`, `seats_taken`, `seats_total`, `age_s`, `name`}] |
 | `upgrade_required` | the app is too old |
 | `seat` | your token, room code, alias and whether you are host |
-| `lobby` | seats taken of 4, room code |
+| `lobby` | seats taken of 4, room code; to the host only also `seats`: one `{id, connected}` per other seat, ordered by `id` (an opaque handle, never join order, never an alias) |
 | `round` | your round screen |
 | `reveal` | the night's results |
 | `end` | the final scoring |
@@ -131,6 +132,7 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `FEATURES` | ['list_rooms'] |
 | `CLOSE_UPGRADE_REQUIRED` | 4002 |
 | `CLOSE_TAKEN_OVER` | 4003 |
+| `CLOSE_KICKED` | 4004 |
 | `CLOSE_PAUSE` | 0.25 |
 
 <!-- check:error-codes -->
@@ -141,6 +143,7 @@ WebSocket, one JSON object per frame, each with `"t"`. Full field lists: `docs/a
 | `refused` | a rule said no (the messages are listed below); nothing changed |
 | `seat_gone` | `resume` with a token the server does not know, or whose room is gone: forget the token. The connection stays open, so the client can create or join a room without reconnecting |
 | `room_gone` | `join_room` with a code that matches no room |
+| `kicked` | the host removed this seat in the lobby; this connection is about to be closed with code 4004 and the token is dead |
 | `room_started` | `join_room` for a game that has already started |
 | `room_full` | `join_room` for a room with all 4 seats taken |
 | `rate_limited` | `list_rooms` again within `LIST_INTERVAL` seconds on the same connection; nothing was sent, ask again later |
@@ -152,6 +155,14 @@ Godot's `WebSocketPeer` drops a message that arrives in the same poll as the clo
 message, waits `CLOSE_PAUSE` seconds, and only then closes. Code 4001 ("seat gone") is deliberately not used: a dead seat
 is an ordinary error and the connection stays open. From the moment a seat is taken over, anything the old connection
 still sends is ignored.
+
+**Kicking.** In the lobby the host's `lobby` message carries `seats`, one `{id, connected}` per other seat, so a seat whose
+player dropped off can be told from one that is there. `kick` with that `id` frees the seat like `leave` does (same
+`left_lobby` record, marked `kicked`) and the token dies. A connected target gets `error` `kicked`, then the close with
+code **4004** after `CLOSE_PAUSE`, like a takeover; a disconnected one simply finds `seat_gone` on `resume`. The `id` is a
+hash of the room's secret salt, the pid, the alias and the occupant's key, so it names the person and not the chair: it
+changes when the seat changes hands and a stale handle is refused, never applied to the next person. Only the host sees
+`seats`; there is no kick after the start; a kicked player can join again by code (there is no ban).
 
 **Open camps (`list_rooms`).** The client asks, the server answers with one `rooms` message. A room is listed only when
 all of these hold: its `visibility` is `public`, it is still in the lobby, a seat is free, and at least one human is
@@ -189,6 +200,10 @@ by code as before. One `list_rooms` per `LIST_INTERVAL` per connection; an earli
 | `Amount must be a whole number.` | a gift amount that is not an integer |
 | `Unknown message type '{t}'.` | any other `t` |
 | `The game has started; use leave to quit it for good.` | `leave_lobby` after the start (the server only calls it in the lobby, so a client never sees this) |
+| `Kicking is only possible in the lobby.` | `kick` after the start |
+| `Only the host can kick.` | `kick` by a seat that is not the host |
+| `That seat is not in the room any more.` | `kick` with a handle nobody holds (the seat left, was kicked, or changed hands) |
+| `You can't kick yourself; use leave.` | `kick` naming your own seat |
 | `Visibility must be public or private.` | `create_room` with any other `visibility` (a typo must not publish a private camp) |
 | `Too many room lists; wait a second.` | a second `list_rooms` within `LIST_INTERVAL` on one connection |
 

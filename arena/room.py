@@ -306,12 +306,13 @@ class RoomGame(GameCore):
             self._changed("quit")
             self._check_advance()
 
-    def leave_lobby(self, user_key):
-        """Give the seat back before the game starts: the seat is free for someone else and the token is dead."""
+    def leave_lobby(self, user_key, kicked=False):
+        """Give the seat back before the game starts: the seat is free for someone else and the token is dead.
+        `kicked` only records that the host removed them (the log tells the two apart); the effect is the same."""
         pid, _ = self._who(user_key)
         if self.started:
             raise GameError("The game has started; use leave to quit it for good.")
-        self._append({"type": "left_lobby", "pid": pid})
+        self._append({"type": "left_lobby", "pid": pid, **({"kicked": True} if kicked else {})})
         self.identity.remove(user_key)
         self.present.discard(pid)
         self.gone_since.pop(pid, None)

@@ -42,7 +42,8 @@ FEATURES = ["list_rooms"]                        # advertised in hello_ok so a c
 # 4001 (seat gone) is NOT used: a dead seat is a plain error and the connection stays open to create or join a room.
 CLOSE_UPGRADE_REQUIRED = 4002
 CLOSE_TAKEN_OVER = 4003
-CLOSE_PAUSE = 0.25                               # chosen default (seconds)
+CLOSE_KICKED = 4004
+CLOSE_PAUSE = 0.25                              # chosen default (seconds)
 
 
 class Coded(GameError):
@@ -351,6 +352,28 @@ class Server:
             await room.push(pid)
         elif t == "continue":
             g.continue_(pid)
+        elif t == "kick":
+            if g.started:
+                raise GameError("Kicking is only possible in the lobby.")
+            if pid != room.host_pid():
+                raise GameError("Only the host can kick.")
+            target = next((j[0] for j in g.joined if views.seat_handle(g, j[0]) == msg.get("seat")), None)
+            if target is None:
+                raise GameError("That seat is not in the room any more.")
+            if target == pid:
+                raise GameError("You can't kick yourself; use leave.")
+            key = room.identity.key_for(target)
+            gone = room.conns.pop(target, None)         # from here the target's connection no longer holds the seat
+            g.leave_lobby(key, kicked=True)
+            self.by_token.pop(key, None)
+            if gone is not None:
+                try:
+                    await self._error(gone, "kicked", "The host removed you from this camp.")
+                except Exception:
+                    pass
+                asyncio.ensure_future(self._close_after_pause(gone, CLOSE_KICKED, "kicked"))
+            await room.push_all()
+            return seat
         elif t == "leave":
             key = room.identity.key_for(pid)
             if g.started:

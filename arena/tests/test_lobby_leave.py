@@ -141,6 +141,66 @@ class GivingASeatBack(unittest.TestCase):
         self.assertEqual(g.humans(), [0, 2])
 
 
+class HostView(unittest.TestCase):
+    """What the lobby tells the host so they can kick: opaque handles, never aliases, never join order."""
+
+    @staticmethod
+    def _room(n=3):
+        g, mem, sched = make()
+        for i in range(n):
+            g.add_human(f"u{i}")
+            g.connect(i)
+        return g, mem
+
+    def test_only_the_host_gets_a_seats_list_and_it_has_the_other_seats_only(self):
+        from arena import views
+        g, _ = self._room(3)
+        host = views.lobby(g, 0, "ABCD", True)
+        guest = views.lobby(g, 1, "ABCD", False)
+        self.assertEqual(len(host["seats"]), 2)
+        self.assertNotIn("seats", guest)
+        self.assertEqual(sorted(host), ["host", "room_code", "seats", "seats_taken", "seats_total", "t"])
+
+    def test_handles_are_short_hex_unique_sorted_and_carry_no_alias_or_pid(self):
+        import json
+        import re
+        from arena import views
+        g, _ = self._room(4)
+        seats = views.lobby(g, 0, "ABCD", True)["seats"]
+        ids = [s["id"] for s in seats]
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{8}", i) for i in ids), ids)
+        self.assertEqual(ids, sorted(ids), "ordered by handle: join order must not leak")
+        self.assertEqual(len(set(ids)), 3)
+        blob = json.dumps(views.lobby(g, 0, "ABCD", True))
+        for _, alias, _, _ in g.joined:
+            self.assertNotIn(alias, blob)
+
+    def test_connected_follows_presence(self):
+        from arena import views
+        g, _ = self._room(3)
+        g.disconnect(2)
+        by_handle = {s["id"]: s["connected"] for s in views.lobby(g, 0, "ABCD", True)["seats"]}
+        self.assertEqual(by_handle[views.seat_handle(g, 1)], True)
+        self.assertEqual(by_handle[views.seat_handle(g, 2)], False)
+
+    def test_a_handle_is_stable_and_changes_when_the_seat_changes_hands(self):
+        from arena import views
+        g, (_, ident, _) = self._room(2)
+        before = views.seat_handle(g, 1)
+        self.assertEqual(before, views.seat_handle(g, 1))
+        g.leave_lobby("u1", kicked=True)
+        g.add_human("u9")                                  # takes pid 1 again
+        self.assertEqual(ident.get("u9")["pid"], 1)
+        self.assertNotEqual(views.seat_handle(g, 1), before, "the new occupant must not answer to the old handle")
+
+    def test_the_log_marks_a_kick_and_a_plain_leave_differently(self):
+        g, _ = self._room(3)
+        g.leave_lobby("u1", kicked=True)
+        g.leave_lobby("u2")
+        recs = records(g, "left_lobby")
+        self.assertEqual([r.get("kicked", False) for r in recs], [True, False])
+
+
 class Replay(unittest.TestCase):
     def test_a_reload_gives_the_same_room_and_the_next_join_still_takes_the_free_pid(self):
         g, (store, ident, texts), sched = make()

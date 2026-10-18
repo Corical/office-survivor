@@ -319,6 +319,188 @@ class OpenCamps(unittest.IsolatedAsyncioTestCase):
         await live.send({"t": "resume", "token": seat_a["token"]})
         await live.until("seat")
 
+    # ---------------- the host kicks ----------------
+    async def _host_sees(self, host, n, connected=None):
+        """The host's next lobby with n other seats (and, if given, with exactly this connected flag on every one)."""
+        return await host.until("lobby", lambda m: "seats" in m and len(m["seats"]) == n
+                                and (connected is None or all(s["connected"] == connected for s in m["seats"])))
+
+    async def test_only_the_host_is_told_about_the_other_seats_and_nobody_is_named(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        seat_b = await b.until("seat")
+        lobby = await self._host_sees(a, 1, connected=True)
+        self.assertRegex(lobby["seats"][0]["id"], r"^[0-9a-f]{8}$")
+        guest = await b.until("lobby", lambda m: m["seats_taken"] == 2)
+        self.assertNotIn("seats", guest)
+        self.assertNotIn(seat_b["alias"], json.dumps(a.seen), "the host never learns a guest's alias")
+
+    async def test_the_host_kicks_a_dropped_player_without_waiting_for_anything(self):
+        """The owner's case: a connection that is gone, a seat that should be open now."""
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        seat_b = await b.until("seat")
+        await self._host_sees(a, 1, connected=True)
+        await b.close()
+        dropped = await self._host_sees(a, 1, connected=False)         # the host can see which seat is dead
+        await a.send({"t": "kick", "seat": dropped["seats"][0]["id"]})
+        lobby = await self._lobby_count(a, 1)
+        self.assertEqual(lobby["seats"], [])
+        self.assertEqual((await self._list())[0]["seats_taken"], 1)
+        back = await Client.open(self.port)
+        await back.send({"t": "resume", "token": seat_b["token"]})
+        self.assertEqual((await back.until("error"))["code"], "seat_gone")
+
+    async def test_a_connected_player_is_told_kicked_and_closed_with_4004(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        seat_b = await b.until("seat")
+        lobby = await self._host_sees(a, 1)
+        await a.send({"t": "kick", "seat": lobby["seats"][0]["id"]})
+        self.assertEqual((await b.until("error"))["code"], "kicked")
+        after = []
+        from websockets.exceptions import ConnectionClosed
+        try:
+            while True:                                     # everything the kicked socket hears until it is closed
+                after.append(json.loads(await asyncio.wait_for(b.ws.recv(), 5)))
+        except ConnectionClosed:
+            pass
+        self.assertEqual(after, [], "a kicked player is not pushed lobbies for a seat they no longer hold")
+        self.assertEqual(b.ws.close_code, 4004)
+        await self._lobby_count(a, 1)
+        again = await Client.open(self.port)
+        await again.send({"t": "resume", "token": seat_b["token"]})
+        self.assertEqual((await again.until("error"))["code"], "seat_gone")
+
+    async def test_a_guest_can_not_kick_and_nothing_changes(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        await b.until("seat")
+        host_view = await self._host_sees(a, 1)
+        for handle in (host_view["seats"][0]["id"], "deadbeef", None):
+            await b.send({"t": "kick", "seat": handle})
+            err = await b.until("error")
+            self.assertEqual((err["code"], err["message"]), ("refused", "Only the host can kick."))
+        await asyncio.sleep(0.2)
+        self.assertEqual((await self._list())[0]["seats_taken"], 2)
+
+    async def test_self_unknown_malformed_stale_and_after_the_start_are_all_refused_calmly(self):
+        from arena import views
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        await b.until("seat")
+        room = self.server.rooms[seat_a["room_code"]]
+        mine = views.seat_handle(room.game, room.host_pid())
+        handle_b = (await self._host_sees(a, 1))["seats"][0]["id"]
+        cases = [(mine, "yourself"), ("00000000", "not in the room"), ("", "not in the room"), (None, "not in the room"),
+                 (123, "not in the room"), (["x"], "not in the room"), ({"a": 1}, "not in the room")]
+        for handle, words in cases:
+            await a.send({"t": "kick", "seat": handle})
+            err = await a.until("error")
+            self.assertEqual(err["code"], "refused", f"seat={handle!r}")
+            self.assertIn(words, err["message"], f"seat={handle!r}")
+        await a.send({"t": "kick"})                                      # no field at all
+        self.assertEqual((await a.until("error"))["code"], "refused")
+        self.assertEqual((await self._list())[0]["seats_taken"], 2, "nothing was removed by any of those")
+        await a.send({"t": "kick", "seat": handle_b})
+        await self._lobby_count(a, 1)
+        await a.send({"t": "kick", "seat": handle_b})                    # the same handle again: stale
+        self.assertIn("not in the room", (await a.until("error"))["message"])
+        await a.send({"t": "start"})
+        await a.until("round")
+        await a.send({"t": "kick", "seat": handle_b})
+        self.assertIn("only possible in the lobby", (await a.until("error"))["message"])
+
+    async def test_a_stale_handle_never_hits_the_next_person_who_takes_the_seat(self):
+        a, seat_a = await self._camp()
+        code = seat_a["room_code"]
+        b = await self._join(code)
+        await b.until("seat")
+        old = (await self._host_sees(a, 1))["seats"][0]["id"]
+        await a.send({"t": "kick", "seat": old})
+        await self._lobby_count(a, 1)
+        c = await self._join(code)                                       # takes the freed pid
+        await c.until("seat")
+        fresh = (await self._host_sees(a, 1))["seats"][0]["id"]
+        self.assertNotEqual(fresh, old, "a new occupant gets a new handle")
+        await a.send({"t": "kick", "seat": old})
+        self.assertIn("not in the room", (await a.until("error"))["message"])
+        await asyncio.sleep(0.2)
+        self.assertEqual((await self._list())[0]["seats_taken"], 2, "the newcomer is still there")
+
+    async def test_a_kicked_player_can_join_again_by_code_and_the_host_sees_a_new_handle(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        await b.until("seat")
+        first = (await self._host_sees(a, 1))["seats"][0]["id"]
+        await a.send({"t": "kick", "seat": first})
+        await self._lobby_count(a, 1)
+        again = await self._join(seat_a["room_code"])
+        await again.until("seat")
+        self.assertNotEqual((await self._host_sees(a, 1))["seats"][0]["id"], first)
+
+    async def test_when_the_host_drops_off_the_next_seat_becomes_host_and_can_kick_the_old_one(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        await b.until("seat")
+        await self._host_sees(a, 1, connected=True)
+        await a.close()
+        lobby = await b.until("lobby", lambda m: m["host"] and "seats" in m and m["seats"] and not m["seats"][0]["connected"])
+        await b.send({"t": "kick", "seat": lobby["seats"][0]["id"]})
+        await self._lobby_count(b, 1)
+        gone = await Client.open(self.port)
+        await gone.send({"t": "resume", "token": seat_a["token"]})
+        self.assertEqual((await gone.until("error"))["code"], "seat_gone")
+
+    async def test_a_kick_reopens_a_full_camp_and_the_host_is_never_left_with_an_empty_room(self):
+        a, seat_a = await self._camp()
+        code = seat_a["room_code"]
+        guests = []
+        for _ in range(3):
+            g = await self._join(code)
+            await g.until("seat")
+            guests.append(g)
+        self.assertEqual(await self._list(), [])
+        lobby = await self._host_sees(a, 3)
+        await a.send({"t": "kick", "seat": lobby["seats"][0]["id"]})
+        await self._until_listed(code, True)
+        lobby = await self._host_sees(a, 2)
+        for s in lobby["seats"]:
+            await a.send({"t": "kick", "seat": s["id"]})
+        await self._lobby_count(a, 1)
+        await a.send({"t": "start"})                                     # the room is alive and the host can still start
+        await a.until("round")
+
+    async def test_a_kick_survives_a_restart_and_the_log_says_kicked(self):
+        a, seat_a = await self._camp()
+        b = await self._join(seat_a["room_code"])
+        seat_b = await b.until("seat")
+        c = await self._join(seat_a["room_code"])
+        seat_c = await c.until("seat")
+        from arena import views
+        from arena.server import token_key
+        await self._host_sees(a, 2)
+        room = self.server.rooms[seat_a["room_code"]]
+        kicked_pid = room.identity.get(token_key(seat_b["token"]))["pid"]
+        await a.send({"t": "kick", "seat": views.seat_handle(room.game, kicked_pid)})
+        await self._lobby_count(a, 2)
+        for cl in (a, b, c):
+            await cl.close()
+        await self._stop()
+        log = os.path.join(self.data, "rooms", seat_a["room_code"], "log.jsonl")
+        with open(log, encoding="utf-8") as f:
+            recs = [json.loads(line) for line in f if line.strip()]
+        self.assertEqual([r.get("kicked") for r in recs if r["type"] == "left_lobby"], [True])
+        await self._start()
+        for seat in (seat_a, seat_c):
+            cl = await Client.open(self.port)
+            await cl.send({"t": "resume", "token": seat["token"]})
+            self.assertEqual((await cl.until("seat"))["alias"], seat["alias"])
+        dead = await Client.open(self.port)
+        await dead.send({"t": "resume", "token": seat_b["token"]})
+        self.assertEqual((await dead.until("error"))["code"], "seat_gone")
+        self.assertEqual((await self._list())[0]["seats_taken"], 2)
+
     # ---------------- the races the list creates ----------------
     async def test_room_fills_between_the_list_and_the_tap(self):
         c, seat = await self._camp()
