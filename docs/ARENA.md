@@ -242,6 +242,7 @@ Update between games where you can: a restart does not lose a game, but players 
 
 | Date | Change |
 |---|---|
+| 18 October 2026 | The host can kick a seat in the lobby: `kick`, `seats` in the host's `lobby`, error `kicked` + close code 4004. Live on the Pi 16:50 (commit 1091620). |
 | 18 October 2026 | Leaving the lobby gives the seat back (`left_lobby` record; the creator no longer sees a stuck 2 of 4). A freed pid is handed to the next joiner so pids stay 0..3. Live on the Pi 16:42 (commit feb9e90). |
 | 18 October 2026 | Open camps: `list_rooms` / `rooms`, `create_room` `visibility` and `name`, `features` in `hello_ok`, error codes `room_full`, `room_started`, `rate_limited`. Live on the Pi since 18 October 2026 15:41 (commit 4ffe082). |
 | 18 October 2026 | The Arena service on the Pi (tailnet-only, loopback behind Tailscale serve, resource ceilings). |
