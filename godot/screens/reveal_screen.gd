@@ -6,7 +6,7 @@ extends Control
 ## Phone: Stage on top, log below. Wide window: Stage on the left, log and Continue on the right.
 
 const WIDE_PX := 900
-const LOG_MIN_H := 200.0              # chosen: room for about three log lines on a phone
+const LOG_MIN_H := 150.0              # chosen: room for about two log lines on a phone; the Stage gets the rest
 const STAGE_MIN_H := 360.0
 
 var _timer_label: Label
@@ -106,7 +106,7 @@ func _build() -> void:
 		var col := VBoxContainer.new()
 		col.add_theme_constant_override("separation", 8)
 		col.add_child(head)
-		stage_box.size_flags_stretch_ratio = 3.0
+		stage_box.size_flags_stretch_ratio = 4.0
 		col.add_child(stage_box)
 		_log.custom_minimum_size = Vector2(0, LOG_MIN_H)
 		_log.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -123,6 +123,7 @@ func _head() -> Control:
 	row.add_child(Ui.label(Words.render("ui.reveal_title"), "reveal_title", "HeaderLabel"))
 	_timer_label = Ui.label("", "timer_label", "MutedLabel")
 	_timer_label.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_timer_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(_timer_label)
 	return row

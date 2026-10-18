@@ -163,7 +163,7 @@ func _plate_size() -> int:
 
 
 func _plate_w() -> float:
-	return clampf(_hut_px * 1.5, 112.0, 200.0)
+	return clampf(_hut_px * 1.4, 108.0, 190.0)
 
 
 func _process(delta: float) -> void:
@@ -470,13 +470,9 @@ func _draw_rich() -> void:
 	var c: Vector2 = get_meta("centre", size * 0.5)
 	draw_set_transform(_shake_off, 0.0, Vector2.ONE)
 	_draw_wash(cur, p)
+	_draw_fire(c)                                  # the fire is the back of the scene: plates and huts sit in front of it
 	for e in _order:
-		if (_pos[e.alias] as Vector2).y <= c.y:
-			_draw_home(e, font, ink)
-	_draw_fire(c)
-	for e in _order:
-		if (_pos[e.alias] as Vector2).y > c.y:
-			_draw_home(e, font, ink)
+		_draw_home(e, font, ink)
 	if not cur.is_empty():
 		_draw_beat(cur, p, c)
 	_pool.draw_texts(self, font, fs + 6, ink)

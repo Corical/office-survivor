@@ -100,10 +100,17 @@ func _podium(m: Dictionary, ranks: Array) -> HBoxContainer:
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.set_meta("id", "podium")
 	var shown := mini(3, m.rows.size())
+	var by_place: Array = []                        # winners take the top steps; the server's order decides within each group
+	for i in m.rows.size():
+		if m.rows[i].is_winner:
+			by_place.append(i)
+	for i in m.rows.size():
+		if not m.rows[i].is_winner:
+			by_place.append(i)
 	for slot in PODIUM_ORDER:
 		if slot >= shown:
 			continue
-		var r: Dictionary = m.rows[slot]
+		var r: Dictionary = m.rows[by_place[slot]]
 		var column := Ui.vbox(6)
 		column.size_flags_vertical = Control.SIZE_SHRINK_END
 		column.set_meta("id", "podium_" + r.alias)
@@ -119,7 +126,7 @@ func _podium(m: Dictionary, ranks: Array) -> HBoxContainer:
 		column.add_child(who)
 		var step := Ui.card("PlinthFirst" if slot == 0 else "Plinth")
 		step.custom_minimum_size = Vector2(0, STEP_MIN_H[slot])
-		var rank := Ui.label(Words.render("ui.rank", {"n": ranks[slot]}), "", "RankLabel")
+		var rank := Ui.label(Words.render("ui.rank", {"n": ranks[by_place[slot]]}), "", "RankLabel")
 		rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		step.add_child(rank)
 		column.add_child(step)
@@ -185,7 +192,7 @@ func _player_card(m: Dictionary, r: Dictionary, rank: int, best: Dictionary) -> 
 		var v: int = int(r.cells[c.id])
 		var is_top: bool = c.highlight and best.get(c.id, -1) == v and v > 0
 		var cell := Ui.vbox(0)
-		cell.add_child(Ui.name_label(Words.render(c.key), "head_" + c.id, "MutedLabel"))
+		cell.add_child(Ui.label(Words.render(c.key), "head_" + c.id, "MutedLabel"))
 		var value := Ui.name_label(("[%d]" % v) if is_top else str(v), "cell_%s_%s" % [r.alias, c.id], "StatLabel")
 		cell.add_child(value)
 		stats.add_child(cell)

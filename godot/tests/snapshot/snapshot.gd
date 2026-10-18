@@ -192,7 +192,7 @@ func _night(round_view: Dictionary, me: String) -> Dictionary:
 		],
 		"private": [
 			{"code": "scavenged", "args": {"found": 2}},
-			{"code": "guard_up_1", "args": {}},
+			{"code": "guard_up_1", "args": {"night": int(round_view.round)}},
 			{"code": "stole", "args": {"target": y, "amount": 2}},
 			{"code": "steal_caught", "args": {"target": z, "paid": 2}},
 			{"code": "steal_empty", "args": {"target": x}},
