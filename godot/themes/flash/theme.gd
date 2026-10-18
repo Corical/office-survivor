@@ -139,7 +139,7 @@ static func _fx() -> Dictionary:
 		"embers": {"amount": 34, "lifetime": 6.0, "motion": true},
 		"flicker": {"strength": 0.2, "motion": true},
 		# screen-to-screen
-		"transition": {"fade": 0.25, "slide": 30.0},
+		"transition": {"fade": 0.18, "slide": 24.0},
 		# buttons and entrances (screens/ui.gd)
 		"press": {"down": 0.93, "up": 1.07, "time": 0.2},
 		"intro": {"time": 0.38, "rise": 28.0, "stagger": 0.07},

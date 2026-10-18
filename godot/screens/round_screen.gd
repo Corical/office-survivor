@@ -419,29 +419,31 @@ func _roster() -> Control:
 	var s := Ui.vbox(8)
 	card.add_child(s)
 	s.add_child(Ui.label(Words.render("ui.roster"), "", "MutedLabel"))
-	var row := Ui.hbox(8)
+	var grid := GridContainer.new()
+	grid.columns = 2                                  # two people a row: a face beside the name and band, wide enough for a long name
+	grid.add_theme_constant_override("h_separation", 14)
+	grid.add_theme_constant_override("v_separation", 10)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for e in _m.roster:
-		var cell := Ui.vbox(2)
+		var cell := Ui.hbox(10)
 		cell.set_meta("id", "home_" + e.alias)
 		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var face := Ui.avatar(e.alias, _avatars)
 		if face != null:
-			var pic := Ui.picture(face, Vector2(0, 56))
-			cell.add_child(pic)
-		cell.add_child(Ui.name_label(e.alias, "", "NameLabel"))
+			cell.add_child(Ui.picture(face, Vector2(54, 54)))
+		var words := Ui.vbox(0)
+		words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		words.add_child(Ui.name_label(e.alias, "", "NameLabel"))
 		var sub := ""
 		if e.is_me:
 			sub = Words.render("ui.you_mark")
 		elif e.band != "":
 			sub = Words.render(e.band)
 		if sub != "":
-			var small := Ui.name_label(sub, "", "MutedLabel")
-			cell.add_child(small)
-		for c in cell.get_children():
-			if c is Label:
-				c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		row.add_child(cell)
-	s.add_child(row)
+			words.add_child(Ui.name_label(sub, "", "MutedLabel"))
+		cell.add_child(words)
+		grid.add_child(cell)
+	s.add_child(grid)
 	return card
 
 

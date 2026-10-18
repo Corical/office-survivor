@@ -18,7 +18,8 @@ const OFFSTAGE := "@offstage"
 const PLATE_H := 52.0
 const SHAKE_DECAY := 46.0               # chosen: pixels of shake lost per second
 const FLASH_DECAY := 2.6                # chosen: flash alpha lost per second
-const SKIP_ROOM := 130.0                # chosen: space kept free at the top right for the Skip pill
+const CAPTION_H := 46.0                 # chosen: the strip at the top that holds the line being played
+const SKIP_ROOM := 130.0               # chosen: space kept free at the top right for the Skip pill
 
 var _roster: Array = []
 var _beats: Array = []
@@ -124,11 +125,15 @@ func _load() -> void:
 
 func _layout() -> void:
 	_pos = {}
-	var hs := clampf(minf(size.x * 0.30, size.y * 0.24), 64.0, 170.0)
+	# The ring fills the Stage. Plates go above the huts in the top half and below them in the bottom half, so the
+	# vertical room needed is: caption strip + plate + hut at the top, hut + plate at the bottom. The centre is chosen so
+	# both ends have the same room; the radius is whatever is left, so a tall desktop Stage gets a big ring.
+	var hs := clampf(minf(size.x * 0.27, size.y * 0.2), 64.0, 190.0)
 	_hut_px = hs
-	var c := Vector2(size.x * 0.5, size.y * 0.5 + 10.0)
-	var ry := maxf(40.0, size.y * 0.5 - 10.0 - hs * 0.5 - PLATE_H - 6.0)
-	var rx := maxf(40.0, minf(size.x * 0.5 - hs * 0.5 - 14.0, ry * 1.45))
+	var plate := PLATE_H + 2.0
+	var c := Vector2(size.x * 0.5, (size.y + CAPTION_H + 0.06 * hs) * 0.5)
+	var ry := maxf(36.0, minf(size.y - 4.0 - plate - hs * 0.5 - c.y, c.y - CAPTION_H - plate - hs * 0.56))
+	var rx := maxf(40.0, minf(size.x * 0.5 - hs * 0.5 - 10.0, ry * 1.8))
 	var others: Array = _roster.filter(func(e): return not e.is_me)
 	for e in _roster:
 		if e.is_me:
@@ -496,7 +501,7 @@ func _draw_fire(c: Vector2) -> void:
 	var fire: Texture2D = _tex.fire
 	if fire == null:
 		return
-	var s := _hut_px * 0.95
+	var s := _hut_px * 0.62
 	var fl := 1.0
 	if not Themes.fx("flicker").is_empty():
 		fl = 1.0 + 0.04 * sin(_t * 11.0) + 0.022 * sin(_t * 17.3 + 1.0)
@@ -545,7 +550,10 @@ func _draw_home(e: Dictionary, font: Font, ink: Color) -> void:
 ## The name plate under a home: the name, and below it my food (a number) or another player's band (an icon and a word).
 func _draw_plate(e: Dictionary, at: Vector2, font: Font, ink: Color) -> void:
 	var pw := _plate_w()
-	var rect := Rect2(clampf(at.x - pw * 0.5, 4.0, maxf(4.0, size.x - pw - 4.0)), at.y + _hut_px * 0.5 + 2.0, pw, PLATE_H)
+	var centre: Vector2 = get_meta("centre", size * 0.5)
+	var above: bool = at.y < centre.y - _hut_px * 0.4          # homes in the top half carry their plate above, clear of the fire
+	var py := at.y - _hut_px * 0.56 - PLATE_H - 2.0 if above else at.y + _hut_px * 0.5 + 2.0
+	var rect := Rect2(clampf(at.x - pw * 0.5, 4.0, maxf(4.0, size.x - pw - 4.0)), py, pw, PLATE_H)
 	var sb := get_theme_stylebox("plate_me" if e.is_me else "plate", "Stage")
 	draw_style_box(sb, rect)
 	var ps := _plate_size()
