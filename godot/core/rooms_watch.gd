@@ -96,14 +96,14 @@ func sent(now: int) -> void:
 	_next_poll_ms = now + (SLOW_POLL_MS if _hidden else POLL_MS)
 	if _awaiting_since < 0:
 		_awaiting_since = now                 # the clock runs from the OLDEST unanswered request
-	if not supported:
-		loading = true
+	if not supported and not _hidden:
+		loading = true                            # a list we gave up on is not "loading" again at every slow poll
 
 
 ## True when this call changed what the screen shows (silence hid the list).
 func tick(now: int) -> bool:
 	if watching and _awaiting_since >= 0 and now - _awaiting_since >= SILENCE_MS:
-		_hide()
+		_hide(now)
 		return true
 	return false
 
@@ -130,24 +130,25 @@ func on_reply(raw: Variant) -> bool:
 
 ## An `error` that answers list_rooms. `rate_limited` is an answer ("the list you have is current"); anything else means
 ## this server does not do lists.
-func on_error(code: String) -> bool:
+func on_error(code: String, now: int) -> bool:
 	if not watching:
 		return false
 	_awaiting_since = -1
 	if code == "rate_limited":
 		loading = false
 		return false
-	_hide()
+	_hide(now)
 	return true
 
 
-func _hide() -> void:
+func _hide(now: int) -> void:
 	supported = false
 	rooms = []
 	stale = false
 	loading = false
 	_hidden = true
 	_awaiting_since = -1
+	_next_poll_ms = now + SLOW_POLL_MS            # having given up, ask rarely, not at the very next beat
 
 
 # ---------------- hostile input ----------------
@@ -228,11 +229,12 @@ static func clean_name(v: Variant) -> String:
 		if looked > 400 or out.length() >= MAX_NAME + 1:
 			break                                       # a 10 000 character name is cut before it costs anything
 		var c := s.unicode_at(i)
-		var junk := c < 32 or (c >= 127 and c < 160) or (c >= 0x200B and c <= 0x200F) or (c >= 0x202A and c <= 0x202E) \
+		var blank := c == 32 or c == 9 or c == 10 or c == 13 or c == 0xA0 or c == 0x3000       # tab and line breaks read as a space
+		var junk := (c < 32 and not blank) or (c >= 127 and c < 160) or (c >= 0x200B and c <= 0x200F) or (c >= 0x202A and c <= 0x202E) \
 			or (c >= 0x2060 and c <= 0x2069) or c == 0xFEFF or c == 0xFFFC or c == 0xFFFD or (c >= 0xD800 and c <= 0xDFFF)
 		if junk:
 			continue
-		if c == 32 or c == 0xA0 or c == 0x3000:
+		if blank:
 			if last_space:
 				continue
 			last_space = true

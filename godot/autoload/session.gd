@@ -358,7 +358,7 @@ func _on_error(msg: Dictionary) -> void:
 	# An error answers the request sent last. If that was the list request, it says "no lists here" (or "slow down"),
 	# and it is not something to tell the player about.
 	if rooms.awaiting() and _list_wire > _intent_wire:
-		if rooms.on_error(code):
+		if rooms.on_error(code, clock.now_msec()):
 			rooms_changed.emit(rooms.model())
 		Log.event("session", "list_rooms_error", {"code": code})
 		return
@@ -549,9 +549,10 @@ func rooms_watch(on: bool) -> void:
 		if screen != "title" or locked_out:
 			return
 		_watchers += 1
-		if _watchers == 1:
-			rooms.start(clock.now_msec())
-			rooms_changed.emit(rooms.model())
+		if _watchers > 1:
+			return                               # the list is already running for another screen
+		rooms.start(clock.now_msec())
+		rooms_changed.emit(rooms.model())
 		_watch_connect()
 		return
 	if _watchers == 0:
