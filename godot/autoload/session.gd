@@ -29,10 +29,10 @@ var ruleset_factory: Callable = RulesetRegistry.try_make
 ## The game id of the room I am in when this client does not have it ("" when it does): the room runs under an inert ruleset
 ## so its frames are never misread as another game's.
 var unsupported_game := ""
-var server_url := "wss://raspberrypi.tail87b476.ts.net:8470"      # the arena server on the Pi (tailnet only); Settings can change it
+var server_url := "wss://raspberrypi.tail87b476.ts.net/arena"     # the arena server on the Pi, public through Tailscale Funnel; Settings can change it
 ## Old defaults that earlier builds saved to disk as if the player had chosen them. A saved copy of one of these is not a
 ## choice, so it is dropped on load and the current default applies (an address the player typed is always kept).
-const RETIRED_DEFAULT_URLS: Array[String] = ["ws://127.0.0.1:8765"]
+const RETIRED_DEFAULT_URLS: Array[String] = ["ws://127.0.0.1:8765", "wss://raspberrypi.tail87b476.ts.net:8470"]
 const CONTINUE_ACK_MARGIN_MS := 10000          # after the reveal's own clock runs out, the next view should come within this
 const CONTINUE_ACK_MAX_MS := 120000            # chosen: no reveal waits longer than two minutes, whatever the server says
 ## The exact words the server uses when a kick targets a seat that is no longer in the room (docs/arena/GODOT_FOUNDATION.md).
