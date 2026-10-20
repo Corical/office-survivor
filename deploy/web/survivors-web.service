@@ -1,0 +1,26 @@
+[Unit]
+Description=Survivors web build (static files for the browser client)
+After=network.target
+
+[Service]
+User=arena
+Group=arena
+WorkingDirectory=/opt/survivors-web
+Environment=WEB_ROOT=/opt/survivors-web/www
+Environment=WEB_HOST=127.0.0.1
+Environment=WEB_PORT=8771
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /opt/survivors-web/survivors_web.py
+Restart=always
+RestartSec=5
+# The Pi runs about 25 other services: this one gets a ceiling.
+MemoryMax=128M
+CPUQuota=25%
+TasksMax=32
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target
